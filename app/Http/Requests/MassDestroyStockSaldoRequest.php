@@ -1,0 +1,26 @@
+<?php
+
+namespace App\Http\Requests;
+
+use App\Models\StockSaldo;
+use Gate;
+use Illuminate\Foundation\Http\FormRequest;
+use Symfony\Component\HttpFoundation\Response;
+
+class MassDestroyStockSaldoRequest extends FormRequest
+{
+    public function authorize()
+    {
+        abort_if(Gate::denies('stock_saldo_delete'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+
+        return true;
+    }
+
+    public function rules()
+    {
+        return [
+            'ids'   => 'required|array',
+            'ids.*' => 'exists:stock_saldos,id',
+        ];
+    }
+}

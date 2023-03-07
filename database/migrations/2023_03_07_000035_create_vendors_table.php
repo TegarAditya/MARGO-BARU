@@ -1,0 +1,23 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+class CreateVendorsTable extends Migration
+{
+    public function up()
+    {
+        Schema::create('vendors', function (Blueprint $table) {
+            $table->bigIncrements('id');
+            $table->string('code')->unique();
+            $table->string('name');
+            $table->string('type');
+            $table->string('contact')->nullable();
+            $table->longText('address')->nullable();
+            $table->string('company')->nullable();
+            $table->timestamps();
+            $table->softDeletes();
+        });
+    }
+}
