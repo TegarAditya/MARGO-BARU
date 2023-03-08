@@ -45,6 +45,9 @@ class UpdateBookRequest extends FormRequest
                 'required',
                 'integer',
             ],
+            'photo' => [
+                'array',
+            ],
         ];
     }
 }

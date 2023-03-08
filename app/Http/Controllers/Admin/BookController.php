@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Traits\MediaUploadingTrait;
 use App\Http\Requests\MassDestroyBookRequest;
 use App\Http\Requests\StoreBookRequest;
 use App\Http\Requests\UpdateBookRequest;
@@ -15,11 +16,14 @@ use App\Models\Mapel;
 use App\Models\Semester;
 use Gate;
 use Illuminate\Http\Request;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Symfony\Component\HttpFoundation\Response;
 use Yajra\DataTables\Facades\DataTables;
 
 class BookController extends Controller
 {
+    use MediaUploadingTrait;
+
     public function index(Request $request)
     {
         abort_if(Gate::denies('book_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
@@ -110,6 +114,14 @@ class BookController extends Controller
     {
         $book = Book::create($request->all());
 
+        foreach ($request->input('photo', []) as $file) {
+            $book->addMedia(storage_path('tmp/uploads/' . basename($file)))->toMediaCollection('photo');
+        }
+
+        if ($media = $request->input('ck-media', false)) {
+            Media::whereIn('id', $media)->update(['model_id' => $book->id]);
+        }
+
         return redirect()->route('admin.books.index');
     }
 
@@ -137,6 +149,20 @@ class BookController extends Controller
     public function update(UpdateBookRequest $request, Book $book)
     {
         $book->update($request->all());
+
+        if (count($book->photo) > 0) {
+            foreach ($book->photo as $media) {
+                if (! in_array($media->file_name, $request->input('photo', []))) {
+                    $media->delete();
+                }
+            }
+        }
+        $media = $book->photo->pluck('file_name')->toArray();
+        foreach ($request->input('photo', []) as $file) {
+            if (count($media) === 0 || ! in_array($file, $media)) {
+                $book->addMedia(storage_path('tmp/uploads/' . basename($file)))->toMediaCollection('photo');
+            }
+        }
 
         return redirect()->route('admin.books.index');
     }
@@ -168,5 +194,17 @@ class BookController extends Controller
         }
 
         return response(null, Response::HTTP_NO_CONTENT);
+    }
+
+    public function storeCKEditorImages(Request $request)
+    {
+        abort_if(Gate::denies('book_create') && Gate::denies('book_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+
+        $model         = new Book();
+        $model->id     = $request->input('crud_id', 0);
+        $model->exists = true;
+        $media         = $model->addMediaFromRequest('upload')->toMediaCollection('ck-media');
+
+        return response()->json(['id' => $media->id, 'url' => $media->getUrl()], Response::HTTP_CREATED);
     }
 }

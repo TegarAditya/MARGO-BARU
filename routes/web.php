@@ -96,6 +96,8 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
 
     // Book
     Route::delete('books/destroy', 'BookController@massDestroy')->name('books.massDestroy');
+    Route::post('books/media', 'BookController@storeMedia')->name('books.storeMedia');
+    Route::post('books/ckmedia', 'BookController@storeCKEditorImages')->name('books.storeCKEditorImages');
     Route::resource('books', 'BookController');
 
     // Book Variant
