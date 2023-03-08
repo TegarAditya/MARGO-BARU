@@ -1,6 +1,9 @@
 <?php
 
 Route::group(['prefix' => 'v1', 'as' => 'api.', 'namespace' => 'Api\V1\Admin', 'middleware' => ['auth:sanctum']], function () {
+    // Marketing Area
+    Route::apiResource('marketing-areas', 'MarketingAreaApiController');
+
     // Book
     Route::apiResource('books', 'BookApiController');
 
@@ -12,4 +15,16 @@ Route::group(['prefix' => 'v1', 'as' => 'api.', 'namespace' => 'Api\V1\Admin', '
 
     // Materials
     Route::apiResource('materials', 'MaterialsApiController');
+
+    // Sales Order
+    Route::apiResource('sales-orders', 'SalesOrderApiController');
+
+    // Delivery Order
+    Route::apiResource('delivery-orders', 'DeliveryOrderApiController');
+
+    // Payment
+    Route::apiResource('payments', 'PaymentApiController');
+
+    // Vendor
+    Route::apiResource('vendors', 'VendorApiController');
 });
