@@ -5,6 +5,7 @@ Route::group(['prefix' => 'v1', 'as' => 'api.', 'namespace' => 'Api\V1\Admin', '
     Route::apiResource('marketing-areas', 'MarketingAreaApiController');
 
     // Book
+    Route::post('books/media', 'BookApiController@storeMedia')->name('books.storeMedia');
     Route::apiResource('books', 'BookApiController');
 
     // Book Variant

@@ -349,6 +349,8 @@ return [
             'updated_at_helper'  => ' ',
             'deleted_at'         => 'Deleted at',
             'deleted_at_helper'  => ' ',
+            'photo'              => 'Photo',
+            'photo_helper'       => ' ',
         ],
     ],
     'bookVariant' => [

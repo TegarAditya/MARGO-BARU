@@ -45,6 +45,9 @@ class StoreBookRequest extends FormRequest
                 'required',
                 'integer',
             ],
+            'photo' => [
+                'array',
+            ],
         ];
     }
 }
