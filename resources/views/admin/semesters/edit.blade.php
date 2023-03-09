@@ -19,6 +19,19 @@
                 <span class="help-block">{{ trans('cruds.semester.fields.name_helper') }}</span>
             </div>
             <div class="form-group">
+                <label class="required">{{ trans('cruds.semester.fields.type') }}</label>
+                <select class="form-control {{ $errors->has('type') ? 'is-invalid' : '' }}" name="type" id="type" required>
+                    <option value disabled {{ old('type', null) === null ? 'selected' : '' }}>{{ trans('global.pleaseSelect') }}</option>
+                    @foreach(App\Models\Semester::TYPE_SELECT as $key => $label)
+                        <option value="{{ $key }}" {{ old('type', $semester->type) === (string) $key ? 'selected' : '' }}>{{ $label }}</option>
+                    @endforeach
+                </select>
+                @if($errors->has('type'))
+                    <span class="text-danger">{{ $errors->first('type') }}</span>
+                @endif
+                <span class="help-block">{{ trans('cruds.semester.fields.type_helper') }}</span>
+            </div>
+            <div class="form-group">
                 <label for="start_date">{{ trans('cruds.semester.fields.start_date') }}</label>
                 <input class="form-control date {{ $errors->has('start_date') ? 'is-invalid' : '' }}" type="text" name="start_date" id="start_date" value="{{ old('start_date', $semester->start_date) }}">
                 @if($errors->has('start_date'))

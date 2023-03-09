@@ -21,6 +21,9 @@ class StoreSemesterRequest extends FormRequest
                 'string',
                 'required',
             ],
+            'type' => [
+                'required',
+            ],
             'start_date' => [
                 'date_format:' . config('panel.date_format'),
                 'nullable',

@@ -183,6 +183,8 @@ return [
             'deleted_at_helper' => ' ',
             'code'              => 'Code',
             'code_helper'       => ' ',
+            'type'              => 'Type',
+            'type_helper'       => ' ',
         ],
     ],
     'cover' => [

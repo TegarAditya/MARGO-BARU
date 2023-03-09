@@ -32,6 +32,9 @@
                         {{ trans('cruds.semester.fields.name') }}
                     </th>
                     <th>
+                        {{ trans('cruds.semester.fields.type') }}
+                    </th>
+                    <th>
                         {{ trans('cruds.semester.fields.start_date') }}
                     </th>
                     <th>
@@ -98,6 +101,7 @@
       { data: 'placeholder', name: 'placeholder' },
 { data: 'code', name: 'code' },
 { data: 'name', name: 'name' },
+{ data: 'type', name: 'type' },
 { data: 'start_date', name: 'start_date' },
 { data: 'end_date', name: 'end_date' },
 { data: 'status', name: 'status' },
