@@ -12,6 +12,7 @@ class CreateSemestersTable extends Migration
             $table->bigIncrements('id');
             $table->string('code')->nullable();
             $table->string('name');
+            $table->string('type');
             $table->date('start_date')->nullable();
             $table->date('end_date')->nullable();
             $table->boolean('status')->default(0);

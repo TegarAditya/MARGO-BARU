@@ -49,6 +49,9 @@ class SemesterController extends Controller
             $table->editColumn('name', function ($row) {
                 return $row->name ? $row->name : '';
             });
+            $table->editColumn('type', function ($row) {
+                return $row->type ? Semester::TYPE_SELECT[$row->type] : '';
+            });
 
             $table->editColumn('status', function ($row) {
                 return '<input type="checkbox" disabled ' . ($row->status ? 'checked' : null) . '>';

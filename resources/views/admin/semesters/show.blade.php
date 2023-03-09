@@ -33,6 +33,14 @@
                     </tr>
                     <tr>
                         <th>
+                            {{ trans('cruds.semester.fields.type') }}
+                        </th>
+                        <td>
+                            {{ App\Models\Semester::TYPE_SELECT[$semester->type] ?? '' }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>
                             {{ trans('cruds.semester.fields.start_date') }}
                         </th>
                         <td>
