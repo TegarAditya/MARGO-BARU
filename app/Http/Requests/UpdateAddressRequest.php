@@ -17,6 +17,10 @@ class UpdateAddressRequest extends FormRequest
     public function rules()
     {
         return [
+            'salesperson_id' => [
+                'required',
+                'integer',
+            ],
             'address' => [
                 'required',
             ],

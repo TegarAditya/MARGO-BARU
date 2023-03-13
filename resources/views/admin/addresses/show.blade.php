@@ -17,6 +17,14 @@
                 <tbody>
                     <tr>
                         <th>
+                            {{ trans('cruds.address.fields.salesperson') }}
+                        </th>
+                        <td>
+                            {{ $address->salesperson->name ?? '' }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>
                             {{ trans('cruds.address.fields.address') }}
                         </th>
                         <td>
