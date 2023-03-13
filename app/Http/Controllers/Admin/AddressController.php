@@ -8,6 +8,7 @@ use App\Http\Requests\MassDestroyAddressRequest;
 use App\Http\Requests\StoreAddressRequest;
 use App\Http\Requests\UpdateAddressRequest;
 use App\Models\Address;
+use App\Models\Salesperson;
 use Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -63,7 +64,9 @@ class AddressController extends Controller
     {
         abort_if(Gate::denies('address_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        return view('admin.addresses.create');
+        $salespeople = Salesperson::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+
+        return view('admin.addresses.create', compact('salespeople'));
     }
 
     public function store(StoreAddressRequest $request)
@@ -77,9 +80,11 @@ class AddressController extends Controller
     {
         abort_if(Gate::denies('address_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
+        $salespeople = Salesperson::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+
         $address->load('salesperson', 'marketing_area');
 
-        return view('admin.addresses.edit', compact('address'));
+        return view('admin.addresses.edit', compact('address', 'salespeople'));
     }
 
     public function update(UpdateAddressRequest $request, Address $address)
