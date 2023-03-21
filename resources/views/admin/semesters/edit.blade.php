@@ -11,6 +11,14 @@
             @method('PUT')
             @csrf
             <div class="form-group">
+                <label for="code">{{ trans('cruds.semester.fields.code') }}</label>
+                <input class="form-control {{ $errors->has('code') ? 'is-invalid' : '' }}" type="text" name="code" id="code" value="{{ old('code', $semester->code) }}">
+                @if($errors->has('code'))
+                    <span class="text-danger">{{ $errors->first('code') }}</span>
+                @endif
+                <span class="help-block">{{ trans('cruds.semester.fields.code_helper') }}</span>
+            </div>
+            <div class="form-group">
                 <label class="required" for="name">{{ trans('cruds.semester.fields.name') }}</label>
                 <input class="form-control {{ $errors->has('name') ? 'is-invalid' : '' }}" type="text" name="name" id="name" value="{{ old('name', $semester->name) }}" required>
                 @if($errors->has('name'))
