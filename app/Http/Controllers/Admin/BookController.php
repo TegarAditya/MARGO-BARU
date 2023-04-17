@@ -8,17 +8,23 @@ use App\Http\Requests\MassDestroyBookRequest;
 use App\Http\Requests\StoreBookRequest;
 use App\Http\Requests\UpdateBookRequest;
 use App\Models\Book;
+use App\Models\BookVariant;
 use App\Models\Cover;
 use App\Models\Jenjang;
-use App\Models\Kela;
+use App\Models\Kelas;
 use App\Models\Kurikulum;
 use App\Models\Mapel;
 use App\Models\Semester;
+use App\Models\Halaman;
 use Gate;
+use DB;
 use Illuminate\Http\Request;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Symfony\Component\HttpFoundation\Response;
 use Yajra\DataTables\Facades\DataTables;
+use Alert;
+use Excel;
+use App\Imports\BookImport;
 
 class BookController extends Controller
 {
@@ -36,8 +42,8 @@ class BookController extends Controller
             $table->addColumn('actions', '&nbsp;');
 
             $table->editColumn('actions', function ($row) {
-                $viewGate      = 'book_show';
-                $editGate      = 'book_edit';
+                $viewGate      = 'book_show_hide';
+                $editGate      = 'book_edit_hide';
                 $deleteGate    = 'book_delete';
                 $crudRoutePart = 'books';
 
@@ -56,34 +62,20 @@ class BookController extends Controller
             $table->editColumn('name', function ($row) {
                 return $row->name ? $row->name : '';
             });
-            $table->editColumn('description', function ($row) {
-                return $row->description ? $row->description : '';
-            });
+
             $table->addColumn('jenjang_name', function ($row) {
                 return $row->jenjang ? $row->jenjang->name : '';
-            });
-
-            $table->addColumn('kurikulum_name', function ($row) {
-                return $row->kurikulum ? $row->kurikulum->name : '';
-            });
-
-            $table->addColumn('mapel_name', function ($row) {
-                return $row->mapel ? $row->mapel->name : '';
-            });
-
-            $table->addColumn('kelas_name', function ($row) {
-                return $row->kelas ? $row->kelas->name : '';
-            });
-
-            $table->addColumn('cover_name', function ($row) {
-                return $row->cover ? $row->cover->name : '';
             });
 
             $table->addColumn('semester_name', function ($row) {
                 return $row->semester ? $row->semester->name : '';
             });
 
-            $table->rawColumns(['actions', 'placeholder', 'jenjang', 'kurikulum', 'mapel', 'kelas', 'cover', 'semester']);
+            $table->addColumn('stock', function ($row) {
+                return $row->buku ? $row->buku->stock : '';
+            });
+
+            $table->rawColumns(['actions', 'placeholder', 'jenjang', 'semester']);
 
             return $table->make(true);
         }
@@ -101,26 +93,83 @@ class BookController extends Controller
 
         $mapels = Mapel::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
-        $kelas = Kela::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $kelas = Kelas::pluck('name', 'id');
 
         $covers = Cover::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
-        $semesters = Semester::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $semesters = Semester::where('status', 1)->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
-        return view('admin.books.create', compact('covers', 'jenjangs', 'kelas', 'kurikulums', 'mapels', 'semesters'));
+        $halamen = Halaman::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+
+        return view('admin.books.create', compact('covers', 'jenjangs', 'kelas', 'kurikulums', 'mapels', 'semesters', 'halamen'));
     }
 
     public function store(StoreBookRequest $request)
     {
-        $book = Book::create($request->all());
+        $kelas = $request->kelas;
+        $jenjang_id = $request->jenjang_id;
+        $kurikulum_id = $request->kurikulum_id;
+        $mapel_id = $request->mapel_id;
+        $cover_id = $request->cover_id;
+        $semester_id = $request->semester_id;
+        $halaman_id = $request->halaman_id;
 
-        foreach ($request->input('photo', []) as $file) {
-            $book->addMedia(storage_path('tmp/uploads/' . basename($file)))->toMediaCollection('photo');
+        DB::beginTransaction();
+        try {
+            foreach($kelas as $kelas_id) {
+                $code = Book::generateCode($jenjang_id, $kurikulum_id, $mapel_id, $kelas_id, $cover_id, $semester_id);
+                $name = Book::generateName($jenjang_id, $kurikulum_id, $mapel_id, $kelas_id, $cover_id, $semester_id);
+
+                $buku = Book::create([
+                    'code' => $code,
+                    'name' => $name,
+                    'jenjang_id' => $jenjang_id,
+                    'kurikulum_id' => $kurikulum_id,
+                    'mapel_id' => $mapel_id,
+                    'kelas_id' => $kelas_id,
+                    'cover_id' => $cover_id,
+                    'semester_id' => $semester_id,
+                ]);
+
+                foreach(BookVariant::TYPE_SELECT as $key => $label) {
+                    $stock = ($key == 'L') ? $request->stock : 0;
+                    $price = ($key == 'L') ? $request->price : 0;
+                    $cost = ($key == 'L') ? $request->cost : 0;
+
+                    BookVariant::create([
+                        'book_id' => $buku->id,
+                        'code' => $key . '-' .$code,
+                        'type' => $key,
+                        'jenjang_id' => $jenjang_id,
+                        'semester_id' => $semester_id,
+                        'kurikulum_id' => $kurikulum_id,
+                        'halaman_id' => $halaman_id,
+                        'warehouse_id' => 1,
+                        'stock' => $stock,
+                        'unit_id' => 1,
+                        'price' => $price,
+                        'cost' => $cost,
+                        'status' => 1,
+                    ]);
+                }
+            }
+
+            DB::commit();
+            Alert::success('Success', 'Buku berhasil disimpan');
+        } catch (\Exception $e) {
+            DB::rollback();
+            Alert::error('Error', $e->getMessage());
+
+            return redirect()->back()->withInput();
         }
 
-        if ($media = $request->input('ck-media', false)) {
-            Media::whereIn('id', $media)->update(['model_id' => $book->id]);
-        }
+        // foreach ($request->input('photo', []) as $file) {
+        //     $book->addMedia(storage_path('tmp/uploads/' . basename($file)))->toMediaCollection('photo');
+        // }
+
+        // if ($media = $request->input('ck-media', false)) {
+        //     Media::whereIn('id', $media)->update(['model_id' => $book->id]);
+        // }
 
         return redirect()->route('admin.books.index');
     }
@@ -135,7 +184,7 @@ class BookController extends Controller
 
         $mapels = Mapel::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
-        $kelas = Kela::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $kelas = Kelas::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
         $covers = Cover::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
@@ -180,6 +229,11 @@ class BookController extends Controller
     {
         abort_if(Gate::denies('book_delete'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
+        $variants = BookVariant::where('book_id', $book->id)->get();
+        foreach($variants as $variant) {
+            $variant->delete();
+        }
+
         $book->delete();
 
         return back();
@@ -206,5 +260,29 @@ class BookController extends Controller
         $media         = $model->addMediaFromRequest('upload')->toMediaCollection('ck-media');
 
         return response()->json(['id' => $media->id, 'url' => $media->getUrl()], Response::HTTP_CREATED);
+    }
+
+    public function import(Request $request)
+    {
+        $file = $request->file('import_file');
+        $request->validate([
+            'import_file' => 'mimes:csv,txt,xls,xlsx',
+        ]);
+
+        try {
+            Excel::import(new BookImport(), $file);
+        } catch (\Exception $e) {
+            Alert::error('Error', $e->getMessage());
+            return redirect()->back();
+        }
+
+        Alert::success('Success', 'Buku berhasil di import');
+        return redirect()->back();
+    }
+
+    public function template_import()
+    {
+        $filepath = public_path('import-template\BOOK_TEMPLATE.xlsx');
+        return response()->download($filepath);
     }
 }

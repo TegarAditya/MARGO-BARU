@@ -14,6 +14,10 @@ class DatabaseSeeder extends Seeder
             PermissionRoleTableSeeder::class,
             UsersTableSeeder::class,
             RoleUserTableSeeder::class,
+            MarketingAreaTableSeeder::class,
+            SemesterTableSeeder::class,
+            UnitTableSeeder::class,
+            WarehouseTableSeeder::class
         ]);
     }
 }

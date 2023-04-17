@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Http\Controllers\Traits\CsvImportTrait;
 use App\Http\Requests\MassDestroyHalamanRequest;
 use App\Http\Requests\StoreHalamanRequest;
 use App\Http\Requests\UpdateHalamanRequest;
@@ -12,10 +11,12 @@ use Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Yajra\DataTables\Facades\DataTables;
+use Alert;
+use Excel;
+use App\Imports\HalamanImport;
 
 class HalamanController extends Controller
 {
-    use CsvImportTrait;
 
     public function index(Request $request)
     {
@@ -32,7 +33,7 @@ class HalamanController extends Controller
                 $viewGate      = 'halaman_show';
                 $editGate      = 'halaman_edit';
                 $deleteGate    = 'halaman_delete';
-                $crudRoutePart = 'halamen';
+                $crudRoutePart = 'halaman';
 
                 return view('partials.datatablesActions', compact(
                     'viewGate',
@@ -55,42 +56,42 @@ class HalamanController extends Controller
             return $table->make(true);
         }
 
-        return view('admin.halamen.index');
+        return view('admin.halaman.index');
     }
 
     public function create()
     {
         abort_if(Gate::denies('halaman_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        return view('admin.halamen.create');
+        return view('admin.halaman.create');
     }
 
     public function store(StoreHalamanRequest $request)
     {
         $halaman = Halaman::create($request->all());
 
-        return redirect()->route('admin.halamen.index');
+        return redirect()->route('admin.halaman.index');
     }
 
     public function edit(Halaman $halaman)
     {
         abort_if(Gate::denies('halaman_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        return view('admin.halamen.edit', compact('halaman'));
+        return view('admin.halaman.edit', compact('halaman'));
     }
 
     public function update(UpdateHalamanRequest $request, Halaman $halaman)
     {
         $halaman->update($request->all());
 
-        return redirect()->route('admin.halamen.index');
+        return redirect()->route('admin.halaman.index');
     }
 
     public function show(Halaman $halaman)
     {
         abort_if(Gate::denies('halaman_show'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        return view('admin.halamen.show', compact('halaman'));
+        return view('admin.halaman.show', compact('halaman'));
     }
 
     public function destroy(Halaman $halaman)
@@ -111,5 +112,18 @@ class HalamanController extends Controller
         }
 
         return response(null, Response::HTTP_NO_CONTENT);
+    }
+
+    public function import(Request $request)
+    {
+        $file = $request->file('import_file');
+        $request->validate([
+            'import_file' => 'mimes:csv,txt,xls,xlsx',
+        ]);
+
+        Excel::import(new HalamanImport(), $file);
+
+        Alert::success('Success', 'Halaman berhasil di import');
+        return redirect()->back();
     }
 }

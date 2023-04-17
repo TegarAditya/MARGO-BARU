@@ -70,7 +70,7 @@ class Book extends Model implements HasMedia
 
     public function kelas()
     {
-        return $this->belongsTo(Kela::class, 'kelas_id');
+        return $this->belongsTo(Kelas::class, 'kelas_id');
     }
 
     public function cover()
@@ -83,6 +83,11 @@ class Book extends Model implements HasMedia
         return $this->belongsTo(Semester::class, 'semester_id');
     }
 
+    public function buku()
+    {
+        return $this->hasOne(BookVariant::class, 'book_id')->where('type', 'L');
+    }
+
     public function getPhotoAttribute()
     {
         $files = $this->getMedia('photo');
@@ -93,5 +98,29 @@ class Book extends Model implements HasMedia
         });
 
         return $files;
+    }
+
+    public static function generateCode($jenjang_id, $kurikulum_id, $mapel_id, $kelas_id, $cover_id, $semester_id)
+    {
+        $jenjang = Jenjang::find($jenjang_id)->code ?? '000';
+        $kurikulum = Kurikulum::find($kurikulum_id)->code ?? '00';
+        $mapel = Mapel::find($mapel_id)->code ?? '000';
+        $kelas = Kelas::find($kelas_id)->code ?? '00';
+        $cover = Cover::find($cover_id)->code ?? '000';
+        $semester = Semester::find($semester_id)->code ?? '0000';
+
+        return $jenjang. ''. $kurikulum. ''. $mapel. '' .$kelas. ''. $cover. ''. $semester;
+    }
+
+    public static function generateName($jenjang_id, $kurikulum_id, $mapel_id, $kelas_id, $cover_id, $semester_id)
+    {
+        $jenjang = Jenjang::find($jenjang_id)->name ?? 'Tidak Ada';
+        $kurikulum = Kurikulum::find($kurikulum_id)->name ?? 'Tidak Ada';
+        $mapel = Mapel::find($mapel_id)->name ?? 'Tidak Ada';
+        $kelas = Kelas::find($kelas_id)->name ?? 'Tidak Ada';
+        $cover = Cover::find($cover_id)->name ?? 'Tidak Ada';
+        $semester = Semester::find($semester_id)->name ?? 'Tidak Ada';
+
+        return $jenjang. ' - '. $kurikulum. ' - '. $mapel. ' - ' .$kelas. ' - '. $cover. ' - '. $semester;
     }
 }

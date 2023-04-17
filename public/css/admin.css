@@ -1,0 +1,119 @@
+/** Menu scrollbar **/
+.sidebar::-webkit-scrollbar {
+  width: .75rem;
+}
+
+.sidebar::-webkit-scrollbar-track {
+  background: #ccc;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+  background: #888;
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover {
+  background: #909090;
+}
+
+.sidebar::-webkit-scrollbar-thumb:active {
+  background: #767676;
+}
+
+/** Forms **/
+.form-group + .form-group {
+  margin-top: 0.75rem;
+}
+
+.text-field.text-field-sm {
+  padding: 0.25rem 0.5rem;
+}
+.text-field.text-field-sm .form-control {
+  font-size: 0.85rem;
+}
+
+.text-field-input {
+  display: flex;
+  align-items: center;
+  position: relative;
+  padding: 0.5rem 1rem;
+}
+.text-field-input *:not(.text-field-border) {
+  z-index: 5;
+}
+.text-field-input .form-control {
+  border: none;
+  padding: 0;
+  border-radius: 0;
+  flex: 1;
+  min-height: 0;
+  background: none
+}
+.text-field-input .form-control:focus {
+  outline: none;
+  box-shadow: none;
+}
+.text-field-input .form-control.shadow {
+  box-shadow: none !important;
+}
+
+.text-field-border {
+  z-index: 0;
+  background-color: #ffffff;
+  border: 1px solid #BDBDBD;
+  border-radius: 0.5rem;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  transition: 250ms ease-in-out border-color;
+}
+.text-field.border-none .text-field-border {
+  border-color: transparent;
+}
+.form-control.underline ~ .text-field-border {
+  border: none;
+  border-bottom: 2px solid #BDBDBD;
+  border-radius: 0;
+}
+.form-control.shadow ~ .text-field-border {
+  border: none;
+  box-shadow: 0 0.075rem 0.75rem rgba(37, 56, 124, 0.08), 0 0.075rem 0.375rem rgba(37, 56, 124, 0.04);
+}
+.form-control.form-control-sm ~ .text-field-border {
+  border-radius: 0.25rem;
+}
+.form-control.is-error ~ .text-field-border {
+  border-color: #f44336;
+}
+.form-control:focus ~ .text-field-border {
+  border-color: var(--primary);
+}
+
+input.hide-arrows {
+  -webkit-appearance: textfield;
+          appearance: textfield;
+  -moz-appearance: textfield;
+}
+input.hide-arrows::-webkit-outer-spin-button, input.hide-arrows::-webkit-inner-spin-button {
+  appearance: none;
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+@media only screen and (min-width: 760px) {
+    .usetwentyfour {
+        width: 380px !important;
+    }
+
+    .datepicker, .table-condensed {
+        width: 365px;
+        font-size: x-small;
+    }
+
+    .datepicker td,th{
+        text-align: center;
+        padding: 8px 12px;
+        font-size: 14px;
+    }
+}

@@ -38,6 +38,8 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     Route::delete('salespeople/destroy', 'SalespersonController@massDestroy')->name('salespeople.massDestroy');
     Route::post('salespeople/parse-csv-import', 'SalespersonController@parseCsvImport')->name('salespeople.parseCsvImport');
     Route::post('salespeople/process-csv-import', 'SalespersonController@processCsvImport')->name('salespeople.processCsvImport');
+    Route::post('salespeople/import', 'SalespersonController@import')->name('salespeople.import');
+    Route::get('salespeople/template-import', 'SalespersonController@template_import')->name('salespeople.templateImport');
     Route::resource('salespeople', 'SalespersonController');
 
     // Address
@@ -83,10 +85,9 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     Route::resource('kelas', 'KelasController');
 
     // Halaman
-    Route::delete('halamen/destroy', 'HalamanController@massDestroy')->name('halamen.massDestroy');
-    Route::post('halamen/parse-csv-import', 'HalamanController@parseCsvImport')->name('halamen.parseCsvImport');
-    Route::post('halamen/process-csv-import', 'HalamanController@processCsvImport')->name('halamen.processCsvImport');
-    Route::resource('halamen', 'HalamanController');
+    Route::delete('halaman/destroy', 'HalamanController@massDestroy')->name('halaman.massDestroy');
+    Route::post('halaman/import', 'HalamanController@import')->name('halaman.import');
+    Route::resource('halaman', 'HalamanController');
 
     // Unit
     Route::delete('units/destroy', 'UnitController@massDestroy')->name('units.massDestroy');
@@ -98,10 +99,13 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     Route::delete('books/destroy', 'BookController@massDestroy')->name('books.massDestroy');
     Route::post('books/media', 'BookController@storeMedia')->name('books.storeMedia');
     Route::post('books/ckmedia', 'BookController@storeCKEditorImages')->name('books.storeCKEditorImages');
+    Route::post('books/import', 'BookController@import')->name('books.import');
+    Route::get('books/template-import', 'BookController@template_import')->name('books.templateImport');
     Route::resource('books', 'BookController');
 
     // Book Variant
     Route::delete('book-variants/destroy', 'BookVariantController@massDestroy')->name('book-variants.massDestroy');
+    Route::get('book-variants/getProduct', 'BookVariantController@getProductList')->name('book-variants.getProduct');
     Route::resource('book-variants', 'BookVariantController');
 
     // Warehouse
@@ -126,6 +130,8 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     Route::delete('materials/destroy', 'MaterialsController@massDestroy')->name('materials.massDestroy');
     Route::post('materials/parse-csv-import', 'MaterialsController@parseCsvImport')->name('materials.parseCsvImport');
     Route::post('materials/process-csv-import', 'MaterialsController@processCsvImport')->name('materials.processCsvImport');
+    Route::post('materials/import', 'MaterialsController@import')->name('materials.import');
+    Route::get('materials/template-import', 'MaterialsController@template_import')->name('materials.templateImport');
     Route::resource('materials', 'MaterialsController');
 
     // Stock Adjustment Detail

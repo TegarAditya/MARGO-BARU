@@ -135,8 +135,8 @@
                     </li>
                 @endcan
                 @can('master_buku_access')
-                    <li class="nav-item has-treeview {{ request()->is("admin/semesters*") ? "menu-open" : "" }} {{ request()->is("admin/covers*") ? "menu-open" : "" }} {{ request()->is("admin/jenjangs*") ? "menu-open" : "" }} {{ request()->is("admin/kurikulums*") ? "menu-open" : "" }} {{ request()->is("admin/mapels*") ? "menu-open" : "" }} {{ request()->is("admin/kelas*") ? "menu-open" : "" }} {{ request()->is("admin/halamen*") ? "menu-open" : "" }}">
-                        <a class="nav-link nav-dropdown-toggle {{ request()->is("admin/semesters*") ? "active" : "" }} {{ request()->is("admin/covers*") ? "active" : "" }} {{ request()->is("admin/jenjangs*") ? "active" : "" }} {{ request()->is("admin/kurikulums*") ? "active" : "" }} {{ request()->is("admin/mapels*") ? "active" : "" }} {{ request()->is("admin/kelas*") ? "active" : "" }} {{ request()->is("admin/halamen*") ? "active" : "" }}" href="#">
+                    <li class="nav-item has-treeview {{ request()->is("admin/semesters*") ? "menu-open" : "" }} {{ request()->is("admin/covers*") ? "menu-open" : "" }} {{ request()->is("admin/jenjangs*") ? "menu-open" : "" }} {{ request()->is("admin/kurikulums*") ? "menu-open" : "" }} {{ request()->is("admin/mapels*") ? "menu-open" : "" }} {{ request()->is("admin/kelas*") ? "menu-open" : "" }} {{ request()->is("admin/halaman*") ? "menu-open" : "" }}">
+                        <a class="nav-link nav-dropdown-toggle {{ request()->is("admin/semesters*") ? "active" : "" }} {{ request()->is("admin/covers*") ? "active" : "" }} {{ request()->is("admin/jenjangs*") ? "active" : "" }} {{ request()->is("admin/kurikulums*") ? "active" : "" }} {{ request()->is("admin/mapels*") ? "active" : "" }} {{ request()->is("admin/kelas*") ? "active" : "" }} {{ request()->is("admin/halaman*") ? "active" : "" }}" href="#">
                             <i class="fa-fw nav-icon fas fa-cogs">
 
                             </i>
@@ -220,7 +220,7 @@
                             @endcan
                             @can('halaman_access')
                                 <li class="nav-item">
-                                    <a href="{{ route("admin.halamen.index") }}" class="nav-link {{ request()->is("admin/halamen") || request()->is("admin/halamen/*") ? "active" : "" }}">
+                                    <a href="{{ route("admin.halaman.index") }}" class="nav-link {{ request()->is("admin/halaman") || request()->is("admin/halaman/*") ? "active" : "" }}">
                                         <i class="fa-fw nav-icon fas fa-file">
 
                                         </i>

@@ -13,6 +13,9 @@ use App\Models\Jenjang;
 use App\Models\Kurikulum;
 use App\Models\Semester;
 use App\Models\Unit;
+use App\Models\Cover;
+use App\Models\Kelas;
+use App\Models\Mapel;
 use Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -26,6 +29,31 @@ class BookVariantController extends Controller
 
         if ($request->ajax()) {
             $query = BookVariant::with(['book', 'jenjang', 'semester', 'kurikulum', 'halaman', 'warehouse', 'unit'])->select(sprintf('%s.*', (new BookVariant)->table));
+
+            if (!empty($request->type)) {
+                $query->where('type', $request->type);
+            }
+
+            if (!empty($request->semester)) {
+                $query->where('semester_id', $request->semester);
+            }
+
+            if (!empty($request->jenjang)) {
+                $query->where('jenjang_id', $request->jenjang);
+            }
+
+            if (!empty($request->kurikulum)) {
+                $query->where('kurikulum_id', $request->kurikulum);
+            }
+
+            if (!empty($request->cover) || !empty($request->mapel) || !empty($request->kelas)) {
+                $query->whereHas('book', function ($q) use ($request) {
+                    $q->where('cover_id', $request->cover)
+                    ->orWhere('mapel_id', $request->mapel)
+                    ->orWhere('kelas_id', $request->kelas);
+                });
+            }
+
             $table = Datatables::of($query);
 
             $table->addColumn('placeholder', '&nbsp;');
@@ -56,6 +84,10 @@ class BookVariantController extends Controller
                 return $row->jenjang ? $row->jenjang->code : '';
             });
 
+            $table->addColumn('buku', function ($row) {
+                return $row->book ? BookVariant::TYPE_SELECT[$row->type] . ' - '. $row->book->name : '';
+            });
+
             $table->addColumn('semester_name', function ($row) {
                 return $row->semester ? $row->semester->name : '';
             });
@@ -74,13 +106,28 @@ class BookVariantController extends Controller
             $table->editColumn('price', function ($row) {
                 return $row->price ? $row->price : '';
             });
+            $table->editColumn('cost', function ($row) {
+                return $row->cost ? $row->cost : '';
+            });
 
-            $table->rawColumns(['actions', 'placeholder', 'jenjang', 'semester', 'kurikulum', 'halaman']);
+            $table->rawColumns(['actions', 'placeholder', 'jenjang', 'semester', 'kurikulum', 'halaman', 'buku']);
 
             return $table->make(true);
         }
 
-        return view('admin.bookVariants.index');
+        $jenjangs = Jenjang::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+
+        $kurikulums = Kurikulum::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+
+        $mapels = Mapel::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+
+        $kelas = Kelas::pluck('name', 'id');
+
+        $covers = Cover::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+
+        $semesters = Semester::where('status', 1)->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+
+        return view('admin.bookVariants.index', compact('covers', 'jenjangs', 'kelas', 'kurikulums', 'mapels', 'semesters'));
     }
 
     public function create()
@@ -164,5 +211,16 @@ class BookVariantController extends Controller
         }
 
         return response(null, Response::HTTP_NO_CONTENT);
+    }
+
+    public function getProductList(Request $request)
+    {
+        $term = $request->input('term');
+
+        $products = BookVariant::where('code', 'like', '%' . $term . '%')->get();
+
+        return response()->json([
+            'products' => $products
+        ]);
     }
 }

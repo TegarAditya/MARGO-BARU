@@ -261,7 +261,7 @@ return [
     ],
     'kela' => [
         'title'          => 'Kelas',
-        'title_singular' => 'Kela',
+        'title_singular' => 'Kelas',
         'fields'         => [
             'id'                => 'ID',
             'id_helper'         => ' ',

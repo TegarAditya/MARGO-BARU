@@ -7,7 +7,7 @@ use App\Http\Controllers\Traits\CsvImportTrait;
 use App\Http\Requests\MassDestroyKelaRequest;
 use App\Http\Requests\StoreKelaRequest;
 use App\Http\Requests\UpdateKelaRequest;
-use App\Models\Kela;
+use App\Models\Kelas;
 use Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -22,7 +22,7 @@ class KelasController extends Controller
         abort_if(Gate::denies('kela_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         if ($request->ajax()) {
-            $query = Kela::query()->select(sprintf('%s.*', (new Kela)->table));
+            $query = Kelas::query()->select(sprintf('%s.*', (new Kelas)->table));
             $table = Datatables::of($query);
 
             $table->addColumn('placeholder', '&nbsp;');
@@ -67,33 +67,33 @@ class KelasController extends Controller
 
     public function store(StoreKelaRequest $request)
     {
-        $kela = Kela::create($request->all());
+        $kela = Kelas::create($request->all());
 
         return redirect()->route('admin.kelas.index');
     }
 
-    public function edit(Kela $kela)
+    public function edit(Kelas $kela)
     {
         abort_if(Gate::denies('kela_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         return view('admin.kelas.edit', compact('kela'));
     }
 
-    public function update(UpdateKelaRequest $request, Kela $kela)
+    public function update(UpdateKelaRequest $request, Kelas $kela)
     {
         $kela->update($request->all());
 
         return redirect()->route('admin.kelas.index');
     }
 
-    public function show(Kela $kela)
+    public function show(Kelas $kela)
     {
         abort_if(Gate::denies('kela_show'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         return view('admin.kelas.show', compact('kela'));
     }
 
-    public function destroy(Kela $kela)
+    public function destroy(Kelas $kela)
     {
         abort_if(Gate::denies('kela_delete'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
@@ -104,7 +104,7 @@ class KelasController extends Controller
 
     public function massDestroy(MassDestroyKelaRequest $request)
     {
-        $kelas = Kela::find(request('ids'));
+        $kelas = Kelas::find(request('ids'));
 
         foreach ($kelas as $kela) {
             $kela->delete();

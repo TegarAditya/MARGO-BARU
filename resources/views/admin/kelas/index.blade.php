@@ -9,7 +9,7 @@
             <button class="btn btn-warning" data-toggle="modal" data-target="#csvImportModal">
                 {{ trans('global.app_csvImport') }}
             </button>
-            @include('csvImport.modal', ['model' => 'Kela', 'route' => 'admin.kelas.parseCsvImport'])
+            @include('csvImport.modal', ['model' => 'Kelas', 'route' => 'admin.kelas.parseCsvImport'])
         </div>
     </div>
 @endcan
@@ -100,7 +100,7 @@
       $($.fn.dataTable.tables(true)).DataTable()
           .columns.adjust();
   });
-  
+
 });
 
 </script>

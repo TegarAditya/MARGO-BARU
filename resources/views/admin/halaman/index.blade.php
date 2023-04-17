@@ -3,13 +3,13 @@
 @can('halaman_create')
     <div style="margin-bottom: 10px;" class="row">
         <div class="col-lg-12">
-            <a class="btn btn-success" href="{{ route('admin.halamen.create') }}">
+            <a class="btn btn-success" href="{{ route('admin.halaman.create') }}">
                 {{ trans('global.add') }} {{ trans('cruds.halaman.title_singular') }}
             </a>
-            <button class="btn btn-warning" data-toggle="modal" data-target="#csvImportModal">
-                {{ trans('global.app_csvImport') }}
+            <button class="btn btn-primary" data-toggle="modal" data-target="#importModal">
+                Import
             </button>
-            @include('csvImport.modal', ['model' => 'Halaman', 'route' => 'admin.halamen.parseCsvImport'])
+            @include('csvImport.import_modal', ['model' => 'Halaman', 'route' => 'admin.halaman.import'])
         </div>
     </div>
 @endcan
@@ -52,7 +52,7 @@
   let deleteButtonTrans = '{{ trans('global.datatables.delete') }}';
   let deleteButton = {
     text: deleteButtonTrans,
-    url: "{{ route('admin.halamen.massDestroy') }}",
+    url: "{{ route('admin.halaman.massDestroy') }}",
     className: 'btn-danger',
     action: function (e, dt, node, config) {
       var ids = $.map(dt.rows({ selected: true }).data(), function (entry) {
@@ -84,7 +84,7 @@
     serverSide: true,
     retrieve: true,
     aaSorting: [],
-    ajax: "{{ route('admin.halamen.index') }}",
+    ajax: "{{ route('admin.halaman.index') }}",
     columns: [
       { data: 'placeholder', name: 'placeholder' },
 { data: 'code', name: 'code' },
@@ -100,7 +100,7 @@
       $($.fn.dataTable.tables(true)).DataTable()
           .columns.adjust();
   });
-  
+
 });
 
 </script>

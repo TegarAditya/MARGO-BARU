@@ -6,6 +6,13 @@
             <a class="btn btn-success" href="{{ route('admin.books.create') }}">
                 {{ trans('global.add') }} {{ trans('cruds.book.title_singular') }}
             </a>
+            <a class="btn btn-danger" href="{{ route('admin.books.templateImport') }}">
+                Template Import
+            </a>
+            <button class="btn btn-primary" data-toggle="modal" data-target="#importModal">
+                Import
+            </button>
+            @include('csvImport.import_modal', ['model' => 'Book', 'route' => 'admin.books.import'])
         </div>
     </div>
 @endcan
@@ -28,25 +35,7 @@
                         {{ trans('cruds.book.fields.name') }}
                     </th>
                     <th>
-                        {{ trans('cruds.book.fields.description') }}
-                    </th>
-                    <th>
-                        {{ trans('cruds.book.fields.jenjang') }}
-                    </th>
-                    <th>
-                        {{ trans('cruds.book.fields.kurikulum') }}
-                    </th>
-                    <th>
-                        {{ trans('cruds.book.fields.mapel') }}
-                    </th>
-                    <th>
-                        {{ trans('cruds.book.fields.kelas') }}
-                    </th>
-                    <th>
-                        {{ trans('cruds.book.fields.cover') }}
-                    </th>
-                    <th>
-                        {{ trans('cruds.book.fields.semester') }}
+                        {{ trans('cruds.bookVariant.fields.stock') }}
                     </th>
                     <th>
                         &nbsp;
@@ -64,68 +53,48 @@
 @parent
 <script>
     $(function () {
-  let dtButtons = $.extend(true, [], $.fn.dataTable.defaults.buttons)
-@can('book_delete')
-  let deleteButtonTrans = '{{ trans('global.datatables.delete') }}';
-  let deleteButton = {
-    text: deleteButtonTrans,
-    url: "{{ route('admin.books.massDestroy') }}",
-    className: 'btn-danger',
-    action: function (e, dt, node, config) {
-      var ids = $.map(dt.rows({ selected: true }).data(), function (entry) {
-          return entry.id
-      });
+        let dtButtons = $.extend(true, [], $.fn.dataTable.defaults.buttons)
 
-      if (ids.length === 0) {
-        alert('{{ trans('global.datatables.zero_selected') }}')
+        let dtOverrideGlobals = {
+            // buttons: dtButtons,
+            processing: true,
+            serverSide: true,
+            retrieve: true,
+            aaSorting: [],
+            ajax: "{{ route('admin.books.index') }}",
+            columns: [{
+                    data: 'placeholder',
+                    name: 'placeholder'
+                },
+                {
+                    data: 'code',
+                    name: 'code',
+                    class: 'text-center'
+                },
+                {
+                    data: 'name',
+                    name: 'name'
+                },
+                {
+                    data: 'stock',
+                    name: 'stock',
+                    class: 'text-center'
+                },
+                {
+                    data: 'actions',
+                    name: '{{ trans('global.actions') }}'
+                }
+            ],
+            orderCellsTop: true,
+            order: [[1, 'asc']],
+            pageLength: 25,
+        };
+        let table = $('.datatable-Book').DataTable(dtOverrideGlobals);
+        $('a[data-toggle="tab"]').on('shown.bs.tab click', function (e) {
+            $($.fn.dataTable.tables(true)).DataTable()
+                .columns.adjust();
+        });
 
-        return
-      }
-
-      if (confirm('{{ trans('global.areYouSure') }}')) {
-        $.ajax({
-          headers: {'x-csrf-token': _token},
-          method: 'POST',
-          url: config.url,
-          data: { ids: ids, _method: 'DELETE' }})
-          .done(function () { location.reload() })
-      }
-    }
-  }
-  dtButtons.push(deleteButton)
-@endcan
-
-  let dtOverrideGlobals = {
-    buttons: dtButtons,
-    processing: true,
-    serverSide: true,
-    retrieve: true,
-    aaSorting: [],
-    ajax: "{{ route('admin.books.index') }}",
-    columns: [
-      { data: 'placeholder', name: 'placeholder' },
-{ data: 'code', name: 'code' },
-{ data: 'name', name: 'name' },
-{ data: 'description', name: 'description' },
-{ data: 'jenjang_name', name: 'jenjang.name' },
-{ data: 'kurikulum_name', name: 'kurikulum.name' },
-{ data: 'mapel_name', name: 'mapel.name' },
-{ data: 'kelas_name', name: 'kelas.name' },
-{ data: 'cover_name', name: 'cover.name' },
-{ data: 'semester_name', name: 'semester.name' },
-{ data: 'actions', name: '{{ trans('global.actions') }}' }
-    ],
-    orderCellsTop: true,
-    order: [[ 1, 'asc' ]],
-    pageLength: 25,
-  };
-  let table = $('.datatable-Book').DataTable(dtOverrideGlobals);
-  $('a[data-toggle="tab"]').on('shown.bs.tab click', function(e){
-      $($.fn.dataTable.tables(true)).DataTable()
-          .columns.adjust();
-  });
-  
-});
-
+    });
 </script>
 @endsection

@@ -13,6 +13,10 @@ use Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Yajra\DataTables\Facades\DataTables;
+use Alert;
+use Excel;
+use App\Imports\MaterialImport;
+use App\Exports\MaterialTemplate;
 
 class MaterialsController extends Controller
 {
@@ -127,5 +131,27 @@ class MaterialsController extends Controller
         }
 
         return response(null, Response::HTTP_NO_CONTENT);
+    }
+
+    public function import(Request $request)
+    {
+        $file = $request->file('import_file');
+        $request->validate([
+            'import_file' => 'mimes:csv,txt,xls,xlsx',
+        ]);
+
+        try {
+            Excel::import(new MaterialImport(), $file);
+        } catch (\Exception $e) {
+            Alert::error('Error', $e->getMessage());
+            return redirect()->back();
+        }
+
+        Alert::success('Success', 'Material berhasil di import');
+        return redirect()->back();
+    }
+
+    public function template_import() {
+        return (new MaterialTemplate())->download('Template Import Material.xlsx');
     }
 }

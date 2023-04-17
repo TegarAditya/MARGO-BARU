@@ -6,10 +6,17 @@
             <a class="btn btn-success" href="{{ route('admin.materials.create') }}">
                 {{ trans('global.add') }} {{ trans('cruds.material.title_singular') }}
             </a>
+            <a class="btn btn-danger" href="{{ route('admin.materials.templateImport') }}">
+                Template Import
+            </a>
+            <button class="btn btn-primary" data-toggle="modal" data-target="#importModal">
+                Import
+            </button>
             <button class="btn btn-warning" data-toggle="modal" data-target="#csvImportModal">
                 {{ trans('global.app_csvImport') }}
             </button>
             @include('csvImport.modal', ['model' => 'Material', 'route' => 'admin.materials.parseCsvImport'])
+            @include('csvImport.import_modal', ['model' => 'Material', 'route' => 'admin.materials.import'])
         </div>
     </div>
 @endcan
@@ -108,7 +115,7 @@
       $($.fn.dataTable.tables(true)).DataTable()
           .columns.adjust();
   });
-  
+
 });
 
 </script>

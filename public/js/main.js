@@ -69,3 +69,24 @@ $(document).ready(function () {
     }, 350);
   })
 })
+
+if (window.numeral) {
+    window.numeral.register('locale', 'id', {
+      delimiters: {
+        thousands: '.',
+        decimal: ','
+      },
+      abbreviations: {
+        thousand: 'rb',
+        million: 'jt',
+        billion: 'm',
+        trillion: 't'
+      },
+      ordinal: numeral.locales.en.ordinal,
+      currency: {
+        symbol: 'Rp'
+      }
+    });
+
+    window.numeral.locale('id');
+  };

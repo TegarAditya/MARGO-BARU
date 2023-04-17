@@ -33,9 +33,8 @@ class StoreBookRequest extends FormRequest
                 'required',
                 'integer',
             ],
-            'kelas_id' => [
+            'kelas' => [
                 'required',
-                'integer',
             ],
             'cover_id' => [
                 'required',
