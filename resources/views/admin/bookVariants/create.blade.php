@@ -22,6 +22,18 @@
                 <span class="help-block">{{ trans('cruds.bookVariant.fields.book_helper') }}</span>
             </div>
             <div class="form-group">
+                <label for="parent_id">{{ trans('cruds.bookVariant.fields.parent') }}</label>
+                <select class="form-control select2 {{ $errors->has('parent') ? 'is-invalid' : '' }}" name="parent_id" id="parent_id">
+                    @foreach($parents as $id => $entry)
+                        <option value="{{ $id }}" {{ old('parent_id') == $id ? 'selected' : '' }}>{{ $entry }}</option>
+                    @endforeach
+                </select>
+                @if($errors->has('parent'))
+                    <span class="text-danger">{{ $errors->first('parent') }}</span>
+                @endif
+                <span class="help-block">{{ trans('cruds.bookVariant.fields.parent_helper') }}</span>
+            </div>
+            <div class="form-group">
                 <label class="required">{{ trans('cruds.bookVariant.fields.type') }}</label>
                 <select class="form-control {{ $errors->has('type') ? 'is-invalid' : '' }}" name="type" id="type" required>
                     <option value disabled {{ old('type', null) === null ? 'selected' : '' }}>{{ trans('global.pleaseSelect') }}</option>
