@@ -28,32 +28,7 @@ class BookVariantController extends Controller
         abort_if(Gate::denies('book_variant_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         if ($request->ajax()) {
-            $query = BookVariant::with(['book', 'jenjang', 'semester', 'kurikulum', 'halaman', 'warehouse', 'unit'])->select(sprintf('%s.*', (new BookVariant)->table));
-
-            if (!empty($request->type)) {
-                $query->where('type', $request->type);
-            }
-
-            if (!empty($request->semester)) {
-                $query->where('semester_id', $request->semester);
-            }
-
-            if (!empty($request->jenjang)) {
-                $query->where('jenjang_id', $request->jenjang);
-            }
-
-            if (!empty($request->kurikulum)) {
-                $query->where('kurikulum_id', $request->kurikulum);
-            }
-
-            if (!empty($request->cover) || !empty($request->mapel) || !empty($request->kelas)) {
-                $query->whereHas('book', function ($q) use ($request) {
-                    $q->where('cover_id', $request->cover)
-                    ->orWhere('mapel_id', $request->mapel)
-                    ->orWhere('kelas_id', $request->kelas);
-                });
-            }
-
+            $query = BookVariant::with(['book', 'parent', 'jenjang', 'semester', 'kurikulum', 'halaman', 'warehouse', 'unit'])->select(sprintf('%s.*', (new BookVariant)->table));
             $table = Datatables::of($query);
 
             $table->addColumn('placeholder', '&nbsp;');
@@ -136,6 +111,8 @@ class BookVariantController extends Controller
 
         $books = Book::pluck('code', 'id')->prepend(trans('global.pleaseSelect'), '');
 
+        $parents = BookVariant::pluck('code', 'id')->prepend(trans('global.pleaseSelect'), '');
+
         $jenjangs = Jenjang::pluck('code', 'id')->prepend(trans('global.pleaseSelect'), '');
 
         $semesters = Semester::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
@@ -146,7 +123,7 @@ class BookVariantController extends Controller
 
         $units = Unit::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
-        return view('admin.bookVariants.create', compact('books', 'halamen', 'jenjangs', 'kurikulums', 'semesters', 'units'));
+        return view('admin.bookVariants.create', compact('books', 'halamen', 'jenjangs', 'kurikulums', 'parents', 'semesters', 'units'));
     }
 
     public function store(StoreBookVariantRequest $request)
@@ -162,6 +139,8 @@ class BookVariantController extends Controller
 
         $books = Book::pluck('code', 'id')->prepend(trans('global.pleaseSelect'), '');
 
+        $parents = BookVariant::pluck('code', 'id')->prepend(trans('global.pleaseSelect'), '');
+
         $jenjangs = Jenjang::pluck('code', 'id')->prepend(trans('global.pleaseSelect'), '');
 
         $semesters = Semester::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
@@ -172,9 +151,9 @@ class BookVariantController extends Controller
 
         $units = Unit::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
-        $bookVariant->load('book', 'jenjang', 'semester', 'kurikulum', 'halaman', 'warehouse', 'unit');
+        $bookVariant->load('book', 'parent', 'jenjang', 'semester', 'kurikulum', 'halaman', 'warehouse', 'unit');
 
-        return view('admin.bookVariants.edit', compact('bookVariant', 'books', 'halamen', 'jenjangs', 'kurikulums', 'semesters', 'units'));
+        return view('admin.bookVariants.edit', compact('bookVariant', 'books', 'halamen', 'jenjangs', 'kurikulums', 'parents', 'semesters', 'units'));
     }
 
     public function update(UpdateBookVariantRequest $request, BookVariant $bookVariant)
@@ -188,7 +167,7 @@ class BookVariantController extends Controller
     {
         abort_if(Gate::denies('book_variant_show'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $bookVariant->load('book', 'jenjang', 'semester', 'kurikulum', 'halaman', 'warehouse', 'unit');
+        $bookVariant->load('book', 'parent', 'jenjang', 'semester', 'kurikulum', 'halaman', 'warehouse', 'unit');
 
         return view('admin.bookVariants.show', compact('bookVariant'));
     }

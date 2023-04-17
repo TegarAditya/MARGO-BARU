@@ -25,6 +25,14 @@
                     </tr>
                     <tr>
                         <th>
+                            {{ trans('cruds.bookVariant.fields.parent') }}
+                        </th>
+                        <td>
+                            {{ $bookVariant->parent->code ?? '' }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>
                             {{ trans('cruds.bookVariant.fields.code') }}
                         </th>
                         <td>
