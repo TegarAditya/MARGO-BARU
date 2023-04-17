@@ -29,6 +29,7 @@ class BookVariant extends Model
 
     protected $fillable = [
         'book_id',
+        'parent_id',
         'code',
         'type',
         'jenjang_id',
@@ -54,6 +55,11 @@ class BookVariant extends Model
     public function book()
     {
         return $this->belongsTo(Book::class, 'book_id');
+    }
+
+    public function parent()
+    {
+        return $this->belongsTo(self::class, 'parent_id');
     }
 
     public function jenjang()

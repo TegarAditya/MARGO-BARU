@@ -393,6 +393,8 @@ return [
             'semester_helper'   => ' ',
             'kurikulum'         => 'Kurikulum',
             'kurikulum_helper'  => ' ',
+            'parent'            => 'Parent',
+            'parent_helper'     => ' ',
         ],
     ],
     'warehouse' => [

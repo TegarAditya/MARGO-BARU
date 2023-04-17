@@ -11,6 +11,8 @@ class AddRelationshipFieldsToBookVariantsTable extends Migration
         Schema::table('book_variants', function (Blueprint $table) {
             $table->unsignedBigInteger('book_id')->nullable();
             $table->foreign('book_id', 'book_fk_8102567')->references('id')->on('books');
+            $table->unsignedBigInteger('parent_id')->nullable();
+            $table->foreign('parent_id', 'parent_fk_8344334')->references('id')->on('book_variants');
             $table->unsignedBigInteger('jenjang_id')->nullable();
             $table->foreign('jenjang_id', 'jenjang_fk_8106298')->references('id')->on('jenjangs');
             $table->unsignedBigInteger('semester_id')->nullable();

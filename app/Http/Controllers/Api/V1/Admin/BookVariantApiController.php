@@ -17,7 +17,7 @@ class BookVariantApiController extends Controller
     {
         abort_if(Gate::denies('book_variant_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        return new BookVariantResource(BookVariant::with(['book', 'jenjang', 'semester', 'kurikulum', 'halaman', 'warehouse', 'unit'])->get());
+        return new BookVariantResource(BookVariant::with(['book', 'parent', 'jenjang', 'semester', 'kurikulum', 'halaman', 'warehouse', 'unit'])->get());
     }
 
     public function store(StoreBookVariantRequest $request)
@@ -33,7 +33,7 @@ class BookVariantApiController extends Controller
     {
         abort_if(Gate::denies('book_variant_show'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        return new BookVariantResource($bookVariant->load(['book', 'jenjang', 'semester', 'kurikulum', 'halaman', 'warehouse', 'unit']));
+        return new BookVariantResource($bookVariant->load(['book', 'parent', 'jenjang', 'semester', 'kurikulum', 'halaman', 'warehouse', 'unit']));
     }
 
     public function update(UpdateBookVariantRequest $request, BookVariant $bookVariant)
