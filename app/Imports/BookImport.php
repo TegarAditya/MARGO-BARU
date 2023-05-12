@@ -55,7 +55,7 @@ class BookImport implements ToCollection, WithHeadingRow
                     $price = ($key == 'L') ? $row['harga'] : 0;
                     $cost = ($key == 'L') ? $row['hpp'] : 0;
 
-                    BookVariant::updateOrCreate([
+                    $variant = BookVariant::updateOrCreate([
                         'book_id' => $buku->id,
                         'code' => $key . '-' .$code,
                         'type' => $key,

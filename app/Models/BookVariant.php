@@ -22,9 +22,16 @@ class BookVariant extends Model
 
     public const TYPE_SELECT = [
         'L' => 'LKS',
-        'C' => 'Cover',
-        'I' => 'Isi',
+        'C' => 'Cover LKS',
+        'I' => 'Isi LKS',
         'P' => 'Pegangan Guru',
+        'V' => 'Cover PG',
+        'S' => 'Isi PG',
+    ];
+
+    public const VARIANT = [
+        'L' => ['C', 'I'],
+        'P' => ['V', 'S']
     ];
 
     protected $fillable = [
