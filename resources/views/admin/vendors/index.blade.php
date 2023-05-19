@@ -35,15 +35,6 @@
                         {{ trans('cruds.vendor.fields.type') }}
                     </th>
                     <th>
-                        {{ trans('cruds.vendor.fields.contact') }}
-                    </th>
-                    <th>
-                        {{ trans('cruds.vendor.fields.address') }}
-                    </th>
-                    <th>
-                        {{ trans('cruds.vendor.fields.company') }}
-                    </th>
-                    <th>
                         &nbsp;
                     </th>
                 </tr>
@@ -98,14 +89,11 @@
     aaSorting: [],
     ajax: "{{ route('admin.vendors.index') }}",
     columns: [
-      { data: 'placeholder', name: 'placeholder' },
-{ data: 'code', name: 'code' },
-{ data: 'name', name: 'name' },
-{ data: 'type', name: 'type' },
-{ data: 'contact', name: 'contact' },
-{ data: 'address', name: 'address' },
-{ data: 'company', name: 'company' },
-{ data: 'actions', name: '{{ trans('global.actions') }}' }
+        { data: 'placeholder', name: 'placeholder' },
+        { data: 'code', name: 'code', class: 'text-center' },
+        { data: 'name', name: 'name', class: 'text-center' },
+        { data: 'type', name: 'type', class: 'text-center' },
+        { data: 'actions', name: '{{ trans('global.actions') }}', class: 'text-center' }
     ],
     orderCellsTop: true,
     order: [[ 1, 'desc' ]],
@@ -116,7 +104,7 @@
       $($.fn.dataTable.tables(true)).DataTable()
           .columns.adjust();
   });
-  
+
 });
 
 </script>

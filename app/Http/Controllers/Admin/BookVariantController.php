@@ -76,7 +76,7 @@ class BookVariantController extends Controller
             });
 
             $table->editColumn('stock', function ($row) {
-                return $row->stock ? $row->stock : '';
+                return $row->stock ? $row->stock : 0;
             });
             $table->editColumn('price', function ($row) {
                 return $row->price ? $row->price : '';

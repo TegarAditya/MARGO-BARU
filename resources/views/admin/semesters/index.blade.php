@@ -32,15 +32,6 @@
                         {{ trans('cruds.semester.fields.name') }}
                     </th>
                     <th>
-                        {{ trans('cruds.semester.fields.type') }}
-                    </th>
-                    <th>
-                        {{ trans('cruds.semester.fields.start_date') }}
-                    </th>
-                    <th>
-                        {{ trans('cruds.semester.fields.end_date') }}
-                    </th>
-                    <th>
                         {{ trans('cruds.semester.fields.status') }}
                     </th>
                     <th>
@@ -98,14 +89,11 @@
     aaSorting: [],
     ajax: "{{ route('admin.semesters.index') }}",
     columns: [
-      { data: 'placeholder', name: 'placeholder' },
-{ data: 'code', name: 'code' },
-{ data: 'name', name: 'name' },
-{ data: 'type', name: 'type' },
-{ data: 'start_date', name: 'start_date' },
-{ data: 'end_date', name: 'end_date' },
-{ data: 'status', name: 'status' },
-{ data: 'actions', name: '{{ trans('global.actions') }}' }
+        { data: 'placeholder', name: 'placeholder' },
+        { data: 'code', name: 'code', class: 'text-center' },
+        { data: 'name', name: 'name', class: 'text-center' },
+        { data: 'status', name: 'status', class: 'text-center' },
+        { data: 'actions', name: '{{ trans('global.actions') }}', class: 'text-center' }
     ],
     orderCellsTop: true,
     order: [[ 2, 'desc' ]],
@@ -116,7 +104,7 @@
       $($.fn.dataTable.tables(true)).DataTable()
           .columns.adjust();
   });
-  
+
 });
 
 </script>

@@ -100,8 +100,97 @@
             </div>
         </form>
     </div>
+
+    <div class="card-body">
+        <form action="{{ route('admin.sales-orders.store') }}" method="POST">
+            @csrf
+
+            <div class="form-group">
+                <label for="customer">Customer</label>
+                <select id="customer" name="customer" class="form-control">
+                    <option value="">Select a customer</option>
+                    @foreach ($salespeople as $id => $entry)
+                        <option value="{{ $id }}">{{ $entry }}</option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div id="products-container">
+                <div class="form-group">
+                    <label>Products</label>
+                    <div class="product-row">
+                        <select name="products[0][id]" class="form-control product-select" required>
+                            <option value="">Select a product</option>
+                            @foreach ($products as $id => $entry)
+                                <option value="{{ $id }}">{{ $entry }}</option>
+                            @endforeach
+                        </select>
+                        <input type="number" name="products[0][quantity]" class="form-control" placeholder="Quantity" required>
+                        <input type="number" name="products[0][price]" class="form-control" placeholder="Price" required>
+                        <button type="button" class="btn btn-danger btn-sm remove-product">Remove</button>
+                    </div>
+                </div>
+            </div>
+
+            <button type="button" class="btn btn-primary btn-sm" id="add-product">Add Product</button>
+            <button type="submit" class="btn btn-success">Submit</button>
+        </form>
+    </div>
 </div>
 
+@endsection
 
+@section('scripts')
+    <script>
+        $(document).ready(function () {
+            // Initialize Select2 for customer selection
+            $('#customer').select2();
 
+            // Initialize Select2 for product selection
+            $('.product-select').select2({
+                ajax: {
+                    url: '/products/search',
+                    dataType: 'json',
+                    delay: 250,
+                    processResults: function (data) {
+                        return {
+                            results: data
+                        };
+                    },
+                    cache: true
+                },
+                minimumInputLength: 1
+            });
+
+            // Add product row
+            $('#add-product').on('click', function () {
+                var index = $('.product-row').length;
+                var productRow = $('.product-row').first().clone();
+                productRow.find('.product-select').attr('name', 'products[' + index + '][id]');
+                productRow.find('input[name^="products"]').attr('name', 'products[' + index + '][quantity]');
+                productRow.find('input[name^="products"]').attr('name', 'products[' + index + '][price]');
+                productRow.find('.remove-product').show();
+                $('#products-container').append(productRow);
+                productRow.find('.product-select').select2({
+                    ajax: {
+                        url: '/products/search',
+                        dataType: 'json',
+                        delay: 250,
+                        processResults: function (data) {
+                            return {
+                                results: data
+                            };
+                        },
+                        cache: true
+                    },
+                    minimumInputLength: 1
+                });
+            });
+
+            // Remove product row
+            $(document).on('click', '.remove-product', function () {
+                $(this).closest('.product-row').remove();
+            });
+        });
+    </script>
 @endsection

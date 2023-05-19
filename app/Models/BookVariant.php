@@ -29,9 +29,14 @@ class BookVariant extends Model
         'S' => 'Isi PG',
     ];
 
-    public const VARIANT = [
-        'L' => ['C', 'I'],
-        'P' => ['V', 'S']
+    public const LKS_TYPE = [
+        'C' => 'Cover LKS',
+        'I' => 'Isi LKS',
+    ];
+
+    public const PG_TYPE = [
+        'V' => 'Cover PG',
+        'S' => 'Isi PG',
     ];
 
     protected $fillable = [
@@ -52,6 +57,11 @@ class BookVariant extends Model
         'created_at',
         'updated_at',
         'deleted_at',
+    ];
+
+    protected $casts = [
+        'price' => 'double',
+        'cost' => 'double',
     ];
 
     protected function serializeDate(DateTimeInterface $date)

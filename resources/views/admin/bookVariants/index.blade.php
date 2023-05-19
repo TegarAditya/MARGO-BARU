@@ -119,7 +119,7 @@
                     <th width="10">
 
                     </th>
-                    <th>
+                    <th width="200">
                         {{ trans('cruds.bookVariant.fields.code') }}
                     </th>
                     <th>
@@ -130,9 +130,6 @@
                     </th>
                     <th>
                         {{ trans('cruds.bookVariant.fields.price') }}
-                    </th>
-                    <th>
-                        HPP
                     </th>
                     <th>
                         &nbsp;
@@ -181,7 +178,8 @@ $(function () {
             },
             {
                 data: 'stock',
-                name: 'stock'
+                name: 'stock',
+                class: 'text-center',
             },
             {
                 data: 'price',
@@ -190,14 +188,9 @@ $(function () {
                 render: function(value) { return numeral(value).format('$0,0'); }
             },
             {
-                data: 'cost',
-                name: 'cost',
-                class: 'text-right',
-                render: function(value) { return numeral(value).format('$0,0'); }
-            },
-            {
                 data: 'actions',
-                name: '{{ trans('global.actions ') }}'
+                name: '{{ trans('global.actions ') }}',
+                class: 'text-center'
             }
         ],
         orderCellsTop: true,

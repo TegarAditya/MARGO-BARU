@@ -50,26 +50,80 @@ class BookImport implements ToCollection, WithHeadingRow
                     'semester_id' => $semester->id,
                 ]);
 
-                foreach(BookVariant::TYPE_SELECT as $key => $label) {
-                    $stock = ($key == 'L') ? $row['stok'] : 0;
-                    $price = ($key == 'L') ? $row['harga'] : 0;
-                    $cost = ($key == 'L') ? $row['hpp'] : 0;
+                $lks = BookVariant::updateOrCreate([
+                    'book_id' => $buku->id,
+                    'code' => 'L' . '-' .$code,
+                    'type' => 'L',
+                ],
+                [
+                    'jenjang_id' => $jenjang->id,
+                    'semester_id' => $semester->id,
+                    'kurikulum_id' => $kurikulum->id,
+                    'halaman_id' => $halaman->id,
+                    'warehouse_id' => 1,
+                    'stock' => $row['stok'],
+                    'unit_id' => 1,
+                    'price' => $row['harga'],
+                    'cost' => $row['hpp'],
+                    'status' => 1,
+                ]);
 
+                foreach(BookVariant::LKS_TYPE as $key => $label) {
                     $variant = BookVariant::updateOrCreate([
                         'book_id' => $buku->id,
                         'code' => $key . '-' .$code,
                         'type' => $key,
                     ],
                     [
+                        'parent_id' => $lks->id,
                         'jenjang_id' => $jenjang->id,
                         'semester_id' => $semester->id,
                         'kurikulum_id' => $kurikulum->id,
                         'halaman_id' => $halaman->id,
                         'warehouse_id' => 1,
-                        'stock' => $stock,
+                        'stock' => 0,
                         'unit_id' => 1,
-                        'price' => $price,
-                        'cost' => $cost,
+                        'price' => 0,
+                        'cost' => 0,
+                        'status' => 1,
+                    ]);
+                }
+
+                $pg = BookVariant::updateOrCreate([
+                    'book_id' => $buku->id,
+                    'code' => 'P' . '-' .$code,
+                    'type' => 'P',
+                ],
+                [
+                    'jenjang_id' => $jenjang->id,
+                    'semester_id' => $semester->id,
+                    'kurikulum_id' => $kurikulum->id,
+                    'halaman_id' => $halaman->id,
+                    'warehouse_id' => 1,
+                    'stock' => 0,
+                    'unit_id' => 1,
+                    'price' => 0,
+                    'cost' => 0,
+                    'status' => 1,
+                ]);
+
+                foreach(BookVariant::PG_TYPE as $key => $label) {
+                    $variant = BookVariant::updateOrCreate([
+                        'book_id' => $buku->id,
+                        'code' => $key . '-' .$code,
+                        'type' => $key,
+                    ],
+                    [
+                        'parent_id' => $pg->id,
+                        'jenjang_id' => $jenjang->id,
+                        'semester_id' => $semester->id,
+                        'kurikulum_id' => $kurikulum->id,
+                        'halaman_id' => $halaman->id,
+                        'warehouse_id' => 1,
+                        'stock' => 0,
+                        'unit_id' => 1,
+                        'price' => 0,
+                        'cost' => 0,
                         'status' => 1,
                     ]);
                 }
