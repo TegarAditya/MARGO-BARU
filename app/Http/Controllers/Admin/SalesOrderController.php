@@ -94,11 +94,36 @@ class SalesOrderController extends Controller
         return view('admin.salesOrders.create', compact('jenjangs', 'kurikulums', 'products', 'salespeople', 'semesters'));
     }
 
-    public function store(StoreSalesOrderRequest $request)
+    public function store(Request $request)
     {
-        $salesOrder = SalesOrder::create($request->all());
+        $validatedData = $request->validate([
+            'customer_name' => 'required',
+            'order_number' => 'required',
+            'address' => 'required',
+            'product' => 'required|array',
+            'product.*' => 'distinct',
+            'quantity' => 'required|array',
+            'quantity.*' => 'numeric|min:1',
+            'price' => 'required|array',
+            'price.*' => 'numeric|min:0',
+        ]);
 
-        return redirect()->route('admin.sales-orders.index');
+        $customer = Customer::create([
+            'name' => $validatedData['customer_name'],
+            'order_number' => $validatedData['order_number'],
+            'address' => $validatedData['address'],
+        ]);
+
+        foreach ($validatedData['product'] as $index => $product) {
+            $order = new Order;
+            $order->customer_id = $customer->id;
+            $order->product_id = $product;
+            $order->quantity = $validatedData['quantity'][$index];
+            $order->price = $validatedData['price'][$index];
+            $order->save();
+        }
+
+        return redirect()->back()->with('success', 'Order submitted successfully.');
     }
 
     public function edit(SalesOrder $salesOrder)

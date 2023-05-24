@@ -86,10 +86,10 @@
     aaSorting: [],
     ajax: "{{ route('admin.halaman.index') }}",
     columns: [
-      { data: 'placeholder', name: 'placeholder' },
-{ data: 'code', name: 'code' },
-{ data: 'name', name: 'name' },
-{ data: 'actions', name: '{{ trans('global.actions') }}' }
+        { data: 'placeholder', name: 'placeholder' },
+        { data: 'code', name: 'code', class: 'text-center' },
+        { data: 'name', name: 'name' },
+        { data: 'actions', name: '{{ trans('global.actions') }}', class: 'text-center' }
     ],
     orderCellsTop: true,
     order: [[ 2, 'asc' ]],

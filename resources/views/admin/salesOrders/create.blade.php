@@ -102,38 +102,37 @@
     </div>
 
     <div class="card-body">
-        <form action="{{ route('admin.sales-orders.store') }}" method="POST">
+        <form method="post" action="{{ route('admin.sales-orders.store') }}">
             @csrf
 
             <div class="form-group">
-                <label for="customer">Customer</label>
-                <select id="customer" name="customer" class="form-control">
-                    <option value="">Select a customer</option>
-                    @foreach ($salespeople as $id => $entry)
-                        <option value="{{ $id }}">{{ $entry }}</option>
-                    @endforeach
-                </select>
+                <label for="customer_name">Customer Name</label>
+                <input type="text" class="form-control" id="customer_name" name="customer_name" required>
             </div>
-
-            <div id="products-container">
-                <div class="form-group">
-                    <label>Products</label>
-                    <div class="product-row">
-                        <select name="products[0][id]" class="form-control product-select" required>
-                            <option value="">Select a product</option>
-                            @foreach ($products as $id => $entry)
-                                <option value="{{ $id }}">{{ $entry }}</option>
-                            @endforeach
-                        </select>
-                        <input type="number" name="products[0][quantity]" class="form-control" placeholder="Quantity" required>
-                        <input type="number" name="products[0][price]" class="form-control" placeholder="Price" required>
-                        <button type="button" class="btn btn-danger btn-sm remove-product">Remove</button>
+            <div class="form-group">
+                <label for="order_number">Order Number</label>
+                <input type="text" class="form-control" id="order_number" name="order_number" required>
+            </div>
+            <div class="form-group">
+                <label for="address">Address</label>
+                <textarea class="form-control" id="address" name="address" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="product">Product</label>
+                <select class="form-control" id="product" name="product[]" multiple required></select>
+                <div id="product_details" class="mt-3">
+                    <label>Product Details</label>
+                    <div class="form-row">
+                        <div class="col-md-4">
+                            <label>Quantity</label>
+                        </div>
+                        <div class="col-md-4">
+                            <label>Price</label>
+                        </div>
                     </div>
                 </div>
             </div>
-
-            <button type="button" class="btn btn-primary btn-sm" id="add-product">Add Product</button>
-            <button type="submit" class="btn btn-success">Submit</button>
+            <button type="submit" class="btn btn-primary">Submit</button>
         </form>
     </div>
 </div>
@@ -141,56 +140,72 @@
 @endsection
 
 @section('scripts')
-    <script>
-        $(document).ready(function () {
-            // Initialize Select2 for customer selection
-            $('#customer').select2();
-
-            // Initialize Select2 for product selection
-            $('.product-select').select2({
-                ajax: {
-                    url: '/products/search',
-                    dataType: 'json',
-                    delay: 250,
-                    processResults: function (data) {
-                        return {
-                            results: data
-                        };
-                    },
-                    cache: true
+<script>
+    $(document).ready(function() {
+        // Initialize Select2
+        $('#product').select2({
+            ajax: {
+                url: "{{ route('admin.book-variants.getBooks') }}",
+                dataType: 'json',
+                delay: 300,
+                data: function (params) {
+                    return {
+                        q: params.term
+                    };
                 },
-                minimumInputLength: 1
-            });
-
-            // Add product row
-            $('#add-product').on('click', function () {
-                var index = $('.product-row').length;
-                var productRow = $('.product-row').first().clone();
-                productRow.find('.product-select').attr('name', 'products[' + index + '][id]');
-                productRow.find('input[name^="products"]').attr('name', 'products[' + index + '][quantity]');
-                productRow.find('input[name^="products"]').attr('name', 'products[' + index + '][price]');
-                productRow.find('.remove-product').show();
-                $('#products-container').append(productRow);
-                productRow.find('.product-select').select2({
-                    ajax: {
-                        url: '/products/search',
-                        dataType: 'json',
-                        delay: 250,
-                        processResults: function (data) {
+                processResults: function (data) {
+                    return {
+                        results: $.map(data, function (item) {
                             return {
-                                results: data
-                            };
-                        },
-                        cache: true
-                    },
-                    minimumInputLength: 1
-                });
-            });
+                                text: item.code,
+                                id: item.id
+                            }
+                        })
+                    };
+                },
+                cache: true
+            },
+            minimumInputLength: 1
+        });
 
-            // Remove product row
-            $(document).on('click', '.remove-product', function () {
-                $(this).closest('.product-row').remove();
+        // Listen for changes to product selection
+        $('#product').on('change', function() {
+            // Clear existing product details
+            $('#product_details').empty();
+
+            // Add quantity and price fields for each selected product
+            $.each($(this).val(), function(index, productId) {
+                var $productDetails = $('<div>', { class: 'form-row mt-2' });
+
+                var $productName = $('<label>', { text: 'Product Name', class: 'col-md-2' });
+                var $quantityLabel = $('<label>', { text: 'Quantity', class: 'col-md-2' });
+                var $priceLabel = $('<label>', { text: 'Price', class: 'col-md-2' });
+
+                var $productNameInput = $('<input>', { type: 'text', class: 'form-control col-md-4', value: '', readonly: true });
+                var $quantityInput = $('<input>', { type: 'number', class: 'form-control col-md-2 ml-2', placeholder: 'Quantity', name: 'quantity[]' });
+                var $priceInput = $('<input>', { type: 'number', class: 'form-control col-md-2 ml-2', placeholder: 'Price', name: 'price[]' });
+
+                $productDetails.append($productName);
+                $productDetails.append($productNameInput);
+                $productDetails.append($quantityLabel);
+                $productDetails.append($quantityInput);
+                $productDetails.append($priceLabel);
+                $productDetails.append($priceInput);
+
+                // Fetch the product name via AJAX and set it in the product name input
+                $.ajax({
+                    url: "{{ route('admin.book-variants.getBook') }}" +  '?id=' + productId,
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function(response) {
+                        $productNameInput.val(response.name);
+                        $priceInput.val(response.price)
+                    }
+                });
+
+                $('#product_details').append($productDetails);
             });
         });
-    </script>
+    });
+</script>
 @endsection

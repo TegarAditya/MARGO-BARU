@@ -192,14 +192,22 @@ class BookVariantController extends Controller
         return response(null, Response::HTTP_NO_CONTENT);
     }
 
-    public function getProductList(Request $request)
+    public function getBooks(Request $request)
     {
-        $term = $request->input('term');
+        $query = $request->input('q');
 
-        $products = BookVariant::where('code', 'like', '%' . $term . '%')->get();
+        $products = BookVariant::select('id', 'code')->where('code', 'like', "%$query%")->where('type', 'L')->get();
 
-        return response()->json([
-            'products' => $products
-        ]);
+        return response()->json($products);
+    }
+
+    public function getBook(Request $request)
+    {
+        $id = $request->input('id');
+
+        $product = BookVariant::find($id);
+        $product->load('book');
+
+        return response()->json($product);
     }
 }

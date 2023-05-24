@@ -59,6 +59,10 @@ class BookVariant extends Model
         'deleted_at',
     ];
 
+    protected $appends = [
+        'name',
+    ];
+
     protected $casts = [
         'price' => 'double',
         'cost' => 'double',
@@ -67,6 +71,13 @@ class BookVariant extends Model
     protected function serializeDate(DateTimeInterface $date)
     {
         return $date->format('Y-m-d H:i:s');
+    }
+
+    public function getNameAttribute()
+    {
+        $name = $this->book->name ?? '-';
+
+        return $name;
     }
 
     public function book()

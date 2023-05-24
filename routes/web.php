@@ -105,7 +105,8 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
 
     // Book Variant
     Route::delete('book-variants/destroy', 'BookVariantController@massDestroy')->name('book-variants.massDestroy');
-    Route::get('book-variants/getProduct', 'BookVariantController@getProductList')->name('book-variants.getProduct');
+    Route::get('book-variants/getBooks', 'BookVariantController@getBooks')->name('book-variants.getBooks');
+    Route::get('book-variants/getBook', 'BookVariantController@getBook')->name('book-variants.getBook');
     Route::resource('book-variants', 'BookVariantController');
 
     // Warehouse
