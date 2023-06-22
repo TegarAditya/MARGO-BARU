@@ -105,8 +105,16 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
 
     // Book Variant
     Route::delete('book-variants/destroy', 'BookVariantController@massDestroy')->name('book-variants.massDestroy');
-    Route::get('book-variants/getBooks', 'BookVariantController@getBooks')->name('book-variants.getBooks');
-    Route::get('book-variants/getBook', 'BookVariantController@getBook')->name('book-variants.getBook');
+    Route::get('book-variants/get-books', 'BookVariantController@getBooks')->name('book-variants.getBooks');
+    Route::get('book-variants/get-book', 'BookVariantController@getBook')->name('book-variants.getBook');
+    Route::get('book-variants/get-estimasi', 'BookVariantController@getEstimasi')->name('book-variants.getEstimasi');
+    Route::get('book-variants/get-info-estimasi', 'BookVariantController@getInfoEstimasi')->name('book-variants.getInfoEstimasi');
+    Route::get('book-variants/get-delivery', 'BookVariantController@getDelivery')->name('book-variants.getDelivery');
+    Route::get('book-variants/get-info-delivery', 'BookVariantController@getInfoDelivery')->name('book-variants.getInfoDelivery');
+    Route::get('book-variants/get-retur', 'BookVariantController@getRetur')->name('book-variants.getRetur');
+    Route::get('book-variants/get-info-retur', 'BookVariantController@getInfoRetur')->name('book-variants.getInfoRetur');
+    Route::get('book-variants/get-edit-retur', 'BookVariantController@getEditRetur')->name('book-variants.getEditRetur');
+    Route::get('book-variants/get-info-edit-retur', 'BookVariantController@getInfoEditRetur')->name('book-variants.getInfoEditRetur');
     Route::resource('book-variants', 'BookVariantController');
 
     // Warehouse
@@ -149,6 +157,8 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
 
     // Sales Order
     Route::delete('sales-orders/destroy', 'SalesOrderController@massDestroy')->name('sales-orders.massDestroy');
+    Route::post('sales-orders/import', 'SalesOrderController@import')->name('sales-orders.import');
+    Route::get('sales-orders/template-import', 'SalesOrderController@template_import')->name('sales-orders.templateImport');
     Route::resource('sales-orders', 'SalesOrderController');
 
     // Delivery Order
@@ -161,6 +171,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
 
     // Invoice
     Route::delete('invoices/destroy', 'InvoiceController@massDestroy')->name('invoices.massDestroy');
+    Route::get('invoices/generate/{delivery}', 'InvoiceController@generate')->name('invoices.generate');
     Route::resource('invoices', 'InvoiceController');
 
     // Invoice Item
@@ -216,6 +227,9 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     // Finishing Item
     Route::delete('finishing-items/destroy', 'FinishingItemController@massDestroy')->name('finishing-items.massDestroy');
     Route::resource('finishing-items', 'FinishingItemController');
+
+    // Estimation Movement
+    Route::resource('estimation-movements', 'EstimationMovementController', ['except' => ['create', 'store', 'edit', 'update', 'show', 'destroy']]);
 
     Route::get('system-calendar', 'SystemCalendarController@index')->name('systemCalendar');
 });

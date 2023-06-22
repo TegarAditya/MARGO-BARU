@@ -411,8 +411,8 @@
                     </li>
                 @endcan
                 @can('estimasi_access')
-                    <li class="nav-item has-treeview {{ request()->is("admin/sales-orders*") ? "menu-open" : "" }} {{ request()->is("admin/estimasi-saldos*") ? "menu-open" : "" }} {{ request()->is("admin/production-estimations*") ? "menu-open" : "" }}">
-                        <a class="nav-link nav-dropdown-toggle {{ request()->is("admin/sales-orders*") ? "active" : "" }} {{ request()->is("admin/estimasi-saldos*") ? "active" : "" }} {{ request()->is("admin/production-estimations*") ? "active" : "" }}" href="#">
+                    <li class="nav-item has-treeview {{ request()->is("admin/sales-orders*") ? "menu-open" : "" }} {{ request()->is("admin/estimasi-saldos*") ? "menu-open" : "" }} {{ request()->is("admin/production-estimations*") ? "menu-open" : "" }} {{ request()->is("admin/estimation-movements*") ? "menu-open" : "" }}">
+                        <a class="nav-link nav-dropdown-toggle {{ request()->is("admin/sales-orders*") ? "active" : "" }} {{ request()->is("admin/estimasi-saldos*") ? "active" : "" }} {{ request()->is("admin/production-estimations*") ? "active" : "" }} {{ request()->is("admin/estimation-movements*") ? "active" : "" }}" href="#">
                             <i class="fa-fw nav-icon fas fa-weight">
 
                             </i>
@@ -454,6 +454,18 @@
                                         </i>
                                         <p>
                                             {{ trans('cruds.productionEstimation.title') }}
+                                        </p>
+                                    </a>
+                                </li>
+                            @endcan
+                            @can('estimation_movement_access')
+                                <li class="nav-item">
+                                    <a href="{{ route("admin.estimation-movements.index") }}" class="nav-link {{ request()->is("admin/estimation-movements") || request()->is("admin/estimation-movements/*") ? "active" : "" }}">
+                                        <i class="fa-fw nav-icon fas fa-arrows-alt">
+
+                                        </i>
+                                        <p>
+                                            {{ trans('cruds.estimationMovement.title') }}
                                         </p>
                                     </a>
                                 </li>

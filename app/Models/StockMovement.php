@@ -24,23 +24,26 @@ class StockMovement extends Model
 
     public const TRANSACTION_TYPE_SELECT = [
         'adjustment' => 'Adjustment',
-        'sale'       => 'Sale',
+        'delivery'   => 'Delivery',
+        'retur'      => 'Retur',
+        'produksi'   => 'Produksi',
     ];
 
     public const MOVEMENT_TYPE_SELECT = [
-        'adjustment' => 'Adjustment',
         'in'         => 'In',
         'out'        => 'Out',
+        'revisi'     => 'Revisi'
     ];
 
     protected $fillable = [
         'warehouse_id',
         'movement_date',
         'movement_type',
+        'transaction_type',
+        'reference_id',
         'product_id',
         'material_id',
         'quantity',
-        'transaction_type',
         'reversal_of_id',
         'created_at',
         'updated_at',
@@ -65,6 +68,11 @@ class StockMovement extends Model
     public function setMovementDateAttribute($value)
     {
         $this->attributes['movement_date'] = $value ? Carbon::createFromFormat(config('panel.date_format'), $value)->format('Y-m-d') : null;
+    }
+
+    public function reference()
+    {
+        return $this->belongsTo(StockAdjustment::class, 'reference_id');
     }
 
     public function product()

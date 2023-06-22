@@ -25,9 +25,6 @@
                         {{ trans('cruds.productionEstimation.fields.product') }}
                     </th>
                     <th>
-                        {{ trans('cruds.productionEstimation.fields.quantity') }}
-                    </th>
-                    <th>
                         {{ trans('cruds.productionEstimation.fields.estimasi') }}
                     </th>
                     <th>
@@ -94,14 +91,13 @@
     aaSorting: [],
     ajax: "{{ route('admin.production-estimations.index') }}",
     columns: [
-      { data: 'placeholder', name: 'placeholder' },
-{ data: 'product_code', name: 'product.code' },
-{ data: 'quantity', name: 'quantity' },
-{ data: 'estimasi', name: 'estimasi' },
-{ data: 'isi', name: 'isi' },
-{ data: 'cover', name: 'cover' },
-{ data: 'finishing', name: 'finishing' },
-{ data: 'actions', name: '{{ trans('global.actions') }}' }
+        { data: 'placeholder', name: 'placeholder' },
+        { data: 'product_code', name: 'product.code' },
+        { data: 'estimasi', name: 'estimasi', class: 'text-right' },
+        { data: 'isi', name: 'isi', class: 'text-right' },
+        { data: 'cover', name: 'cover', class: 'text-right' },
+        { data: 'finishing', name: 'finishing', class: 'text-right' },
+        { data: 'actions', name: '{{ trans('global.actions') }}' }
     ],
     orderCellsTop: true,
     order: [[ 1, 'desc' ]],
@@ -112,7 +108,7 @@
       $($.fn.dataTable.tables(true)).DataTable()
           .columns.adjust();
   });
-  
+
 });
 
 </script>

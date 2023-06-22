@@ -1,3 +1,12 @@
+body {
+    font-family: Tahoma, 'Source Sans Pro', sans-serif;
+    font-size: 14px
+}
+
+h6 {
+    font-weight: 700;
+}
+
 .ck-editor__editable,
 textarea {
     min-height: 150px;
@@ -57,6 +66,14 @@ table.dataTable thead .sorting_desc {
     border-radius: 3px;
 }
 
+.rounded-lg {
+    border-radius: .5rem !important;
+}
+
+.rounded-xl {
+    border-radius: .75rem !important;
+}
+
 .searchable-title {
     font-weight: bold;
 }
@@ -87,6 +104,14 @@ table.dataTable thead .sorting_desc {
     display: block;
 }
 
+.form-control {
+    font-size: 1em;
+}
+
+.text-sm {
+    font-size: .875em !important;
+}
+
 .dataTables_length label select {
     width: 65px!important;
 }
@@ -103,3 +128,51 @@ div.dt-button-collection {
     background-color: rgba(128, 128, 128, 0.1);
     font-weight: bolder;
 }
+
+.breadcrumb-nav {
+    position: sticky;
+    position: -webkit-sticky;
+    top: 0;
+    z-index: 100;
+    background-color: #fff;
+    margin: 0 -1.25rem;
+    padding: 0 1.25rem;
+}
+
+.breadcrumb-nav > ul {
+    list-style: none;
+    display: flex;
+    padding: .25rem 0 0;
+}
+
+.breadcrumb-nav > ul > li + li {
+    margin-left: .25rem;
+}
+
+.breadcrumb-nav > ul > li a {
+    display: block;
+    color: var(--dark);
+    padding: .5rem;
+    border-bottom: 2px solid transparent;
+}
+
+.breadcrumb-nav > ul > li a.active {
+    color: var(--primary);
+    border-color: var(--primary);
+}
+
+.nav-treeview > .nav-item .nav-link {
+    padding-left: 2rem;
+}
+
+.product-group-title {
+    position: sticky;
+    position: -webkit-sticky;
+    top: 0;
+    z-index: 100;
+    background-color: #fff;
+    padding: .25em .5em;
+    margin-left: -.5em;
+    margin-right: -.5em;
+}
+

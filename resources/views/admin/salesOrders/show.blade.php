@@ -7,85 +7,96 @@
     </div>
 
     <div class="card-body">
-        <div class="form-group">
-            <div class="form-group">
-                <a class="btn btn-default" href="{{ route('admin.sales-orders.index') }}">
-                    {{ trans('global.back_to_list') }}
+        <div class="row">
+
+            <div class="col">
+                <a class="btn btn-default" href="{{ url()->previous() }}">
+                    Back
                 </a>
             </div>
-            <table class="table table-bordered table-striped">
-                <tbody>
-                    <tr>
-                        <th>
-                            {{ trans('cruds.salesOrder.fields.semester') }}
-                        </th>
-                        <td>
-                            {{ $salesOrder->semester->name ?? '' }}
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>
-                            {{ trans('cruds.salesOrder.fields.salesperson') }}
-                        </th>
-                        <td>
-                            {{ $salesOrder->salesperson->name ?? '' }}
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>
-                            {{ trans('cruds.salesOrder.fields.product') }}
-                        </th>
-                        <td>
-                            {{ $salesOrder->product->code ?? '' }}
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>
-                            {{ trans('cruds.salesOrder.fields.jenjang') }}
-                        </th>
-                        <td>
-                            {{ $salesOrder->jenjang->code ?? '' }}
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>
-                            {{ trans('cruds.salesOrder.fields.kurikulum') }}
-                        </th>
-                        <td>
-                            {{ $salesOrder->kurikulum->code ?? '' }}
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>
-                            {{ trans('cruds.salesOrder.fields.quantity') }}
-                        </th>
-                        <td>
-                            {{ $salesOrder->quantity }}
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>
-                            {{ trans('cruds.salesOrder.fields.moved') }}
-                        </th>
-                        <td>
-                            {{ $salesOrder->moved }}
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>
-                            {{ trans('cruds.salesOrder.fields.retur') }}
-                        </th>
-                        <td>
-                            {{ $salesOrder->retur }}
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-            <div class="form-group">
-                <a class="btn btn-default" href="{{ route('admin.sales-orders.index') }}">
-                    {{ trans('global.back_to_list') }}
-                </a>
+
+            <div class="col-auto">
+
             </div>
+        </div>
+
+        <div class="model-detail mt-3">
+
+            <section class="py-3" id="modelDetail">
+                <h6>Detail Sales Order</h6>
+
+                <table class="table table-sm border m-0">
+                    <tbody>
+                        <tr>
+                            <th width="150">
+                                Semester
+                            </th>
+                            <td>
+                                {{ $salesOrder->semester->name ?? '' }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>
+                                Sales
+                            </th>
+                            <td>
+                                {{ $salesOrder->salesperson->name ?? '' }}
+                            </td>
+                        </tr>
+                        {{-- <tr>
+                            <th>
+                                Jenjang
+                            </th>
+                            <td>
+
+                            </td>
+                        </tr> --}}
+                    </tbody>
+                </table>
+            </section>
+
+            <section class="border-top py-3">
+                <div class="row mb-2">
+                    <div class="col">
+                        <h6>Daftar Produk</h6>
+
+                        <p class="mb-0">Total Produk: {{ $orders->count() }}</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-body px-3 py-2">
+                        <table class="table table-sm table-bordered m-0">
+                            <thead>
+                                <tr>
+                                    <th class="text-center" width="1%">No.</th>
+                                    <th>Nama Produk</th>
+                                    <th class="text-center px-2" width="1%">Halaman</th>
+                                    <th class="text-center px-2" width="1%">Estimasi</th>
+                                    <th class="text-center px-2" width="1%">Dikirim</th>
+                                    <th class="text-center px-2" width="1%">Retur</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                @foreach ($orders as $order)
+                                    @php
+                                    $product = $order->product;
+                                    @endphp
+                                    <tr>
+                                        <td class="text-right px-3">{{ $loop->iteration }}.</td>
+                                        <td>{{ $product->name }}</td>
+                                        <td class="text-center px-2">{{ $product->halaman->code }}</td>
+                                        <td class="text-center px-2">{{ $order->quantity }}</td>
+                                        <td class="text-center px-2">{{ $order->moved }}</td>
+                                        <td class="text-center px-2">{{ $order->retur }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
         </div>
     </div>
 </div>

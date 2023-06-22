@@ -12,7 +12,9 @@ class CreateDeliveryOrdersTable extends Migration
             $table->bigIncrements('id');
             $table->string('no_suratjalan')->unique();
             $table->date('date');
+            $table->string('payment_type');
             $table->longText('address')->nullable();
+            $table->boolean('faktur')->default(0)->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

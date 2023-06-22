@@ -19,6 +19,7 @@ class Book extends Model implements HasMedia
 
     protected $appends = [
         'photo',
+        'short_name'
     ];
 
     protected $dates = [
@@ -51,6 +52,13 @@ class Book extends Model implements HasMedia
     {
         $this->addMediaConversion('thumb')->fit('crop', 50, 50);
         $this->addMediaConversion('preview')->fit('crop', 120, 120);
+    }
+
+    public function getShortNameAttribute()
+    {
+        $name = $this->mapel->name .' - '. $this->kelas->name;
+
+        return $name;
     }
 
     public function jenjang()

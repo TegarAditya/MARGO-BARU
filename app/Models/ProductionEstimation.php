@@ -22,14 +22,22 @@ class ProductionEstimation extends Model
 
     protected $fillable = [
         'product_id',
-        'quantity',
+        'type',
         'estimasi',
         'isi',
         'cover',
-        'finishing',
         'created_at',
         'updated_at',
         'deleted_at',
+    ];
+
+    public const TYPE_SELECT = [
+        'L' => 'LKS',
+        'I' => 'Isi LKS',
+        'C' => 'Cover LKS',
+        'P' => 'Pegangan Guru',
+        'S' => 'Isi PG',
+        'V' => 'Cover PG',
     ];
 
     protected function serializeDate(DateTimeInterface $date)
@@ -39,6 +47,6 @@ class ProductionEstimation extends Model
 
     public function product()
     {
-        return $this->belongsTo(Book::class, 'product_id');
+        return $this->belongsTo(BookVariant::class, 'product_id');
     }
 }

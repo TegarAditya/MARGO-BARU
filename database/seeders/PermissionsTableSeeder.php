@@ -888,6 +888,10 @@ class PermissionsTableSeeder extends Seeder
             ],
             [
                 'id'    => 220,
+                'title' => 'estimation_movement_access',
+            ],
+            [
+                'id'    => 221,
                 'title' => 'profile_password_edit',
             ],
         ];

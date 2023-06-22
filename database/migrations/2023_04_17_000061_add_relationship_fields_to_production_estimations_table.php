@@ -10,7 +10,7 @@ class AddRelationshipFieldsToProductionEstimationsTable extends Migration
     {
         Schema::table('production_estimations', function (Blueprint $table) {
             $table->unsignedBigInteger('product_id')->nullable();
-            $table->foreign('product_id', 'product_fk_8144003')->references('id')->on('books');
+            $table->foreign('product_id', 'product_fk_8144003')->references('id')->on('book_variants');
         });
     }
 }

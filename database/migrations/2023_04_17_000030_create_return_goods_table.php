@@ -12,7 +12,7 @@ class CreateReturnGoodsTable extends Migration
             $table->bigIncrements('id');
             $table->string('no_retur')->unique();
             $table->date('date');
-            $table->decimal('nominal', 15, 2);
+            $table->decimal('nominal', 15, 2)->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

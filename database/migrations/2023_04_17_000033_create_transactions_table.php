@@ -14,6 +14,7 @@ class CreateTransactionsTable extends Migration
             $table->longText('description')->nullable();
             $table->string('type')->nullable();
             $table->string('reference_no');
+            $table->date('transaction_date')->nullable();
             $table->decimal('amount', 15, 2);
             $table->string('category');
             $table->boolean('status')->default(0);

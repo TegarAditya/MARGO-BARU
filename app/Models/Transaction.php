@@ -42,9 +42,11 @@ class Transaction extends Model
         'type',
         'reference_id',
         'reference_no',
+        'transaction_date',
         'amount',
         'category',
         'status',
+        'reversal_of_id',
         'created_at',
         'updated_at',
         'deleted_at',
@@ -65,6 +67,16 @@ class Transaction extends Model
         $this->attributes['date'] = $value ? Carbon::createFromFormat(config('panel.date_format'), $value)->format('Y-m-d') : null;
     }
 
+    public function getTransactionDateAttribute($value)
+    {
+        return $value ? Carbon::parse($value)->format(config('panel.date_format')) : null;
+    }
+
+    public function setTransactionDateAttribute($value)
+    {
+        $this->attributes['transaction_date'] = $value ? Carbon::createFromFormat(config('panel.date_format'), $value)->format('Y-m-d') : null;
+    }
+
     public function salesperson()
     {
         return $this->belongsTo(Salesperson::class, 'salesperson_id');
@@ -78,5 +90,10 @@ class Transaction extends Model
     public function reference()
     {
         return $this->belongsTo(Invoice::class, 'reference_id');
+    }
+
+    public function reversal_of()
+    {
+        return $this->belongsTo(self::class, 'reversal_of_id');
     }
 }

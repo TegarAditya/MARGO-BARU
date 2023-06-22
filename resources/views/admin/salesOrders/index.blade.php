@@ -6,6 +6,13 @@
             <a class="btn btn-success" href="{{ route('admin.sales-orders.create') }}">
                 {{ trans('global.add') }} {{ trans('cruds.salesOrder.title_singular') }}
             </a>
+            <a class="btn btn-danger" href="{{ route('admin.sales-orders.templateImport') }}">
+                Template Import
+            </a>
+            <button class="btn btn-primary" data-toggle="modal" data-target="#importModal">
+                Import
+            </button>
+            @include('csvImport.import_modal', ['model' => 'SalesOrder', 'route' => 'admin.sales-orders.import'])
         </div>
     </div>
 @endcan
@@ -28,16 +35,7 @@
                         {{ trans('cruds.salesOrder.fields.salesperson') }}
                     </th>
                     <th>
-                        {{ trans('cruds.salesOrder.fields.product') }}
-                    </th>
-                    <th>
-                        {{ trans('cruds.salesOrder.fields.jenjang') }}
-                    </th>
-                    <th>
-                        {{ trans('cruds.salesOrder.fields.kurikulum') }}
-                    </th>
-                    <th>
-                        {{ trans('cruds.salesOrder.fields.quantity') }}
+                        Payment Type
                     </th>
                     <th>
                         &nbsp;
@@ -94,14 +92,11 @@
     aaSorting: [],
     ajax: "{{ route('admin.sales-orders.index') }}",
     columns: [
-      { data: 'placeholder', name: 'placeholder' },
-{ data: 'semester_name', name: 'semester.name' },
-{ data: 'salesperson_name', name: 'salesperson.name' },
-{ data: 'product_code', name: 'product.code' },
-{ data: 'jenjang_code', name: 'jenjang.code' },
-{ data: 'kurikulum_code', name: 'kurikulum.code' },
-{ data: 'quantity', name: 'quantity' },
-{ data: 'actions', name: '{{ trans('global.actions') }}' }
+        { data: 'placeholder', name: 'placeholder' },
+        { data: 'semester_name', name: 'semester.name', class: 'text-center' },
+        { data: 'salesperson_name', name: 'salesperson.name', class: 'text-center' },
+        { data: 'payment_type', name: 'payment_type', class: 'text-center' },
+        { data: 'actions', name: '{{ trans('global.actions') }}', class: 'text-center' }
     ],
     orderCellsTop: true,
     order: [[ 2, 'desc' ]],
@@ -112,7 +107,7 @@
       $($.fn.dataTable.tables(true)).DataTable()
           .columns.adjust();
   });
-  
+
 });
 
 </script>

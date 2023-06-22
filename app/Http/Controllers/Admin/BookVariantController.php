@@ -16,6 +16,7 @@ use App\Models\Unit;
 use App\Models\Cover;
 use App\Models\Kelas;
 use App\Models\Mapel;
+use App\Models\SalesOrder;
 use Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -195,10 +196,28 @@ class BookVariantController extends Controller
     public function getBooks(Request $request)
     {
         $query = $request->input('q');
+        $jenjang = $request->input('jenjang');
 
-        $products = BookVariant::select('id', 'code')->where('code', 'like', "%$query%")->where('type', 'L')->get();
+        $query = BookVariant::whereIn('type', ['L', 'P'])->where('code', 'like', "%{$query}%")->orderBy('code', 'ASC');
 
-        return response()->json($products);
+        if (!empty($jenjang)) {
+            $query->where('jenjang_id', $jenjang);
+        }
+
+        $products = $query->get();
+
+        $formattedProducts = [];
+
+        foreach ($products as $product) {
+            $formattedProducts[] = [
+                'id' => $product->id,
+                'text' => $product->code,
+                'stock' => $product->stock,
+                'name' => $product->name,
+            ];
+        }
+
+        return response()->json($formattedProducts);
     }
 
     public function getBook(Request $request)
@@ -206,7 +225,186 @@ class BookVariantController extends Controller
         $id = $request->input('id');
 
         $product = BookVariant::find($id);
-        $product->load('book');
+        $product->load('book', 'jenjang', 'book.cover', 'book.kurikulum');
+
+        return response()->json($product);
+    }
+
+    public function getEstimasi(Request $request)
+    {
+        $query = $request->input('q');
+        $semester = $request->input('semester');
+        $salesperson = $request->input('salesperson');
+        $type = $request->input('type');
+        $jenjang = $request->input('jenjang');
+
+        $query = BookVariant::whereHas('estimasi', function ($q) use ($semester, $salesperson, $type) {
+                    $q->where('salesperson_id', $salesperson)
+                    ->where('payment_type', $type)
+                    ->where('semester_id', $semester);
+                })->where('code', 'like', "%{$query}%")->orderBy('code', 'ASC');
+
+        if (!empty($jenjang)) {
+            $query->where('jenjang_id', $jenjang);
+        }
+
+        $products = $query->get();
+
+        $formattedProducts = [];
+
+        foreach ($products as $product) {
+            $formattedProducts[] = [
+                'id' => $product->id,
+                'text' => $product->code,
+                'stock' => $product->stock,
+                'name' => $product->name,
+            ];
+        }
+
+        return response()->json($formattedProducts);
+    }
+
+    public function getInfoEstimasi(Request $request)
+    {
+        $id = $request->input('id');
+        $semester = $request->input('semester');
+        $salesperson = $request->input('salesperson');
+        $type = $request->input('type');
+
+        $product = BookVariant::join('sales_orders', 'sales_orders.product_id', '=', 'book_variants.id')
+                ->where('book_variants.id', $id)
+                ->where('sales_orders.semester_id', $semester)
+                ->where('sales_orders.salesperson_id', $salesperson)
+                ->where('sales_orders.payment_type', $type)
+                ->first(['book_variants.*', 'sales_orders.quantity as estimasi', 'sales_orders.moved as terkirim', 'sales_orders.id as order_id']);
+        $product->load('book', 'jenjang', 'book.cover', 'book.kurikulum');
+
+        return response()->json($product);
+    }
+
+    public function getDelivery(Request $request)
+    {
+        $query = $request->input('q');
+        $delivery = $request->input('delivery');
+
+        $products = BookVariant::whereHas('dikirim', function ($q) use ($delivery) {
+                    $q->where('delivery_order_id', $delivery);
+                })->where('code', 'like', "%{$query}%")
+                ->orderBy('code', 'ASC')
+                ->get();
+
+        $formattedProducts = [];
+
+        foreach ($products as $product) {
+            $formattedProducts[] = [
+                'id' => $product->id,
+                'text' => $product->code,
+                'stock' => $product->stock,
+                'name' => $product->name,
+            ];
+        }
+
+        return response()->json($formattedProducts);
+    }
+
+    public function getInfoDelivery(Request $request)
+    {
+        $id = $request->input('id');
+        $delivery = $request->input('delivery');
+
+        $product = BookVariant::join('delivery_order_items', 'delivery_order_items.product_id', '=', 'book_variants.id')
+                ->join('sales_orders', 'sales_orders.id', '=', 'delivery_order_items.sales_order_id')
+                ->where('book_variants.id', $id)
+                ->where('delivery_order_items.delivery_order_id', $delivery)
+                ->first(['book_variants.*', 'delivery_order_items.quantity as quantity', 'delivery_order_items.id as delivery_item_id', 'sales_orders.quantity as estimasi', 'sales_orders.moved as terkirim']);
+        $product->load('book', 'jenjang', 'book.cover', 'book.kurikulum');
+
+        return response()->json($product);
+    }
+
+    public function getRetur(Request $request)
+    {
+        $query = $request->input('q');
+        $semester = $request->input('semester');
+        $salesperson = $request->input('salesperson');
+
+        $products = BookVariant::whereHas('dikirim', function ($q) use ($semester, $salesperson) {
+                    $q->where('semester_id', $semester)
+                    ->where('salesperson_id', $salesperson);
+                })->where('code', 'like', "%{$query}%")
+                ->orderBy('code', 'ASC')
+                ->get();
+
+        $formattedProducts = [];
+
+        foreach ($products as $product) {
+            $formattedProducts[] = [
+                'id' => $product->id,
+                'text' => $product->code,
+                'stock' => $product->stock,
+                'name' => $product->name,
+            ];
+        }
+
+        return response()->json($formattedProducts);
+    }
+
+    public function getInfoRetur(Request $request)
+    {
+        $id = $request->input('id');
+        $semester = $request->input('semester');
+        $salesperson = $request->input('salesperson');
+
+        $product = BookVariant::join('sales_orders', 'sales_orders.product_id', '=', 'book_variants.id')
+                ->where('book_variants.id', $id)
+                ->where('sales_orders.semester_id', $semester)
+                ->where('sales_orders.salesperson_id', $salesperson)
+                ->first(['book_variants.*', 'sales_orders.moved as terkirim',
+                    'sales_orders.retur as retur', 'sales_orders.id as order_id'
+                ]);
+
+        $product->load('book', 'jenjang', 'book.cover', 'book.kurikulum');
+
+        return response()->json($product);
+    }
+
+    public function getEditRetur(Request $request)
+    {
+        $query = $request->input('q');
+        $retur = $request->input('retur');
+
+        $products = BookVariant::whereHas('diretur', function ($q) use ($retur) {
+                    $q->where('retur_id', $retur);
+                })->where('code', 'like', "%{$query}%")
+                ->orderBy('code', 'ASC')
+                ->get();
+
+        $formattedProducts = [];
+
+        foreach ($products as $product) {
+            $formattedProducts[] = [
+                'id' => $product->id,
+                'text' => $product->code,
+                'stock' => $product->stock,
+                'name' => $product->name,
+            ];
+        }
+
+        return response()->json($formattedProducts);
+    }
+
+    public function getInfoEditRetur(Request $request)
+    {
+        $id = $request->input('id');
+        $retur = $request->input('retur');
+
+        $product = BookVariant::join('return_good_items', 'return_good_items.product_id', '=', 'book_variants.id')
+                ->join('sales_orders', 'sales_orders.id', '=', 'return_good_items.sales_order_id')
+                ->where('book_variants.id', $id)
+                ->where('return_good_items.retur_id', $retur)
+                ->first(['book_variants.*', 'return_good_items.quantity as quantity', 'return_good_items.id as retur_item_id',
+                    'sales_orders.retur as retur', 'sales_orders.moved as terkirim']);
+        $product->load('book', 'jenjang', 'book.cover', 'book.kurikulum');
 
         return response()->json($product);
     }

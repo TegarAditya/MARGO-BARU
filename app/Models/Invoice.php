@@ -8,12 +8,15 @@ use DateTimeInterface;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Date;
 
 class Invoice extends Model
 {
     use SoftDeletes, Auditable, HasFactory;
 
     public $table = 'invoices';
+
+    public const BULAN_ROMAWI = array(1=>"I","II","III", "IV", "V","VI","VII","VIII","IX","X", "XI","XII");
 
     protected $dates = [
         'date',
@@ -63,5 +66,17 @@ class Invoice extends Model
     public function salesperson()
     {
         return $this->belongsTo(Salesperson::class, 'salesperson_id');
+    }
+
+    public static function generateNoInvoice($semester) {
+        $data = self::where('semester_id', $semester)->count();
+        $semester = Semester::find($semester);
+
+        $invoice_number = !$data ? 1 : ($data + 1);
+
+        $prefix = 'INV/'.strtoupper($semester->type).'/MMJ/'.self::BULAN_ROMAWI[Date::now()->format('n')].'/'.Date::now()->format('y').'/';
+        $code = $prefix.sprintf("%04d", $invoice_number);
+
+        return $code;
     }
 }

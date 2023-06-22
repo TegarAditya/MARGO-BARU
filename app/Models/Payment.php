@@ -8,12 +8,15 @@ use DateTimeInterface;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Date;
 
 class Payment extends Model
 {
     use SoftDeletes, Auditable, HasFactory;
 
     public $table = 'payments';
+
+    public const BULAN_ROMAWI = array(1=>"I","II","III", "IV", "V","VI","VII","VIII","IX","X", "XI","XII");
 
     protected $dates = [
         'date',
@@ -43,6 +46,12 @@ class Payment extends Model
         'deleted_at',
     ];
 
+    protected $casts = [
+        'paid' => 'double',
+        'discount' => 'double',
+        'amount' => 'double',
+    ];
+
     protected function serializeDate(DateTimeInterface $date)
     {
         return $date->format('Y-m-d H:i:s');
@@ -66,5 +75,17 @@ class Payment extends Model
     public function semester()
     {
         return $this->belongsTo(Semester::class, 'semester_id');
+    }
+
+    public static function generateNoKwitansi($semester) {
+        $data = self::where('semester_id', $semester)->count();
+        $semester = Semester::find($semester);
+
+        $payment_number = !$data ? 1 : ($data + 1);
+
+        $prefix = 'KW/'.strtoupper($semester->type).'/MMJ/'.self::BULAN_ROMAWI[Date::now()->format('n')].'/'.Date::now()->format('y').'/';
+        $code = $prefix.sprintf("%04d", $payment_number);
+
+        return $code;
     }
 }

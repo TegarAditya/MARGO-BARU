@@ -8,12 +8,20 @@ use DateTimeInterface;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Date;
 
 class DeliveryOrder extends Model
 {
     use SoftDeletes, Auditable, HasFactory;
 
     public $table = 'delivery_orders';
+
+    public const BULAN_ROMAWI = array(1=>"I","II","III", "IV", "V","VI","VII","VIII","IX","X", "XI","XII");
+
+    public const PAYMENT_TYPE_SELECT = [
+        'cash'  => 'Cash',
+        'retur' => 'Retur',
+    ];
 
     protected $dates = [
         'date',
@@ -27,7 +35,9 @@ class DeliveryOrder extends Model
         'date',
         'semester_id',
         'salesperson_id',
+        'payment_type',
         'address',
+        'faktur',
         'created_at',
         'updated_at',
         'deleted_at',
@@ -56,5 +66,17 @@ class DeliveryOrder extends Model
     public function salesperson()
     {
         return $this->belongsTo(Salesperson::class, 'salesperson_id');
+    }
+
+    public static function generateNoSJ($semester) {
+        $data = self::where('semester_id', $semester)->count();
+        $semester = Semester::find($semester);
+
+        $order_number = !$data ? 1 : ($data + 1);
+
+        $prefix = 'SJ/'.strtoupper($semester->type).'/MMJ/'.self::BULAN_ROMAWI[Date::now()->format('n')].'/'.Date::now()->format('y').'/';
+        $code = $prefix.sprintf("%04d", $order_number);
+
+        return $code;
     }
 }

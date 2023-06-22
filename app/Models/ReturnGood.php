@@ -8,12 +8,15 @@ use DateTimeInterface;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Date;
 
 class ReturnGood extends Model
 {
     use SoftDeletes, Auditable, HasFactory;
 
     public $table = 'return_goods';
+
+    public const BULAN_ROMAWI = array(1=>"I","II","III", "IV", "V","VI","VII","VIII","IX","X", "XI","XII");
 
     protected $dates = [
         'date',
@@ -56,5 +59,17 @@ class ReturnGood extends Model
     public function semester()
     {
         return $this->belongsTo(Semester::class, 'semester_id');
+    }
+
+    public static function generateNoRetur($semester) {
+        $data = self::where('semester_id', $semester)->count();
+        $semester = Semester::find($semester);
+
+        $order_number = !$data ? 1 : ($data + 1);
+
+        $prefix = 'RETUR/'.strtoupper($semester->type).'/MMJ/'.self::BULAN_ROMAWI[Date::now()->format('n')].'/'.Date::now()->format('y').'/';
+        $code = $prefix.sprintf("%04d", $order_number);
+
+        return $code;
     }
 }

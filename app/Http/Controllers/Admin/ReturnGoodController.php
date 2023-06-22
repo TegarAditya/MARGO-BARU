@@ -7,12 +7,19 @@ use App\Http\Requests\MassDestroyReturnGoodRequest;
 use App\Http\Requests\StoreReturnGoodRequest;
 use App\Http\Requests\UpdateReturnGoodRequest;
 use App\Models\ReturnGood;
+use App\Models\ReturnGoodItem;
 use App\Models\Salesperson;
 use App\Models\Semester;
+use App\Models\BookVariant;
 use Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Yajra\DataTables\Facades\DataTables;
+use DB;
+use Alert;
+use Carbon\Carbon;
+use App\Services\EstimationService;
+use App\Services\StockService;
 
 class ReturnGoodController extends Controller
 {
@@ -70,18 +77,86 @@ class ReturnGoodController extends Controller
     {
         abort_if(Gate::denies('return_good_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $salespeople = Salesperson::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $semesters = Semester::orderBy('code', 'DESC')->where('status', 1)->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
-        $semesters = Semester::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $salespeople = Salesperson::whereHas('estimasi')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
         return view('admin.returnGoods.create', compact('salespeople', 'semesters'));
     }
 
-    public function store(StoreReturnGoodRequest $request)
+    public function store(Request $request)
     {
-        $returnGood = ReturnGood::create($request->all());
+         // Validate the form data
+        $validatedData = $request->validate([
+            'date' => 'required',
+            'semester_id' =>'required',
+            'salesperson_id' => 'required',
+            'orders' => 'required|array',
+            'orders.*' => 'exists:sales_orders,id',
+            'products' => 'required|array',
+            'products.*' => 'exists:book_variants,id',
+            'quantities' => 'required|array',
+            'quantities.*' => 'numeric|min:1',
+        ]);
 
-        return redirect()->route('admin.return-goods.index');
+        $date = $validatedData['date'];
+        $semester = $validatedData['semester_id'];
+        $salesperson = $validatedData['salesperson_id'];
+        $products = $validatedData['products'];
+        $orders = $validatedData['orders'];
+        $quantities = $validatedData['quantities'];
+
+        DB::beginTransaction();
+        try {
+            $retur = ReturnGood::create([
+                'no_retur' => ReturnGood::generateNoRetur($semester),
+                'date' => $date,
+                'semester_id' => $semester,
+                'salesperson_id' => $salesperson,
+            ]);
+
+            $nominal = 0;
+
+            for ($i = 0; $i < count($products); $i++) {
+                $product = $products[$i];
+                $book = BookVariant::find($product);
+
+                $order = $orders[$i];
+                $price = $book->price;
+                $quantity = $quantities[$i];
+                $total = (int) $price * $quantity;
+                $nominal += $total;
+
+                $retur_item = ReturnGoodItem::create([
+                    'retur_id' => $retur->id,
+                    'semester_id' => $semester,
+                    'salesperson_id' => $salesperson,
+                    'sales_order_id' => $order,
+                    'product_id' => $product,
+                    'price' => $price,
+                    'quantity' => $quantity,
+                    'total' => $total
+                ]);
+
+                StockService::createMovement('in', 'retur', $retur->id, $product, $quantity);
+                StockService::updateStock($product, $quantity);
+
+                EstimationService::updateRetur($order, $quantity);
+            }
+
+            $retur->nominal = $nominal;
+            $retur->save();
+
+            DB::commit();
+
+            Alert::success('Success', 'Retur berhasil di simpan');
+
+            return redirect()->route('admin.return-goods.index');
+        } catch (\Exception $e) {
+            DB::rollback();
+
+            return redirect()->back()->with('error-message', $e->getMessage())->withInput();
+        };
     }
 
     public function edit(ReturnGood $returnGood)
@@ -97,11 +172,69 @@ class ReturnGoodController extends Controller
         return view('admin.returnGoods.edit', compact('returnGood', 'salespeople', 'semesters'));
     }
 
-    public function update(UpdateReturnGoodRequest $request, ReturnGood $returnGood)
+    public function update(Request $request, ReturnGood $returnGood)
     {
-        $returnGood->update($request->all());
+         // Validate the form data
+        $validatedData = $request->validate([
+            'date' => 'required',
+            'retur_id' =>'required',
+            'retur_items' => 'required|array',
+            'retur_items.*' => 'exists:return_good_items,id',
+            'products' => 'required|array',
+            'products.*' => 'exists:book_variants,id',
+            'quantities' => 'required|array',
+            'quantities.*' => 'numeric|min:1',
+        ]);
 
-        return redirect()->route('admin.return-goods.index');
+        $date = $validatedData['date'];
+        $retur = $validatedData['retur_id'];
+        $products = $validatedData['products'];
+        $retur_items = $validatedData['retur_items'];
+        $quantities = $validatedData['quantities'];
+
+        DB::beginTransaction();
+        try {
+            $nominal = 0;
+
+            for ($i = 0; $i < count($products); $i++) {
+                $product = $products[$i];
+                $book = BookVariant::find($product);
+                
+                $price = $book->price;
+                $quantity = $quantities[$i];
+                $total = (int) $price * $quantity;
+                $nominal += $total;
+                
+                $retur_item = $retur_items[$i];
+                $retur_good_item = ReturnGoodItem::find($retur_item);
+
+                $old_quantity = $retur_good_item->quantity;
+                $order = $retur_good_item->sales_order_id;
+
+                $retur_good_item->quantity = $quantity;
+                $retur_good_item->save();
+
+                StockService::editMovement('in', 'retur', $returnGood->id, $product, $quantity);
+                StockService::updateStock($product, ($quantity - $old_quantity));
+
+                EstimationService::updateRetur($order, ($quantity - $old_quantity));
+            }
+
+            $returnGood->update([
+                'date' => $date,
+                'nominal' => $nominal
+            ]);
+
+            DB::commit();
+
+            Alert::success('Success', 'Retur berhasil di simpan');
+
+            return redirect()->route('admin.return-goods.index');
+        } catch (\Exception $e) {
+            DB::rollback();
+
+            return redirect()->back()->with('error-message', $e->getMessage())->withInput();
+        };
     }
 
     public function show(ReturnGood $returnGood)

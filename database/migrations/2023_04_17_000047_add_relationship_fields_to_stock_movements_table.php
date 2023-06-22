@@ -11,6 +11,8 @@ class AddRelationshipFieldsToStockMovementsTable extends Migration
         Schema::table('stock_movements', function (Blueprint $table) {
             $table->unsignedBigInteger('warehouse_id')->nullable();
             $table->foreign('warehouse_id', 'warehouse_fk_8106901')->references('id')->on('warehouses');
+            $table->unsignedBigInteger('reference_id')->nullable();
+            $table->foreign('reference_id', 'reference_fk_8534393')->references('id')->on('stock_adjustments');
             $table->unsignedBigInteger('product_id')->nullable();
             $table->foreign('product_id', 'product_fk_8106904')->references('id')->on('book_variants');
             $table->unsignedBigInteger('material_id')->nullable();

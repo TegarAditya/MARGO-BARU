@@ -61,6 +61,8 @@ class BookVariant extends Model
 
     protected $appends = [
         'name',
+        'short_name',
+        'book_type'
     ];
 
     protected $casts = [
@@ -75,7 +77,21 @@ class BookVariant extends Model
 
     public function getNameAttribute()
     {
-        $name = $this->book->name ?? '-';
+        $name = BookVariant::TYPE_SELECT[$this->type] . ' - '. $this->book->name ?? '-';
+
+        return $name;
+    }
+
+    public function getShortNameAttribute()
+    {
+        $name = $this->book->short_name .' - '. $this->halaman->name;
+
+        return $name;
+    }
+
+    public function getBookTypeAttribute()
+    {
+        $name = BookVariant::TYPE_SELECT[$this->type];
 
         return $name;
     }
@@ -88,6 +104,11 @@ class BookVariant extends Model
     public function parent()
     {
         return $this->belongsTo(self::class, 'parent_id');
+    }
+
+    public function child()
+    {
+        return $this->hasMany(self::class, 'parent_id');
     }
 
     public function jenjang()
@@ -118,5 +139,20 @@ class BookVariant extends Model
     public function unit()
     {
         return $this->belongsTo(Unit::class, 'unit_id');
+    }
+
+    public function estimasi()
+    {
+        return $this->hasMany(SalesOrder::class, 'product_id');
+    }
+
+    public function dikirim()
+    {
+        return $this->hasMany(DeliveryOrderItem::class, 'product_id');
+    }
+
+    public function diretur()
+    {
+        return $this->hasMany(ReturnGoodItem::class, 'product_id');
     }
 }

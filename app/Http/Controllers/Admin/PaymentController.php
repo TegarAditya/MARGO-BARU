@@ -13,6 +13,9 @@ use Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Yajra\DataTables\Facades\DataTables;
+use DB;
+use Alert;
+use App\Services\TransactionService;
 
 class PaymentController extends Controller
 {
@@ -76,35 +79,129 @@ class PaymentController extends Controller
     {
         abort_if(Gate::denies('payment_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $salespeople = Salesperson::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $semesters = Semester::orderBy('code', 'DESC')->where('status', 1)->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
-        $semesters = Semester::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $salespeople = Salesperson::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
         return view('admin.payments.create', compact('salespeople', 'semesters'));
     }
 
-    public function store(StorePaymentRequest $request)
+    public function store(Request $request)
     {
-        $payment = Payment::create($request->all());
+        // Validate the form data
+        $validatedData = $request->validate([
+            'date' => 'required',
+            'salesperson_id' => 'required',
+            'semester_id' => 'required',
+            'payment_method' => 'required',
+            'bayar' => 'required|numeric|min:1',
+            'diskon' => 'nullable|numeric',
+            'nominal' => 'required|numeric|min:1',
+            'note' => 'nullable'
+        ]);
 
-        return redirect()->route('admin.payments.index');
+        $date = $validatedData['date'];
+        $salesperson = $validatedData['salesperson_id'];
+        $semester = $validatedData['semester_id'];
+        $payment_method = $validatedData['payment_method'];
+        $bayar = $validatedData['bayar'];
+        $diskon = $validatedData['diskon'];
+        $nominal = $validatedData['nominal'];
+        $note = $validatedData['note'];
+
+        DB::beginTransaction();
+        try {
+            $payment = Payment::create([
+                'no_kwitansi' => Payment::generateNoKwitansi($semester),
+                'date' => $date,
+                'salesperson_id' => $salesperson,
+                'semester_id' => $semester,
+                'paid' => $bayar,
+                'discount' => $diskon,
+                'amount' => $nominal,
+                'payment_method' => $payment_method,
+                'note' => $note
+            ]);
+
+            TransactionService::createTransaction($date, $note, $salesperson, $semester, 'bayar', $payment->id, $payment->no_kwitansi, $bayar, 'credit');
+            TransactionService::createTransaction($date, $note, $salesperson, $semester, 'diskon', $payment->id, $payment->no_kwitansi, $diskon, 'credit');
+
+            DB::commit();
+
+            Alert::success('Success', 'Pembayaran berhasil di simpan');
+
+            return redirect()->route('admin.payments.index');
+        } catch (\Exception $e) {
+            DB::rollback();
+
+            return redirect()->back()->with('error-message', $e->getMessage())->withInput();
+        }
     }
 
     public function edit(Payment $payment)
     {
         abort_if(Gate::denies('payment_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $salespeople = Salesperson::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $semesters = Semester::orderBy('code', 'DESC')->where('status', 1)->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
-        $semesters = Semester::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $salespeople = Salesperson::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
         $payment->load('salesperson', 'semester');
 
         return view('admin.payments.edit', compact('payment', 'salespeople', 'semesters'));
     }
 
-    public function update(UpdatePaymentRequest $request, Payment $payment)
+    public function update(Request $request, Payment $payment)
     {
+        // Validate the form data
+        $validatedData = $request->validate([
+            'date' => 'required',
+            'salesperson_id' => 'required',
+            'semester_id' => 'required',
+            'payment_method' => 'required',
+            'bayar' => 'required|numeric|min:1',
+            'diskon' => 'nullable|numeric',
+            'nominal' => 'required|numeric|min:1',
+            'note' => 'nullable'
+        ]);
+
+        $date = $validatedData['date'];
+        $salesperson = $validatedData['salesperson_id'];
+        $semester = $validatedData['semester_id'];
+        $payment_method = $validatedData['payment_method'];
+        $bayar = $validatedData['bayar'];
+        $diskon = $validatedData['diskon'];
+        $nominal = $validatedData['nominal'];
+        $note = $validatedData['note'];
+
+        $reference_no = $payment->no_kwitansi;
+
+        DB::beginTransaction();
+        try {
+            $payment->update([
+                'date' => $date,
+                'salesperson_id' => $salesperson,
+                'semester_id' => $semester,
+                'paid' => $bayar,
+                'discount' => $diskon,
+                'amount' => $nominal,
+                'payment_method' => $payment_method,
+                'note' => $note
+            ]);
+
+            TransactionService::editTransaction($date, $note, $salesperson, $semester, 'bayar', $payment->id, $reference_no, $bayar, 'credit');
+            TransactionService::editTransaction($date, $note, $salesperson, $semester, 'diskon', $payment->id, $reference_no, $diskon, 'credit');
+
+            DB::commit();
+
+            Alert::success('Success', 'Pembayaran berhasil di simpan');
+
+            return redirect()->route('admin.payments.index');
+        } catch (\Exception $e) {
+            DB::rollback();
+
+            return redirect()->back()->with('error-message', $e->getMessage())->withInput();
+        }
         $payment->update($request->all());
 
         return redirect()->route('admin.payments.index');

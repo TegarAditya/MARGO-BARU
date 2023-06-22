@@ -41,4 +41,9 @@ class Salesperson extends Model
     {
         return $this->belongsTo(MarketingArea::class, 'marketing_area_id');
     }
+
+    public function estimasi()
+    {
+        return $this->hasMany(SalesOrder::class);
+    }
 }
