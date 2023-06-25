@@ -71,6 +71,9 @@
 
                     </th>
                     <th>
+                        No Order
+                    </th>
+                    <th>
                         {{ trans('cruds.salesOrder.fields.semester') }}
                     </th>
                     <th>
@@ -142,6 +145,7 @@
     },
     columns: [
         { data: 'placeholder', name: 'placeholder' },
+        { data: 'no_order', name: 'no_order', class: 'text-center' },
         { data: 'semester_name', name: 'semester.name', class: 'text-center' },
         { data: 'salesperson_name', name: 'salesperson.name', class: 'text-center' },
         { data: 'payment_type', name: 'payment_type', class: 'text-center' },

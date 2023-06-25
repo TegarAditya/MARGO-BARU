@@ -138,7 +138,7 @@ class ReturnGoodController extends Controller
                     'total' => $total
                 ]);
 
-                StockService::createMovement('in', 'retur', $retur->id, $product, $quantity);
+                StockService::createMovement('in', 'retur', $retur->id, $date, $product, $quantity);
                 StockService::updateStock($product, $quantity);
 
                 EstimationService::updateRetur($order, $quantity);
@@ -199,12 +199,12 @@ class ReturnGoodController extends Controller
             for ($i = 0; $i < count($products); $i++) {
                 $product = $products[$i];
                 $book = BookVariant::find($product);
-                
+
                 $price = $book->price;
                 $quantity = $quantities[$i];
                 $total = (int) $price * $quantity;
                 $nominal += $total;
-                
+
                 $retur_item = $retur_items[$i];
                 $retur_good_item = ReturnGoodItem::find($retur_item);
 
@@ -214,7 +214,7 @@ class ReturnGoodController extends Controller
                 $retur_good_item->quantity = $quantity;
                 $retur_good_item->save();
 
-                StockService::editMovement('in', 'retur', $returnGood->id, $product, $quantity);
+                StockService::editMovement('in', 'retur', $returnGood->id, $date, $product, $quantity);
                 StockService::updateStock($product, ($quantity - $old_quantity));
 
                 EstimationService::updateRetur($order, ($quantity - $old_quantity));

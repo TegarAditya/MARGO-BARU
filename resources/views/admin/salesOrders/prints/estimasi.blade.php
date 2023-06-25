@@ -34,7 +34,6 @@
         @endif
 
         @php
-            $total_estimasi = 0;
             $total_sisa = 0;
         @endphp
 
@@ -42,11 +41,10 @@
             <thead>
                 <tr>
                     <th width="1%" class="text-center">No.</th>
-                    <th>Kode</th>
+                    <th>Cover</th>
                     <th>Tema/Mapel</th>
-                    <th>Kelas</th>
-                    <th width="1%" class="text-center">Halaman</th>
-                    <th width="1%" class="text-center">Estimasi</th>
+                    <th width="1%">Kelas</th>
+                    <th width="1%" class="text-center">Hal</th>
                     <th width="1%" class="text-center">Sisa</th>
                 </tr>
             </thead>
@@ -56,17 +54,15 @@
                     @php
                     $sisa = $order->quantity - $order->moved;
                     $total_sisa += $sisa;
-                    $total_estimasi += $order->quantity;
 
                     $product = $order->product;
                     @endphp
                     <tr>
                         <td class="text-center">{{ $loop->iteration }}</td>
-                        <td>{{ $product->code }}</td>
+                        <td>{{ $product->book->cover->name }}</td>
                         <td>{{ $product->book->mapel->name }}</td>
                         <td class="text-center">{{ $product->book->kelas->code }}</td>
                         <td class="text-center">{{ $product->halaman->code }}</td>
-                        <td class="text-center">{{ angka($order->quantity) }}</td>
                         <td class="text-center">{{ angka($sisa)}}</td>
                     </tr>
                 @endforeach
@@ -74,12 +70,11 @@
             <tfoot>
                 <tr>
                     <th class="text-center" colspan="5"><b>Total</b></th>
-                    <th class="text-center">{{ angka($total_estimasi) }}</th>
                     <th width="1%" class="text-center">{{ angka($total_sisa) }}</th>
                 </tr>
             </tfoot>
         </table>
-    @endforeach 
+    @endforeach
 @endsection
 
 @section('footer')

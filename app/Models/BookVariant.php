@@ -46,9 +46,12 @@ class BookVariant extends Model
         'name',
         'type',
         'jenjang_id',
-        'semester_id',
         'kurikulum_id',
+        'cover_id',
+        'mapel_id',
+        'kelas_id',
         'halaman_id',
+        'semester_id',
         'warehouse_id',
         'stock',
         'unit_id',
@@ -117,19 +120,34 @@ class BookVariant extends Model
         return $this->belongsTo(Jenjang::class, 'jenjang_id');
     }
 
-    public function semester()
-    {
-        return $this->belongsTo(Semester::class, 'semester_id');
-    }
-
     public function kurikulum()
     {
         return $this->belongsTo(Kurikulum::class, 'kurikulum_id');
     }
 
+    public function cover()
+    {
+        return $this->belongsTo(Cover::class, 'cover_id');
+    }
+
+    public function mapel()
+    {
+        return $this->belongsTo(Mapel::class, 'mapel_id');
+    }
+
+    public function kelas()
+    {
+        return $this->belongsTo(Kela::class, 'kelas_id');
+    }
+
     public function halaman()
     {
         return $this->belongsTo(Halaman::class, 'halaman_id');
+    }
+
+    public function semester()
+    {
+        return $this->belongsTo(Semester::class, 'semester_id');
     }
 
     public function warehouse()

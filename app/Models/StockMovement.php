@@ -69,7 +69,7 @@ class StockMovement extends Model
 
     public function setMovementDateAttribute($value)
     {
-        $this->attributes['reference_date'] = $value ? Carbon::createFromFormat(config('panel.date_format'), $value)->format('Y-m-d') : null;
+        $this->attributes['movement_date'] = $value ? Carbon::createFromFormat(config('panel.date_format'), $value)->format('Y-m-d') : null;
     }
 
     public function getReferenceDateAttribute($value)

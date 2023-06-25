@@ -128,7 +128,7 @@ class DeliveryOrderController extends Controller
                     'quantity' => $quantity
                 ]);
 
-                StockService::createMovement('out', 'delivery', $delivery->id, $product, -1 * $quantity);
+                StockService::createMovement('out', 'delivery', $delivery->id, $date, $product, -1 * $quantity);
                 StockService::updateStock($product, -1 * $quantity);
 
                 EstimationService::updateMoved($order, $quantity);
@@ -196,7 +196,7 @@ class DeliveryOrderController extends Controller
                 $delivery_order_item->quantity = $quantity;
                 $delivery_order_item->save();
 
-                StockService::editMovement('out', 'delivery', $deliveryOrder->id, $product, -1 * $quantity);
+                StockService::editMovement('out', 'delivery', $deliveryOrder->id, $date, $product, -1 * $quantity);
                 StockService::updateStock($product, -1 * ($quantity - $old_quantity));
 
                 EstimationService::updateMoved($order, ($quantity - $old_quantity));

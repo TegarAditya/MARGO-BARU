@@ -187,7 +187,7 @@
                                         </div>
                                     </div>
                                     <div class="col-auto pl-5">
-                                        <button type="button" class="btn btn-danger btn-sm product-delete" data-product-id="${product.id}">
+                                        <button type="button" class="btn btn-danger btn-sm product-delete" data-product-id="${product.id}" tabIndex="-1">
                                             <i class="fa fa-trash"></i>
                                         </button>
                                     </div>

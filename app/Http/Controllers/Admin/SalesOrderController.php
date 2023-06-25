@@ -31,7 +31,7 @@ class SalesOrderController extends Controller
 
         if ($request->ajax()) {
             // $query = SalesOrder::with(['semester', 'salesperson', 'product', 'jenjang', 'kurikulum'])->select(sprintf('%s.*', (new SalesOrder)->table));
-            $query = SalesOrder::select('semester_id', 'salesperson_id', 'payment_type')->distinct()->with(['semester', 'salesperson']);
+            $query = SalesOrder::select('no_order', 'semester_id', 'salesperson_id', 'payment_type')->distinct()->with(['semester', 'salesperson']);
 
             if (!empty($request->salesperson)) {
                 $query->where('salesperson_id', $request->salesperson);
@@ -53,7 +53,7 @@ class SalesOrderController extends Controller
                     <a class="px-1" href="'.route('admin.sales-orders.show', ['salesperson' => $row->salesperson_id, 'semester' => $row->semester_id, 'payment_type' => $row->payment_type]).'" title="Show">
                         <i class="fas fa-eye text-success fa-lg"></i>
                     </a>
-                    <a class="px-1" href="'.route('admin.sales-orders.show', ['print' => true, 'salesperson' => $row->salesperson_id, 'semester' => $row->semester_id, 'payment_type' => $row->payment_type]).'" title="Show">
+                    <a class="px-1" href="'.route('admin.sales-orders.estimasi', ['salesperson' => $row->salesperson_id, 'semester' => $row->semester_id, 'payment_type' => $row->payment_type]).'" target="_blank" title="Show" >
                         <i class="fas fa-print text-secondary fa-lg"></i>
                     </a>
                     <a class="px-1" href="'.route('admin.sales-orders.edit', ['salesperson' => $row->salesperson_id, 'semester' => $row->semester_id, 'payment_type' => $row->payment_type]).'" title="Edit">
@@ -322,7 +322,7 @@ class SalesOrderController extends Controller
         $salesOrder = $orders->first();
         $salesOrder->load('semester', 'salesperson', 'product', 'jenjang', 'kurikulum');
 
-        $grouped = $orders->groupBy('jen_kum')->sortBy('product.id');
+        $grouped = $orders->groupBy('jen_kum')->sortBy('product.mapel_id')->sortBy('product.kelas_id');
 
         return view('admin.salesOrders.prints.estimasi', compact('salesOrder', 'orders', 'grouped'));
     }

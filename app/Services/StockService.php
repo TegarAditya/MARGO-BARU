@@ -9,7 +9,7 @@ use App\Models\StockMovement;
 
 class StockService
 {
-    public static function createMovement($type_movement, $transaction_type, $reference, $product, $quantity)
+    public static function createMovement($type_movement, $transaction_type, $reference, $date,  $product, $quantity)
     {
         $estimation = StockMovement::create([
             'warehouse' => 1,
@@ -17,6 +17,7 @@ class StockService
             'movement_type' => $type_movement,
             'transaction_type' => $transaction_type,
             'reference_id' => $reference,
+            'reference_date' => $date,
             'product_id' => $product,
             'quantity' => $quantity,
         ]);
@@ -28,7 +29,7 @@ class StockService
         ]);
     }
 
-    public static function editMovement($type_movement, $transaction_type, $reference, $product, $quantity)
+    public static function editMovement($type_movement, $transaction_type, $reference, $date, $product, $quantity)
     {
         $reversal = StockMovement::where('transaction_type', $transaction_type)->where('reference_id', $reference)
                     ->where('product_id', $product)->orderBy('id', 'DESC')->first();
@@ -39,17 +40,19 @@ class StockService
             'movement_type' => 'revisi',
             'transaction_type' => $transaction_type,
             'reference_id' => $reference,
+            'reference_date' => $date,
             'product_id' => $product,
             'quantity' => -1 * $reversal->quantity,
             'reversal_of_id' => $reversal->id
         ]);
 
-        $estimation = StockMovement::create([
+        $stock = StockMovement::create([
             'warehouse' => 1,
             'movement_date' => Carbon::now()->format('d-m-Y'),
             'movement_type' => $type_movement,
             'transaction_type' => $transaction_type,
             'reference_id' => $reference,
+            'reference_date' => $date,
             'product_id' => $product,
             'quantity' => $quantity,
         ]);

@@ -105,7 +105,7 @@ class StockAdjustmentController extends Controller
                     'quantity' => $quantity
                 ]);
 
-                StockService::createMovement($type, 'adjustment', $adjustment->id, $product, $multiplier * $quantity);
+                StockService::createMovement($type, 'adjustment', $adjustment->id, $date, $product, $multiplier * $quantity);
                 StockService::updateStock($product, $multiplier * $quantity);
             }
 
@@ -175,7 +175,7 @@ class StockAdjustmentController extends Controller
 
                 $adjustment_item->save();
 
-                StockService::editMovement($type, 'adjustment', $stockAdjustment->id, $product, $multiplier * $quantity);
+                StockService::editMovement($type, 'adjustment', $stockAdjustment->id, $date, $product, $multiplier * $quantity);
                 StockService::updateStock($product, ($multiplier * $quantity) - ($multiplier * $old_quantity));
             }
 
