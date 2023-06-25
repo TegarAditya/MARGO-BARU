@@ -13,7 +13,8 @@ class CreateFinishingsTable extends Migration
             $table->string('no_spk');
             $table->date('date');
             $table->decimal('total_cost', 15, 2);
-            $table->string('total_oplah');
+            $table->integer('estimasi_oplah');
+            $table->integer('total_oplah')->nullable();
             $table->longText('note')->nullable();
             $table->timestamps();
             $table->softDeletes();

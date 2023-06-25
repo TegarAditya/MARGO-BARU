@@ -14,6 +14,7 @@ class CreateStockMovementsTable extends Migration
             $table->string('movement_type');
             $table->float('quantity', 17, 2);
             $table->string('transaction_type')->nullable();
+            $table->date('reference_date');
             $table->timestamps();
             $table->softDeletes();
         });

@@ -28,6 +28,7 @@ class Finishing extends Model
         'semester_id',
         'vendor_id',
         'total_cost',
+        'estimasi_oplah',
         'total_oplah',
         'note',
         'created_at',

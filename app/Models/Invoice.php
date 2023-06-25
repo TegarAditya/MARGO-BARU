@@ -31,6 +31,8 @@ class Invoice extends Model
         'delivery_order_id',
         'semester_id',
         'salesperson_id',
+        'total',
+        'discount',
         'nominal',
         'note',
         'created_at',

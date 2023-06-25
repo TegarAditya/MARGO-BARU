@@ -53,4 +53,9 @@ class Material extends Model
     {
         return $this->belongsTo(Warehouse::class, 'warehouse_id');
     }
+
+    public function vendors()
+    {
+        return $this->belongsToMany(Vendor::class);
+    }
 }

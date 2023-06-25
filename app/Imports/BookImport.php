@@ -56,6 +56,7 @@ class BookImport implements ToCollection, WithHeadingRow
                     'type' => 'L',
                 ],
                 [
+                    'name' => 'LKS' . ' - '. $buku->name,
                     'jenjang_id' => $jenjang->id,
                     'semester_id' => $semester->id,
                     'kurikulum_id' => $kurikulum->id,
@@ -75,6 +76,7 @@ class BookImport implements ToCollection, WithHeadingRow
                         'type' => $key,
                     ],
                     [
+                        'name' => BookVariant::TYPE_SELECT[$key] . ' - '. $buku->name,
                         'parent_id' => $lks->id,
                         'jenjang_id' => $jenjang->id,
                         'semester_id' => $semester->id,
@@ -95,6 +97,7 @@ class BookImport implements ToCollection, WithHeadingRow
                     'type' => 'P',
                 ],
                 [
+                    'name' => 'Pegangan Guru' . ' - '. $buku->name,
                     'jenjang_id' => $jenjang->id,
                     'semester_id' => $semester->id,
                     'kurikulum_id' => $kurikulum->id,
@@ -114,6 +117,7 @@ class BookImport implements ToCollection, WithHeadingRow
                         'type' => $key,
                     ],
                     [
+                        'name' => BookVariant::TYPE_SELECT[$key] . ' - '. $buku->name,
                         'parent_id' => $pg->id,
                         'jenjang_id' => $jenjang->id,
                         'semester_id' => $semester->id,

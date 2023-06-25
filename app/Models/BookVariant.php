@@ -43,6 +43,7 @@ class BookVariant extends Model
         'book_id',
         'parent_id',
         'code',
+        'name',
         'type',
         'jenjang_id',
         'semester_id',
@@ -60,9 +61,9 @@ class BookVariant extends Model
     ];
 
     protected $appends = [
-        'name',
+        'long_name',
         'short_name',
-        'book_type'
+        'book_type',
     ];
 
     protected $casts = [
@@ -75,7 +76,7 @@ class BookVariant extends Model
         return $date->format('Y-m-d H:i:s');
     }
 
-    public function getNameAttribute()
+    public function getLongNameAttribute()
     {
         $name = BookVariant::TYPE_SELECT[$this->type] . ' - '. $this->book->name ?? '-';
 
@@ -154,5 +155,10 @@ class BookVariant extends Model
     public function diretur()
     {
         return $this->hasMany(ReturnGoodItem::class, 'product_id');
+    }
+
+    public function adjustment()
+    {
+        return $this->hasMany(StockAdjustmentDetail::class, 'product_id');
     }
 }

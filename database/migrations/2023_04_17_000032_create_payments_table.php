@@ -15,7 +15,7 @@ class CreatePaymentsTable extends Migration
             $table->decimal('paid', 15, 2);
             $table->decimal('discount', 15, 2)->nullable();
             $table->decimal('amount', 15, 2);
-            $table->string('payment_method')->nullable();
+            $table->string('payment_method');
             $table->longText('note')->nullable();
             $table->timestamps();
             $table->softDeletes();

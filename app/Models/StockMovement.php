@@ -17,6 +17,7 @@ class StockMovement extends Model
 
     protected $dates = [
         'movement_date',
+        'reference_date',
         'created_at',
         'updated_at',
         'deleted_at',
@@ -41,6 +42,7 @@ class StockMovement extends Model
         'movement_type',
         'transaction_type',
         'reference_id',
+        'reference_date',
         'product_id',
         'material_id',
         'quantity',
@@ -67,7 +69,17 @@ class StockMovement extends Model
 
     public function setMovementDateAttribute($value)
     {
-        $this->attributes['movement_date'] = $value ? Carbon::createFromFormat(config('panel.date_format'), $value)->format('Y-m-d') : null;
+        $this->attributes['reference_date'] = $value ? Carbon::createFromFormat(config('panel.date_format'), $value)->format('Y-m-d') : null;
+    }
+
+    public function getReferenceDateAttribute($value)
+    {
+        return $value ? Carbon::parse($value)->format(config('panel.date_format')) : null;
+    }
+
+    public function setReferenceDateAttribute($value)
+    {
+        $this->attributes['reference_date'] = $value ? Carbon::createFromFormat(config('panel.date_format'), $value)->format('Y-m-d') : null;
     }
 
     public function reference()

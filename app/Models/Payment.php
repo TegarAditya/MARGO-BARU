@@ -26,9 +26,10 @@ class Payment extends Model
     ];
 
     public const PAYMENT_METHOD_SELECT = [
-        'cash' => 'Cash',
+        'cash' => 'Kas Besar',
         'bca'  => 'Bank BCA',
         'bri'  => 'Bank BRI',
+        'mandiri'  => 'Bank Mandiri',
     ];
 
     protected $fillable = [

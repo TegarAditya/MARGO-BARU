@@ -9,6 +9,7 @@ use App\Http\Requests\StoreMaterialRequest;
 use App\Http\Requests\UpdateMaterialRequest;
 use App\Models\Material;
 use App\Models\Unit;
+use App\Models\Vendor;
 use Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -62,7 +63,16 @@ class MaterialsController extends Controller
                 return $row->stock ? $row->stock : '';
             });
 
-            $table->rawColumns(['actions', 'placeholder', 'unit']);
+            $table->editColumn('vendor', function ($row) {
+                $labels = [];
+                foreach ($row->vendors as $vendor) {
+                    $labels[] = sprintf('<span class="label label-info label-many">%s</span>', $vendor->name);
+                }
+
+                return implode(' ', $labels);
+            });
+
+            $table->rawColumns(['actions', 'placeholder', 'unit', 'vendor']);
 
             return $table->make(true);
         }
@@ -76,12 +86,15 @@ class MaterialsController extends Controller
 
         $units = Unit::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
-        return view('admin.materials.create', compact('units'));
+        $vendors = Vendor::pluck('name', 'id');
+
+        return view('admin.materials.create', compact('units', 'vendors'));
     }
 
     public function store(StoreMaterialRequest $request)
     {
         $material = Material::create($request->all());
+        $material->vendors()->sync($request->input('vendors', []));
 
         return redirect()->route('admin.materials.index');
     }
@@ -92,14 +105,17 @@ class MaterialsController extends Controller
 
         $units = Unit::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
-        $material->load('unit', 'warehouse');
+        $vendors = Vendor::pluck('name', 'id');
 
-        return view('admin.materials.edit', compact('material', 'units'));
+        $material->load('unit', 'warehouse', 'vendors');
+
+        return view('admin.materials.edit', compact('material', 'units', 'vendors'));
     }
 
     public function update(UpdateMaterialRequest $request, Material $material)
     {
         $material->update($request->all());
+        $material->vendors()->sync($request->input('vendors', []));
 
         return redirect()->route('admin.materials.index');
     }
@@ -108,7 +124,7 @@ class MaterialsController extends Controller
     {
         abort_if(Gate::denies('material_show'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $material->load('unit', 'warehouse');
+        $material->load('unit', 'warehouse', 'vendors');
 
         return view('admin.materials.show', compact('material'));
     }

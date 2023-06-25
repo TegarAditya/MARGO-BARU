@@ -30,26 +30,36 @@ class SalesOrderController extends Controller
         abort_if(Gate::denies('sales_order_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         if ($request->ajax()) {
-            $query = SalesOrder::with(['semester', 'salesperson', 'product', 'jenjang', 'kurikulum'])->select(sprintf('%s.*', (new SalesOrder)->table));
-            // $query = $query = SalesOrder::select('semester_id', 'salesperson_id', 'payment_type')->distinct()->with(['semester', 'salesperson']);
+            // $query = SalesOrder::with(['semester', 'salesperson', 'product', 'jenjang', 'kurikulum'])->select(sprintf('%s.*', (new SalesOrder)->table));
+            $query = SalesOrder::select('semester_id', 'salesperson_id', 'payment_type')->distinct()->with(['semester', 'salesperson']);
+
+            if (!empty($request->salesperson)) {
+                $query->where('salesperson_id', $request->salesperson);
+            }
+            if (!empty($request->semester)) {
+                $query->where('semester_id', $request->semester);
+            }
+            if (!empty($request->semester)) {
+                $query->where('payment_type', $request->payment_type);
+            }
+
             $table = Datatables::of($query);
 
             $table->addColumn('placeholder', '&nbsp;');
             $table->addColumn('actions', '&nbsp;');
 
             $table->editColumn('actions', function ($row) {
-                $viewGate      = 'sales_order_show';
-                $editGate      = 'sales_order_edit';
-                $deleteGate    = 'sales_order_delete';
-                $crudRoutePart = 'sales-orders';
-
-                return view('partials.datatablesActions', compact(
-                    'viewGate',
-                    'editGate',
-                    'deleteGate',
-                    'crudRoutePart',
-                    'row'
-                ));
+                return '
+                    <a class="px-1" href="'.route('admin.sales-orders.show', ['salesperson' => $row->salesperson_id, 'semester' => $row->semester_id, 'payment_type' => $row->payment_type]).'" title="Show">
+                        <i class="fas fa-eye text-success fa-lg"></i>
+                    </a>
+                    <a class="px-1" href="'.route('admin.sales-orders.show', ['print' => true, 'salesperson' => $row->salesperson_id, 'semester' => $row->semester_id, 'payment_type' => $row->payment_type]).'" title="Show">
+                        <i class="fas fa-print text-secondary fa-lg"></i>
+                    </a>
+                    <a class="px-1" href="'.route('admin.sales-orders.edit', ['salesperson' => $row->salesperson_id, 'semester' => $row->semester_id, 'payment_type' => $row->payment_type]).'" title="Edit">
+                        <i class="fas fa-edit fa-lg"></i>
+                    </a>
+                ';
             });
 
             $table->addColumn('semester_name', function ($row) {
@@ -64,16 +74,16 @@ class SalesOrderController extends Controller
                 return $row->payment_type ? SalesOrder::PAYMENT_TYPE_SELECT[$row->payment_type] : '';
             });
 
-            // $table->addColumn('jenjang_code', function ($row) {
-            //     return $row->jenjang ? $row->jenjang->code : '';
-            // });
-
-            $table->rawColumns(['actions', 'placeholder', 'semester', 'salesperson', 'jenjang']);
+            $table->rawColumns(['actions', 'placeholder', 'semester', 'salesperson']);
 
             return $table->make(true);
         }
 
-        return view('admin.salesOrders.index');
+        $semesters = Semester::orderBy('code', 'DESC')->where('status', 1)->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+
+        $salespeople = Salesperson::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+
+        return view('admin.salesOrders.index', compact('salespeople', 'semesters'));
     }
 
     public function create()
@@ -82,7 +92,7 @@ class SalesOrderController extends Controller
 
         $semesters = Semester::orderBy('code', 'DESC')->where('status', 1)->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
-        $salespeople = Salesperson::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $salespeople = Salesperson::get()->pluck('full_name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
         $jenjangs = Jenjang::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
@@ -124,6 +134,7 @@ class SalesOrderController extends Controller
                     'jenjang_id' => $product->jenjang_id,
                     'kurikulum_id' => $product->kurikulum_id
                 ], [
+                    'no_order' => SalesOrder::generateNoOrder($semester, $salesperson, $payment_type),
                     'quantity' => DB::raw("quantity + $quantity"),
                     'moved' => 0,
                     'retur' => 0
@@ -148,13 +159,15 @@ class SalesOrderController extends Controller
 
             return redirect()->back()->with('error-message', $e->getMessage())->withInput();
         }
-
-        return redirect()->back()->with('success', 'Sales Order submitted successfully.');
     }
 
-    public function edit(SalesOrder $salesOrder)
+    public function edit(Request $request)
     {
         abort_if(Gate::denies('sales_order_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+
+        $semester = $request->semester;
+        $salesperson = $request->salesperson;
+        $payment_type = $request->payment_type;
 
         $semesters = Semester::orderBy('code', 'DESC')->where('status', 1)->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
@@ -162,14 +175,15 @@ class SalesOrderController extends Controller
 
         $jenjangs = Jenjang::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
-        $orders = SalesOrder::where('salesperson_id', $salesOrder->salesperson_id)
-                    ->where('semester_id', $salesOrder->semester_id)
-                    ->where('jenjang_id', $salesOrder->jenjang_id)
-                    ->where('kurikulum_id', $salesOrder->kurikulum_id)
+        $orders = SalesOrder::where('salesperson_id', $salesperson)
+                    ->where('semester_id', $semester)
+                    ->where('payment_type', $payment_type)
                     ->orderBy('product_id', 'ASC')
                     ->get();
 
-        return view('admin.salesOrders.edit', compact('jenjangs', 'salesOrder', 'salespeople', 'semesters', 'orders'));
+        $salesOrder = $orders->first();
+
+        return view('admin.salesOrders.edit', compact('jenjangs', 'salespeople', 'semesters', 'orders', 'salesOrder'));
     }
 
     public function update(Request $request, SalesOrder $salesOrder)
@@ -226,13 +240,20 @@ class SalesOrderController extends Controller
         }
     }
 
-    public function show(SalesOrder $salesOrder, Request $request)
+    public function show(Request $request)
     {
         abort_if(Gate::denies('sales_order_show'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-        $orders = SalesOrder::where('salesperson_id', $salesOrder->salesperson_id)
-            ->where('jenjang_id', $salesOrder->jenjang_id)
-            ->where('kurikulum_id', $salesOrder->kurikulum_id)
+
+        $semester = $request->semester;
+        $salesperson = $request->salesperson;
+        $payment_type = $request->payment_type;
+
+        $orders = SalesOrder::where('salesperson_id', $salesperson)
+            ->where('semester_id', $semester)
+            ->where('payment_type', $payment_type)
             ->get();
+
+        $salesOrder = $orders->first();
 
         $salesOrder->load('semester', 'salesperson', 'product', 'jenjang', 'kurikulum');
 
@@ -263,18 +284,6 @@ class SalesOrderController extends Controller
         return response(null, Response::HTTP_NO_CONTENT);
     }
 
-    public function printEstimasi(SalesOrder $salesOrder)
-    {
-        $orders = SalesOrder::where('salesperson_id', $salesOrder->salesperson_id)
-            ->where('jenjang_id', $salesOrder->jenjang_id)
-            ->where('kurikulum_id', $salesOrder->kurikulum_id)
-            ->get();
-
-        $salesOrder->load('semester', 'salesperson', 'product', 'jenjang', 'kurikulum');
-
-        return view('admin.salesOrders.show', compact('salesOrder', 'orders'));
-    }
-
     public function import(Request $request)
     {
         $file = $request->file('import_file');
@@ -298,4 +307,24 @@ class SalesOrderController extends Controller
         $filepath = public_path('import-template\SALES_ORDER_TEMPLATE.xlsx');
         return response()->download($filepath);
     }
+
+    public function estimasi(Request $request)
+    {
+        $semester = $request->semester;
+        $salesperson = $request->salesperson;
+        $payment_type = $request->payment_type;
+
+        $orders = SalesOrder::where('salesperson_id', $salesperson)
+            ->where('semester_id', $semester)
+            ->where('payment_type', $payment_type)
+            ->get();
+
+        $salesOrder = $orders->first();
+        $salesOrder->load('semester', 'salesperson', 'product', 'jenjang', 'kurikulum');
+
+        $grouped = $orders->groupBy('jen_kum')->sortBy('product.id');
+
+        return view('admin.salesOrders.prints.estimasi', compact('salesOrder', 'orders', 'grouped'));
+    }
+
 }

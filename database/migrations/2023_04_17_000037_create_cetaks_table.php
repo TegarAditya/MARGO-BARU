@@ -13,8 +13,9 @@ class CreateCetaksTable extends Migration
             $table->string('no_spc')->unique();
             $table->date('date');
             $table->string('type');
-            $table->decimal('total_cost', 15, 2);
-            $table->float('total_oplah', 15, 2);
+            $table->decimal('total_cost', 15, 2)->nullable();
+            $table->integer('estimasi_oplah');
+            $table->integer('total_oplah')->nullable();
             $table->longText('note')->nullable();
             $table->timestamps();
             $table->softDeletes();

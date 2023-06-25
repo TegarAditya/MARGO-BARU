@@ -26,48 +26,60 @@
 @stop
 
 @section('content')
-    @php
-        $total_estimasi = 0;
-        $total_sisa = 0;
-    @endphp
+    @foreach ($grouped as $key => $value)
+        @if ($loop->first)
+            <h5 class="text-center my-3">JENJANG {{ $key }}</h5>
+        @else
+            <h5 class="pagebreak text-center my-3">JENJANG {{ $key }}</h5>
+        @endif
 
-    <table cellspacing="0" cellpadding="0" class="table table-sm table-bordered" style="width: 100%">
-        <thead>
-            <tr>
-                <th width="1%" class="text-center">No.</th>
-                <th>Nama Produk</th>
-                <th width="1%" class="text-center">Halaman</th>
-                <th width="1%" class="text-center">Estimasi</th>
-                <th width="1%" class="text-center">Sisa</th>
-            </tr>
-        </thead>
+        @php
+            $total_estimasi = 0;
+            $total_sisa = 0;
+        @endphp
 
-        <tbody>
-            @foreach ($orders as $order)
-                @php
-                $sisa = $order->quantity - $order->moved;
-                $total_sisa += $sisa;
-                $total_estimasi += $order->quantity;
-
-                $product = $order->product;
-                @endphp
+        <table cellspacing="0" cellpadding="0" class="table table-sm table-bordered" style="width: 100%">
+            <thead>
                 <tr>
-                    <td class="text-center">{{ $loop->iteration }}</td>
-                    <td>{{ $product->name }}</td>
-                    <td class="text-center">{{ $product->halaman->code }}</td>
-                    <td class="text-center">{{ angka($order->quantity) }}</td>
-                    <td class="text-center">{{ angka($sisa)}}</td>
+                    <th width="1%" class="text-center">No.</th>
+                    <th>Kode</th>
+                    <th>Tema/Mapel</th>
+                    <th>Kelas</th>
+                    <th width="1%" class="text-center">Halaman</th>
+                    <th width="1%" class="text-center">Estimasi</th>
+                    <th width="1%" class="text-center">Sisa</th>
                 </tr>
-            @endforeach
-        </tbody>
-        <tfoot>
-            <tr>
-                <th class="text-center" colspan="3"><b>Total</b></th>
-                <th class="text-center">{{ angka($total_estimasi) }}</th>
-                <th width="1%" class="text-center">{{ angka($total_sisa) }}</th>
-            </tr>
-        </tfoot>
-    </table>
+            </thead>
+
+            <tbody>
+                @foreach ($value as $order)
+                    @php
+                    $sisa = $order->quantity - $order->moved;
+                    $total_sisa += $sisa;
+                    $total_estimasi += $order->quantity;
+
+                    $product = $order->product;
+                    @endphp
+                    <tr>
+                        <td class="text-center">{{ $loop->iteration }}</td>
+                        <td>{{ $product->code }}</td>
+                        <td>{{ $product->book->mapel->name }}</td>
+                        <td class="text-center">{{ $product->book->kelas->code }}</td>
+                        <td class="text-center">{{ $product->halaman->code }}</td>
+                        <td class="text-center">{{ angka($order->quantity) }}</td>
+                        <td class="text-center">{{ angka($sisa)}}</td>
+                    </tr>
+                @endforeach
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th class="text-center" colspan="5"><b>Total</b></th>
+                    <th class="text-center">{{ angka($total_estimasi) }}</th>
+                    <th width="1%" class="text-center">{{ angka($total_sisa) }}</th>
+                </tr>
+            </tfoot>
+        </table>
+    @endforeach 
 @endsection
 
 @section('footer')

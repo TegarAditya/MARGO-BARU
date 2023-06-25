@@ -395,18 +395,6 @@
                                     </a>
                                 </li>
                             @endcan
-                            @can('stock_adjustment_detail_access')
-                                <li class="nav-item">
-                                    <a href="{{ route("admin.stock-adjustment-details.index") }}" class="nav-link {{ request()->is("admin/stock-adjustment-details") || request()->is("admin/stock-adjustment-details/*") ? "active" : "" }}">
-                                        <i class="fa-fw nav-icon fas fa-th-large">
-
-                                        </i>
-                                        <p>
-                                            {{ trans('cruds.stockAdjustmentDetail.title') }}
-                                        </p>
-                                    </a>
-                                </li>
-                            @endcan
                         </ul>
                     </li>
                 @endcan

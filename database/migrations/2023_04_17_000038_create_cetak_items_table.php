@@ -10,10 +10,12 @@ class CreateCetakItemsTable extends Migration
     {
         Schema::create('cetak_items', function (Blueprint $table) {
             $table->bigIncrements('id');
+            $table->integer('estimasi');
             $table->integer('quantity');
-            $table->decimal('cost', 15, 2);
+            $table->decimal('cost', 15, 2)->nullable();
             $table->integer('plate_cost')->nullable();
             $table->float('paper_cost', 15, 2)->nullable();
+            $table->boolean('done')->default(0);
             $table->timestamps();
             $table->softDeletes();
         });

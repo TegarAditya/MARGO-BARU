@@ -17,7 +17,7 @@ class Cetak extends Model
 
     public const TYPE_SELECT = [
         'isi'   => 'Isi',
-        'cetak' => 'Cetak',
+        'cover' => 'Cover',
     ];
 
     protected $dates = [
@@ -34,6 +34,7 @@ class Cetak extends Model
         'vendor_id',
         'type',
         'total_cost',
+        'estimasi_oplah',
         'total_oplah',
         'note',
         'created_at',

@@ -71,6 +71,16 @@
                             {{ $material->stock }}
                         </td>
                     </tr>
+                    <tr>
+                        <th>
+                            {{ trans('cruds.material.fields.vendor') }}
+                        </th>
+                        <td>
+                            @foreach($material->vendors as $key => $vendor)
+                                <span class="label label-info">{{ $vendor->name }}</span>
+                            @endforeach
+                        </td>
+                    </tr>
                 </tbody>
             </table>
             <div class="form-group">

@@ -40,6 +40,12 @@ class UpdateMaterialRequest extends FormRequest
                 'numeric',
                 'required',
             ],
+            'vendors.*' => [
+                'integer',
+            ],
+            'vendors' => [
+                'array',
+            ],
         ];
     }
 }

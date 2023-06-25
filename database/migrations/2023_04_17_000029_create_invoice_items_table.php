@@ -11,10 +11,10 @@ class CreateInvoiceItemsTable extends Migration
         Schema::create('invoice_items', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->integer('quantity');
-            $table->decimal('price_unit', 15, 2);
-            $table->decimal('discount', 15, 2)->nullable();
             $table->decimal('price', 15, 2);
             $table->decimal('total', 15, 2);
+            $table->decimal('discount', 15, 2)->nullable();
+            $table->decimal('total_discount', 15, 2);
             $table->timestamps();
             $table->softDeletes();
         });

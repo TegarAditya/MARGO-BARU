@@ -131,24 +131,84 @@ class BookController extends Controller
                     'semester_id' => $semester_id,
                 ]);
 
-                foreach(BookVariant::TYPE_SELECT as $key => $label) {
-                    $stock = ($key == 'L') ? $request->stock : 0;
-                    $price = ($key == 'L') ? $request->price : 0;
-                    $cost = ($key == 'L') ? $request->cost : 0;
+                $lks = BookVariant::updateOrCreate([
+                    'book_id' => $buku->id,
+                    'code' => 'L' . '-' .$code,
+                    'type' => 'L',
+                ],
+                [
+                    'name' => 'LKS' . ' - '. $buku->name,
+                    'jenjang_id' => $jenjang->id,
+                    'semester_id' => $semester->id,
+                    'kurikulum_id' => $kurikulum->id,
+                    'halaman_id' => $halaman->id,
+                    'warehouse_id' => 1,
+                    'stock' => $row['stok'],
+                    'unit_id' => 1,
+                    'price' => $row['harga'],
+                    'cost' => $row['hpp'],
+                    'status' => 1,
+                ]);
 
-                    BookVariant::create([
+                foreach(BookVariant::LKS_TYPE as $key => $label) {
+                    $variant = BookVariant::updateOrCreate([
                         'book_id' => $buku->id,
                         'code' => $key . '-' .$code,
                         'type' => $key,
-                        'jenjang_id' => $jenjang_id,
-                        'semester_id' => $semester_id,
-                        'kurikulum_id' => $kurikulum_id,
-                        'halaman_id' => $halaman_id,
+                    ],
+                    [
+                        'name' => BookVariant::TYPE_SELECT[$key] . ' - '. $buku->name,
+                        'parent_id' => $lks->id,
+                        'jenjang_id' => $jenjang->id,
+                        'semester_id' => $semester->id,
+                        'kurikulum_id' => $kurikulum->id,
+                        'halaman_id' => $halaman->id,
                         'warehouse_id' => 1,
-                        'stock' => $stock,
+                        'stock' => 0,
                         'unit_id' => 1,
-                        'price' => $price,
-                        'cost' => $cost,
+                        'price' => 0,
+                        'cost' => 0,
+                        'status' => 1,
+                    ]);
+                }
+
+                $pg = BookVariant::updateOrCreate([
+                    'book_id' => $buku->id,
+                    'code' => 'P' . '-' .$code,
+                    'type' => 'P',
+                ],
+                [
+                    'name' => 'Pegangan Guru' . ' - '. $buku->name,
+                    'jenjang_id' => $jenjang->id,
+                    'semester_id' => $semester->id,
+                    'kurikulum_id' => $kurikulum->id,
+                    'halaman_id' => $halaman->id,
+                    'warehouse_id' => 1,
+                    'stock' => 0,
+                    'unit_id' => 1,
+                    'price' => 0,
+                    'cost' => 0,
+                    'status' => 1,
+                ]);
+
+                foreach(BookVariant::PG_TYPE as $key => $label) {
+                    $variant = BookVariant::updateOrCreate([
+                        'book_id' => $buku->id,
+                        'code' => $key . '-' .$code,
+                        'type' => $key,
+                    ],
+                    [
+                        'name' => BookVariant::TYPE_SELECT[$key] . ' - '. $buku->name,
+                        'parent_id' => $pg->id,
+                        'jenjang_id' => $jenjang->id,
+                        'semester_id' => $semester->id,
+                        'kurikulum_id' => $kurikulum->id,
+                        'halaman_id' => $halaman->id,
+                        'warehouse_id' => 1,
+                        'stock' => 0,
+                        'unit_id' => 1,
+                        'price' => 0,
+                        'cost' => 0,
                         'status' => 1,
                     ]);
                 }

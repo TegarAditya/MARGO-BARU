@@ -408,4 +408,43 @@ class BookVariantController extends Controller
 
         return response()->json($product);
     }
+
+    public function getAdjustment(Request $request)
+    {
+        $query = $request->input('q');
+        $adjustment = $request->input('adjustment');
+
+        $products = BookVariant::whereHas('adjustment', function ($q) use ($adjustment) {
+                    $q->where('stock_adjustment_id', $adjustment);
+                })->where('code', 'like', "%{$query}%")
+                ->orderBy('code', 'ASC')
+                ->get();
+
+        $formattedProducts = [];
+
+        foreach ($products as $product) {
+            $formattedProducts[] = [
+                'id' => $product->id,
+                'text' => $product->code,
+                'stock' => $product->stock,
+                'name' => $product->name,
+            ];
+        }
+
+        return response()->json($formattedProducts);
+    }
+
+    public function getInfoAdjustment(Request $request)
+    {
+        $id = $request->input('id');
+        $adjustment = $request->input('adjustment');
+
+        $product = BookVariant::join('stock_adjustment_details', 'stock_adjustment_details.product_id', '=', 'book_variants.id')
+                ->where('book_variants.id', $id)
+                ->where('stock_adjustment_details.stock_adjustment_id', $adjustment)
+                ->first(['book_variants.*', 'stock_adjustment_details.quantity as quantity', 'stock_adjustment_details.id as adjustment_detail_id']);
+        $product->load('book', 'jenjang', 'book.cover', 'book.kurikulum');
+
+        return response()->json($product);
+    }
 }

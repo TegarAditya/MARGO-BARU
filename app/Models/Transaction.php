@@ -30,8 +30,9 @@ class Transaction extends Model
     public const TYPE_SELECT = [
         'faktur' => 'Faktur',
         'bayar'  => 'Pembayaran',
-        'diskon' => 'Potongan',
+        'diskon' => 'Diskon',
         'retur'  => 'Retur',
+        'potongan' => 'Potongan',
     ];
 
     protected $fillable = [

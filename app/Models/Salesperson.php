@@ -32,6 +32,10 @@ class Salesperson extends Model
         'deleted_at',
     ];
 
+    protected $appends = [
+        'full_name',
+    ];
+
     protected function serializeDate(DateTimeInterface $date)
     {
         return $date->format('Y-m-d H:i:s');
@@ -45,5 +49,12 @@ class Salesperson extends Model
     public function estimasi()
     {
         return $this->hasMany(SalesOrder::class);
+    }
+
+    public function getFullNameAttribute()
+    {
+        $name = $this->code. ' - '. $this->name. ' - '. $this->marketing_area?->name;
+
+        return $name;
     }
 }

@@ -40,6 +40,12 @@ class StoreMaterialRequest extends FormRequest
                 'numeric',
                 'required',
             ],
+            'vendors.*' => [
+                'integer',
+            ],
+            'vendors' => [
+                'array',
+            ],
         ];
     }
 }

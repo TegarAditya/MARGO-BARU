@@ -115,6 +115,8 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     Route::get('book-variants/get-info-retur', 'BookVariantController@getInfoRetur')->name('book-variants.getInfoRetur');
     Route::get('book-variants/get-edit-retur', 'BookVariantController@getEditRetur')->name('book-variants.getEditRetur');
     Route::get('book-variants/get-info-edit-retur', 'BookVariantController@getInfoEditRetur')->name('book-variants.getInfoEditRetur');
+    Route::get('book-variants/get-adjustment', 'BookVariantController@getAdjustment')->name('book-variants.getAdjustment');
+    Route::get('book-variants/get-info-adjustment', 'BookVariantController@getInfoAdjustment')->name('book-variants.getInfoAdjustment');
     Route::resource('book-variants', 'BookVariantController');
 
     // Warehouse
@@ -157,9 +159,12 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
 
     // Sales Order
     Route::delete('sales-orders/destroy', 'SalesOrderController@massDestroy')->name('sales-orders.massDestroy');
+    Route::get('sales-orders/show', 'SalesOrderController@show')->name('sales-orders.show');
+    Route::get('sales-orders/edit', 'SalesOrderController@edit')->name('sales-orders.edit');
+    Route::get('sales-orders/estimasi', 'SalesOrderController@estimasi')->name('sales-orders.estimasi');
     Route::post('sales-orders/import', 'SalesOrderController@import')->name('sales-orders.import');
     Route::get('sales-orders/template-import', 'SalesOrderController@template_import')->name('sales-orders.templateImport');
-    Route::resource('sales-orders', 'SalesOrderController');
+    Route::resource('sales-orders', 'SalesOrderController', ['except' => ['edit', 'show']]);
 
     // Delivery Order
     Route::delete('delivery-orders/destroy', 'DeliveryOrderController@massDestroy')->name('delivery-orders.massDestroy');

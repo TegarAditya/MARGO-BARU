@@ -11,6 +11,7 @@ class CreateBookVariantsTable extends Migration
         Schema::create('book_variants', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('code')->nullable();
+            $table->string('name')->nullable();
             $table->string('type');
             $table->integer('stock');
             $table->decimal('price', 15, 2)->nullable();

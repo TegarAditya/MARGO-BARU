@@ -17,7 +17,9 @@ class DatabaseSeeder extends Seeder
             MarketingAreaTableSeeder::class,
             SemesterTableSeeder::class,
             UnitTableSeeder::class,
-            WarehouseTableSeeder::class
+            WarehouseTableSeeder::class,
+            CoversTableSeeder::class,
+            MasterBukuSeeder::class
         ]);
     }
 }

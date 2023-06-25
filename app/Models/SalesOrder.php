@@ -26,6 +26,7 @@ class SalesOrder extends Model
     ];
 
     protected $fillable = [
+        'no_order',
         'semester_id',
         'salesperson_id',
         'payment_type',
@@ -39,6 +40,13 @@ class SalesOrder extends Model
         'updated_at',
         'deleted_at',
     ];
+
+    public function getJenKumAttribute()
+    {
+        $name = $this->jenjang->name. ' - '. $this->kurikulum->name;
+
+        return $name;
+    }
 
     protected function serializeDate(DateTimeInterface $date)
     {
@@ -68,5 +76,14 @@ class SalesOrder extends Model
     public function kurikulum()
     {
         return $this->belongsTo(Kurikulum::class, 'kurikulum_id');
+    }
+
+    public static function generateNoOrder($semester, $salesperson, $payment_type) {
+        $semester = Semester::find($semester);
+        $salesperson = Salesperson::find($salesperson);
+
+        $code = 'ORD/'.strtoupper($salesperson->code).'/'.strtoupper($payment_type).'/'.$semester->code;
+
+        return $code;
     }
 }

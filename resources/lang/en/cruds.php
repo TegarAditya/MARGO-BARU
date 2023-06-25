@@ -509,6 +509,8 @@ return [
             'warehouse_helper'   => ' ',
             'category'           => 'Category',
             'category_helper'    => ' ',
+            'vendor'             => 'Vendor',
+            'vendor_helper'      => ' ',
         ],
     ],
     'stockAdjustmentDetail' => [

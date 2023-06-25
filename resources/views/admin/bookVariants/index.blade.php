@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 @section('content')
-@can('book_variant_create')
+{{-- @can('book_variant_create')
     <div style="margin-bottom: 10px;" class="row">
         <div class="col-lg-12">
             <a class="btn btn-success" href="{{ route('admin.book-variants.create') }}">
@@ -8,7 +8,7 @@
             </a>
         </div>
     </div>
-@endcan
+@endcan --}}
 <div class="card">
     <div class="card-header">
         {{ trans('cruds.bookVariant.title_singular') }} {{ trans('global.list') }}

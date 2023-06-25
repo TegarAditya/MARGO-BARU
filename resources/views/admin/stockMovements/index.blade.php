@@ -30,9 +30,9 @@
                     <th>
                         {{ trans('cruds.stockMovement.fields.product') }}
                     </th>
-                    <th>
+                    {{-- <th>
                         {{ trans('cruds.stockMovement.fields.material') }}
-                    </th>
+                    </th> --}}
                     <th>
                         {{ trans('cruds.stockMovement.fields.quantity') }}
                     </th>
@@ -94,14 +94,14 @@
     aaSorting: [],
     ajax: "{{ route('admin.stock-movements.index') }}",
     columns: [
-      { data: 'placeholder', name: 'placeholder' },
-{ data: 'movement_date', name: 'movement_date' },
-{ data: 'movement_type', name: 'movement_type' },
-{ data: 'product_code', name: 'product.code' },
-{ data: 'material_code', name: 'material.code' },
-{ data: 'quantity', name: 'quantity' },
-{ data: 'transaction_type', name: 'transaction_type' },
-{ data: 'actions', name: '{{ trans('global.actions') }}' }
+        { data: 'placeholder', name: 'placeholder' },
+        { data: 'movement_date', name: 'movement_date' },
+        { data: 'movement_type', name: 'movement_type' },
+        { data: 'product_code', name: 'product.code' },
+        // { data: 'material_code', name: 'material.code' },
+        { data: 'quantity', name: 'quantity' },
+        { data: 'transaction_type', name: 'transaction_type' },
+        { data: 'actions', name: '{{ trans('global.actions') }}' }
     ],
     orderCellsTop: true,
     order: [[ 1, 'desc' ]],
@@ -112,7 +112,7 @@
       $($.fn.dataTable.tables(true)).DataTable()
           .columns.adjust();
   });
-  
+
 });
 
 </script>
