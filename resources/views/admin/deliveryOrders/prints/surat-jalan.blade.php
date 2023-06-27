@@ -9,7 +9,7 @@
     <tbody>
 
         <tr>
-            <td width="120"><strong>No. Surat Jalan</strong></td>
+            <td width="200"><strong>No. Surat Jalan</strong></td>
             <td width="8">:</td>
             <td>{{ $deliveryOrder->no_suratjalan }}</td>
         </tr>
@@ -55,7 +55,7 @@
     <thead>
         <th width="1%" class="text-center">No.</th>
         <th>Jenjang</th>
-        <th width="1%">Cover</th>
+        <th>Cover</th>
         <th>Tema/Mapel</th>
         <th width="1%" class="text-center">Kelas</th>
         <th width="1%" class="text-center">Hal</th>
@@ -74,9 +74,9 @@
         <tr>
             <td class="px-3">{{ $loop->iteration }}</td>
             <td>{{ $product->jenjang->name ?? '' }} - {{ $product->kurikulum->code ?? '' }}</td>
-            <td>{{ $product->book->cover->code ?? '' }}</td>
-            <td>{{ $product->short_name }}</td>
-            <td class="text-center">{{ $product->book->kelas->code ?? '' }}</td>
+            <td>{{ $product->cover->name ?? '' }}</td>
+            <td>{{ $product->mapel->name }}</td>
+            <td class="text-center">{{ $product->kelas->code ?? '' }}</td>
             <td class="text-center">{{ $product->halaman->code ?? '' }}</td>
             <td class="px-3 text-center">{{ angka($item->quantity) }}</td>
         </tr>

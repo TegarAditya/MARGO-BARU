@@ -29,24 +29,50 @@ class DeliveryOrderController extends Controller
 
         if ($request->ajax()) {
             $query = DeliveryOrder::with(['semester', 'salesperson'])->select(sprintf('%s.*', (new DeliveryOrder)->table));
+
+            if (!empty($request->salesperson)) {
+                $query->where('salesperson_id', $request->salesperson);
+            }
+            if (!empty($request->semester)) {
+                $query->where('semester_id', $request->semester);
+            }
+            if (!empty($request->semester)) {
+                $query->where('payment_type', $request->payment_type);
+            }
+
             $table = Datatables::of($query);
 
             $table->addColumn('placeholder', '&nbsp;');
             $table->addColumn('actions', '&nbsp;');
 
             $table->editColumn('actions', function ($row) {
-                $viewGate      = 'delivery_order_show';
-                $editGate      = 'delivery_order_edit';
-                $deleteGate    = 'delivery_order_delete';
-                $crudRoutePart = 'delivery-orders';
+                $btn = '
+                    <a class="px-1" href="'.route('admin.delivery-orders.show', $row->id).'" title="Show">
+                        <i class="fas fa-eye text-success fa-lg"></i>
+                    </a>
+                    <a class="px-1" href="'.route('admin.delivery-orders.printSj', $row->id).'" title="Print SJ" target="_blank">
+                        <i class="fas fa-print text-secondary fa-lg"></i>
+                    </a>
+                    <a class="px-1" href="'.route('admin.delivery-orders.edit', $row->id).'" title="Edit">
+                        <i class="fas fa-edit fa-lg"></i>
+                    </a>
+                ';
 
-                return view('partials.datatablesActions', compact(
-                    'viewGate',
-                    'editGate',
-                    'deleteGate',
-                    'crudRoutePart',
-                    'row'
-                ));
+                if ($row->faktur) {
+                    $btn = $btn. '
+                        <a class="px-1" href="'.route('admin.delivery-orders.printSj', $row->id).'" title="Generate Invoice" target="_blank">
+                            <i class="fas fa-tasks text-danger fa-lg"></i>
+                        </a>
+                    ';
+                } else {
+                    $btn = $btn. '
+                        <a class="px-1" href="'.route('admin.invoices.generate', $row->id).'" title="Generate Invoice">
+                            <i class="fas fa-receipt text-danger fa-lg"></i>
+                        </a>
+                    ';
+                }
+
+                return $btn;
             });
 
             $table->editColumn('no_suratjalan', function ($row) {
@@ -58,7 +84,7 @@ class DeliveryOrderController extends Controller
             });
 
             $table->addColumn('salesperson_name', function ($row) {
-                return $row->salesperson ? $row->salesperson->name : '';
+                return $row->salesperson ? $row->salesperson->short_name : '';
             });
 
             $table->rawColumns(['actions', 'placeholder', 'semester', 'salesperson']);
@@ -66,7 +92,11 @@ class DeliveryOrderController extends Controller
             return $table->make(true);
         }
 
-        return view('admin.deliveryOrders.index');
+        $semesters = Semester::orderBy('code', 'DESC')->where('status', 1)->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+
+        $salespeople = Salesperson::get()->pluck('short_name', 'id')->prepend(trans('global.pleaseSelect'), '');
+
+        return view('admin.deliveryOrders.index', compact('salespeople', 'semesters'));
     }
 
     public function create()
@@ -75,7 +105,7 @@ class DeliveryOrderController extends Controller
 
         $semesters = Semester::orderBy('code', 'DESC')->where('status', 1)->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
-        $salespeople = Salesperson::whereHas('estimasi')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $salespeople = Salesperson::whereHas('estimasi')->get()->pluck('full_name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
         return view('admin.deliveryOrders.create', compact('salespeople', 'semesters'));
     }
@@ -222,11 +252,18 @@ class DeliveryOrderController extends Controller
 
         $delivery_items = DeliveryOrderItem::where('delivery_order_id', $deliveryOrder->id)->get();
 
-        if ($request->print) {
-            return view('admin.deliveryOrders.prints.surat-jalan', compact('deliveryOrder', 'delivery_items'));
-        }
-
         return view('admin.deliveryOrders.show', compact('deliveryOrder', 'delivery_items'));
+    }
+
+    public function printSj(DeliveryOrder $deliveryOrder, Request $request)
+    {
+        $deliveryOrder->load('semester', 'salesperson');
+
+        $delivery_items = DeliveryOrderItem::with('product')->where('delivery_order_id', $deliveryOrder->id)->get();
+
+        $delivery_items = $delivery_items->sortBy('product.kelas_id')->sortBy('product.mapel_id')->sortBy('product.kurikulum_id')->sortBy('product.jenjang_id');
+
+        return view('admin.deliveryOrders.prints.surat-jalan', compact('deliveryOrder', 'delivery_items'));
     }
 
     public function destroy(DeliveryOrder $deliveryOrder)

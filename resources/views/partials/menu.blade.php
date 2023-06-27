@@ -485,18 +485,6 @@
                                     </a>
                                 </li>
                             @endcan
-                            @can('delivery_order_item_access')
-                                <li class="nav-item">
-                                    <a href="{{ route("admin.delivery-order-items.index") }}" class="nav-link {{ request()->is("admin/delivery-order-items") || request()->is("admin/delivery-order-items/*") ? "active" : "" }}">
-                                        <i class="fa-fw nav-icon fas fa-box">
-
-                                        </i>
-                                        <p>
-                                            {{ trans('cruds.deliveryOrderItem.title') }}
-                                        </p>
-                                    </a>
-                                </li>
-                            @endcan
                             @can('return_good_access')
                                 <li class="nav-item">
                                     <a href="{{ route("admin.return-goods.index") }}" class="nav-link {{ request()->is("admin/return-goods") || request()->is("admin/return-goods/*") ? "active" : "" }}">
@@ -544,18 +532,6 @@
                                         </i>
                                         <p>
                                             {{ trans('cruds.invoice.title') }}
-                                        </p>
-                                    </a>
-                                </li>
-                            @endcan
-                            @can('invoice_item_access')
-                                <li class="nav-item">
-                                    <a href="{{ route("admin.invoice-items.index") }}" class="nav-link {{ request()->is("admin/invoice-items") || request()->is("admin/invoice-items/*") ? "active" : "" }}">
-                                        <i class="fa-fw nav-icon fas fa-file-invoice-dollar">
-
-                                        </i>
-                                        <p>
-                                            {{ trans('cruds.invoiceItem.title') }}
                                         </p>
                                     </a>
                                 </li>

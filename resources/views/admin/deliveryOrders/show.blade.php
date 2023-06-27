@@ -3,16 +3,11 @@
 
 <div class="card">
     <div class="card-header">
-        {{ trans('global.show') }} {{ trans('cruds.invoice.title') }}
+        {{ trans('global.show') }} {{ trans('cruds.deliveryOrder.title_singular') }}
     </div>
 
     <div class="card-body">
-        <div class="form-group">
-            <a class="btn btn-default" href="{{ url()->previous() }}">
-                Back
-            </a>
-        </div>
-        <div class="model-detail mt-`3">
+        <div class="model-detail">
             <section class="py-3">
                 <div class="card">
                     <div class="card-body px-3 py-2">
@@ -29,21 +24,11 @@
 
                             <div class="col-3">
                                 <p class="mb-0 text-sm">
-                                    No. Invoice
-                                    <br />
-                                    <strong>{{ $deliveryOrder->no_suratjalan }}</strong>
-
-                                    <a href="#" class="fa fa-print ml-1 text-info" title="Generate Invoice" target="_blank"></a>
-                                </p>
-                            </div>
-
-                            <div class="col-3">
-                                <p class="mb-0 text-sm">
                                     No. Surat Jalan
                                     <br />
                                     <strong>{{ $deliveryOrder->no_suratjalan }}</strong>
 
-                                    <a href="{{ route('admin.delivery-orders.show', $deliveryOrder->id) }}?print=1" class="fa fa-print ml-1 text-info" title="Print Surat Jalan" target="_blank"></a>
+                                    <a href="{{ route('admin.delivery-orders.printSj', $deliveryOrder->id) }}" class="fa fa-print ml-1 text-info" title="Print Surat Jalan" target="_blank"></a>
                                 </p>
                             </div>
 
@@ -53,15 +38,15 @@
                         </div>
 
                         <div class="row">
-                            <div class="col-3">
+                            <div class="col-4">
                                 <p class="mb-0 text-sm">
                                     Salesman
                                     <br />
-                                    <strong>{{ $deliveryOrder->salesperson->name }}</strong>
+                                    <strong>{{ $deliveryOrder->salesperson->name }} - {{ $deliveryOrder->salesperson->marketing_area->name }} </strong>
                                 </p>
                             </div>
 
-                            <div class="col-3">
+                            <div class="col-4">
                                 <p class="mb-0 text-sm">
                                     Semester
                                     <br />
@@ -95,7 +80,7 @@
                                     @endphp
                                     <tr>
                                         <td class="text-right px-3">{{ $loop->iteration }}.</td>
-                                        <td class="text-center">{{ $product->jenjang->name ?? '' }}</td>
+                                        <td class="text-center">{{ $product->jenjang->name ?? '' }} - {{ $product->kurikulum->code ?? '' }}</td>
                                         <td>{{ $product->name }}</td>
                                         <td class="text-center px-3">{{ $item->quantity }}</td>
                                     </tr>
@@ -118,6 +103,18 @@
                     </div>
                 </div>
             </section>
+        </div>
+        <div class="row mt-3">
+
+            <div class="col">
+                <a class="btn btn-primary" href="{{ url()->previous() }}">
+                    <i class="fa fa-arrow-left"></i> Back
+                </a>
+            </div>
+
+            <div class="col-auto">
+
+            </div>
         </div>
     </div>
 </div>

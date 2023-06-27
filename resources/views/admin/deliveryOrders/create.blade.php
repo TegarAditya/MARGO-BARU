@@ -193,6 +193,9 @@
                                     <p class="mb-0 text-sm">
                                         <strong>TERKIRIM : ${product.terkirim}</strong>
                                     </p>
+                                    <p class="mb-0 text-sm">
+                                        <strong>STOCK : ${product.stock}</strong>
+                                    </p>
                                 </div>
                                 <div class="col offset-1 row align-items-end align-self-center">
                                     <div class="col" style="max-width: 160px">
@@ -208,7 +211,7 @@
                                         </div>
                                     </div>
                                     <div class="col-auto pl-5">
-                                        <button type="button" class="btn btn-danger btn-sm product-delete" data-product-id="${product.id}">
+                                        <button type="button" class="btn btn-danger btn-sm product-delete" data-product-id="${product.id}" tabIndex="-1">
                                             <i class="fa fa-trash"></i>
                                         </button>
                                     </div>
@@ -227,6 +230,7 @@
                         var product = $(item);
                         var quantity = product.find('.quantity');
                         var quantityText = product.find('.quantity_text');
+                        var max = quantity.data('max');
 
                         quantityText.on('input change', function(e) {
                             var value = numeral(e.target.value);
@@ -241,6 +245,22 @@
                             if (valueNum < 1) {
                                 el.val(1);
                                 quantityText.val(1).trigger('change');
+                            }
+
+                            if (valueNum > max) {
+                                Swal.fire({
+                                    title: 'Quantity Exceeded',
+                                    text: 'The input quantity exceeds the maximum allowed.',
+                                    icon: 'warning',
+                                    showCancelButton: true,
+                                    confirmButtonText: 'I Know',
+                                    cancelButtonText: 'Cancel'
+                                }).then((result) => {
+                                    if (result.isConfirmed) {
+                                        max = valueNum;
+                                        quantity.data('max', valueNum);
+                                    }
+                                });
                             }
                         }).trigger('change');
                     });

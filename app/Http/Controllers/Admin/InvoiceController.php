@@ -35,18 +35,17 @@ class InvoiceController extends Controller
             $table->addColumn('actions', '&nbsp;');
 
             $table->editColumn('actions', function ($row) {
-                $viewGate      = 'invoice_show';
-                $editGate      = 'invoice_edit';
-                $deleteGate    = 'invoice_delete';
-                $crudRoutePart = 'invoices';
-
-                return view('partials.datatablesActions', compact(
-                    'viewGate',
-                    'editGate',
-                    'deleteGate',
-                    'crudRoutePart',
-                    'row'
-                ));
+                return '
+                    <a class="px-1" href="'.route('admin.invoices.show', $row->id).'" title="Show">
+                        <i class="fas fa-eye text-success fa-lg"></i>
+                    </a>
+                    <a class="px-1" href="'.route('admin.invoices.print-faktur', $row->id).'" target="_blank" title="Print Faktur" >
+                        <i class="fas fa-print text-secondary fa-lg"></i>
+                    </a>
+                    <a class="px-1" href="'.route('admin.invoices.edit', $row->id).'" title="Edit">
+                        <i class="fas fa-edit fa-lg"></i>
+                    </a>
+                ';
             });
 
             $table->editColumn('no_faktur', function ($row) {
@@ -58,11 +57,19 @@ class InvoiceController extends Controller
             });
 
             $table->addColumn('salesperson_name', function ($row) {
-                return $row->salesperson ? $row->salesperson->name : '';
+                return $row->salesperson ? $row->salesperson->short_name : '';
+            });
+
+            $table->editColumn('total', function ($row) {
+                return $row->total ? money($row->total) : 0;
+            });
+
+            $table->editColumn('discount', function ($row) {
+                return $row->discount ? money($row->discount) : 0;
             });
 
             $table->editColumn('nominal', function ($row) {
-                return $row->nominal ? $row->nominal : '';
+                return $row->nominal ? $row->nominal : 0;
             });
 
             $table->rawColumns(['actions', 'placeholder', 'semester', 'salesperson']);
@@ -79,7 +86,9 @@ class InvoiceController extends Controller
 
         $delivery_orders = DeliveryOrder::pluck('no_suratjalan', 'id')->prepend(trans('global.pleaseSelect'), '');
 
-        $salespeople = Salesperson::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $semesters = Semester::orderBy('code', 'DESC')->where('status', 1)->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+
+        $salespeople = Salesperson::whereHas('estimasi')->get()->pluck('full_name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
         return view('admin.invoices.create', compact('delivery_orders', 'salespeople', 'semesters'));
     }
@@ -99,8 +108,10 @@ class InvoiceController extends Controller
         $validatedData = $request->validate([
             'date' => 'required',
             'delivery' =>'required|exists:delivery_orders,id',
-            'note' => 'nullable',
+            // 'note' => 'nullable',
             'nominal' => 'numeric|min:1',
+            'total_price' => 'numeric|min:1',
+            'total_diskon' => 'numeric|min:1',
             'delivery_items' => 'required|array',
             'delivery_items.*' => 'exists:delivery_order_items,id',
             'products' => 'required|array',
@@ -113,18 +124,23 @@ class InvoiceController extends Controller
             'quantities.*' => 'numeric|min:1',
             'subtotals' => 'required|array',
             'subtotals.*' => 'numeric|min:1',
+            'subdiscounts' => 'required|array',
+            'subdiscounts.*' => 'numeric|min:1',
         ]);
 
         $date = $validatedData['date'];
         $delivery = $validatedData['delivery'];
-        $note = $validatedData['note'];
+        // $note = $validatedData['note'];
         $nominal = $validatedData['nominal'];
+        $total_price = $validatedData['total_price'];
+        $total_diskon = $validatedData['total_diskon'];
         $delivery_items = $validatedData['delivery_items'];
         $products = $validatedData['products'];
         $prices = $validatedData['prices'];
-        $diskons = $validatedData['diskons'];
         $quantities = $validatedData['quantities'];
         $subtotals = $validatedData['subtotals'];
+        $diskons = $validatedData['diskons'];
+        $subdiscounts = $validatedData['subdiscounts'];
 
         $delivery_order = DeliveryOrder::find($delivery);
         $semester = $delivery_order->semester_id;
@@ -138,17 +154,20 @@ class InvoiceController extends Controller
                 'delivery_order_id' => $delivery,
                 'semester_id' => $semester,
                 'salesperson_id' => $salesperson,
+                'discount' => $total_diskon,
+                'total' => $total_price,
                 'nominal' => $nominal,
-                'note' => $note
+                'note' => 'Generated Invoice From '. $delivery_order->no_faktur
             ]);
 
             for ($i = 0; $i < count($products); $i++) {
                 $delivery_item = $delivery_items[$i];
                 $product = $products[$i];
                 $price = $prices[$i];
-                $diskon = $diskons[$i];
                 $quantity = $quantities[$i];
                 $subtotal = $subtotals[$i];
+                $diskon = $diskons[$i];
+                $subdiscount = $subdiscounts[$i];
 
                 $invoice_item = InvoiceItem::create([
                     'invoice_id' => $invoice->id,
@@ -158,15 +177,15 @@ class InvoiceController extends Controller
                     'salesperson_id' => $salesperson,
                     'product_id' => $product,
                     'quantity' => $quantity,
-                    'price_unit' => $price,
+                    'price' => $price,
+                    'total' => $subtotal,
                     'discount' => $diskon,
-                    'price' => ($price - $diskon),
-                    'total' => $subtotal
+                    'total_discount' => $subdiscount,
                 ]);
-
             }
 
-            TransactionService::createTransaction($date, $note, $salesperson, $semester, 'faktur', $invoice->id, $invoice->no_faktur, $nominal, 'debet');
+            TransactionService::createTransaction($date, 'Faktur from '. $invoice->no_faktur, $salesperson, $semester, 'faktur', $invoice->id, $invoice->no_faktur, $nominal, 'debet');
+            TransactionService::createTransaction($date, 'Diskon from '. $invoice->no_faktur, $salesperson, $semester, 'diskon', $invoice->id, $invoice->no_faktur, $nominal, 'credit');
             DeliveryService::generateFaktur($delivery);
 
             DB::commit();
@@ -226,7 +245,7 @@ class InvoiceController extends Controller
         $salesperson = $invoice->salesperson_id;
         $semester = $invoice->semester_id;
         $no_faktur = $invoice->no_faktur;
-        
+
         DB::beginTransaction();
         try {
             $invoice->update([
@@ -274,7 +293,22 @@ class InvoiceController extends Controller
 
         $invoice->load('delivery_order', 'semester', 'salesperson');
 
-        return view('admin.invoices.show', compact('invoice'));
+        $details = InvoiceItem::with('product')->where('invoice_id', $invoice->id)->get();
+
+        $invoice_items = $details->sortBy('product.kelas_id')->sortBy('product.mapel_id')->sortBy('product.kurikulum_id')->sortBy('product.jenjang_id');
+
+        return view('admin.invoices.show', compact('invoice', 'invoice_items'));
+    }
+
+    public function printFaktur(Invoice $invoice)
+    {
+        $invoice->load('delivery_order', 'semester', 'salesperson');
+
+        $details = InvoiceItem::with('product')->where('invoice_id', $invoice->id)->get();
+
+        $invoice_items = $details->sortBy('product.kelas_id')->sortBy('product.mapel_id')->sortBy('product.kurikulum_id')->sortBy('product.jenjang_id');
+
+        return view('admin.invoices.faktur', compact('invoice', 'invoice_items'));
     }
 
     public function destroy(Invoice $invoice)

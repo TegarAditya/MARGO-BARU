@@ -34,6 +34,7 @@ class Salesperson extends Model
 
     protected $appends = [
         'full_name',
+        'short_name',
     ];
 
     protected function serializeDate(DateTimeInterface $date)
@@ -54,6 +55,13 @@ class Salesperson extends Model
     public function getFullNameAttribute()
     {
         $name = $this->code. ' - '. $this->name. ' - '. $this->marketing_area?->name;
+
+        return $name;
+    }
+
+    public function getShortNameAttribute()
+    {
+        $name = $this->name. ' - '. $this->marketing_area?->name;
 
         return $name;
     }

@@ -9,6 +9,9 @@ use App\Http\Requests\UpdatePaymentRequest;
 use App\Models\Payment;
 use App\Models\Salesperson;
 use App\Models\Semester;
+use App\Models\Invoice;
+use App\Models\ReturnGood;
+use App\Models\Transaction;
 use Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -31,18 +34,17 @@ class PaymentController extends Controller
             $table->addColumn('actions', '&nbsp;');
 
             $table->editColumn('actions', function ($row) {
-                $viewGate      = 'payment_show';
-                $editGate      = 'payment_edit';
-                $deleteGate    = 'payment_delete';
-                $crudRoutePart = 'payments';
-
-                return view('partials.datatablesActions', compact(
-                    'viewGate',
-                    'editGate',
-                    'deleteGate',
-                    'crudRoutePart',
-                    'row'
-                ));
+                return '
+                    <a class="px-1" href="'.route('admin.payments.show', $row->id).'" title="Show">
+                        <i class="fas fa-eye text-success fa-lg"></i>
+                    </a>
+                    <a class="px-1" href="'.route('admin.payments.kwitansi', $row->id).'" target="_blank" title="Print Kwitansi" >
+                        <i class="fas fa-print text-secondary fa-lg"></i>
+                    </a>
+                    <a class="px-1" href="'.route('admin.payments.edit', $row->id).'" title="Edit">
+                        <i class="fas fa-edit fa-lg"></i>
+                    </a>
+                ';
             });
 
             $table->editColumn('no_kwitansi', function ($row) {
@@ -50,7 +52,7 @@ class PaymentController extends Controller
             });
 
             $table->addColumn('salesperson_name', function ($row) {
-                return $row->salesperson ? $row->salesperson->name : '';
+                return $row->salesperson ? $row->salesperson->short_name : '';
             });
 
             $table->addColumn('semester_name', function ($row) {
@@ -58,16 +60,18 @@ class PaymentController extends Controller
             });
 
             $table->editColumn('paid', function ($row) {
-                return $row->paid ? $row->paid : '';
+                return 'Metode Pembayaran : <b>'. Payment::PAYMENT_METHOD_SELECT[$row->payment_method]. '</b><br>Bayar : <b>'. money($row->paid) .'</b><br>Potongan: <b>'.money($row->discount).'</b>';
             });
+
             $table->editColumn('discount', function ($row) {
-                return $row->discount ? $row->discount : '';
+                return $row->discount ? money($row->discount) : '';
             });
+
             $table->editColumn('payment_method', function ($row) {
                 return $row->payment_method ? Payment::PAYMENT_METHOD_SELECT[$row->payment_method] : '';
             });
 
-            $table->rawColumns(['actions', 'placeholder', 'salesperson', 'semester']);
+            $table->rawColumns(['actions', 'placeholder', 'salesperson', 'semester', 'paid']);
 
             return $table->make(true);
         }
@@ -81,7 +85,7 @@ class PaymentController extends Controller
 
         $semesters = Semester::orderBy('code', 'DESC')->where('status', 1)->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
-        $salespeople = Salesperson::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $salespeople = Salesperson::get()->pluck('full_name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
         return view('admin.payments.create', compact('salespeople', 'semesters'));
     }
@@ -124,7 +128,7 @@ class PaymentController extends Controller
             ]);
 
             TransactionService::createTransaction($date, $note, $salesperson, $semester, 'bayar', $payment->id, $payment->no_kwitansi, $bayar, 'credit');
-            TransactionService::createTransaction($date, $note, $salesperson, $semester, 'diskon', $payment->id, $payment->no_kwitansi, $diskon, 'credit');
+            TransactionService::createTransaction($date, $note, $salesperson, $semester, 'potongan', $payment->id, $payment->no_kwitansi, $diskon, 'credit');
 
             DB::commit();
 
@@ -234,5 +238,22 @@ class PaymentController extends Controller
         }
 
         return response(null, Response::HTTP_NO_CONTENT);
+    }
+
+    public function getTagihan(Request $request)
+    {
+        $invoice = Invoice::where('salesperson_id', $request->salesperson)->where('semester_id', $request->semester)->sum('nominal');
+        $retur = ReturnGood::where('salesperson_id', $request->salesperson)->where('semester_id', $request->semester)->sum('nominal');
+        $paid = Payment::where('salesperson_id', $request->salesperson)->where('semester_id', $request->semester)->sum('amount');
+
+        $tagihan = ($invoice - $retur);
+        $sisa = $tagihan - $paid;
+
+        return response()->json(['status' => 'success', 'message' => 'Data ditemukan', 'data' => ['tagihan' => $tagihan, 'bayar' => $paid, 'sisa' => $sisa]]);
+    }
+
+    public function kwitansi(Payment $payment)
+    {
+        return view('admin.payments.kwitansi', compact('payment'));
     }
 }

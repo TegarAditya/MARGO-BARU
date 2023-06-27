@@ -85,7 +85,7 @@ class Payment extends Model
         $payment_number = !$data ? 1 : ($data + 1);
 
         $prefix = 'KW/'.strtoupper($semester->type).'/MMJ/'.self::BULAN_ROMAWI[Date::now()->format('n')].'/'.Date::now()->format('y').'/';
-        $code = $prefix.sprintf("%04d", $payment_number);
+        $code = $prefix.sprintf("%06d", $payment_number);
 
         return $code;
     }

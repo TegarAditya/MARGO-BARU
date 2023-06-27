@@ -41,7 +41,7 @@
             <thead>
                 <tr>
                     <th width="1%" class="text-center">No.</th>
-                    <th>Cover</th>
+                    <th width="20%">Cover</th>
                     <th>Tema/Mapel</th>
                     <th width="1%">Kelas</th>
                     <th width="1%" class="text-center">Hal</th>
@@ -59,9 +59,9 @@
                     @endphp
                     <tr>
                         <td class="text-center">{{ $loop->iteration }}</td>
-                        <td>{{ $product->book->cover->name }}</td>
-                        <td>{{ $product->book->mapel->name }}</td>
-                        <td class="text-center">{{ $product->book->kelas->code }}</td>
+                        <td>{{ $product->cover->name }}</td>
+                        <td>{{ $product->mapel->name }}</td>
+                        <td class="text-center">{{ $product->kelas->code }}</td>
                         <td class="text-center">{{ $product->halaman->code }}</td>
                         <td class="text-center">{{ angka($sisa)}}</td>
                     </tr>

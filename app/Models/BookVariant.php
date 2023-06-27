@@ -64,7 +64,6 @@ class BookVariant extends Model
     ];
 
     protected $appends = [
-        'long_name',
         'short_name',
         'book_type',
     ];
@@ -79,16 +78,9 @@ class BookVariant extends Model
         return $date->format('Y-m-d H:i:s');
     }
 
-    public function getLongNameAttribute()
-    {
-        $name = BookVariant::TYPE_SELECT[$this->type] . ' - '. $this->book->name ?? '-';
-
-        return $name;
-    }
-
     public function getShortNameAttribute()
     {
-        $name = $this->book->short_name .' - '. $this->halaman->name;
+        $name = $this->mapel->name .' - '. $this->kelas->name.' - '. $this->halaman->name;
 
         return $name;
     }
@@ -137,7 +129,7 @@ class BookVariant extends Model
 
     public function kelas()
     {
-        return $this->belongsTo(Kela::class, 'kelas_id');
+        return $this->belongsTo(Kelas::class, 'kelas_id');
     }
 
     public function halaman()

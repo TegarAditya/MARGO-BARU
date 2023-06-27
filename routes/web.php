@@ -168,6 +168,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
 
     // Delivery Order
     Route::delete('delivery-orders/destroy', 'DeliveryOrderController@massDestroy')->name('delivery-orders.massDestroy');
+    Route::get('delivery-orders/print-sj/{deliveryOrder}', 'DeliveryOrderController@printSj')->name('delivery-orders.printSj');
     Route::resource('delivery-orders', 'DeliveryOrderController');
 
     // Delivery Order Item
@@ -177,6 +178,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     // Invoice
     Route::delete('invoices/destroy', 'InvoiceController@massDestroy')->name('invoices.massDestroy');
     Route::get('invoices/generate/{delivery}', 'InvoiceController@generate')->name('invoices.generate');
+    Route::get('invoices/print-faktur/{invoice}', 'InvoiceController@printFaktur')->name('invoices.print-faktur');
     Route::resource('invoices', 'InvoiceController');
 
     // Invoice Item
@@ -197,6 +199,8 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
 
     // Payment
     Route::delete('payments/destroy', 'PaymentController@massDestroy')->name('payments.massDestroy');
+    Route::get('payments/get-tagihan', 'PaymentController@getTagihan')->name('payments.getTagihan');
+    Route::get('payments/kwitansi/{payment}', 'PaymentController@kwitansi')->name('payments.kwitansi');
     Route::resource('payments', 'PaymentController');
 
     // Transaction

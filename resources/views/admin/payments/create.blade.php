@@ -12,7 +12,7 @@
                 {{session()->get('error-message')}}
             </p>
         @endif
-        
+
         <form method="POST" id="paymentForm" action="{{ route("admin.payments.store") }}" enctype="multipart/form-data">
             @csrf
             <input type="hidden" name="bayar" value="0" />
@@ -66,6 +66,37 @@
                             <span class="text-danger">{{ $errors->first('semester') }}</span>
                         @endif
                         <span class="help-block">{{ trans('cruds.payment.fields.semester_helper') }}</span>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="detail-tagihan mt-3 mb-4" style="display: none;">
+                        <p class="mb-0 font-weight-bold">Detail Tagihan dan Pembayaran</p>
+
+                        <div class="row">
+                            <div class="col-auto">
+                                <p class="mb-0">
+                                    <small class="font-weight-bold">Total Tagihan</small>
+                                    <br />
+                                    <span class="tagihan-total"></span>
+                                </p>
+                            </div>
+
+                            <div class="col-auto">
+                                <p class="mb-0">
+                                    <small class="font-weight-bold">Total Pembayaran</small>
+                                    <br />
+                                    <span class="tagihan-saldo"></span>
+                                </p>
+                            </div>
+
+                            <div class="col-auto">
+                                <p class="mb-0">
+                                    <small class="font-weight-bold">Sisa Tagihan</small>
+                                    <br />
+                                    <span class="tagihan-sisa"></span>
+                                </p>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="col-6">
@@ -183,6 +214,11 @@ $(document).ready(function() {
     var bayar = form.find('[name="bayar"]');
     var bayarText = form.find('[name="bayar_text"]');
 
+    var tagihanDetail = form.find('.detail-tagihan');
+    var tagihanTotal = tagihanDetail.find('.tagihan-total');
+    var tagihanSaldo = tagihanDetail.find('.tagihan-saldo');
+    var tagihanSisa = tagihanDetail.find('.tagihan-sisa');
+
     bayarText.on('change keyup blur paste', function(e) {
         var value = numeral(e.target.value);
         console.log(value.format('0,0'));
@@ -241,6 +277,53 @@ $(document).ready(function() {
         diskon.val(diskonRp);
         diskonAmount.val(diskonVal);
     });
+
+    $('#salesperson_id').on('select2:select', function (e) {
+        var semester = $('#semester_id').val();
+        var salesperson = e.params.data.id;
+
+        if (semester && salesperson){
+            getTagihan(semester, salesperson);
+        }
+    });
+
+    $('#semester_id').on('select2:select', function (e) {
+        var semester = e.params.data.id;
+        var salesperson = $('#salesperson_id').val();
+
+        if (semester && salesperson){
+            getTagihan(semester, salesperson);
+        }
+    });
+
+    function getTagihan(semester, salesperson) {
+        $.ajax({
+            type: "GET",
+            url: "{{ route('admin.payments.getTagihan') }}",
+            data: {
+                semester: semester,
+                salesperson: salesperson
+            },
+            success: function (response) {
+                if (response.status == 'success') {
+                    var total = Math.abs(response.data.tagihan);
+                    var saldo = Math.abs(response.data.bayar);
+                    var sisa = Math.abs(response.data.sisa);
+
+                    if (!isNaN(total) && !isNaN(saldo) && !isNaN(sisa)) {
+                        tagihanDetail.show();
+                        tagihanTotal.html(numeral(total).format('$0,0'));
+                        tagihanSaldo.html(numeral(saldo).format('$0,0'));
+                        tagihanSisa.html(numeral(sisa).format('$0,0'));
+                    } else {
+                        tagihanDetail.hide();
+                    }
+                } else {
+                    swal("Warning!", response.message, 'error');
+                }
+            }
+        });
+    }
 });
 </script>
 @endsection

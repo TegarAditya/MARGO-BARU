@@ -28,19 +28,13 @@
                         {{ trans('cruds.payment.fields.date') }}
                     </th>
                     <th>
-                        {{ trans('cruds.payment.fields.salesperson') }}
-                    </th>
-                    <th>
                         {{ trans('cruds.payment.fields.semester') }}
                     </th>
                     <th>
-                        {{ trans('cruds.payment.fields.paid') }}
+                        {{ trans('cruds.payment.fields.salesperson') }}
                     </th>
                     <th>
-                        {{ trans('cruds.payment.fields.discount') }}
-                    </th>
-                    <th>
-                        {{ trans('cruds.payment.fields.payment_method') }}
+                        Pembayaran
                     </th>
                     <th>
                         &nbsp;
@@ -97,15 +91,13 @@
     aaSorting: [],
     ajax: "{{ route('admin.payments.index') }}",
     columns: [
-      { data: 'placeholder', name: 'placeholder' },
-{ data: 'no_kwitansi', name: 'no_kwitansi' },
-{ data: 'date', name: 'date' },
-{ data: 'salesperson_name', name: 'salesperson.name' },
-{ data: 'semester_name', name: 'semester.name' },
-{ data: 'paid', name: 'paid' },
-{ data: 'discount', name: 'discount' },
-{ data: 'payment_method', name: 'payment_method' },
-{ data: 'actions', name: '{{ trans('global.actions') }}' }
+        { data: 'placeholder', name: 'placeholder' },
+        { data: 'no_kwitansi', name: 'no_kwitansi', class: 'text-center' },
+        { data: 'date', name: 'date', class: 'text-center' },
+        { data: 'semester_name', name: 'semester.name', class: 'text-center' },
+        { data: 'salesperson_name', name: 'salesperson.name', class: 'text-center' },
+        { data: 'paid', name: 'paid' },
+        { data: 'actions', name: '{{ trans('global.actions') }}', class: 'text-center' }
     ],
     orderCellsTop: true,
     order: [[ 1, 'desc' ]],

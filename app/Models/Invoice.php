@@ -40,6 +40,12 @@ class Invoice extends Model
         'deleted_at',
     ];
 
+    protected $casts = [
+        'total' => 'double',
+        'discount' => 'double',
+        'nominal' => 'double',
+    ];
+
     protected function serializeDate(DateTimeInterface $date)
     {
         return $date->format('Y-m-d H:i:s');
@@ -77,7 +83,7 @@ class Invoice extends Model
         $invoice_number = !$data ? 1 : ($data + 1);
 
         $prefix = 'INV/'.strtoupper($semester->type).'/MMJ/'.self::BULAN_ROMAWI[Date::now()->format('n')].'/'.Date::now()->format('y').'/';
-        $code = $prefix.sprintf("%04d", $invoice_number);
+        $code = $prefix.sprintf("%06d", $invoice_number);
 
         return $code;
     }

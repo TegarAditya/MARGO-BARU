@@ -198,7 +198,10 @@ class BookVariantController extends Controller
         $query = $request->input('q');
         $jenjang = $request->input('jenjang');
 
-        $query = BookVariant::whereIn('type', ['L', 'P'])->where('code', 'like', "%{$query}%")->orderBy('code', 'ASC');
+        $query = BookVariant::whereIn('type', ['L', 'P'])->where(function($q) use ($query) {
+                    $q->where('code', 'LIKE', "%{$query}%")
+                    ->orWhere('name', 'LIKE', "%{$query}%");
+                })->orderBy('code', 'ASC');
 
         if (!empty($jenjang)) {
             $query->where('jenjang_id', $jenjang);
@@ -242,7 +245,10 @@ class BookVariantController extends Controller
                     $q->where('salesperson_id', $salesperson)
                     ->where('payment_type', $type)
                     ->where('semester_id', $semester);
-                })->where('code', 'like', "%{$query}%")->orderBy('code', 'ASC');
+                })->where(function($q) use ($query) {
+                    $q->where('code', 'LIKE', "%{$query}%")
+                    ->orWhere('name', 'LIKE', "%{$query}%");
+                })->orderBy('code', 'ASC');
 
         if (!empty($jenjang)) {
             $query->where('jenjang_id', $jenjang);
@@ -289,9 +295,10 @@ class BookVariantController extends Controller
 
         $products = BookVariant::whereHas('dikirim', function ($q) use ($delivery) {
                     $q->where('delivery_order_id', $delivery);
-                })->where('code', 'like', "%{$query}%")
-                ->orderBy('code', 'ASC')
-                ->get();
+                })->where(function($q) use ($query) {
+                    $q->where('code', 'LIKE', "%{$query}%")
+                    ->orWhere('name', 'LIKE', "%{$query}%");
+                })->orderBy('code', 'ASC')->get();
 
         $formattedProducts = [];
 
@@ -331,9 +338,10 @@ class BookVariantController extends Controller
         $products = BookVariant::whereHas('dikirim', function ($q) use ($semester, $salesperson) {
                     $q->where('semester_id', $semester)
                     ->where('salesperson_id', $salesperson);
-                })->where('code', 'like', "%{$query}%")
-                ->orderBy('code', 'ASC')
-                ->get();
+                })->where(function($q) use ($query) {
+                    $q->where('code', 'LIKE', "%{$query}%")
+                    ->orWhere('name', 'LIKE', "%{$query}%");
+                })->orderBy('code', 'ASC')->get();
 
         $formattedProducts = [];
 
@@ -416,9 +424,10 @@ class BookVariantController extends Controller
 
         $products = BookVariant::whereHas('adjustment', function ($q) use ($adjustment) {
                     $q->where('stock_adjustment_id', $adjustment);
-                })->where('code', 'like', "%{$query}%")
-                ->orderBy('code', 'ASC')
-                ->get();
+                })->where(function($q) use ($query) {
+                    $q->where('code', 'LIKE', "%{$query}%")
+                    ->orWhere('name', 'LIKE', "%{$query}%");
+                })->orderBy('code', 'ASC')->get();
 
         $formattedProducts = [];
 

@@ -33,14 +33,6 @@
                     </tr>
                     <tr>
                         <th>
-                            {{ trans('cruds.payment.fields.salesperson') }}
-                        </th>
-                        <td>
-                            {{ $payment->salesperson->name ?? '' }}
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>
                             {{ trans('cruds.payment.fields.semester') }}
                         </th>
                         <td>
@@ -49,26 +41,10 @@
                     </tr>
                     <tr>
                         <th>
-                            {{ trans('cruds.payment.fields.paid') }}
+                            {{ trans('cruds.payment.fields.salesperson') }}
                         </th>
                         <td>
-                            {{ $payment->paid }}
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>
-                            {{ trans('cruds.payment.fields.discount') }}
-                        </th>
-                        <td>
-                            {{ $payment->discount }}
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>
-                            {{ trans('cruds.payment.fields.amount') }}
-                        </th>
-                        <td>
-                            {{ $payment->amount }}
+                            {{ $payment->salesperson->short_name ?? '' }}
                         </td>
                     </tr>
                     <tr>
@@ -79,6 +55,31 @@
                             {{ App\Models\Payment::PAYMENT_METHOD_SELECT[$payment->payment_method] ?? '' }}
                         </td>
                     </tr>
+                    <tr>
+                        <th>
+                            Bayar
+                        </th>
+                        <td>
+                            {{ money($payment->paid) }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>
+                            Potongan
+                        </th>
+                        <td>
+                            {{ money($payment->discount) }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>
+                            Nominal
+                        </th>
+                        <td>
+                            {{ money($payment->amount) }}
+                        </td>
+                    </tr>
+                    
                     <tr>
                         <th>
                             {{ trans('cruds.payment.fields.note') }}

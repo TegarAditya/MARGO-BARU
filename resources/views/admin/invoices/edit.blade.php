@@ -7,7 +7,7 @@
     </div>
 
     <div class="card-body">
-        
+
         @if (session()->has('error-message'))
             <p class="text-danger">
                 {{session()->get('error-message')}}
@@ -50,16 +50,6 @@
                         <input class="form-control" type="text" name="salesperson" value="{{ $invoice->salesperson->name }}" readonly>
                     </div>
                 </div>
-                <div class="col-12">
-                    <div class="form-group">
-                        <label for="note">{{ trans('cruds.invoice.fields.note') }}</label>
-                        <textarea class="form-control {{ $errors->has('note') ? 'is-invalid' : '' }}" name="note" id="note">{{ old('note', $invoice->note) }}</textarea>
-                        @if($errors->has('note'))
-                            <span class="text-danger">{{ $errors->first('note') }}</span>
-                        @endif
-                        <span class="help-block">{{ trans('cruds.invoice.fields.note_helper') }}</span>
-                    </div>
-                </div>
             </div>
             <hr style="margin: .5em -15px;border-color:#ccc" />
             <div class="row mb-2">
@@ -100,6 +90,16 @@
                                         </div>
                                     </div>
                                 </div>
+                                <div class="col" style="max-width: 120px">
+                                    <p class="mb-0 text-sm">Quantity</p>
+                                    <div class="form-group text-field m-0">
+                                        <div class="text-field-input px-2 py-0">
+                                            <input class="quantity" type="hidden" name="quantities[]" value="{{ $item->quantity }}">
+                                            <input class="form-control text-center quantity_text" type="text" name="quantity_text[]" value="{{ angka($item->quantity) }}" readonly tabindex="-1">
+                                            <label class="text-field-border"></label>
+                                        </div>
+                                    </div>
+                                </div>
                                 <div class="col" style="max-width: 210px">
                                     <p class="mb-0 text-sm"><b>Discount</b></p>
                                     <div class="form-group text-field m-0">
@@ -111,20 +111,15 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col" style="max-width: 120px">
-                                    <p class="mb-0 text-sm">Quantity</p>
-                                    <div class="form-group text-field m-0">
-                                        <div class="text-field-input px-2 py-0">
-                                            <input class="quantity" type="hidden" name="quantities[]" value="{{ $item->quantity }}">
-                                            <input class="form-control text-center quantity_text" type="text" name="quantity_text[]" value="{{ angka($item->quantity) }}" readonly tabindex="-1">
-                                            <label class="text-field-border"></label>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col text-right pl-5">
+                                <div class="col text-right pl-2">
                                     <input class="subtotal" type="hidden" name="subtotals[]" value="{{ $item->total }}">
-                                    <p class="text-sm mb-0"><b>Subtotal</b></p>
+                                    <p class="text-sm mb-0"><b>Total</b></p>
                                     <p class="m-0 product-subtotal">{{ money($item->total) }}</p>
+                                </div>
+                                <div class="col text-right pl-2">
+                                    <input class="subdiskon" type="hidden" name="subdiscounts[]" value="0">
+                                    <p class="text-sm mb-0"><b>Discount</b></p>
+                                    <p class="m-0 product-subdiskon">{{ money($item->total_discount) }}</p>
                                 </div>
                             </div>
                         </div>
@@ -132,12 +127,35 @@
                     </div>
                 @endforeach
                 <div class="row mt-3 pt-2 ml-2">
-                    <div class="col text-right">
+                    <div class="col-md-10 text-right">
+                        <span class="text-sm"><b>Subtotal</b></span>
+                    </div>
+                    <div class="col-2 text-right">
                         <p class="mb-1">
-                            <span class="text-sm"><b>Grand Total</b></span>
-                            <br />
+                            <input class="total_price" type="hidden" name="total_price" id="total_price" value="{{ $invoice->total }}">
+                            <strong class="product-total-price">{{ money($invoice->total) }}</strong>
+                        </p>
+                    </div>
+                </div>
+                <div class="row pt-2 ml-2">
+                    <div class="col-10 text-right">
+                        <span class="text-sm"><b>Discount</b></span>
+                    </div>
+                    <div class="col-2 text-right">
+                        <p class="mb-1">
+                            <input class="total_diskon" type="hidden" name="total_diskon" id="total_diskon" value="{{ $invoice->discount }}">
+                            <strong class="product-total-diskon">{{ money($invoice->discount) }}</strong>
+                        </p>
+                    </div>
+                </div>
+                <div class="row mb-3 pt-2 ml-2">
+                    <div class="col-10 text-right">
+                        <span class="text-sm"><b>Grand Total</b></span>
+                    </div>
+                    <div class="col-2 text-right">
+                        <p class="mb-1">
                             <input class="subtotal" type="hidden" name="nominal" id="nominal" value="{{ $invoice->nominal }}">
-                            <strong class="product-total">{{ money($invoice->nominal) }}</strong>
+                            <strong class="product-total-nominal">{{ money($invoice->nominal) }}</strong>
                         </p>
                     </div>
                 </div>
@@ -161,7 +179,9 @@
     $(function() {
         var productForm = $('#product-form');
         var productItem = productForm.find('.item-product');
-        var productTotal = productForm.find('.product-total');
+        var productTotal = productForm.find('.product-total-nominal');
+        var productTotalPrice = productForm.find('.product-total-price');
+        var productTotalDiskon = productForm.find('.product-total-diskon');
 
         productItem.each(function(index, item) {
             var product = $(item);
@@ -170,20 +190,24 @@
 
             diskonText.on('input change', function(e) {
                 var value = numeral(e.target.value);
-                var max = diskon.data('max');
-                var valueNum = value.value();
-                if (valueNum < 0) {
-                    diskonText.val(0);
-                    diskon.val(0);
-                } else if (valueNum > max) {
-                    var maxNum = numeral(max);
-                    diskonText.val(maxNum.format('0,0'));
-                    diskon.val(maxNum.value());
-                } else {
-                    diskonText.val(value.format('0,0'));
-                    diskon.val(value.value());
-                }
+
+                diskonText.val(value.format('0,0'));
+                diskon.val(value.value());
                 calculatePrice();
+            }).trigger('change');
+
+            diskon.on('change', function(e) {
+                var el = $(e.currentTarget);
+                var max = parseInt(el.data('max'));
+                console.log(max);
+                var valueNum = parseInt(el.val());
+                if (valueNum < 1 ) {
+                    el.val(0);
+                    diskonText.val(0);
+                }else if (valueNum > max) {
+                    el.val(max);
+                    diskonText.val(max);
+                }
             }).trigger('change');
         });
 
@@ -194,19 +218,23 @@
         });
 
         function calculatePrice () {
-            var total = 0;
+            var total_diskon = 0;
 
             productForm.children().each(function(i, item) {
                 var product = $(item);
-                var price = parseInt(product.find('.price').val() || 0);
-                var diskon = parseInt(product.find('.diskon').val() || 0);
                 var quantity = parseInt(product.find('.quantity').val() || 0);
-                subtotal = (price - diskon) * quantity;
-                product.find('.product-subtotal').html(numeral(subtotal).format('$0,0'));
+                var diskon = parseInt(product.find('.diskon').val() || 0);
 
-                total += subtotal
+                subdiskon = diskon * quantity;
+                product.find('.product-subdiskon').html(numeral(subdiskon).format('$0,0'));
+                product.find('.subdiskon').val(subdiskon);
+                total_diskon += subdiskon;
             });
+            var total_price = parseInt(productForm.find('[name="total_price"]').val() || 0);
+            var total = total_price - total_diskon;
 
+            productTotalDiskon.html(numeral(total_diskon).format('$0,0'));
+            productForm.find('[name="total_diskon"]').val(total_diskon);
             productTotal.html(numeral(total).format('$0,0'));
             productForm.find('[name="nominal"]').val(total);
         };

@@ -34,7 +34,10 @@
                         {{ trans('cruds.invoice.fields.salesperson') }}
                     </th>
                     <th>
-                        {{ trans('cruds.invoice.fields.nominal') }}
+                        Total
+                    </th>
+                    <th>
+                        Discount
                     </th>
                     <th>
                         &nbsp;
@@ -91,13 +94,14 @@
     aaSorting: [],
     ajax: "{{ route('admin.invoices.index') }}",
     columns: [
-      { data: 'placeholder', name: 'placeholder' },
-{ data: 'no_faktur', name: 'no_faktur' },
-{ data: 'date', name: 'date' },
-{ data: 'semester_name', name: 'semester.name' },
-{ data: 'salesperson_name', name: 'salesperson.name' },
-{ data: 'nominal', name: 'nominal' },
-{ data: 'actions', name: '{{ trans('global.actions') }}' }
+        { data: 'placeholder', name: 'placeholder' },
+        { data: 'no_faktur', name: 'no_faktur', class: 'text-center' },
+        { data: 'date', name: 'date', class: 'text-center' },
+        { data: 'semester_name', name: 'semester.name', class: 'text-center' },
+        { data: 'salesperson_name', name: 'salesperson.name', class: 'text-center' },
+        { data: 'total', name: 'total', class: 'text-right' },
+        { data: 'discount', name: 'discount', class: 'text-right' },
+        { data: 'actions', name: '{{ trans('global.actions') }}', class: 'text-center' }
     ],
     orderCellsTop: true,
     order: [[ 1, 'desc' ]],

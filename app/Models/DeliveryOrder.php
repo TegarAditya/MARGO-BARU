@@ -75,7 +75,7 @@ class DeliveryOrder extends Model
         $order_number = !$data ? 1 : ($data + 1);
 
         $prefix = 'SJ/'.strtoupper($semester->type).'/MMJ/'.self::BULAN_ROMAWI[Date::now()->format('n')].'/'.Date::now()->format('y').'/';
-        $code = $prefix.sprintf("%04d", $order_number);
+        $code = $prefix.sprintf("%06d", $order_number);
 
         return $code;
     }

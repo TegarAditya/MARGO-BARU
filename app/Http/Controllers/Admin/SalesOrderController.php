@@ -67,7 +67,7 @@ class SalesOrderController extends Controller
             });
 
             $table->addColumn('salesperson_name', function ($row) {
-                return $row->salesperson ? $row->salesperson->name : '';
+                return $row->salesperson ? $row->salesperson->short_name : '';
             });
 
             $table->editColumn('payment_type', function ($row) {
@@ -81,7 +81,7 @@ class SalesOrderController extends Controller
 
         $semesters = Semester::orderBy('code', 'DESC')->where('status', 1)->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
-        $salespeople = Salesperson::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $salespeople = Salesperson::get()->pluck('short_name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
         return view('admin.salesOrders.index', compact('salespeople', 'semesters'));
     }
@@ -322,7 +322,7 @@ class SalesOrderController extends Controller
         $salesOrder = $orders->first();
         $salesOrder->load('semester', 'salesperson', 'product', 'jenjang', 'kurikulum');
 
-        $grouped = $orders->groupBy('jen_kum')->sortBy('product.mapel_id')->sortBy('product.kelas_id');
+        $grouped = $orders->sortBy('product.kelas_id')->sortBy('product.mapel_id')->groupBy('jen_kum');
 
         return view('admin.salesOrders.prints.estimasi', compact('salesOrder', 'orders', 'grouped'));
     }

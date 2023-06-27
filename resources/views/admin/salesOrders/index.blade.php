@@ -161,7 +161,7 @@
           .columns.adjust();
   });
 
-  $("#filterform").submit(function(event) {
+    $("#filterform").submit(function(event) {
         event.preventDefault();
         table.ajax.reload();
     });
