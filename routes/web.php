@@ -54,6 +54,12 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     Route::post('semesters/process-csv-import', 'SemesterController@processCsvImport')->name('semesters.processCsvImport');
     Route::resource('semesters', 'SemesterController');
 
+    // Isi
+    Route::delete('isis/destroy', 'IsiController@massDestroy')->name('isis.massDestroy');
+    Route::post('isis/parse-csv-import', 'IsiController@parseCsvImport')->name('isis.parseCsvImport');
+    Route::post('isis/process-csv-import', 'IsiController@processCsvImport')->name('isis.processCsvImport');
+    Route::resource('isis', 'IsiController');
+
     // Cover
     Route::delete('covers/destroy', 'CoverController@massDestroy')->name('covers.massDestroy');
     Route::post('covers/parse-csv-import', 'CoverController@parseCsvImport')->name('covers.parseCsvImport');
@@ -105,6 +111,9 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
 
     // Book Variant
     Route::delete('book-variants/destroy', 'BookVariantController@massDestroy')->name('book-variants.massDestroy');
+    Route::post('book-variants/media', 'BookVariantController@storeMedia')->name('book-variants.storeMedia');
+    Route::post('book-variants/ckmedia', 'BookVariantController@storeCKEditorImages')->name('book-variants.storeCKEditorImages');
+    Route::get('book-variants/get-products', 'BookVariantController@getProducts')->name('book-variants.getProducts');
     Route::get('book-variants/get-books', 'BookVariantController@getBooks')->name('book-variants.getBooks');
     Route::get('book-variants/get-book', 'BookVariantController@getBook')->name('book-variants.getBook');
     Route::get('book-variants/get-estimasi', 'BookVariantController@getEstimasi')->name('book-variants.getEstimasi');
@@ -117,7 +126,14 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     Route::get('book-variants/get-info-edit-retur', 'BookVariantController@getInfoEditRetur')->name('book-variants.getInfoEditRetur');
     Route::get('book-variants/get-adjustment', 'BookVariantController@getAdjustment')->name('book-variants.getAdjustment');
     Route::get('book-variants/get-info-adjustment', 'BookVariantController@getInfoAdjustment')->name('book-variants.getInfoAdjustment');
+    Route::get('book-variants/get-cetak', 'BookVariantController@getCetak')->name('book-variants.getCetak');
+    Route::get('book-variants/get-info-cetak', 'BookVariantController@getInfoCetak')->name('book-variants.getInfoCetak');
+    Route::get('book-variants/get-info-finishing', 'BookVariantController@getInfoFinishing')->name('book-variants.getInfoFinishing');
     Route::resource('book-variants', 'BookVariantController');
+
+    // Book Component
+    Route::delete('book-components/destroy', 'BookComponentController@massDestroy')->name('book-components.massDestroy');
+    Route::resource('book-components', 'BookComponentController');
 
     // Warehouse
     Route::delete('warehouses/destroy', 'WarehouseController@massDestroy')->name('warehouses.massDestroy');
@@ -131,6 +147,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
 
     // Stock Opname
     Route::delete('stock-opnames/destroy', 'StockOpnameController@massDestroy')->name('stock-opnames.massDestroy');
+    Route::get('stock-opnames/summary', 'StockOpnameController@summary')->name('stock-opnames.summary');
     Route::resource('stock-opnames', 'StockOpnameController');
 
     // Stock Adjustment
@@ -143,6 +160,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     Route::post('materials/process-csv-import', 'MaterialsController@processCsvImport')->name('materials.processCsvImport');
     Route::post('materials/import', 'MaterialsController@import')->name('materials.import');
     Route::get('materials/template-import', 'MaterialsController@template_import')->name('materials.templateImport');
+    Route::get('materials/get-plates', 'MaterialsController@getPlates')->name('materials.getPlates');
     Route::resource('materials', 'MaterialsController');
 
     // Stock Adjustment Detail
@@ -169,6 +187,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     // Delivery Order
     Route::delete('delivery-orders/destroy', 'DeliveryOrderController@massDestroy')->name('delivery-orders.massDestroy');
     Route::get('delivery-orders/print-sj/{deliveryOrder}', 'DeliveryOrderController@printSj')->name('delivery-orders.printSj');
+    Route::get('delivery-orders/get-delivery-order', 'DeliveryOrderController@getDeliveryOrder')->name('delivery-orders.getDeliveryOrder');
     Route::resource('delivery-orders', 'DeliveryOrderController');
 
     // Delivery Order Item
@@ -179,6 +198,9 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     Route::delete('invoices/destroy', 'InvoiceController@massDestroy')->name('invoices.massDestroy');
     Route::get('invoices/generate/{delivery}', 'InvoiceController@generate')->name('invoices.generate');
     Route::get('invoices/print-faktur/{invoice}', 'InvoiceController@printFaktur')->name('invoices.print-faktur');
+    Route::get('invoices/editInvoice/{invoice}', 'InvoiceController@editInvoice')->name('invoices.editInvoice');
+    Route::put('invoices/updateInvoice/{invoice}', 'InvoiceController@updateInvoice')->name('invoices.updateInvoice');
+    Route::post('invoices/storeInvoice', 'InvoiceController@storeInvoice')->name('invoices.storeInvoice');
     Route::resource('invoices', 'InvoiceController');
 
     // Invoice Item
@@ -187,6 +209,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
 
     // Return Good
     Route::delete('return-goods/destroy', 'ReturnGoodController@massDestroy')->name('return-goods.massDestroy');
+    Route::get('return-goods/print-faktur/{retur}', 'ReturnGoodController@printFaktur')->name('return-goods.print-faktur');
     Route::resource('return-goods', 'ReturnGoodController');
 
     // Return Good Item
@@ -223,6 +246,9 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
 
     // Cetak
     Route::delete('cetaks/destroy', 'CetakController@massDestroy')->name('cetaks.massDestroy');
+    Route::get('cetaks/{cetak}/realisasi', 'CetakController@realisasi')->name('cetaks.realisasi');
+    Route::put('cetaks/realisasi/{cetak}', 'CetakController@realisasiStore')->name('cetaks.realiasasiStore');
+    Route::get('cetaks/print-spc/{cetak}', 'CetakController@printSpc')->name('cetaks.printSpc');
     Route::resource('cetaks', 'CetakController');
 
     // Cetak Item
@@ -231,6 +257,9 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
 
     // Finishing
     Route::delete('finishings/destroy', 'FinishingController@massDestroy')->name('finishings.massDestroy');
+    Route::get('finishings/{finishing}/realisasi', 'FinishingController@realisasi')->name('finishings.realisasi');
+    Route::put('finishings/realisasi/{finishing}', 'FinishingController@realisasiStore')->name('finishings.realiasasiStore');
+    Route::get('finishings/print-spk/{finishing}', 'FinishingController@printSpk')->name('finishings.printSpk');
     Route::resource('finishings', 'FinishingController');
 
     // Finishing Item
@@ -239,6 +268,10 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
 
     // Estimation Movement
     Route::resource('estimation-movements', 'EstimationMovementController', ['except' => ['create', 'store', 'edit', 'update', 'show', 'destroy']]);
+
+    // Setting
+    Route::delete('settings/destroy', 'SettingController@massDestroy')->name('settings.massDestroy');
+    Route::resource('settings', 'SettingController');
 
     Route::get('system-calendar', 'SystemCalendarController@index')->name('systemCalendar');
 });

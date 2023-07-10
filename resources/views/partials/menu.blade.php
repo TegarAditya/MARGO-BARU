@@ -95,6 +95,18 @@
                             </p>
                         </a>
                         <ul class="nav nav-treeview">
+                            @can('setting_access')
+                                <li class="nav-item">
+                                    <a href="{{ route("admin.settings.index") }}" class="nav-link {{ request()->is("admin/settings") || request()->is("admin/settings/*") ? "active" : "" }}">
+                                        <i class="fa-fw nav-icon fas fa-cogs">
+
+                                        </i>
+                                        <p>
+                                            {{ trans('cruds.setting.title') }}
+                                        </p>
+                                    </a>
+                                </li>
+                            @endcan
                             @can('unit_access')
                                 <li class="nav-item">
                                     <a href="{{ route("admin.units.index") }}" class="nav-link {{ request()->is("admin/units") || request()->is("admin/units/*") ? "active" : "" }}">
@@ -154,6 +166,18 @@
                                         </i>
                                         <p>
                                             {{ trans('cruds.semester.title') }}
+                                        </p>
+                                    </a>
+                                </li>
+                            @endcan
+                            @can('isi_access')
+                                <li class="nav-item">
+                                    <a href="{{ route("admin.isis.index") }}" class="nav-link {{ request()->is("admin/isis") || request()->is("admin/isis/*") ? "active" : "" }}">
+                                        <i class="fa-fw nav-icon fas fa-book">
+
+                                        </i>
+                                        <p>
+                                            {{ trans('cruds.isi.title') }}
                                         </p>
                                     </a>
                                 </li>
@@ -332,6 +356,18 @@
                                     </a>
                                 </li>
                             @endcan
+                            @can('book_component_access')
+                                <li class="nav-item">
+                                    <a href="{{ route("admin.book-components.index") }}" class="nav-link {{ request()->is("admin/book-components") || request()->is("admin/book-components/*") ? "active" : "" }}">
+                                        <i class="fa-fw nav-icon fas fa-book">
+
+                                        </i>
+                                        <p>
+                                            {{ trans('cruds.bookComponent.title') }}
+                                        </p>
+                                    </a>
+                                </li>
+                            @endcan
                         </ul>
                     </li>
                 @endcan
@@ -373,14 +409,29 @@
                             @endcan
                             @can('stock_opname_access')
                                 <li class="nav-item">
-                                    <a href="{{ route("admin.stock-opnames.index") }}" class="nav-link {{ request()->is("admin/stock-opnames") || request()->is("admin/stock-opnames/*") ? "active" : "" }}">
+                                    <a class="nav-link {{ request()->is("admin/stock-opnames") || request()->is("admin/stock-opnames/*") ? "active" : "" }}">
                                         <i class="fa-fw nav-icon fas fa-archive">
 
                                         </i>
                                         <p>
                                             {{ trans('cruds.stockOpname.title') }}
+                                            <i class="right fas fa-angle-left"></i>
                                         </p>
                                     </a>
+                                    <ul class="nav nav-treeview">
+                                        <li class="nav-item">
+                                          <a href="{{ route("admin.stock-opnames.summary") }}" class="nav-link {{ request()->is("admin/stock-opnames/summary") ? "active" : "" }}">
+                                            <i class="far fa-dot-circle nav-icon"></i>
+                                            <p>Summary</p>
+                                          </a>
+                                        </li>
+                                        <li class="nav-item">
+                                          <a href="{{ route("admin.stock-opnames.index") }}" class="nav-link {{ request()->is("admin/stock-opnames/index") ? "active" : "" }}">
+                                            <i class="far fa-dot-circle nav-icon"></i>
+                                            <p>Stock</p>
+                                          </a>
+                                        </li>
+                                      </ul>
                                 </li>
                             @endcan
                             @can('stock_adjustment_access')
@@ -493,18 +544,6 @@
                                         </i>
                                         <p>
                                             {{ trans('cruds.returnGood.title') }}
-                                        </p>
-                                    </a>
-                                </li>
-                            @endcan
-                            @can('return_good_item_access')
-                                <li class="nav-item">
-                                    <a href="{{ route("admin.return-good-items.index") }}" class="nav-link {{ request()->is("admin/return-good-items") || request()->is("admin/return-good-items/*") ? "active" : "" }}">
-                                        <i class="fa-fw nav-icon fas fa-box-open">
-
-                                        </i>
-                                        <p>
-                                            {{ trans('cruds.returnGoodItem.title') }}
                                         </p>
                                     </a>
                                 </li>
@@ -641,7 +680,7 @@
                                     </a>
                                 </li>
                             @endcan
-                            @can('cetak_item_access')
+                            {{-- @can('cetak_item_access')
                                 <li class="nav-item">
                                     <a href="{{ route("admin.cetak-items.index") }}" class="nav-link {{ request()->is("admin/cetak-items") || request()->is("admin/cetak-items/*") ? "active" : "" }}">
                                         <i class="fa-fw nav-icon far fa-dot-circle">
@@ -652,7 +691,7 @@
                                         </p>
                                     </a>
                                 </li>
-                            @endcan
+                            @endcan --}}
                             @can('finishing_access')
                                 <li class="nav-item">
                                     <a href="{{ route("admin.finishings.index") }}" class="nav-link {{ request()->is("admin/finishings") || request()->is("admin/finishings/*") ? "active" : "" }}">
@@ -665,7 +704,7 @@
                                     </a>
                                 </li>
                             @endcan
-                            @can('finishing_item_access')
+                            {{-- @can('finishing_item_access')
                                 <li class="nav-item">
                                     <a href="{{ route("admin.finishing-items.index") }}" class="nav-link {{ request()->is("admin/finishing-items") || request()->is("admin/finishing-items/*") ? "active" : "" }}">
                                         <i class="fa-fw nav-icon fas fa-bullseye">
@@ -676,7 +715,7 @@
                                         </p>
                                     </a>
                                 </li>
-                            @endcan
+                            @endcan --}}
                         </ul>
                     </li>
                 @endcan

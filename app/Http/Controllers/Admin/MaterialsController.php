@@ -170,4 +170,23 @@ class MaterialsController extends Controller
     public function template_import() {
         return (new MaterialTemplate())->download('Template Import Material.xlsx');
     }
+
+    public function getPlates(Request $request) {
+        $vendor = $request->input('vendor');
+
+        $materials = Material::where('category', 'plate')->whereHas('vendors', function ($q) use ($vendor) {
+                    $q->where('id', $vendor);
+                })->orderBy('code', 'ASC')->get();
+
+        $formattedMaterials = [];
+
+        foreach ($materials as $material) {
+            $formattedMaterials[] = [
+                'id' => $material->id,
+                'text' => $material->code . ' - ' . $material->name,
+            ];
+        }
+
+        return response()->json($formattedMaterials);
+    }
 }

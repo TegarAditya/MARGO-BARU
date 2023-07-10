@@ -37,7 +37,8 @@ class EstimationMovement extends Model
 
     public const REFERENCE_TYPE_SELECT = [
         'sales_order' => 'Sales Order',
-        'production'  => 'Produksi',
+        'cetak'  => 'Cetak',
+        'finishing'  => 'Finishing',
     ];
 
     protected $fillable = [

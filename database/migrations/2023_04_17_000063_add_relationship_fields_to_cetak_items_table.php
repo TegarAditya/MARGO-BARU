@@ -9,6 +9,8 @@ class AddRelationshipFieldsToCetakItemsTable extends Migration
     public function up()
     {
         Schema::table('cetak_items', function (Blueprint $table) {
+            $table->unsignedBigInteger('cetak_id')->nullable();
+            $table->foreign('cetak_id', 'cetak_fk_8682435')->references('id')->on('cetaks');
             $table->unsignedBigInteger('semester_id')->nullable();
             $table->foreign('semester_id', 'semester_fk_8147723')->references('id')->on('semesters');
             $table->unsignedBigInteger('product_id')->nullable();

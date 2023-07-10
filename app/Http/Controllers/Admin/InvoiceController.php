@@ -35,17 +35,29 @@ class InvoiceController extends Controller
             $table->addColumn('actions', '&nbsp;');
 
             $table->editColumn('actions', function ($row) {
-                return '
+                $btn = '
                     <a class="px-1" href="'.route('admin.invoices.show', $row->id).'" title="Show">
                         <i class="fas fa-eye text-success fa-lg"></i>
                     </a>
                     <a class="px-1" href="'.route('admin.invoices.print-faktur', $row->id).'" target="_blank" title="Print Faktur" >
                         <i class="fas fa-print text-secondary fa-lg"></i>
                     </a>
-                    <a class="px-1" href="'.route('admin.invoices.edit', $row->id).'" title="Edit">
-                        <i class="fas fa-edit fa-lg"></i>
-                    </a>
                 ';
+
+                if ($row->type == 'jual') {
+                    $btn = $btn. '
+                        <a class="px-1" href="'.route('admin.invoices.edit', $row->id).'" title="Edit">
+                            <i class="fas fa-edit fa-lg"></i>
+                        </a>
+                    ';
+                } else {
+                    $btn = $btn. '
+                        <a class="px-1" href="'.route('admin.invoices.editInvoice', $row->id).'" title="Edit">
+                            <i class="fas fa-edit fa-lg"></i>
+                        </a>
+                    ';
+                }
+                return $btn;
             });
 
             $table->editColumn('no_faktur', function ($row) {
@@ -154,10 +166,12 @@ class InvoiceController extends Controller
                 'delivery_order_id' => $delivery,
                 'semester_id' => $semester,
                 'salesperson_id' => $salesperson,
+                'type' => 'jual',
                 'discount' => $total_diskon,
                 'total' => $total_price,
                 'nominal' => $nominal,
-                'note' => 'Generated Invoice From '. $delivery_order->no_faktur
+                'note' => 'Generated Invoice From '. $delivery_order->no_faktur,
+                'created_by_id' => auth()->user()->id
             ]);
 
             for ($i = 0; $i < count($products); $i++) {
@@ -184,9 +198,62 @@ class InvoiceController extends Controller
                 ]);
             }
 
-            TransactionService::createTransaction($date, 'Faktur from '. $invoice->no_faktur, $salesperson, $semester, 'faktur', $invoice->id, $invoice->no_faktur, $nominal, 'debet');
-            TransactionService::createTransaction($date, 'Diskon from '. $invoice->no_faktur, $salesperson, $semester, 'diskon', $invoice->id, $invoice->no_faktur, $nominal, 'credit');
+            TransactionService::createTransaction($date, 'Faktur from '. $invoice->no_faktur, $salesperson, $semester, 'faktur', $invoice->id, $invoice->no_faktur, $total_price, 'debet');
+            TransactionService::createTransaction($date, 'Diskon from '. $invoice->no_faktur, $salesperson, $semester, 'diskon', $invoice->id, $invoice->no_faktur, $total_diskon, 'credit');
             DeliveryService::generateFaktur($delivery);
+
+            DB::commit();
+
+            Alert::success('Success', 'Faktur berhasil di simpan');
+
+            return redirect()->route('admin.invoices.index');
+        } catch (\Exception $e) {
+            DB::rollback();
+
+            return redirect()->back()->with('error-message', $e->getMessage())->withInput();
+        }
+    }
+
+    public function storeInvoice(Request $request)
+    {
+        // Validate the form data
+        $validatedData = $request->validate([
+            'date' => 'required',
+            'type' => 'required',
+            'salesperson_id' =>'required',
+            'semester_id' =>'required',
+            'delivery_order_id' =>'required|exists:delivery_orders,id',
+            'note' => 'required',
+            'nominal' => 'numeric|min:1',
+        ]);
+
+        $date = $validatedData['date'];
+        $type = $validatedData['type'];
+        $salesperson = $validatedData['salesperson_id'];
+        $semester = $validatedData['semester_id'];
+        $delivery = $validatedData['delivery_order_id'];
+        $note = $validatedData['note'];
+        $nominal = $validatedData['nominal'];
+
+        DB::beginTransaction();
+        try {
+            $invoice = Invoice::create([
+                'no_faktur' => Invoice::generateNoInvoice($semester),
+                'date' => $date,
+                'delivery_order_id' => $delivery,
+                'semester_id' => $semester,
+                'salesperson_id' => $salesperson,
+                'type' => $type,
+                'discount' => 0,
+                'total' => $nominal,
+                'nominal' => $nominal,
+                'note' => $note,
+                'created_by_id' => auth()->user()->id
+            ]);
+
+            $note = 'Faktur From '. $no_faktur. '. Catatan :'. $note;
+
+            TransactionService::createTransaction($date, $note, $salesperson, $semester, 'faktur', $invoice->id, $invoice->no_faktur, $nominal, 'debet');
 
             DB::commit();
 
@@ -211,6 +278,15 @@ class InvoiceController extends Controller
         return view('admin.invoices.edit', compact('invoice', 'invoice_item'));
     }
 
+    public function editInvoice(Invoice $invoice)
+    {
+        abort_if(Gate::denies('invoice_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+
+        $invoice->load('delivery_order', 'semester', 'salesperson');
+
+        return view('admin.invoices.edit-invoice', compact('invoice'));
+    }
+
     public function update(Request $request, Invoice $invoice)
     {
         // Validate the form data
@@ -218,6 +294,8 @@ class InvoiceController extends Controller
             'date' => 'required',
             'note' => 'nullable',
             'nominal' => 'numeric|min:1',
+            'total_price' => 'numeric|min:1',
+            'total_diskon' => 'numeric|min:1',
             'invoice_items' => 'required|array',
             'invoice_items.*' => 'exists:invoice_items,id',
             'products' => 'required|array',
@@ -230,25 +308,34 @@ class InvoiceController extends Controller
             'quantities.*' => 'numeric|min:1',
             'subtotals' => 'required|array',
             'subtotals.*' => 'numeric|min:1',
+            'subdiscounts' => 'required|array',
+            'subdiscounts.*' => 'numeric|min:1',
         ]);
 
         $date = $validatedData['date'];
-        $note = $validatedData['note'];
+        // $note = $validatedData['note'];
         $nominal = $validatedData['nominal'];
+        $total_price = $validatedData['total_price'];
+        $total_diskon = $validatedData['total_diskon'];
         $invoice_items = $validatedData['invoice_items'];
         $products = $validatedData['products'];
         $prices = $validatedData['prices'];
-        $diskons = $validatedData['diskons'];
         $quantities = $validatedData['quantities'];
         $subtotals = $validatedData['subtotals'];
+        $diskons = $validatedData['diskons'];
+        $subdiscounts = $validatedData['subdiscounts'];
 
         $salesperson = $invoice->salesperson_id;
         $semester = $invoice->semester_id;
         $no_faktur = $invoice->no_faktur;
+        $note = $invoice->note;
 
         DB::beginTransaction();
         try {
             $invoice->update([
+                'date' => $date,
+                'discount' => $total_diskon,
+                'total' => $total_price,
                 'nominal' => $nominal,
                 'note' => $note
             ]);
@@ -257,19 +344,68 @@ class InvoiceController extends Controller
                 $invoice_item = $invoice_items[$i];
                 $product = $products[$i];
                 $price = $prices[$i];
-                $diskon = $diskons[$i];
                 $quantity = $quantities[$i];
                 $subtotal = $subtotals[$i];
+                $diskon = $diskons[$i];
+                $subdiscount = $subdiscounts[$i];
 
                 InvoiceItem::where('id', $invoice_item)->update([
                     'product_id' => $product,
                     'quantity' => $quantity,
-                    'price_unit' => $price,
+                    'price' => $price,
+                    'total' => $subtotal,
                     'discount' => $diskon,
-                    'price' => ($price - $diskon),
-                    'total' => $subtotal
+                    'total_discount' => $subdiscount,
                 ]);
             }
+
+            TransactionService::editTransaction($date, $note, $salesperson, $semester, 'faktur', $invoice->id, $no_faktur, $total_price, 'debet');
+            TransactionService::editTransaction($date, $note, $salesperson, $semester, 'diskon', $invoice->id, $no_faktur, $total_diskon, 'credit');
+
+            DB::commit();
+
+            Alert::success('Success', 'Faktur berhasil di simpan');
+
+            return redirect()->route('admin.invoices.index');
+        } catch (\Exception $e) {
+            DB::rollback();
+
+            dd($e);
+
+            return redirect()->back()->with('error-message', $e->getMessage())->withInput();
+        }
+    }
+
+    public function updateInvoice(Request $request, Invoice $invoice)
+    {
+        $validatedData = $request->validate([
+            'date' => 'required',
+            'type' => 'required',
+            'note' => 'required',
+            'nominal' => 'numeric|min:1',
+        ]);
+
+        $date = $validatedData['date'];
+        $type = $validatedData['type'];
+        $note = $validatedData['note'];
+        $nominal = $validatedData['nominal'];
+
+        $salesperson = $invoice->salesperson_id;
+        $semester = $invoice->semester_id;
+        $no_faktur = $invoice->no_faktur;
+
+        DB::beginTransaction();
+        try {
+            $invoice->update([
+                'date' => $date,
+                'type' => $type,
+                'discount' => 0,
+                'total' => $nominal,
+                'nominal' => $nominal,
+                'note' => $note
+            ]);
+
+            $note = 'Faktur From '. $no_faktur. '. Catatan :'. $note;
 
             TransactionService::editTransaction($date, $note, $salesperson, $semester, 'faktur', $invoice->id, $no_faktur, $nominal, 'debet');
 
@@ -293,6 +429,10 @@ class InvoiceController extends Controller
 
         $invoice->load('delivery_order', 'semester', 'salesperson');
 
+        if ($invoice->type !== 'jual') {
+            return view('admin.invoices.show-additional', compact('invoice'));
+        }
+
         $details = InvoiceItem::with('product')->where('invoice_id', $invoice->id)->get();
 
         $invoice_items = $details->sortBy('product.kelas_id')->sortBy('product.mapel_id')->sortBy('product.kurikulum_id')->sortBy('product.jenjang_id');
@@ -303,6 +443,10 @@ class InvoiceController extends Controller
     public function printFaktur(Invoice $invoice)
     {
         $invoice->load('delivery_order', 'semester', 'salesperson');
+
+        if ($invoice->type !== 'jual') {
+            return view('admin.invoices.faktur-additional', compact('invoice'));
+        }
 
         $details = InvoiceItem::with('product')->where('invoice_id', $invoice->id)->get();
 

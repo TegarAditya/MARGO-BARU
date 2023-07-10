@@ -55,7 +55,7 @@
         <th width="1%" class="text-center">No.</th>
         <th>Jenjang</th>
         <th>Tema/Mapel</th>
-        <th width="1%" class="text-center">Kelas</th>
+        <th width="1%" class="text-center">Kls</th>
         <th width="1%" class="text-center">Hal</th>
         <th width="10%" class="text-center">Harga</th>
         <th width="1%" class="text-center">Quantity</th>

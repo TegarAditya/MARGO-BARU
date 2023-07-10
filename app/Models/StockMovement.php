@@ -27,6 +27,7 @@ class StockMovement extends Model
         'adjustment' => 'Adjustment',
         'delivery'   => 'Delivery',
         'retur'      => 'Retur',
+        'cetak'      => 'Cetak',
         'produksi'   => 'Produksi',
     ];
 
@@ -84,7 +85,17 @@ class StockMovement extends Model
 
     public function reference()
     {
-        return $this->belongsTo(StockAdjustment::class, 'reference_id');
+        if ($this->transaction_type === 'adjustment') {
+            return $this->belongsTo(StockAdjustment::class, 'reference_id');
+        } else if ($this->transaction_type === 'delivery') {
+            return $this->belongsTo(Delivery::class, 'reference_id');
+        } else if ($this->transaction_type === 'retur') {
+            return $this->belongsTo(ReturnGood::class, 'reference_id');
+        } else if ($this->transaction_type === 'cetak') {
+            return $this->belongsTo(Cetak::class, 'reference_id');
+        } else if ($this->transaction_type === 'produksi') {
+            return $this->belongsTo(Finishing::class, 'reference_id');
+        }
     }
 
     public function product()

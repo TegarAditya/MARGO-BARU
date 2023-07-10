@@ -8,12 +8,15 @@ use DateTimeInterface;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Date;
 
 class Cetak extends Model
 {
     use SoftDeletes, Auditable, HasFactory;
 
     public $table = 'cetaks';
+
+    public const BULAN_ROMAWI = array(1=>"I","II","III", "IV", "V","VI","VII","VIII","IX","X", "XI","XII");
 
     public const TYPE_SELECT = [
         'isi'   => 'Isi',
@@ -65,5 +68,23 @@ class Cetak extends Model
     public function vendor()
     {
         return $this->belongsTo(Vendor::class, 'vendor_id');
+    }
+
+    public static function generateNoSPC($semester, $vendor, $type) {
+        $data = self::where('semester_id', $semester)->count();
+        $semester = Semester::find($semester);
+        $vendor = Vendor::find($vendor);
+
+        $no = !$data ? 1 : ($data + 1);
+
+        $prefix = 'SPC.'. strtoupper($type) .'/'. $vendor->code .'/'.self::BULAN_ROMAWI[Date::now()->format('n')].'/'.strtoupper($semester->code).'/';
+        $code = $prefix.sprintf("%06d", $no);
+
+        return $code;
+    }
+
+    public function cetak_items()
+    {
+        return $this->hasMany(CetakItem::class, 'cetak_id');
     }
 }

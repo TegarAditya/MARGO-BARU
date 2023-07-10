@@ -57,6 +57,18 @@ class MasterBukuSeeder extends Seeder
 
         DB::unprepared($kelas);
 
+        $isi = "INSERT INTO `isis` (`CODE`, `NAME`) VALUES
+        ('MMJ', 'MARGO MITRO JOYO'),
+        ('MMP', 'MATRA MEDIA PRESINDO'),
+        ('SRG', 'MGMP SRAGEN'),
+        ('CLP', 'MGMP CILACAP'),
+        ('BGR', 'MGMP BOGOR'),
+        ('JRA', 'JUARA'),
+        ('SPT', 'SIPINTAR'),
+        ('PDW', 'PANDAWA')";
+
+        DB::unprepared($isi);
+
         $kurikulum = "INSERT INTO `kurikulums` (`CODE`, `NAME`) VALUES
         ('KM', 'KURIKULUM MERDEKA'),
         ('13', 'K13'),

@@ -11,6 +11,9 @@ use App\Models\ReturnGoodItem;
 use App\Models\Salesperson;
 use App\Models\Semester;
 use App\Models\BookVariant;
+use App\Models\Invoice;
+use App\Models\InvoiceItem;
+use App\Models\SalesOrder;
 use Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -20,6 +23,7 @@ use Alert;
 use Carbon\Carbon;
 use App\Services\EstimationService;
 use App\Services\StockService;
+use App\Services\TransactionService;
 
 class ReturnGoodController extends Controller
 {
@@ -116,16 +120,23 @@ class ReturnGoodController extends Controller
             ]);
 
             $nominal = 0;
+            $flag_cash = false;
 
             for ($i = 0; $i < count($products); $i++) {
                 $product = $products[$i];
                 $book = BookVariant::find($product);
-
                 $order = $orders[$i];
                 $price = $book->price;
                 $quantity = $quantities[$i];
                 $total = (int) $price * $quantity;
                 $nominal += $total;
+
+                if (!$flag_cash) {
+                    $sales_order = SalesOrder::find($order);
+                    if ($sales_order->payment_type == 'cash') {
+                        $flag_cash = true;
+                    }
+                }
 
                 $retur_item = ReturnGoodItem::create([
                     'retur_id' => $retur->id,
@@ -144,6 +155,32 @@ class ReturnGoodController extends Controller
                 EstimationService::updateRetur($order, $quantity);
             }
 
+            $note = 'Retur from '.$retur->no_retur;
+            TransactionService::createTransaction($date, $note, $salesperson, $semester, 'retur', $retur->id, $retur->no_retur, $nominal, 'credit');
+
+            if ($flag_cash) {
+                InvoiceItem::where('salesperson_id', $salesperson)->where('semester_id', $semester)
+                    ->update([
+                        'discount' => 0,
+                        'total_discount' => 0
+                    ]);
+                
+                $invoices = Invoice::where('salesperson_id', $salesperson)->where('semester_id', $semester)->get();
+                $note_transaksi = 'Diskon di cancel karena retur no '.$retur->no_retur;
+                
+                foreach($invoices as $invoice) {
+                    $total = $invoice->total;
+                    if ($invoice->retur) {
+                        TransactionService::editTransaction($date, $note_transaksi, $salesperson, $semester, 'diskon', $invoice->id, $invoice->no_faktur, 0, 'credit');
+                        $invoice->update([
+                            'discount' => 0,
+                            'nominal' => $total,
+                            'retur' => 1
+                        ]);
+                    }
+                }
+            }
+
             $retur->nominal = $nominal;
             $retur->save();
 
@@ -154,6 +191,8 @@ class ReturnGoodController extends Controller
             return redirect()->route('admin.return-goods.index');
         } catch (\Exception $e) {
             DB::rollback();
+            
+            dd($e);
 
             return redirect()->back()->with('error-message', $e->getMessage())->withInput();
         };
@@ -220,10 +259,15 @@ class ReturnGoodController extends Controller
                 EstimationService::updateRetur($order, ($quantity - $old_quantity));
             }
 
+            $salesperson = $returnGood->salesperson_id;
+            $semester = $returnGood->semester_id;
+
             $returnGood->update([
                 'date' => $date,
                 'nominal' => $nominal
             ]);
+
+            TransactionService::editTransaction($date, 'Retur from '.$retur->no_retur , $salesperson, $semester, 'retur', $retur->id, $retur->no_retur, $nominal, 'credit');
 
             DB::commit();
 
@@ -243,7 +287,11 @@ class ReturnGoodController extends Controller
 
         $returnGood->load('salesperson', 'semester');
 
-        return view('admin.returnGoods.show', compact('returnGood'));
+        $details = ReturnGoodItem::with('product')->where('retur_id', $returnGood->id)->get();
+
+        $retur_items = $details->sortBy('product.kelas_id')->sortBy('product.mapel_id')->sortBy('product.kurikulum_id')->sortBy('product.jenjang_id');
+
+        return view('admin.returnGoods.show', compact('returnGood', 'retur_items'));
     }
 
     public function destroy(ReturnGood $returnGood)
@@ -264,5 +312,16 @@ class ReturnGoodController extends Controller
         }
 
         return response(null, Response::HTTP_NO_CONTENT);
+    }
+
+    public function printFaktur(ReturnGood $retur)
+    {
+        $retur->load('salesperson', 'semester');
+
+        $details = ReturnGoodItem::with('product')->where('retur_id', $retur->id)->get();
+
+        $retur_items = $details->sortBy('product.kelas_id')->sortBy('product.mapel_id')->sortBy('product.kurikulum_id')->sortBy('product.jenjang_id');
+
+        return view('admin.returnGoods.faktur', compact('retur', 'retur_items'));
     }
 }

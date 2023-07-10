@@ -20,6 +20,7 @@ class CetakItem extends Model
     ];
 
     protected $fillable = [
+        'cetak_id',
         'semester_id',
         'product_id',
         'halaman_id',

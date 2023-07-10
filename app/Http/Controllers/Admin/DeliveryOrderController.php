@@ -285,4 +285,32 @@ class DeliveryOrderController extends Controller
 
         return response(null, Response::HTTP_NO_CONTENT);
     }
+
+    public function getDeliveryOrder(Request $request) {
+        $semester = $request->input('semester');
+        $salesperson = $request->input('salesperson');
+
+        $query = DeliveryOrder::query();
+
+        if (!empty($semester)) {
+            $query->where('semester_id', $semester);
+        }
+
+        if (!empty($salesperson)) {
+            $query->where('salesperson_id', $salesperson);
+        }
+
+        $items = $query->latest()->get();
+
+        $formatted = [];
+
+        foreach ($items as $item) {
+            $formatted[] = [
+                'id' => $item->id,
+                'text' => '('.$item->date.') - '. $item->no_suratjalan,
+            ];
+        }
+
+        return response()->json($formatted);
+    }
 }

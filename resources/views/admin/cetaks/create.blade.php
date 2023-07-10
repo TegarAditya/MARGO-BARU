@@ -52,6 +52,20 @@
                 </div>
                 <div class="col-6">
                     <div class="form-group">
+                        <label class="required" for="vendor_id">{{ trans('cruds.cetak.fields.vendor') }}</label>
+                        <select class="form-control select2 {{ $errors->has('vendor') ? 'is-invalid' : '' }}" name="vendor_id" id="vendor_id" required>
+                            @foreach($vendors as $id => $entry)
+                                <option value="{{ $id }}" {{ old('vendor_id') == $id ? 'selected' : '' }}>{{ $entry }}</option>
+                            @endforeach
+                        </select>
+                        @if($errors->has('vendor'))
+                            <span class="text-danger">{{ $errors->first('vendor') }}</span>
+                        @endif
+                        <span class="help-block">{{ trans('cruds.cetak.fields.vendor_helper') }}</span>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="form-group">
                         <label class="required">{{ trans('cruds.cetak.fields.type') }}</label>
                         <select class="form-control {{ $errors->has('type') ? 'is-invalid' : '' }}" name="type" id="type" required>
                             <option value disabled {{ old('type', null) === null ? 'selected' : '' }}>{{ trans('global.pleaseSelect') }}</option>
@@ -63,20 +77,6 @@
                             <span class="text-danger">{{ $errors->first('type') }}</span>
                         @endif
                         <span class="help-block">{{ trans('cruds.cetak.fields.type_helper') }}</span>
-                    </div>
-                </div>
-                <div class="col-6">
-                    <div class="form-group">
-                        <label class="required" for="vendor_id">{{ trans('cruds.cetak.fields.vendor') }}</label>
-                        <select class="form-control select2 {{ $errors->has('vendor') ? 'is-invalid' : '' }}" name="vendor_id" id="vendor_id" required>
-                            @foreach($vendors as $id => $entry)
-                                <option value="{{ $id }}" {{ old('vendor_id') == $id ? 'selected' : '' }}>{{ $entry }}</option>
-                            @endforeach
-                        </select>
-                        @if($errors->has('vendor'))
-                            <span class="text-danger">{{ $errors->first('vendor') }}</span>
-                        @endif
-                        <span class="help-block">{{ trans('cruds.cetak.fields.vendor_helper') }}</span>
                     </div>
                 </div>
                 <div class="col-12">
@@ -123,13 +123,13 @@
             templateResult: formatProduct,
             templateSelection: formatProductSelection,
             ajax: {
-                    url: "{{ route('admin.book-variants.getBooks') }}",
+                    url: "{{ route('admin.book-variants.getCetak') }}",
                     dataType: 'json',
                     delay: 250,
                     data: function(params) {
                         return {
                             q: params.term,
-                            jenjang: $('#jenjang_id').val()
+                            type: $('#type').val()
                         };
                     },
                     processResults: function(data) {
@@ -171,50 +171,63 @@
             }
 
             $.ajax({
-                url: "{{ route('admin.book-variants.getBook') }}" +  '?id=' + productId,
+                url: "{{ route('admin.book-variants.getInfoCetak') }}",
                 type: 'GET',
                 dataType: 'json',
+                data: {
+                    id: productId,
+                },
                 success: function(product) {
                     var formHtml = `
                         <div class="item-product" id="product-${product.id}">
                             <div class="row">
-                                <div class="col-6 align-self-center">
+                                <div class="col-5 align-self-center">
                                     <h6 class="text-sm product-name mb-1">(${product.book_type}) ${product.short_name}</h6>
                                     <p class="mb-0 text-sm">
                                         Code : <strong>${product.code}</strong>
                                     </p>
                                     <p class="mb-0 text-sm">
-                                        Jenjang : <strong>${product.jenjang.name}</strong>
+                                        Jenjang - Cover - Isi : <strong>${product.jenjang.name} - ${product.cover.name} - ${product.kurikulum.name}</strong>
                                     </p>
                                     <p class="mb-0 text-sm">
-                                        Cover - Isi : <strong>${product.book.cover.name} - ${product.book.kurikulum.name}</strong>
+                                        <strong>STOCK : ${product.stock}</strong>
+                                    </p>
+                                    <p class="mb-0 text-sm">
+                                        <strong>ESTIMASI : ${product.estimasi_produksi.estimasi}</strong>
                                     </p>
                                 </div>
                                 <div class="col offset-1 row align-items-end align-self-center">
+                                    <input type="hidden" name="products[]" value="${product.id}">
+                                    <div class="col" style="min-width: 240px">
+                                        <p class="mb-0 text-sm">Plate</p>
+                                        <div class="form-group text-field m-0">
+                                            <select class="form-control text-center plates select2" name="plates[]" style="width: 100%;" tabIndex="-1" required>
+                                                <option></option>
+                                            </select>
+                                        </div>
+                                    </div>
                                     <div class="col" style="max-width: 160px">
-                                        <p class="mb-0 text-sm">Estimasi</p>
+                                        <p class="mb-0 text-sm">Jumlah Plate</p>
                                         <div class="form-group text-field m-0">
                                             <div class="text-field-input px-2 py-0">
-                                                <input type="hidden" name="products[]" value="${product.id}">
-                                                <input class="quantity" type="hidden" name="quantities[]">
+                                                <input class="plate_quantity" type="hidden" name="plate_quantities[]" value="1">
+                                                <input class="form-control text-center plate_quantity_text" type="text" name="plate_quantity_text[]" value="1" required>
+                                                <label class="text-field-border"></label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col" style="max-width: 160px">
+                                        <p class="mb-0 text-sm">Cetak</p>
+                                        <div class="form-group text-field m-0">
+                                            <div class="text-field-input px-2 py-0">
+                                                <input class="quantity" type="hidden" name="quantities[]" data-max="${product.estimasi_produksi.estimasi}" value="1">
                                                 <input class="form-control text-center quantity_text" type="text" name="quantity_text[]" value="1" required>
                                                 <label class="text-field-border"></label>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col" style="max-width: 210px">
-                                        <p class="mb-0 text-sm">Price</p>
-                                        <div class="form-group text-field m-0">
-                                            <div class="text-field-input px-2 py-0 pr-3">
-                                                <span class="text-sm mr-1">Rp</span>
-                                                <input class="price" type="hidden" name="prices[]" value="${product.id}">
-                                                <input class="form-control text-right price_text" type="text" name="price_text[]" value="${product.id}" required>
-                                                <label class="text-field-border"></label>
-                                            </div>
-                                        </div>
-                                </div>
                                     <div class="col-auto pl-5">
-                                        <button type="button" class="btn btn-danger btn-sm product-delete" data-product-id="${product.id}">
+                                        <button type="button" class="btn btn-danger btn-sm product-delete" data-product-id="${product.id}" tabIndex="-1">
                                             <i class="fa fa-trash"></i>
                                         </button>
                                     </div>
@@ -229,12 +242,32 @@
                     var productForm = $('#product-form');
                     var productItem = productForm.find('.item-product');
 
+                    $('.plates').select2({
+                        ajax: {
+                            url: "{{ route('admin.materials.getPlates') }}",
+                            data: function() {
+                                return {
+                                    vendor: $('#vendor_id').val()
+                                };
+                            },
+                            dataType: 'json',
+                            processResults: function(data) {
+                                return {
+                                    results: data
+                                };
+                            }
+                        }
+                    });
+
                     productItem.each(function(index, item) {
                         var product = $(item);
                         var quantity = product.find('.quantity');
                         var quantityText = product.find('.quantity_text');
+                        var plateQuantity = product.find('.plate_quantity');
+                        var plateQuantityText = product.find('.plate_quantity_text');
+                        var max = quantity.data('max');
 
-                        quantityText.on('input', function(e) {
+                        quantityText.on('input change', function(e) {
                             var value = numeral(e.target.value);
 
                             quantityText.val(value.format('0,0'));
@@ -247,6 +280,38 @@
                             if (valueNum < 1) {
                                 el.val(1);
                                 quantityText.val(1).trigger('change');
+                            }
+
+                            if (valueNum > max) {
+                                Swal.fire({
+                                    title: 'Quantity Exceeded',
+                                    text: 'The input quantity exceeds the maximum allowed.',
+                                    icon: 'warning',
+                                    showCancelButton: true,
+                                    confirmButtonText: 'I Know',
+                                    cancelButtonText: 'Cancel'
+                                }).then((result) => {
+                                    if (result.isConfirmed) {
+                                        max = valueNum;
+                                        quantity.data('max', valueNum);
+                                    }
+                                });
+                            }
+                        }).trigger('change');
+
+                        plateQuantityText.on('input', function(e) {
+                            var value = numeral(e.target.value);
+
+                            plateQuantityText.val(value.format('0,0'));
+                            plateQuantity.val(value.value()).trigger('change');
+                        }).trigger('change');
+
+                        plateQuantity.on('change', function(e) {
+                            var el = $(e.currentTarget);
+                            var valueNum = parseInt(el.val());
+                            if (valueNum < 1) {
+                                el.val(1);
+                                plateQuantityText.val(1).trigger('change');
                             }
                         }).trigger('change');
                     });

@@ -96,3 +96,7 @@ if (window.numeral) {
 
     window.numeral.locale('id');
   };
+
+$(".bootstrap-switch").each(function(){
+    $(this).bootstrapSwitch('state', $(this).prop('checked'));
+})

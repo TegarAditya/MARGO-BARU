@@ -39,7 +39,7 @@ class SalesOrderController extends Controller
             if (!empty($request->semester)) {
                 $query->where('semester_id', $request->semester);
             }
-            if (!empty($request->semester)) {
+            if (!empty($request->payment_type)) {
                 $query->where('payment_type', $request->payment_type);
             }
 

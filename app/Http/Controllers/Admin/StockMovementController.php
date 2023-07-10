@@ -21,46 +21,44 @@ class StockMovementController extends Controller
         abort_if(Gate::denies('stock_movement_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         if ($request->ajax()) {
-            $query = StockMovement::with(['warehouse', 'product', 'material', 'reversal_of'])->select(sprintf('%s.*', (new StockMovement)->table));
+            $query = StockMovement::with(['warehouse', 'product', 'material', 'reversal_of'])->select(sprintf('%s.*', (new StockMovement)->table))->latest();
             $table = Datatables::of($query);
-
-            $table->addColumn('placeholder', '&nbsp;');
-            $table->addColumn('actions', '&nbsp;');
-
-            $table->editColumn('actions', function ($row) {
-                $viewGate      = 'stock_movement_show';
-                $editGate      = 'stock_movement_edit';
-                $deleteGate    = 'stock_movement_delete';
-                $crudRoutePart = 'stock-movements';
-
-                return view('partials.datatablesActions', compact(
-                    'viewGate',
-                    'editGate',
-                    'deleteGate',
-                    'crudRoutePart',
-                    'row'
-                ));
-            });
 
             $table->editColumn('movement_type', function ($row) {
                 return $row->movement_type ? StockMovement::MOVEMENT_TYPE_SELECT[$row->movement_type] : '';
             });
+
             $table->addColumn('product_code', function ($row) {
                 return $row->product ? $row->product->code : '';
             });
 
-            $table->addColumn('material_code', function ($row) {
-                return $row->material ? $row->material->code : '';
+            $table->addColumn('product_name', function ($row) {
+                return $row->product ? $row->product->name : '';
+            });
+
+            $table->addColumn('reference', function ($row) {
+                if ($row->transaction_type == 'adjustment') {
+                    return 'Adjustment <a class="px-1" title="Reference" href="'.route('admin.stock-adjustments.show', $row->reference_id).'"><i class="fas fa-eye text-success  fa-lg"></i></a>';
+                } else if ($row->transaction_type == 'delivery') {
+                    return 'Delivery <a class="px-1" title="Reference" href="'.route('admin.delivery-orders.show', $row->reference_id).'"><i class="fas fa-eye text-success  fa-lg"></i></a>';
+                } else if ($row->transaction_type == 'retur') {
+                    return 'Retur <a class="px-1" title="Reference" href="'.route('admin.return-goods.show', $row->reference_id).'"><i class="fas fa-eye text-success  fa-lg"></i></a>';
+                } else if ($row->transaction_type == 'cetak') {
+                    return 'Cetak <a class="px-1" title="Reference" href="'.route('admin.cetaks.show', $row->reference_id).'"><i class="fas fa-eye text-success  fa-lg"></i></a>';
+                } else if ($row->transaction_type == 'produksi') {
+                    return 'Produksi <a class="px-1" title="Reference" href="'.route('admin.finishings.show', $row->reference_id).'"><i class="fas fa-eye text-success  fa-lg"></i></a>';
+                }
             });
 
             $table->editColumn('quantity', function ($row) {
-                return $row->quantity ? $row->quantity : '';
+                return $row->quantity ? angka(abs($row->quantity)) : '';
             });
+
             $table->editColumn('transaction_type', function ($row) {
                 return $row->transaction_type ? StockMovement::TRANSACTION_TYPE_SELECT[$row->transaction_type] : '';
             });
 
-            $table->rawColumns(['actions', 'placeholder', 'product', 'material']);
+            $table->rawColumns(['product', 'reference']);
 
             return $table->make(true);
         }

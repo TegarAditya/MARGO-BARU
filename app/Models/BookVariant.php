@@ -7,10 +7,13 @@ use DateTimeInterface;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
-class BookVariant extends Model
+class BookVariant extends Model implements HasMedia
 {
-    use SoftDeletes, Auditable, HasFactory;
+    use SoftDeletes, InteractsWithMedia, Auditable, HasFactory;
 
     public $table = 'book_variants';
 
@@ -47,6 +50,7 @@ class BookVariant extends Model
         'type',
         'jenjang_id',
         'kurikulum_id',
+        'isi_id',
         'cover_id',
         'mapel_id',
         'kelas_id',
@@ -58,6 +62,8 @@ class BookVariant extends Model
         'price',
         'cost',
         'status',
+        'created_by_id',
+        'updated_by_id',
         'created_at',
         'updated_at',
         'deleted_at',
@@ -66,6 +72,7 @@ class BookVariant extends Model
     protected $appends = [
         'short_name',
         'book_type',
+        'photo',
     ];
 
     protected $casts = [
@@ -76,6 +83,17 @@ class BookVariant extends Model
     protected function serializeDate(DateTimeInterface $date)
     {
         return $date->format('Y-m-d H:i:s');
+    }
+
+    public function registerMediaConversions(Media $media = null): void
+    {
+        $this->addMediaConversion('thumb')->fit('crop', 50, 50);
+        $this->addMediaConversion('preview')->fit('crop', 120, 120);
+    }
+
+    public function components()
+    {
+        return $this->belongsToMany(BookComponent::class);
     }
 
     public function getShortNameAttribute()
@@ -115,6 +133,11 @@ class BookVariant extends Model
     public function kurikulum()
     {
         return $this->belongsTo(Kurikulum::class, 'kurikulum_id');
+    }
+
+    public function isi()
+    {
+        return $this->belongsTo(Isi::class, 'isi_id');
     }
 
     public function cover()
@@ -170,5 +193,22 @@ class BookVariant extends Model
     public function adjustment()
     {
         return $this->hasMany(StockAdjustmentDetail::class, 'product_id');
+    }
+
+    public function estimasi_produksi()
+    {
+        return $this->hasOne(ProductionEstimation::class, 'product_id');
+    }
+
+    public function getPhotoAttribute()
+    {
+        $files = $this->getMedia('photo');
+        $files->each(function ($item) {
+            $item->url       = $item->getUrl();
+            $item->thumbnail = $item->getUrl('thumb');
+            $item->preview   = $item->getUrl('preview');
+        });
+
+        return $files;
     }
 }

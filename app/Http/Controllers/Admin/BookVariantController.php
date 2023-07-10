@@ -21,6 +21,8 @@ use Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Yajra\DataTables\Facades\DataTables;
+use DB;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class BookVariantController extends Controller
 {
@@ -30,6 +32,26 @@ class BookVariantController extends Controller
 
         if ($request->ajax()) {
             $query = BookVariant::with(['book', 'parent', 'jenjang', 'semester', 'kurikulum', 'halaman', 'warehouse', 'unit'])->select(sprintf('%s.*', (new BookVariant)->table));
+
+            if (!empty($request->type)) {
+                $query->where('type', $request->type);
+            }
+            if (!empty($request->semester)) {
+                $query->where('semester_id', $request->semester);
+            }
+            if (!empty($request->cover)) {
+                $query->where('cover_id', $request->cover);
+            }
+            if (!empty($request->kurikulum)) {
+                $query->where('kurikulum_id', $request->kurikulum);
+            }
+            if (!empty($request->kelas)) {
+                $query->where('kelas_id', $request->kelas);
+            }
+            if (!empty($request->mapel)) {
+                $query->where('mapel_id', $request->mapel);
+            }
+
             $table = Datatables::of($query);
 
             $table->addColumn('placeholder', '&nbsp;');
@@ -53,15 +75,16 @@ class BookVariantController extends Controller
             $table->editColumn('code', function ($row) {
                 return $row->code ? $row->code : '';
             });
+            $table->editColumn('name', function ($row) {
+                return $row->name ? $row->name : '';
+            });
+
             $table->editColumn('type', function ($row) {
                 return $row->type ? BookVariant::TYPE_SELECT[$row->type] : '';
             });
+
             $table->addColumn('jenjang_code', function ($row) {
                 return $row->jenjang ? $row->jenjang->code : '';
-            });
-
-            $table->addColumn('buku', function ($row) {
-                return $row->book ? BookVariant::TYPE_SELECT[$row->type] . ' - '. $row->book->name : '';
             });
 
             $table->addColumn('semester_name', function ($row) {
@@ -116,20 +139,36 @@ class BookVariantController extends Controller
 
         $jenjangs = Jenjang::pluck('code', 'id')->prepend(trans('global.pleaseSelect'), '');
 
-        $semesters = Semester::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
-
         $kurikulums = Kurikulum::pluck('code', 'id')->prepend(trans('global.pleaseSelect'), '');
+
+        $isis = Isi::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+
+        $covers = Cover::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+
+        $mapels = Mapel::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+
+        $kelas = Kela::pluck('code', 'id')->prepend(trans('global.pleaseSelect'), '');
 
         $halamen = Halaman::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
+        $semesters = Semester::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+
         $units = Unit::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
-        return view('admin.bookVariants.create', compact('books', 'halamen', 'jenjangs', 'kurikulums', 'parents', 'semesters', 'units'));
+        return view('admin.bookVariants.create', compact('books', 'covers', 'halamen', 'isis', 'jenjangs', 'kelas', 'kurikulums', 'mapels', 'parents', 'semesters', 'units'));
     }
 
     public function store(StoreBookVariantRequest $request)
     {
         $bookVariant = BookVariant::create($request->all());
+
+        foreach ($request->input('photo', []) as $file) {
+            $bookVariant->addMedia(storage_path('tmp/uploads/' . basename($file)))->toMediaCollection('photo');
+        }
+
+        if ($media = $request->input('ck-media', false)) {
+            Media::whereIn('id', $media)->update(['model_id' => $bookVariant->id]);
+        }
 
         return redirect()->route('admin.book-variants.index');
     }
@@ -144,22 +183,44 @@ class BookVariantController extends Controller
 
         $jenjangs = Jenjang::pluck('code', 'id')->prepend(trans('global.pleaseSelect'), '');
 
-        $semesters = Semester::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
-
         $kurikulums = Kurikulum::pluck('code', 'id')->prepend(trans('global.pleaseSelect'), '');
+
+        $isis = Isi::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+
+        $covers = Cover::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+
+        $mapels = Mapel::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+
+        $kelas = Kela::pluck('code', 'id')->prepend(trans('global.pleaseSelect'), '');
 
         $halamen = Halaman::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
+        $semesters = Semester::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+
         $units = Unit::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
-        $bookVariant->load('book', 'parent', 'jenjang', 'semester', 'kurikulum', 'halaman', 'warehouse', 'unit');
+        $bookVariant->load('book', 'parent', 'jenjang', 'kurikulum', 'isi', 'cover', 'mapel', 'kelas', 'halaman', 'semester', 'warehouse', 'unit');
 
-        return view('admin.bookVariants.edit', compact('bookVariant', 'books', 'halamen', 'jenjangs', 'kurikulums', 'parents', 'semesters', 'units'));
+        return view('admin.bookVariants.edit', compact('bookVariant', 'books', 'covers', 'halamen', 'isis', 'jenjangs', 'kelas', 'kurikulums', 'mapels', 'parents', 'semesters', 'units'));
     }
 
     public function update(UpdateBookVariantRequest $request, BookVariant $bookVariant)
     {
         $bookVariant->update($request->all());
+
+        if (count($bookVariant->photo) > 0) {
+            foreach ($bookVariant->photo as $media) {
+                if (! in_array($media->file_name, $request->input('photo', []))) {
+                    $media->delete();
+                }
+            }
+        }
+        $media = $bookVariant->photo->pluck('file_name')->toArray();
+        foreach ($request->input('photo', []) as $file) {
+            if (count($media) === 0 || ! in_array($file, $media)) {
+                $bookVariant->addMedia(storage_path('tmp/uploads/' . basename($file)))->toMediaCollection('photo');
+            }
+        }
 
         return redirect()->route('admin.book-variants.index');
     }
@@ -191,6 +252,59 @@ class BookVariantController extends Controller
         }
 
         return response(null, Response::HTTP_NO_CONTENT);
+    }
+
+    public function storeCKEditorImages(Request $request)
+    {
+        abort_if(Gate::denies('book_variant_create') && Gate::denies('book_variant_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+
+        $model         = new BookVariant();
+        $model->id     = $request->input('crud_id', 0);
+        $model->exists = true;
+        $media         = $model->addMediaFromRequest('upload')->toMediaCollection('ck-media');
+
+        return response()->json(['id' => $media->id, 'url' => $media->getUrl()], Response::HTTP_CREATED);
+    }
+
+    public function getProducts(Request $request)
+    {
+        $query = $request->input('q');
+        $jenjang = $request->input('jenjang');
+        $type = $request->input('type');
+
+        $query = BookVariant::where(function($q) use ($query) {
+                    $q->where('code', 'LIKE', "%{$query}%")
+                    ->orWhere('name', 'LIKE', "%{$query}%");
+                });
+
+        if (!empty($jenjang)) {
+            $query->where('jenjang_id', $jenjang);
+        }
+
+        if (!empty($type)) {
+            if ($type == 'isi') {
+                $query->whereIn('type', ['I', 'S']);
+            } else if ($type == 'cover') {
+                $query->whereIn('type', ['C', 'V']);
+            } else {
+                $query->whereIn('type', ['L', 'P']);
+            }
+        }
+
+        $products = $query->orderBy('code', 'ASC')->get();
+
+        $formattedProducts = [];
+
+        foreach ($products as $product) {
+            $formattedProducts[] = [
+                'id' => $product->id,
+                'text' => $product->code,
+                'stock' => $product->stock,
+                'name' => $product->name,
+            ];
+        }
+
+        return response()->json($formattedProducts);
     }
 
     public function getBooks(Request $request)
@@ -453,6 +567,64 @@ class BookVariantController extends Controller
                 ->where('stock_adjustment_details.stock_adjustment_id', $adjustment)
                 ->first(['book_variants.*', 'stock_adjustment_details.quantity as quantity', 'stock_adjustment_details.id as adjustment_detail_id']);
         $product->load('book', 'jenjang', 'book.cover', 'book.kurikulum');
+
+        return response()->json($product);
+    }
+
+    public function getCetak(Request $request)
+    {
+        $query = $request->input('q');
+        $type = $request->input('type');
+
+        $query = BookVariant::whereHas('estimasi_produksi', function ($q) {
+                    $q->where('estimasi', '>', 0);
+                })->where(function($q) use ($query) {
+                    $q->where('code', 'LIKE', "%{$query}%")
+                    ->orWhere('name', 'LIKE', "%{$query}%");
+                });
+
+        if (!empty($type)) {
+            if ($type == 'isi') {
+                $query->whereIn('type', ['I', 'S']);
+            } else if ($type == 'cover') {
+                $query->whereIn('type', ['C', 'V']);
+            }
+        } else {
+            $query->whereIn('type', ['L', 'P']);
+        }
+
+        $products = $query->orderBy('code', 'ASC')->get();
+
+        $formattedProducts = [];
+
+        foreach ($products as $product) {
+            $formattedProducts[] = [
+                'id' => $product->id,
+                'text' => $product->code,
+                'stock' => $product->stock,
+                'name' => $product->name,
+            ];
+        }
+
+        return response()->json($formattedProducts);
+    }
+
+    public function getInfoCetak(Request $request)
+    {
+        $id = $request->input('id');
+
+        $product = BookVariant::find($id);
+        $product->load('book', 'jenjang', 'cover', 'kurikulum', 'estimasi_produksi');
+
+        return response()->json($product);
+    }
+
+    public function getInfoFinishing(Request $request)
+    {
+        $id = $request->input('id');
+
+        $product = BookVariant::withMin('child as finishing_stock', 'stock')->find($id);
+        $product->load('book', 'jenjang', 'cover', 'kurikulum', 'estimasi_produksi');
 
         return response()->json($product);
     }

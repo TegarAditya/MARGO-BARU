@@ -12,10 +12,12 @@ class CreateInvoicesTable extends Migration
             $table->bigIncrements('id');
             $table->string('no_faktur')->unique();
             $table->date('date');
+            $table->string('type')->nullable();
             $table->decimal('total', 15, 2);
             $table->decimal('discount', 15, 2)->nullable();
             $table->decimal('nominal', 15, 2);
             $table->longText('note')->nullable();
+            $table->boolean('retur')->default(0);
             $table->timestamps();
             $table->softDeletes();
         });

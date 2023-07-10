@@ -20,8 +20,8 @@ class FinishingItem extends Model
     ];
 
     protected $fillable = [
+        'finishing_id',
         'semester_id',
-        'buku_id',
         'product_id',
         'estimasi',
         'quantity',

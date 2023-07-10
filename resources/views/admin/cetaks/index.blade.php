@@ -36,15 +36,9 @@
                     <th>
                         {{ trans('cruds.cetak.fields.type') }}
                     </th>
-                    <th>
-                        {{ trans('cruds.cetak.fields.total_cost') }}
-                    </th>
-                    <th>
-                        {{ trans('cruds.cetak.fields.total_oplah') }}
-                    </th>
-                    <th>
+                    {{-- <th>
                         {{ trans('cruds.cetak.fields.note') }}
-                    </th>
+                    </th> --}}
                     <th>
                         &nbsp;
                     </th>
@@ -100,16 +94,16 @@
     aaSorting: [],
     ajax: "{{ route('admin.cetaks.index') }}",
     columns: [
-      { data: 'placeholder', name: 'placeholder' },
-{ data: 'no_spc', name: 'no_spc' },
-{ data: 'date', name: 'date' },
-{ data: 'semester_name', name: 'semester.name' },
-{ data: 'vendor_name', name: 'vendor.name' },
-{ data: 'type', name: 'type' },
-{ data: 'total_cost', name: 'total_cost' },
-{ data: 'total_oplah', name: 'total_oplah' },
-{ data: 'note', name: 'note' },
-{ data: 'actions', name: '{{ trans('global.actions') }}' }
+        { data: 'placeholder', name: 'placeholder' },
+        { data: 'no_spc', name: 'no_spc', class: 'text-center' },
+        { data: 'date', name: 'date', class: 'text-center' },
+        { data: 'semester_name', name: 'semester.name', class: 'text-center' },
+        { data: 'vendor_name', name: 'vendor.name', class: 'text-center' },
+        { data: 'type', name: 'type', class: 'text-center' },
+        // { data: 'total_cost', name: 'total_cost' },
+        // { data: 'total_oplah', name: 'total_oplah' },
+        // { data: 'note', name: 'note' },
+        { data: 'actions', name: '{{ trans('global.actions') }}', class: 'text-center' }
     ],
     orderCellsTop: true,
     order: [[ 1, 'desc' ]],
@@ -120,7 +114,7 @@
       $($.fn.dataTable.tables(true)).DataTable()
           .columns.adjust();
   });
-  
+
 });
 
 </script>

@@ -37,8 +37,19 @@ class Vendor extends Model
         'deleted_at',
     ];
 
+    protected $appends = [
+        'full_name',
+    ];
+
     protected function serializeDate(DateTimeInterface $date)
     {
         return $date->format('Y-m-d H:i:s');
+    }
+
+    public function getFullNameAttribute()
+    {
+        $name = $this->code. ' - '. $this->name;
+
+        return $name;
     }
 }

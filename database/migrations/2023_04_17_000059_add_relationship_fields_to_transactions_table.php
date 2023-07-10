@@ -14,7 +14,6 @@ class AddRelationshipFieldsToTransactionsTable extends Migration
             $table->unsignedBigInteger('semester_id')->nullable();
             $table->foreign('semester_id', 'semester_fk_8137257')->references('id')->on('semesters');
             $table->unsignedBigInteger('reference_id')->nullable();
-            $table->foreign('reference_id', 'reference_fk_8137259')->references('id')->on('invoices');
             $table->unsignedBigInteger('reversal_of_id')->nullable();
             $table->foreign('reversal_of_id', 'reversal_of_fk_8648146')->references('id')->on('transactions');
         });

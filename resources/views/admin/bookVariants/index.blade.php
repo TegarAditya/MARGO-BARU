@@ -173,8 +173,8 @@ $(function () {
                 class: 'text-center',
             },
             {
-                data: 'buku',
-                name: 'buku'
+                data: 'name',
+                name: 'name'
             },
             {
                 data: 'stock',

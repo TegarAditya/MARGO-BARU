@@ -60,6 +60,12 @@
                         <input class="form-control" type="text" name="salesperson" value="{{ $delivery->salesperson->short_name }}" readonly>
                     </div>
                 </div>
+                <div class="col-6">
+                    <div class="form-group">
+                        <label class="required" for="salesperson">{{ trans('cruds.invoice.fields.semester') }}</label>
+                        <input class="form-control" type="text" name="semester" value="{{ $delivery->semester->name }}" readonly>
+                    </div>
+                </div>
                 {{-- <div class="col-12">
                     <div class="form-group">
                         <label for="note">{{ trans('cruds.invoice.fields.note') }}</label>
@@ -119,7 +125,7 @@
                                     <p class="mb-0 text-sm">Quantity</p>
                                     <div class="form-group text-field m-0">
                                         <div class="text-field-input px-2 py-0">
-                                            <input class="quantity" type="hidden" name="quantities[]" value="{{ angka($item->quantity) }}">
+                                            <input class="quantity" type="hidden" name="quantities[]" value="{{ $item->quantity }}">
                                             <input class="form-control text-center quantity_text" type="text" name="quantity_text[]" value="{{ angka($item->quantity) }}" readonly tabindex="-1">
                                             <label class="text-field-border"></label>
                                         </div>
@@ -131,7 +137,7 @@
                                         <div class="text-field-input px-2 py-0 pr-3">
                                             <span class="text-sm mr-1">Rp</span>
                                             <input class="diskon" type="hidden" name="diskons[]" data-max="{{ $product->price }}" value="0">
-                                            <input class="form-control text-right diskon_text" type="text" name="diskon_text[]" value="0" required>
+                                            <input class="form-control text-right diskon_text" type="text" name="diskon_text[]" value="0" {{ $item->sales_order->payment_type == 'cash' ? 'required' : 'readonly' }}>
                                             <label class="text-field-border"></label>
                                         </div>
                                     </div>
@@ -216,21 +222,23 @@
                 var value = numeral(e.target.value);
 
                 diskonText.val(value.format('0,0'));
-                diskon.val(value.value());
+                diskon.val(value.value()).trigger('change');
                 calculatePrice();
             }).trigger('change');
 
-            diskon.on('change', function(e) {
+            diskon.on('change input', function(e) {
                 var el = $(e.currentTarget);
                 var max = parseInt(el.data('max'));
-                console.log(max);
                 var valueNum = parseInt(el.val());
-                if (valueNum < 1 ) {
+
+                if (valueNum < 0) {
                     el.val(0);
-                    diskonText.val(0);
-                }else if (valueNum > max) {
+                    diskonText.val(0).trigger('change');
+                }
+
+                if (valueNum > max) {
                     el.val(max);
-                    diskonText.val(max);
+                    diskonText.val(max).trigger('change');
                 }
             }).trigger('change');
         });
@@ -243,13 +251,14 @@
 
         function calculatePrice () {
             var total_diskon = 0;
-            
+
             productForm.children().each(function(i, item) {
                 var product = $(item);
                 var quantity = parseInt(product.find('.quantity').val() || 0);
                 var diskon = parseInt(product.find('.diskon').val() || 0);
-            
+
                 subdiskon = diskon * quantity;
+
                 product.find('.product-subdiskon').html(numeral(subdiskon).format('$0,0'));
                 product.find('.subdiskon').val(subdiskon);
                 total_diskon += subdiskon;

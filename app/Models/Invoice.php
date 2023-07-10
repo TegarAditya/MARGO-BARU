@@ -25,16 +25,25 @@ class Invoice extends Model
         'deleted_at',
     ];
 
+    public const TYPE_SELECT = [
+        // 'jual'  => 'Penjualan',
+        'kirim' => 'Ongkos Kirim',
+        'pg'    => 'Tambahan Pegangan Guru',
+    ];
+
     protected $fillable = [
         'no_faktur',
         'date',
         'delivery_order_id',
         'semester_id',
         'salesperson_id',
+        'type',
         'total',
         'discount',
         'nominal',
         'note',
+        'retur',
+        'created_by_id',
         'created_at',
         'updated_at',
         'deleted_at',
@@ -86,5 +95,10 @@ class Invoice extends Model
         $code = $prefix.sprintf("%06d", $invoice_number);
 
         return $code;
+    }
+
+    public function created_by()
+    {
+        return $this->belongsTo(User::class, 'created_by_id');
     }
 }

@@ -892,6 +892,66 @@ class PermissionsTableSeeder extends Seeder
             ],
             [
                 'id'    => 221,
+                'title' => 'setting_create',
+            ],
+            [
+                'id'    => 222,
+                'title' => 'setting_edit',
+            ],
+            [
+                'id'    => 223,
+                'title' => 'setting_show',
+            ],
+            [
+                'id'    => 224,
+                'title' => 'setting_delete',
+            ],
+            [
+                'id'    => 225,
+                'title' => 'setting_access',
+            ],
+            [
+                'id'    => 226,
+                'title' => 'isi_create',
+            ],
+            [
+                'id'    => 227,
+                'title' => 'isi_edit',
+            ],
+            [
+                'id'    => 228,
+                'title' => 'isi_show',
+            ],
+            [
+                'id'    => 229,
+                'title' => 'isi_delete',
+            ],
+            [
+                'id'    => 230,
+                'title' => 'isi_access',
+            ],
+            [
+                'id'    => 231,
+                'title' => 'book_component_create',
+            ],
+            [
+                'id'    => 232,
+                'title' => 'book_component_edit',
+            ],
+            [
+                'id'    => 233,
+                'title' => 'book_component_show',
+            ],
+            [
+                'id'    => 234,
+                'title' => 'book_component_delete',
+            ],
+            [
+                'id'    => 235,
+                'title' => 'book_component_access',
+            ],
+            [
+                'id'    => 236,
                 'title' => 'profile_password_edit',
             ],
         ];

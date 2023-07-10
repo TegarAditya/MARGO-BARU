@@ -34,15 +34,6 @@
                         {{ trans('cruds.finishing.fields.vendor') }}
                     </th>
                     <th>
-                        {{ trans('cruds.finishing.fields.total_cost') }}
-                    </th>
-                    <th>
-                        {{ trans('cruds.finishing.fields.total_oplah') }}
-                    </th>
-                    <th>
-                        {{ trans('cruds.finishing.fields.note') }}
-                    </th>
-                    <th>
                         &nbsp;
                     </th>
                 </tr>
@@ -97,15 +88,12 @@
     aaSorting: [],
     ajax: "{{ route('admin.finishings.index') }}",
     columns: [
-      { data: 'placeholder', name: 'placeholder' },
-{ data: 'no_spk', name: 'no_spk' },
-{ data: 'date', name: 'date' },
-{ data: 'semester_name', name: 'semester.name' },
-{ data: 'vendor_name', name: 'vendor.name' },
-{ data: 'total_cost', name: 'total_cost' },
-{ data: 'total_oplah', name: 'total_oplah' },
-{ data: 'note', name: 'note' },
-{ data: 'actions', name: '{{ trans('global.actions') }}' }
+        { data: 'placeholder', name: 'placeholder' },
+        { data: 'no_spk', name: 'no_spk', class: 'text-center' },
+        { data: 'date', name: 'date', class: 'text-center' },
+        { data: 'semester_name', name: 'semester.name', class: 'text-center' },
+        { data: 'vendor_name', name: 'vendor.name', class: 'text-center' },
+        { data: 'actions', name: '{{ trans('global.actions') }}', class: 'text-center' }
     ],
     orderCellsTop: true,
     order: [[ 1, 'desc' ]],
