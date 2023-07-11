@@ -84,8 +84,8 @@
                     </li>
                 @endcan
                 @can('general_master_access')
-                    <li class="nav-item has-treeview {{ request()->is("admin/units*") ? "menu-open" : "" }} {{ request()->is("admin/warehouses*") ? "menu-open" : "" }} {{ request()->is("admin/vendors*") ? "menu-open" : "" }}">
-                        <a class="nav-link nav-dropdown-toggle {{ request()->is("admin/units*") ? "active" : "" }} {{ request()->is("admin/warehouses*") ? "active" : "" }} {{ request()->is("admin/vendors*") ? "active" : "" }}" href="#">
+                    <li class="nav-item has-treeview {{ request()->is("admin/units*") ? "menu-open" : "" }} {{ request()->is("admin/settings*") ? "menu-open" : "" }} {{ request()->is("admin/warehouses*") ? "menu-open" : "" }} {{ request()->is("admin/vendors*") ? "menu-open" : "" }}">
+                        <a class="nav-link nav-dropdown-toggle {{ request()->is("admin/units*") ? "active" : "" }} {{ request()->is("admin/settings*") ? "active" : "" }} {{ request()->is("admin/warehouses*") ? "active" : "" }} {{ request()->is("admin/vendors*") ? "active" : "" }}" href="#">
                             <i class="fa-fw nav-icon fas fa-cogs">
 
                             </i>
@@ -147,8 +147,8 @@
                     </li>
                 @endcan
                 @can('master_buku_access')
-                    <li class="nav-item has-treeview {{ request()->is("admin/semesters*") ? "menu-open" : "" }} {{ request()->is("admin/covers*") ? "menu-open" : "" }} {{ request()->is("admin/jenjangs*") ? "menu-open" : "" }} {{ request()->is("admin/kurikulums*") ? "menu-open" : "" }} {{ request()->is("admin/mapels*") ? "menu-open" : "" }} {{ request()->is("admin/kelas*") ? "menu-open" : "" }} {{ request()->is("admin/halaman*") ? "menu-open" : "" }}">
-                        <a class="nav-link nav-dropdown-toggle {{ request()->is("admin/semesters*") ? "active" : "" }} {{ request()->is("admin/covers*") ? "active" : "" }} {{ request()->is("admin/jenjangs*") ? "active" : "" }} {{ request()->is("admin/kurikulums*") ? "active" : "" }} {{ request()->is("admin/mapels*") ? "active" : "" }} {{ request()->is("admin/kelas*") ? "active" : "" }} {{ request()->is("admin/halaman*") ? "active" : "" }}" href="#">
+                    <li class="nav-item has-treeview {{ request()->is("admin/isis*") ? "menu-open" : "" }} {{ request()->is("admin/semesters*") ? "menu-open" : "" }} {{ request()->is("admin/covers*") ? "menu-open" : "" }} {{ request()->is("admin/jenjangs*") ? "menu-open" : "" }} {{ request()->is("admin/kurikulums*") ? "menu-open" : "" }} {{ request()->is("admin/mapels*") ? "menu-open" : "" }} {{ request()->is("admin/kelas*") ? "menu-open" : "" }} {{ request()->is("admin/halaman*") ? "menu-open" : "" }}">
+                        <a class="nav-link nav-dropdown-toggle {{ request()->is("admin/isis*") ? "active" : "" }} {{ request()->is("admin/semesters*") ? "active" : "" }} {{ request()->is("admin/covers*") ? "active" : "" }} {{ request()->is("admin/jenjangs*") ? "active" : "" }} {{ request()->is("admin/kurikulums*") ? "active" : "" }} {{ request()->is("admin/mapels*") ? "active" : "" }} {{ request()->is("admin/kelas*") ? "active" : "" }} {{ request()->is("admin/halaman*") ? "active" : "" }}" href="#">
                             <i class="fa-fw nav-icon fas fa-cogs">
 
                             </i>
@@ -321,8 +321,8 @@
                     </li>
                 @endcan
                 @can('buku_access')
-                    <li class="nav-item has-treeview {{ request()->is("admin/books*") ? "menu-open" : "" }} {{ request()->is("admin/book-variants*") ? "menu-open" : "" }}">
-                        <a class="nav-link nav-dropdown-toggle {{ request()->is("admin/books*") ? "active" : "" }} {{ request()->is("admin/book-variants*") ? "active" : "" }}" href="#">
+                    <li class="nav-item has-treeview {{ request()->is("admin/books*") ? "menu-open" : "" }} {{ request()->is("admin/book-components*") ? "menu-open" : "" }} {{ request()->is("admin/book-variants*") ? "menu-open" : "" }}">
+                        <a class="nav-link nav-dropdown-toggle {{ request()->is("admin/books*") ? "active" : "" }} {{ request()->is("admin/book-components*") ? "active" : "" }} {{ request()->is("admin/book-variants*") ? "active" : "" }}" href="#">
                             <i class="fa-fw nav-icon fas fa-book">
 
                             </i>
