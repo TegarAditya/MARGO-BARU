@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Traits\Auditable;
+use App\Traits\CreatedUpdatedBy;
 use DateTimeInterface;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -13,13 +14,12 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class Book extends Model implements HasMedia
 {
-    use SoftDeletes, InteractsWithMedia, Auditable, HasFactory;
+    use SoftDeletes, InteractsWithMedia, Auditable, HasFactory, CreatedUpdatedBy;
 
     public $table = 'books';
 
     protected $appends = [
-        'photo',
-        'short_name'
+        'photo'
     ];
 
     protected $dates = [
@@ -36,8 +36,11 @@ class Book extends Model implements HasMedia
         'kurikulum_id',
         'mapel_id',
         'kelas_id',
+        'isi_id',
         'cover_id',
         'semester_id',
+        'created_by_id',
+        'updated_by_id',
         'created_at',
         'updated_at',
         'deleted_at',
@@ -52,13 +55,6 @@ class Book extends Model implements HasMedia
     {
         $this->addMediaConversion('thumb')->fit('crop', 50, 50);
         $this->addMediaConversion('preview')->fit('crop', 120, 120);
-    }
-
-    public function getShortNameAttribute()
-    {
-        $name = $this->mapel->name .' - '. $this->kelas->name;
-
-        return $name;
     }
 
     public function jenjang()
@@ -79,6 +75,11 @@ class Book extends Model implements HasMedia
     public function kelas()
     {
         return $this->belongsTo(Kelas::class, 'kelas_id');
+    }
+
+    public function isi()
+    {
+        return $this->belongsTo(Isi::class, 'isi_id');
     }
 
     public function cover()
@@ -108,27 +109,41 @@ class Book extends Model implements HasMedia
         return $files;
     }
 
-    public static function generateCode($jenjang_id, $kurikulum_id, $mapel_id, $kelas_id, $cover_id, $semester_id)
+    public static function generateCode($jenjang_id, $kurikulum_id, $mapel_id, $kelas_id, $semester_id, $isi_id, $cover_id)
     {
         $jenjang = Jenjang::find($jenjang_id)->code ?? '000';
         $kurikulum = Kurikulum::find($kurikulum_id)->code ?? '00';
         $mapel = Mapel::find($mapel_id)->code ?? '000';
         $kelas = Kelas::find($kelas_id)->code ?? '00';
-        $cover = Cover::find($cover_id)->code ?? '000';
         $semester = Semester::find($semester_id)->code ?? '0000';
+        $isi = Isi::find($cover_id)->code ?? '000';
+        $cover = Cover::find($cover_id)->code ?? '000';
 
-        return $jenjang. ''. $kurikulum. ''. $mapel. '' .$kelas. ''. $cover. ''. $semester;
+        if ($isi == $cover) {
+            $penerbit = $isi;
+        } else {
+            $penerbit = $isi. '' .$cover;
+        }
+
+        return $jenjang. ''. $kurikulum. ''. $mapel. '' .$kelas. ''. $semester. '/'. $penerbit;
     }
 
-    public static function generateName($jenjang_id, $kurikulum_id, $mapel_id, $kelas_id, $cover_id, $semester_id)
+    public static function generateName($jenjang_id, $kurikulum_id, $mapel_id, $kelas_id, $semester_id, $isi_id, $cover_id)
     {
         $jenjang = Jenjang::find($jenjang_id)->name ?? 'Tidak Ada';
         $kurikulum = Kurikulum::find($kurikulum_id)->name ?? 'Tidak Ada';
         $mapel = Mapel::find($mapel_id)->name ?? 'Tidak Ada';
         $kelas = Kelas::find($kelas_id)->name ?? 'Tidak Ada';
-        $cover = Cover::find($cover_id)->name ?? 'Tidak Ada';
         $semester = Semester::find($semester_id)->name ?? 'Tidak Ada';
+        $isi = Isi::find($cover_id)->name ?? 'Tidak Ada';
+        $cover = Cover::find($cover_id)->name ?? 'Tidak Ada';
 
-        return $jenjang. ' - '. $kurikulum. ' - '. $mapel. ' - ' .$kelas. ' - '. $cover. ' - '. $semester;
+        if ($isi == $cover) {
+            $penerbit = $isi;
+        } else {
+            $penerbit = $isi. ' - ' .$cover;
+        }
+
+        return '('. $penerbit .')'. $jenjang. ' - '. $kurikulum. ' - '. $mapel. ' - ' .$kelas. ' - '. $cover. ' - '. $semester;
     }
 }

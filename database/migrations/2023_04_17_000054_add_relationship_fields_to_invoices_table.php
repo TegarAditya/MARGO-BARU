@@ -16,7 +16,9 @@ class AddRelationshipFieldsToInvoicesTable extends Migration
             $table->unsignedBigInteger('salesperson_id')->nullable();
             $table->foreign('salesperson_id', 'salesperson_fk_8116071')->references('id')->on('salespeople');
             $table->unsignedBigInteger('created_by_id')->nullable();
-            $table->foreign('created_by_id', 'created_by_fk_8722691')->references('id')->on('users');
+            $table->foreign('created_by_id')->references('id')->on('users');
+            $table->unsignedBigInteger('updated_by_id')->nullable();
+            $table->foreign('updated_by_id')->references('id')->on('users');
         });
     }
 }

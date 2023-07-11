@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Traits\Auditable;
+use App\Traits\CreatedUpdatedBy;
 use DateTimeInterface;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -10,7 +11,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class SalesOrder extends Model
 {
-    use SoftDeletes, Auditable, HasFactory;
+    use SoftDeletes, Auditable, HasFactory, CreatedUpdatedBy;
 
     public $table = 'sales_orders';
 
@@ -36,6 +37,8 @@ class SalesOrder extends Model
         'quantity',
         'moved',
         'retur',
+        'created_by_id',
+        'updated_by_id',
         'created_at',
         'updated_at',
         'deleted_at',

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Traits\Auditable;
+use App\Traits\CreatedUpdatedBy;
 use DateTimeInterface;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -10,7 +11,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class BookComponent extends Model
 {
-    use SoftDeletes, Auditable, HasFactory;
+    use SoftDeletes, Auditable, HasFactory, CreatedUpdatedBy;
 
     public $table = 'book_components';
 
@@ -25,6 +26,21 @@ class BookComponent extends Model
         'C' => 'Cover LKS',
         'S' => 'Isi Pegangan Guru',
         'V' => 'Cover Pegangan Guru',
+        'U' => 'Isi Kunci',
+    ];
+
+    public const LKS_TYPE = [
+        'C' => 'Cover LKS',
+        'I' => 'Isi LKS',
+    ];
+
+    public const PG_TYPE = [
+        'V' => 'Cover PG',
+        'S' => 'Isi PG',
+    ];
+
+    public const KUNCI_TYPE = [
+        'U' => 'Isi Kunci',
     ];
 
     protected $fillable = [

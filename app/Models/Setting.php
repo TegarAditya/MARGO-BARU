@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Traits\Auditable;
+use App\Traits\CreatedUpdatedBy;
 use DateTimeInterface;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -10,7 +11,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Setting extends Model
 {
-    use SoftDeletes, Auditable, HasFactory;
+    use SoftDeletes, Auditable, HasFactory, CreatedUpdatedBy;
 
     public $table = 'settings';
 
@@ -24,7 +25,8 @@ class Setting extends Model
         'key',
         'value',
         'is_json',
-        'update_by_id',
+        'created_by_id',
+        'updated_by_id',
         'created_at',
         'updated_at',
         'deleted_at',

@@ -16,6 +16,10 @@ class AddRelationshipFieldsToTransactionsTable extends Migration
             $table->unsignedBigInteger('reference_id')->nullable();
             $table->unsignedBigInteger('reversal_of_id')->nullable();
             $table->foreign('reversal_of_id', 'reversal_of_fk_8648146')->references('id')->on('transactions');
+            $table->unsignedBigInteger('created_by_id')->nullable();
+            $table->foreign('created_by_id')->references('id')->on('users');
+            $table->unsignedBigInteger('updated_by_id')->nullable();
+            $table->foreign('updated_by_id')->references('id')->on('users');
         });
     }
 }

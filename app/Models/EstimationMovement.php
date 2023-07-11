@@ -7,10 +7,11 @@ use DateTimeInterface;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Traits\CreatedUpdatedBy;
 
 class EstimationMovement extends Model
 {
-    use SoftDeletes, HasFactory;
+    use SoftDeletes, HasFactory, CreatedUpdatedBy;
 
     public $table = 'estimation_movements';
 
@@ -50,6 +51,8 @@ class EstimationMovement extends Model
         'quantity',
         'type',
         'reversal_of_id',
+        'created_by_id',
+        'updated_by_id',
         'created_at',
         'updated_at',
         'deleted_at',

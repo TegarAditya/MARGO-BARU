@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Traits\Auditable;
+use App\Traits\CreatedUpdatedBy;
 use DateTimeInterface;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -13,7 +14,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class BookVariant extends Model implements HasMedia
 {
-    use SoftDeletes, InteractsWithMedia, Auditable, HasFactory;
+    use SoftDeletes, InteractsWithMedia, Auditable, HasFactory, CreatedUpdatedBy;
 
     public $table = 'book_variants';
 
@@ -25,21 +26,8 @@ class BookVariant extends Model implements HasMedia
 
     public const TYPE_SELECT = [
         'L' => 'LKS',
-        'C' => 'Cover LKS',
-        'I' => 'Isi LKS',
         'P' => 'Pegangan Guru',
-        'V' => 'Cover PG',
-        'S' => 'Isi PG',
-    ];
-
-    public const LKS_TYPE = [
-        'C' => 'Cover LKS',
-        'I' => 'Isi LKS',
-    ];
-
-    public const PG_TYPE = [
-        'V' => 'Cover PG',
-        'S' => 'Isi PG',
+        'K' => 'Kunci',
     ];
 
     protected $fillable = [

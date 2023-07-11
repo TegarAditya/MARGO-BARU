@@ -31,6 +31,10 @@ class AddRelationshipFieldsToBookVariantsTable extends Migration
             $table->foreign('warehouse_id', 'warehouse_fk_8104173')->references('id')->on('warehouses');
             $table->unsignedBigInteger('unit_id')->nullable();
             $table->foreign('unit_id', 'unit_fk_8104174')->references('id')->on('units');
+            $table->unsignedBigInteger('created_by_id')->nullable();
+            $table->foreign('created_by_id')->references('id')->on('users');
+            $table->unsignedBigInteger('updated_by_id')->nullable();
+            $table->foreign('updated_by_id')->references('id')->on('users');
         });
     }
 }

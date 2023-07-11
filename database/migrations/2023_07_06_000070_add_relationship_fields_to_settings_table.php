@@ -9,8 +9,10 @@ class AddRelationshipFieldsToSettingsTable extends Migration
     public function up()
     {
         Schema::table('settings', function (Blueprint $table) {
-            $table->unsignedBigInteger('update_by_id')->nullable();
-            $table->foreign('update_by_id', 'update_by_fk_8722687')->references('id')->on('users');
+            $table->unsignedBigInteger('created_by_id')->nullable();
+            $table->foreign('created_by_id')->references('id')->on('users');
+            $table->unsignedBigInteger('updated_by_id')->nullable();
+            $table->foreign('updated_by_id')->references('id')->on('users');
         });
     }
 }

@@ -19,6 +19,10 @@ class AddRelationshipFieldsToSalesOrdersTable extends Migration
             $table->foreign('jenjang_id', 'jenjang_fk_8110773')->references('id')->on('jenjangs');
             $table->unsignedBigInteger('kurikulum_id')->nullable();
             $table->foreign('kurikulum_id', 'kurikulum_fk_8110774')->references('id')->on('kurikulums');
+            $table->unsignedBigInteger('created_by_id')->nullable();
+            $table->foreign('created_by_id')->references('id')->on('users');
+            $table->unsignedBigInteger('updated_by_id')->nullable();
+            $table->foreign('updated_by_id')->references('id')->on('users');
         });
     }
 }

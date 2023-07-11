@@ -8,6 +8,7 @@ use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithMultipleSheets;
 use App\Models\Book;
 use App\Models\BookVariant;
+use App\Models\BookComponent;
 use App\Models\Jenjang;
 use App\Models\Kurikulum;
 use App\Models\Mapel;
@@ -31,8 +32,13 @@ class BookImport implements ToCollection, WithHeadingRow
             $kurikulum = Kurikulum::where('code', substr($code, 3, 2))->first();
             $mapel = Mapel::where('code', substr($code, 5, 3))->first();
             $kelas = Kelas::where('code', substr($code, 8, 2))->first();
-            $cover = Cover::where('code', substr($code, 10, 3))->first();
-            $semester = Semester::where('code', substr($code, 13, 4))->first();
+            $semester = Semester::where('code', substr($code, 10, 4))->first();
+            $isi = Isi::where('code', substr($code, 18, 3))->first();
+            if (substr($code, 21, 3)) {
+                $cover = Cover::where('code', substr($code, 21, 3))->first();
+            } else {
+                $cover = Cover::where('code', substr($code, 18, 3))->first();
+            }
             $halaman = Halaman::where('code', $row['halaman'])->first();
 
             DB::beginTransaction();
@@ -41,13 +47,15 @@ class BookImport implements ToCollection, WithHeadingRow
                     'code' => $code
                 ],
                 [
-                    'name' => Book::generateName($jenjang->id, $kurikulum->id, $mapel->id, $kelas->id, $cover->id, $semester->id),
+                    'name' => Book::generateName($jenjang->id, $kurikulum->id, $mapel->id, $kelas->id, $semester->id, $cover->id, $isi->id),
                     'jenjang_id' => $jenjang->id,
                     'kurikulum_id' => $kurikulum->id,
                     'mapel_id' => $mapel->id,
                     'kelas_id' => $kelas->id,
+                    'isi_id' => $isi->id,
                     'cover_id' => $cover->id,
                     'semester_id' => $semester->id,
+                    ''
                 ]);
 
                 $lks = BookVariant::updateOrCreate([
@@ -62,6 +70,7 @@ class BookImport implements ToCollection, WithHeadingRow
                     'kurikulum_id' => $kurikulum->id,
                     'mapel_id' => $mapel->id,
                     'kelas_id' => $kelas->id,
+                    'isi_id' => $isi->id,
                     'cover_id' => $cover->id,
                     'halaman_id' => $halaman->id,
                     'warehouse_id' => 1,

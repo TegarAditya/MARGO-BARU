@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Traits\Auditable;
+use App\Traits\CreatedUpdatedBy;
 use Carbon\Carbon;
 use DateTimeInterface;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -12,7 +13,7 @@ use Illuminate\Support\Facades\Date;
 
 class Finishing extends Model
 {
-    use SoftDeletes, Auditable, HasFactory;
+    use SoftDeletes, Auditable, HasFactory, CreatedUpdatedBy;
 
     public const BULAN_ROMAWI = array(1=>"I","II","III", "IV", "V","VI","VII","VIII","IX","X", "XI","XII");
 
@@ -34,6 +35,8 @@ class Finishing extends Model
         'estimasi_oplah',
         'total_oplah',
         'note',
+        'created_by_id',
+        'updated_by_id',
         'created_at',
         'updated_at',
         'deleted_at',

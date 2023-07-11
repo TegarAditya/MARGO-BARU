@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Traits\Auditable;
+use App\Traits\CreatedUpdatedBy;
 use Carbon\Carbon;
 use DateTimeInterface;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -12,7 +13,7 @@ use Illuminate\Support\Facades\Date;
 
 class Invoice extends Model
 {
-    use SoftDeletes, Auditable, HasFactory;
+    use SoftDeletes, Auditable, HasFactory, CreatedUpdatedBy;
 
     public $table = 'invoices';
 
@@ -44,6 +45,7 @@ class Invoice extends Model
         'note',
         'retur',
         'created_by_id',
+        'updated_by_id',
         'created_at',
         'updated_at',
         'deleted_at',

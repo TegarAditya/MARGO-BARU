@@ -18,6 +18,10 @@ class AddRelationshipFieldsToStockMovementsTable extends Migration
             $table->foreign('material_id', 'material_fk_8108915')->references('id')->on('materials');
             $table->unsignedBigInteger('reversal_of_id')->nullable();
             $table->foreign('reversal_of_id', 'reversal_of_fk_8106961')->references('id')->on('stock_movements');
+            $table->unsignedBigInteger('created_by_id')->nullable();
+            $table->foreign('created_by_id')->references('id')->on('users');
+            $table->unsignedBigInteger('updated_by_id')->nullable();
+            $table->foreign('updated_by_id')->references('id')->on('users');
         });
     }
 }
