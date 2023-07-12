@@ -36,6 +36,10 @@ class StoreBookRequest extends FormRequest
             'kelas' => [
                 'required',
             ],
+            'isi_id' => [
+                'required',
+                'integer',
+            ],
             'cover_id' => [
                 'required',
                 'integer',
@@ -46,6 +50,15 @@ class StoreBookRequest extends FormRequest
             ],
             'photo' => [
                 'array',
+            ],
+            'lks_status' => [
+                'nullable'
+            ],
+            'pg_status' => [
+                'nullable'
+            ],
+            'kunci_status' => [
+                'nullable'
             ],
         ];
     }

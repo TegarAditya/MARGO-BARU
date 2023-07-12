@@ -138,4 +138,46 @@ class BookComponent extends Model
     {
         return $this->belongsTo(User::class, 'updated_by_id');
     }
+
+    public static function generateCode($key, $code)
+    {
+        $base = substr($code, 0, 14);
+        $isi = substr($code, 15, 3);
+        $cover = substr($code, 18, 3);
+
+        if (!$cover) {
+            $cover = $isi;
+        }
+
+        if ($key == 'I' || $key == 'S' || $key == 'K' || $key == 'U') {
+            return $key. '-' . $base. '/'. $isi;
+        }
+
+        if ($key == 'C' || $key == 'V') {
+            return $key. '-' . $base. '/'. $cover;
+        }
+    }
+
+    public static function generateName($key, $jenjang_id, $kurikulum_id, $mapel_id, $kelas_id, $semester_id, $isi_id, $cover_id)
+    {
+        $jenjang = Jenjang::find($jenjang_id)->name ?? 'Tidak Ada';
+        $kurikulum = Kurikulum::find($kurikulum_id)->name ?? 'Tidak Ada';
+        $mapel = Mapel::find($mapel_id)->name ?? 'Tidak Ada';
+        $kelas = Kelas::find($kelas_id)->name ?? 'Tidak Ada';
+        $semester = Semester::find($semester_id)->name ?? 'Tidak Ada';
+        $isi = Isi::find($isi_id)->name ?? 'Tidak Ada';
+        $cover = Cover::find($cover_id)->name ?? 'Tidak Ada';
+
+        if ($key == 'K') {
+            return BookVariant::TYPE_SELECT[$key]. ' - '. $jenjang. ' - '. $kurikulum. ' - '. $mapel. ' - ' .$kelas. ' - '. $semester. ' - ('. $isi .') ';
+        }
+
+        if ($key == 'I' || $key == 'S' || $key == 'U') {
+            return BookComponent::TYPE_SELECT[$key]. ' - '. $jenjang. ' - '. $kurikulum. ' - '. $mapel. ' - ' .$kelas. ' - '. $semester. ' - ('. $isi .') ';
+        }
+
+        if ($key == 'C' || $key == 'V') {
+            return BookComponent::TYPE_SELECT[$key]. ' - '. $jenjang. ' - '. $kurikulum. ' - '. $mapel. ' - ' .$kelas. ' - '. $semester. ' - ('. $cover .') ';
+        }
+    }
 }

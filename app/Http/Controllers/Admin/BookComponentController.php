@@ -161,7 +161,7 @@ class BookComponentController extends Controller
     public function store(StoreBookComponentRequest $request)
     {
         $bookComponent = BookComponent::create($request->all());
-        $bookComponent->components()->sync($request->input('components', []));
+        $bookComponent->material_of()->sync($request->input('components', []));
 
         return redirect()->route('admin.book-components.index');
     }
@@ -200,7 +200,7 @@ class BookComponentController extends Controller
     public function update(UpdateBookComponentRequest $request, BookComponent $bookComponent)
     {
         $bookComponent->update($request->all());
-        $bookComponent->components()->sync($request->input('components', []));
+        $bookComponent->material_of()->sync($request->input('components', []));
 
         return redirect()->route('admin.book-components.index');
     }

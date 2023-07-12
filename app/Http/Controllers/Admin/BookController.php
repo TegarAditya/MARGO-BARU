@@ -9,6 +9,8 @@ use App\Http\Requests\StoreBookRequest;
 use App\Http\Requests\UpdateBookRequest;
 use App\Models\Book;
 use App\Models\BookVariant;
+use App\Models\BookComponent;
+use App\Models\Isi;
 use App\Models\Cover;
 use App\Models\Jenjang;
 use App\Models\Kelas;
@@ -95,13 +97,15 @@ class BookController extends Controller
 
         $kelas = Kelas::pluck('name', 'id');
 
+        $isis = Isi::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+
         $covers = Cover::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
         $semesters = Semester::where('status', 1)->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
         $halamen = Halaman::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
-        return view('admin.books.create', compact('covers', 'jenjangs', 'kelas', 'kurikulums', 'mapels', 'semesters', 'halamen'));
+        return view('admin.books.create', compact('isis', 'covers', 'jenjangs', 'kelas', 'kurikulums', 'mapels', 'semesters', 'halamen'));
     }
 
     public function store(StoreBookRequest $request)
@@ -110,6 +114,7 @@ class BookController extends Controller
         $jenjang_id = $request->jenjang_id;
         $kurikulum_id = $request->kurikulum_id;
         $mapel_id = $request->mapel_id;
+        $isi_id = $request->isi_id;
         $cover_id = $request->cover_id;
         $semester_id = $request->semester_id;
         $halaman_id = $request->halaman_id;
@@ -117,8 +122,8 @@ class BookController extends Controller
         DB::beginTransaction();
         try {
             foreach($kelas as $kelas_id) {
-                $code = Book::generateCode($jenjang_id, $kurikulum_id, $mapel_id, $kelas_id, $cover_id, $semester_id);
-                $name = Book::generateName($jenjang_id, $kurikulum_id, $mapel_id, $kelas_id, $cover_id, $semester_id);
+                $code = Book::generateCode($jenjang_id, $kurikulum_id, $mapel_id, $kelas_id, $semester_id, $isi_id, $cover_id);
+                $name = Book::generateName($jenjang_id, $kurikulum_id, $mapel_id, $kelas_id, $semester_id, $isi_id, $cover_id);
 
                 $buku = Book::create([
                     'code' => $code,
@@ -127,94 +132,75 @@ class BookController extends Controller
                     'kurikulum_id' => $kurikulum_id,
                     'mapel_id' => $mapel_id,
                     'kelas_id' => $kelas_id,
-                    'cover_id' => $cover_id,
                     'semester_id' => $semester_id,
-                ]);
-
-                $lks = BookVariant::updateOrCreate([
-                    'book_id' => $buku->id,
-                    'code' => 'L' . '-' .$code,
-                    'type' => 'L',
-                ],
-                [
-                    'name' => 'LKS' . ' - '. $buku->name,
-                    'jenjang_id' => $jenjang->id,
-                    'semester_id' => $semester->id,
-                    'kurikulum_id' => $kurikulum->id,
-                    'mapel_id' => $mapel_id,
-                    'kelas_id' => $kelas_id,
+                    'isi_id' => $isi_id,
                     'cover_id' => $cover_id,
-                    'halaman_id' => $halaman->id,
-                    'warehouse_id' => 1,
-                    'stock' => $row['stok'],
-                    'unit_id' => 1,
-                    'price' => $row['harga'],
-                    'cost' => $row['hpp'],
-                    'status' => 1,
                 ]);
 
-                foreach(BookVariant::LKS_TYPE as $key => $label) {
-                    $variant = BookVariant::updateOrCreate([
+                if ($request->has('lks_status')) {
+                    $lks = BookVariant::updateOrCreate([
                         'book_id' => $buku->id,
-                        'code' => $key . '-' .$code,
-                        'type' => $key,
+                        'code' => 'L' . '-' .$code,
+                        'type' => 'L',
                     ],
                     [
-                        'name' => BookVariant::TYPE_SELECT[$key] . ' - '. $buku->name,
-                        'parent_id' => $lks->id,
+                        'name' => 'LKS' . ' - '. $buku->name,
                         'jenjang_id' => $jenjang->id,
-                        'semester_id' => $semester->id,
                         'kurikulum_id' => $kurikulum->id,
-                        'mapel_id' => $mapel_id,
-                        'kelas_id' => $kelas_id,
-                        'cover_id' => $cover_id,
+                        'isi_id' => $isi->id,
+                        'cover_id' => $cover->id,
+                        'mapel_id' => $mapel->id,
+                        'kelas_id' => $kelas->id,
                         'halaman_id' => $halaman->id,
+                        'semester_id' => $semester->id,
                         'warehouse_id' => 1,
-                        'stock' => 0,
+                        'stock' => $row['stok'],
                         'unit_id' => 1,
-                        'price' => 0,
-                        'cost' => 0,
+                        'price' => $row['harga'],
+                        'cost' => $row['hpp'],
                         'status' => 1,
                     ]);
+
+                    foreach(BookComponent::LKS_TYPE as $key => $label) {
+                        $component = BookComponent::updateOrCreate([
+                            'code' => BookComponent::generateCode($key, $code),
+                            'type' => $key,
+                        ],
+                        [
+                            'name' => BookComponent::generateName($key, $jenjang->id, $kurikulum->id, $mapel->id, $kelas->id, $semester->id, $cover->id, $isi->id),
+                            'jenjang_id' => $jenjang->id,
+                            'kurikulum_id' => $kurikulum->id,
+                            'isi_id' => ($key == 'C')  ? $isi->id : null,
+                            'cover_id' => ($key == 'I') ? $cover->id : null,
+                            'mapel_id' => $mapel->id,
+                            'kelas_id' => $kelas->id,
+                            'halaman_id' => $halaman->id,
+                            'semester_id' => $semester->id,
+                            'warehouse_id' => 2,
+                            'stock' => 0,
+                            'unit_id' => 1,
+                            'price' => 0,
+                            'cost' => 0,
+                            'status' => 1,
+                        ]);
+                        $component->material_of()->syncWithoutDetaching($lks->id);
+                    }
                 }
 
-                $pg = BookVariant::updateOrCreate([
-                    'book_id' => $buku->id,
-                    'code' => 'P' . '-' .$code,
-                    'type' => 'P',
-                ],
-                [
-                    'name' => 'Pegangan Guru' . ' - '. $buku->name,
-                    'jenjang_id' => $jenjang->id,
-                    'semester_id' => $semester->id,
-                    'kurikulum_id' => $kurikulum->id,
-                    'mapel_id' => $mapel_id,
-                    'kelas_id' => $kelas_id,
-                    'cover_id' => $cover_id,
-                    'halaman_id' => $halaman->id,
-                    'warehouse_id' => 1,
-                    'stock' => 0,
-                    'unit_id' => 1,
-                    'price' => 0,
-                    'cost' => 0,
-                    'status' => 1,
-                ]);
-
-                foreach(BookVariant::PG_TYPE as $key => $label) {
-                    $variant = BookVariant::updateOrCreate([
+                if ($request->has('$pg_status')) {
+                    $pg = BookVariant::updateOrCreate([
                         'book_id' => $buku->id,
-                        'code' => $key . '-' .$code,
-                        'type' => $key,
+                        'code' => 'P' . '-' .$code,
+                        'type' => 'P',
                     ],
                     [
-                        'name' => BookVariant::TYPE_SELECT[$key] . ' - '. $buku->name,
-                        'parent_id' => $pg->id,
+                        'name' => 'Pegangan Guru' . ' - '. $buku->name,
                         'jenjang_id' => $jenjang->id,
                         'semester_id' => $semester->id,
                         'kurikulum_id' => $kurikulum->id,
-                        'mapel_id' => $mapel_id,
-                        'kelas_id' => $kelas_id,
-                        'cover_id' => $cover_id,
+                        'mapel_id' => $mapel->id,
+                        'kelas_id' => $kelas->id,
+                        'cover_id' => $cover->id,
                         'halaman_id' => $halaman->id,
                         'warehouse_id' => 1,
                         'stock' => 0,
@@ -223,6 +209,80 @@ class BookController extends Controller
                         'cost' => 0,
                         'status' => 1,
                     ]);
+
+                    foreach(BookComponent::PG_TYPE as $key => $label) {
+                        $component = BookComponent::updateOrCreate([
+                            'code' => BookComponent::generateCode($key, $code),
+                            'type' => $key,
+                        ],
+                        [
+                            'name' => BookComponent::generateName($key, $jenjang->id, $kurikulum->id, $mapel->id, $kelas->id, $semester->id, $cover->id, $isi->id),
+                            'jenjang_id' => $jenjang->id,
+                            'kurikulum_id' => $kurikulum->id,
+                            'isi_id' => ($key == 'V')  ? $isi->id : null,
+                            'cover_id' => ($key == 'S') ? $cover->id : null,
+                            'mapel_id' => $mapel->id,
+                            'kelas_id' => $kelas->id,
+                            'halaman_id' => $halaman->id,
+                            'semester_id' => $semester->id,
+                            'warehouse_id' => 2,
+                            'stock' => 0,
+                            'unit_id' => 1,
+                            'price' => 0,
+                            'cost' => 0,
+                            'status' => 1,
+                        ]);
+                        $component->material_of()->syncWithoutDetaching($pg->id);
+                    }
+                }
+
+                if ($request->has('kunci_status')) {
+                    $kunci = BookVariant::updateOrCreate([
+                        'book_id' => $buku->id,
+                        'code' => BookComponent::generateCode('K', $code),
+                        'type' => 'K',
+                    ],
+                    [
+                        'name' => BookComponent::generateName('K', $jenjang->id, $kurikulum->id, $mapel->id, $kelas->id, $semester->id, $cover->id, $isi->id),
+                        'jenjang_id' => $jenjang->id,
+                        'semester_id' => $semester->id,
+                        'kurikulum_id' => $kurikulum->id,
+                        'mapel_id' => $mapel->id,
+                        'kelas_id' => $kelas->id,
+                        'cover_id' => null,
+                        'halaman_id' => $halaman->id,
+                        'warehouse_id' => 1,
+                        'stock' => 0,
+                        'unit_id' => 1,
+                        'price' => 0,
+                        'cost' => 0,
+                        'status' => 1,
+                    ]);
+
+                    foreach(BookComponent::KUNCI_TYPE as $key => $label) {
+                        $component = BookComponent::updateOrCreate([
+                            'code' => BookComponent::generateCode($key, $code),
+                            'type' => $key,
+                        ],
+                        [
+                            'name' => BookComponent::generateName($key, $jenjang->id, $kurikulum->id, $mapel->id, $kelas->id, $semester->id, $cover->id, $isi->id),
+                            'jenjang_id' => $jenjang->id,
+                            'kurikulum_id' => $kurikulum->id,
+                            'isi_id' => ($key == 'U')  ? $isi->id : null,
+                            'cover_id' => null,
+                            'mapel_id' => $mapel->id,
+                            'kelas_id' => $kelas->id,
+                            'halaman_id' => $halaman->id,
+                            'semester_id' => $semester->id,
+                            'warehouse_id' => 2,
+                            'stock' => 0,
+                            'unit_id' => 1,
+                            'price' => 0,
+                            'cost' => 0,
+                            'status' => 1,
+                        ]);
+                        $component->material_of()->syncWithoutDetaching($kunci->id);
+                    }
                 }
             }
 

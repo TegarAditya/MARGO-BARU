@@ -353,6 +353,8 @@ return [
             'deleted_at_helper'  => ' ',
             'photo'              => 'Photo',
             'photo_helper'       => ' ',
+            'isi'                => 'Isi',
+            'isi_helper'         => ' ',
         ],
     ],
     'bookVariant' => [

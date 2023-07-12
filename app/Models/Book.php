@@ -116,7 +116,7 @@ class Book extends Model implements HasMedia
         $mapel = Mapel::find($mapel_id)->code ?? '000';
         $kelas = Kelas::find($kelas_id)->code ?? '00';
         $semester = Semester::find($semester_id)->code ?? '0000';
-        $isi = Isi::find($cover_id)->code ?? '000';
+        $isi = Isi::find($isi_id)->code ?? '000';
         $cover = Cover::find($cover_id)->code ?? '000';
 
         if ($isi == $cover) {
@@ -135,7 +135,7 @@ class Book extends Model implements HasMedia
         $mapel = Mapel::find($mapel_id)->name ?? 'Tidak Ada';
         $kelas = Kelas::find($kelas_id)->name ?? 'Tidak Ada';
         $semester = Semester::find($semester_id)->name ?? 'Tidak Ada';
-        $isi = Isi::find($cover_id)->name ?? 'Tidak Ada';
+        $isi = Isi::find($isi_id)->name ?? 'Tidak Ada';
         $cover = Cover::find($cover_id)->name ?? 'Tidak Ada';
 
         if ($isi == $cover) {
@@ -144,6 +144,6 @@ class Book extends Model implements HasMedia
             $penerbit = $isi. ' - ' .$cover;
         }
 
-        return '('. $penerbit .')'. $jenjang. ' - '. $kurikulum. ' - '. $mapel. ' - ' .$kelas. ' - '. $cover. ' - '. $semester;
+        return $jenjang. ' - '. $kurikulum. ' - '. $mapel. ' - ' .$kelas. ' - '. $semester. ' - ('. $penerbit .') ';
     }
 }
