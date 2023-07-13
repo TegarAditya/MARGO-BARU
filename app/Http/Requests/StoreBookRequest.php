@@ -60,6 +60,18 @@ class StoreBookRequest extends FormRequest
             'kunci_status' => [
                 'nullable'
             ],
+            'stock' => [
+                'nullable',
+                'integer'
+            ],
+            'price' => [
+                'nullable',
+                'integer'
+            ],
+            'cost' => [
+                'nullable',
+                'integer'
+            ],
         ];
     }
 }

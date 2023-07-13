@@ -118,6 +118,9 @@ class BookController extends Controller
         $cover_id = $request->cover_id;
         $semester_id = $request->semester_id;
         $halaman_id = $request->halaman_id;
+        $stock = $request->stock;
+        $price =  $request->price;
+        $cost = $request->cost;
 
         DB::beginTransaction();
         try {
@@ -145,19 +148,19 @@ class BookController extends Controller
                     ],
                     [
                         'name' => 'LKS' . ' - '. $buku->name,
-                        'jenjang_id' => $jenjang->id,
-                        'kurikulum_id' => $kurikulum->id,
-                        'isi_id' => $isi->id,
-                        'cover_id' => $cover->id,
-                        'mapel_id' => $mapel->id,
-                        'kelas_id' => $kelas->id,
-                        'halaman_id' => $halaman->id,
-                        'semester_id' => $semester->id,
+                        'jenjang_id' => $jenjang_id,
+                        'kurikulum_id' => $kurikulum_id,
+                        'isi_id' => $isi_id,
+                        'cover_id' => $cover_id,
+                        'mapel_id' => $mapel_id,
+                        'kelas_id' => $kelas_id,
+                        'halaman_id' => $halaman_id,
+                        'semester_id' => $semester_id,
                         'warehouse_id' => 1,
-                        'stock' => $row['stok'],
+                        'stock' => $stock,
                         'unit_id' => 1,
-                        'price' => $row['harga'],
-                        'cost' => $row['hpp'],
+                        'price' => $price,
+                        'cost' => $cost,
                         'status' => 1,
                     ]);
 
@@ -167,15 +170,15 @@ class BookController extends Controller
                             'type' => $key,
                         ],
                         [
-                            'name' => BookComponent::generateName($key, $jenjang->id, $kurikulum->id, $mapel->id, $kelas->id, $semester->id, $cover->id, $isi->id),
-                            'jenjang_id' => $jenjang->id,
-                            'kurikulum_id' => $kurikulum->id,
-                            'isi_id' => ($key == 'C')  ? $isi->id : null,
-                            'cover_id' => ($key == 'I') ? $cover->id : null,
-                            'mapel_id' => $mapel->id,
-                            'kelas_id' => $kelas->id,
-                            'halaman_id' => $halaman->id,
-                            'semester_id' => $semester->id,
+                            'name' => BookComponent::generateName($key, $jenjang_id, $kurikulum_id, $mapel_id, $kelas_id, $semester_id, $cover_id, $isi_id),
+                            'jenjang_id' => $jenjang_id,
+                            'kurikulum_id' => $kurikulum_id,
+                            'isi_id' => ($key == 'C')  ? $isi_id : null,
+                            'cover_id' => ($key == 'I') ? $cover_id : null,
+                            'mapel_id' => $mapel_id,
+                            'kelas_id' => $kelas_id,
+                            'halaman_id' => $halaman_id,
+                            'semester_id' => $semester_id,
                             'warehouse_id' => 2,
                             'stock' => 0,
                             'unit_id' => 1,
@@ -195,13 +198,13 @@ class BookController extends Controller
                     ],
                     [
                         'name' => 'Pegangan Guru' . ' - '. $buku->name,
-                        'jenjang_id' => $jenjang->id,
-                        'semester_id' => $semester->id,
-                        'kurikulum_id' => $kurikulum->id,
-                        'mapel_id' => $mapel->id,
-                        'kelas_id' => $kelas->id,
-                        'cover_id' => $cover->id,
-                        'halaman_id' => $halaman->id,
+                        'jenjang_id' => $jenjang_id,
+                        'semester_id' => $semester_id,
+                        'kurikulum_id' => $kurikulum_id,
+                        'mapel_id' => $mapel_id,
+                        'kelas_id' => $kelas_id,
+                        'cover_id' => $cover_id,
+                        'halaman_id' => $halaman_id,
                         'warehouse_id' => 1,
                         'stock' => 0,
                         'unit_id' => 1,
@@ -216,15 +219,15 @@ class BookController extends Controller
                             'type' => $key,
                         ],
                         [
-                            'name' => BookComponent::generateName($key, $jenjang->id, $kurikulum->id, $mapel->id, $kelas->id, $semester->id, $cover->id, $isi->id),
-                            'jenjang_id' => $jenjang->id,
-                            'kurikulum_id' => $kurikulum->id,
-                            'isi_id' => ($key == 'V')  ? $isi->id : null,
-                            'cover_id' => ($key == 'S') ? $cover->id : null,
-                            'mapel_id' => $mapel->id,
-                            'kelas_id' => $kelas->id,
-                            'halaman_id' => $halaman->id,
-                            'semester_id' => $semester->id,
+                            'name' => BookComponent::generateName($key, $jenjang_id, $kurikulum_id, $mapel_id, $kelas_id, $semester_id, $cover_id, $isi_id),
+                            'jenjang_id' => $jenjang_id,
+                            'kurikulum_id' => $kurikulum_id,
+                            'isi_id' => ($key == 'V')  ? $isi_id : null,
+                            'cover_id' => ($key == 'S') ? $cover_id : null,
+                            'mapel_id' => $mapel_id,
+                            'kelas_id' => $kelas_id,
+                            'halaman_id' => $halaman_id,
+                            'semester_id' => $semester_id,
                             'warehouse_id' => 2,
                             'stock' => 0,
                             'unit_id' => 1,
@@ -243,14 +246,14 @@ class BookController extends Controller
                         'type' => 'K',
                     ],
                     [
-                        'name' => BookComponent::generateName('K', $jenjang->id, $kurikulum->id, $mapel->id, $kelas->id, $semester->id, $cover->id, $isi->id),
-                        'jenjang_id' => $jenjang->id,
-                        'semester_id' => $semester->id,
-                        'kurikulum_id' => $kurikulum->id,
-                        'mapel_id' => $mapel->id,
-                        'kelas_id' => $kelas->id,
+                        'name' => BookComponent::generateName('K', $jenjang_id, $kurikulum_id, $mapel_id, $kelas_id, $semester_id, $cover_id, $isi_id),
+                        'jenjang_id' => $jenjang_id,
+                        'semester_id' => $semester_id,
+                        'kurikulum_id' => $kurikulum_id,
+                        'mapel_id' => $mapel_id,
+                        'kelas_id' => $kelas_id,
                         'cover_id' => null,
-                        'halaman_id' => $halaman->id,
+                        'halaman_id' => $halaman_id,
                         'warehouse_id' => 1,
                         'stock' => 0,
                         'unit_id' => 1,
@@ -265,15 +268,15 @@ class BookController extends Controller
                             'type' => $key,
                         ],
                         [
-                            'name' => BookComponent::generateName($key, $jenjang->id, $kurikulum->id, $mapel->id, $kelas->id, $semester->id, $cover->id, $isi->id),
-                            'jenjang_id' => $jenjang->id,
-                            'kurikulum_id' => $kurikulum->id,
-                            'isi_id' => ($key == 'U')  ? $isi->id : null,
+                            'name' => BookComponent::generateName($key, $jenjang_id, $kurikulum_id, $mapel_id, $kelas_id, $semester_id, $cover_id, $isi_id),
+                            'jenjang_id' => $jenjang_id,
+                            'kurikulum_id' => $kurikulum_id,
+                            'isi_id' => ($key == 'U')  ? $isi_id : null,
                             'cover_id' => null,
-                            'mapel_id' => $mapel->id,
-                            'kelas_id' => $kelas->id,
-                            'halaman_id' => $halaman->id,
-                            'semester_id' => $semester->id,
+                            'mapel_id' => $mapel_id,
+                            'kelas_id' => $kelas_id,
+                            'halaman_id' => $halaman_id,
+                            'semester_id' => $semester_id,
                             'warehouse_id' => 2,
                             'stock' => 0,
                             'unit_id' => 1,
@@ -290,6 +293,8 @@ class BookController extends Controller
             Alert::success('Success', 'Buku berhasil disimpan');
         } catch (\Exception $e) {
             DB::rollback();
+
+            dd($e);
             Alert::error('Error', $e->getMessage());
 
             return redirect()->back()->withInput();

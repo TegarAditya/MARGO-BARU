@@ -147,7 +147,7 @@
                     <th width="10">
 
                     </th>
-                    <th>
+                    <th width="200">
                         {{ trans('cruds.bookComponent.fields.code') }}
                     </th>
                     <th>
