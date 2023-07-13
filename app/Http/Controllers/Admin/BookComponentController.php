@@ -12,7 +12,7 @@ use App\Models\Cover;
 use App\Models\Halaman;
 use App\Models\Isi;
 use App\Models\Jenjang;
-use App\Models\Kela;
+use App\Models\Kelas;
 use App\Models\Kurikulum;
 use App\Models\Mapel;
 use App\Models\Semester;
@@ -30,7 +30,33 @@ class BookComponentController extends Controller
         abort_if(Gate::denies('book_component_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         if ($request->ajax()) {
-            $query = BookComponent::with(['jenjang', 'kurikulum', 'isi', 'cover', 'mapel', 'kelas', 'halaman', 'semester', 'warehouse', 'unit', 'components', 'created_by', 'updated_by'])->select(sprintf('%s.*', (new BookComponent)->table));
+            $query = BookComponent::select(sprintf('%s.*', (new BookComponent)->table));
+
+            if (!empty($request->type)) {
+                $query->where('type', $request->type);
+            }
+            if (!empty($request->semester)) {
+                $query->where('semester_id', $request->semester);
+            }
+            if (!empty($request->jenjang)) {
+                $query->where('jenjang_id', $request->jenjang);
+            }
+            if (!empty($request->isi)) {
+                $query->where('isi_id', $request->isi);
+            }
+            if (!empty($request->cover)) {
+                $query->where('cover_id', $request->cover);
+            }
+            if (!empty($request->kurikulum)) {
+                $query->where('kurikulum_id', $request->kurikulum);
+            }
+            if (!empty($request->kelas)) {
+                $query->where('kelas_id', $request->kelas);
+            }
+            if (!empty($request->mapel)) {
+                $query->where('mapel_id', $request->mapel);
+            }
+
             $table = Datatables::of($query);
 
             $table->addColumn('placeholder', '&nbsp;');
@@ -57,76 +83,43 @@ class BookComponentController extends Controller
             $table->editColumn('name', function ($row) {
                 return $row->name ? $row->name : '';
             });
-            $table->editColumn('description', function ($row) {
-                return $row->description ? $row->description : '';
-            });
             $table->editColumn('type', function ($row) {
                 return $row->type ? BookComponent::TYPE_SELECT[$row->type] : '';
-            });
-            $table->addColumn('jenjang_code', function ($row) {
-                return $row->jenjang ? $row->jenjang->code : '';
-            });
-
-            $table->addColumn('kurikulum_code', function ($row) {
-                return $row->kurikulum ? $row->kurikulum->code : '';
-            });
-
-            $table->addColumn('isi_code', function ($row) {
-                return $row->isi ? $row->isi->code : '';
-            });
-
-            $table->addColumn('cover_code', function ($row) {
-                return $row->cover ? $row->cover->code : '';
-            });
-
-            $table->addColumn('mapel_name', function ($row) {
-                return $row->mapel ? $row->mapel->name : '';
-            });
-
-            $table->addColumn('kelas_code', function ($row) {
-                return $row->kelas ? $row->kelas->code : '';
-            });
-
-            $table->addColumn('halaman_code', function ($row) {
-                return $row->halaman ? $row->halaman->code : '';
-            });
-
-            $table->addColumn('semester_name', function ($row) {
-                return $row->semester ? $row->semester->name : '';
-            });
-
-            $table->addColumn('warehouse_code', function ($row) {
-                return $row->warehouse ? $row->warehouse->code : '';
-            });
-
-            $table->editColumn('stock', function ($row) {
-                return $row->stock ? $row->stock : '';
-            });
-            $table->addColumn('unit_code', function ($row) {
-                return $row->unit ? $row->unit->code : '';
             });
 
             $table->editColumn('price', function ($row) {
                 return $row->price ? $row->price : '';
             });
-            $table->editColumn('cost', function ($row) {
-                return $row->cost ? $row->cost : '';
-            });
-            $table->editColumn('components', function ($row) {
+
+            $table->editColumn('material_of', function ($row) {
                 $labels = [];
-                foreach ($row->components as $component) {
+                foreach ($row->material_of as $component) {
                     $labels[] = sprintf('<span class="label label-info label-many">%s</span>', $component->code);
                 }
 
                 return implode(' ', $labels);
             });
 
-            $table->rawColumns(['actions', 'placeholder', 'jenjang', 'kurikulum', 'isi', 'cover', 'mapel', 'kelas', 'halaman', 'semester', 'warehouse', 'unit', 'components']);
+            $table->rawColumns(['actions', 'placeholder', 'jenjang', 'material_of']);
 
             return $table->make(true);
         }
 
-        return view('admin.bookComponents.index');
+        $jenjangs = Jenjang::pluck('name', 'id')->prepend('All', '');
+
+        $kurikulums = Kurikulum::pluck('name', 'id')->prepend('All', '');
+
+        $mapels = Mapel::pluck('name', 'id')->prepend('All', '');
+
+        $kelas = Kelas::pluck('name', 'id')->prepend('All', '');
+
+        $covers = Cover::pluck('name', 'id')->prepend('All', '');
+
+        $isis = Isi::pluck('name', 'id')->prepend('All', '');
+
+        $semesters = Semester::where('status', 1)->pluck('name', 'id')->prepend('All', '');
+
+        return view('admin.bookComponents.index', compact('covers', 'jenjangs', 'kelas', 'kurikulums', 'mapels', 'semesters', 'isis'));
     }
 
     public function create()
@@ -143,7 +136,7 @@ class BookComponentController extends Controller
 
         $mapels = Mapel::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
-        $kelas = Kela::pluck('code', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $kelas = Kelas::pluck('code', 'id')->prepend(trans('global.pleaseSelect'), '');
 
         $halamen = Halaman::pluck('code', 'id')->prepend(trans('global.pleaseSelect'), '');
 
@@ -180,7 +173,7 @@ class BookComponentController extends Controller
 
         $mapels = Mapel::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
-        $kelas = Kela::pluck('code', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $kelas = Kelas::pluck('code', 'id')->prepend(trans('global.pleaseSelect'), '');
 
         $halamen = Halaman::pluck('code', 'id')->prepend(trans('global.pleaseSelect'), '');
 
@@ -190,9 +183,9 @@ class BookComponentController extends Controller
 
         $units = Unit::pluck('code', 'id')->prepend(trans('global.pleaseSelect'), '');
 
-        $components = BookVariant::pluck('code', 'id');
+        $components = BookVariant::pluck('name', 'id');
 
-        $bookComponent->load('jenjang', 'kurikulum', 'isi', 'cover', 'mapel', 'kelas', 'halaman', 'semester', 'warehouse', 'unit', 'components', 'created_by', 'updated_by');
+        $bookComponent->load('jenjang', 'kurikulum', 'isi', 'cover', 'mapel', 'kelas', 'halaman', 'semester', 'warehouse', 'unit', 'material_of', 'created_by', 'updated_by');
 
         return view('admin.bookComponents.edit', compact('bookComponent', 'components', 'covers', 'halamen', 'isis', 'jenjangs', 'kelas', 'kurikulums', 'mapels', 'semesters', 'units', 'warehouses'));
     }
@@ -209,7 +202,7 @@ class BookComponentController extends Controller
     {
         abort_if(Gate::denies('book_component_show'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $bookComponent->load('jenjang', 'kurikulum', 'isi', 'cover', 'mapel', 'kelas', 'halaman', 'semester', 'warehouse', 'unit', 'components', 'created_by', 'updated_by');
+        $bookComponent->load('jenjang', 'kurikulum', 'isi', 'cover', 'mapel', 'kelas', 'halaman', 'semester', 'warehouse', 'unit', 'material_of', 'created_by', 'updated_by');
 
         return view('admin.bookComponents.show', compact('bookComponent'));
     }

@@ -52,7 +52,7 @@ class BookImport implements ToCollection, WithHeadingRow
                     'code' => $code
                 ],
                 [
-                    'name' => Book::generateName($jenjang->id, $kurikulum->id, $mapel->id, $kelas->id, $semester->id, $cover->id, $isi->id),
+                    'name' => Book::generateName($jenjang->id, $kurikulum->id, $mapel->id, $kelas->id, $semester->id, $isi->id, $cover->id),
                     'jenjang_id' => $jenjang->id,
                     'kurikulum_id' => $kurikulum->id,
                     'mapel_id' => $mapel->id,
@@ -92,11 +92,11 @@ class BookImport implements ToCollection, WithHeadingRow
                             'type' => $key,
                         ],
                         [
-                            'name' => BookComponent::generateName($key, $jenjang->id, $kurikulum->id, $mapel->id, $kelas->id, $semester->id, $cover->id, $isi->id),
+                            'name' => BookComponent::generateName($key, $jenjang->id, $kurikulum->id, $mapel->id, $kelas->id, $semester->id, $isi->id, $cover->id),
                             'jenjang_id' => $jenjang->id,
                             'kurikulum_id' => $kurikulum->id,
-                            'isi_id' => ($key == 'C')  ? $isi->id : null,
-                            'cover_id' => ($key == 'I') ? $cover->id : null,
+                            'isi_id' => ($key == 'I')  ? $isi->id : null,
+                            'cover_id' => ($key == 'C') ? $cover->id : null,
                             'mapel_id' => $mapel->id,
                             'kelas_id' => $kelas->id,
                             'halaman_id' => $halaman->id,
@@ -125,6 +125,7 @@ class BookImport implements ToCollection, WithHeadingRow
                         'kurikulum_id' => $kurikulum->id,
                         'mapel_id' => $mapel->id,
                         'kelas_id' => $kelas->id,
+                        'isi_id' => $isi->id,
                         'cover_id' => $cover->id,
                         'halaman_id' => $halaman->id,
                         'warehouse_id' => 1,
@@ -141,11 +142,11 @@ class BookImport implements ToCollection, WithHeadingRow
                             'type' => $key,
                         ],
                         [
-                            'name' => BookComponent::generateName($key, $jenjang->id, $kurikulum->id, $mapel->id, $kelas->id, $semester->id, $cover->id, $isi->id),
+                            'name' => BookComponent::generateName($key, $jenjang->id, $kurikulum->id, $mapel->id, $kelas->id, $semester->id, $isi->id, $cover->id),
                             'jenjang_id' => $jenjang->id,
                             'kurikulum_id' => $kurikulum->id,
-                            'isi_id' => ($key == 'V')  ? $isi->id : null,
-                            'cover_id' => ($key == 'S') ? $cover->id : null,
+                            'isi_id' => ($key == 'S')  ? $isi->id : null,
+                            'cover_id' => ($key == 'V') ? $cover->id : null,
                             'mapel_id' => $mapel->id,
                             'kelas_id' => $kelas->id,
                             'halaman_id' => $halaman->id,
@@ -163,17 +164,18 @@ class BookImport implements ToCollection, WithHeadingRow
 
                 if ($kunci_status) {
                     $kunci = BookVariant::updateOrCreate([
-                        'book_id' => $buku->id,
                         'code' => BookComponent::generateCode('K', $code),
                         'type' => 'K',
                     ],
                     [
-                        'name' => BookComponent::generateName('K', $jenjang->id, $kurikulum->id, $mapel->id, $kelas->id, $semester->id, $cover->id, $isi->id),
+                        'book_id' => $buku->id,
+                        'name' => BookComponent::generateName('K', $jenjang->id, $kurikulum->id, $mapel->id, $kelas->id, $semester->id, $isi->id, $cover->id),
                         'jenjang_id' => $jenjang->id,
                         'semester_id' => $semester->id,
                         'kurikulum_id' => $kurikulum->id,
                         'mapel_id' => $mapel->id,
                         'kelas_id' => $kelas->id,
+                        'isi_id' => $isi->id,
                         'cover_id' => null,
                         'halaman_id' => $halaman->id,
                         'warehouse_id' => 1,
@@ -190,7 +192,7 @@ class BookImport implements ToCollection, WithHeadingRow
                             'type' => $key,
                         ],
                         [
-                            'name' => BookComponent::generateName($key, $jenjang->id, $kurikulum->id, $mapel->id, $kelas->id, $semester->id, $cover->id, $isi->id),
+                            'name' => BookComponent::generateName($key, $jenjang->id, $kurikulum->id, $mapel->id, $kelas->id, $semester->id, $isi->id, $cover->id),
                             'jenjang_id' => $jenjang->id,
                             'kurikulum_id' => $kurikulum->id,
                             'isi_id' => ($key == 'U')  ? $isi->id : null,
@@ -213,7 +215,7 @@ class BookImport implements ToCollection, WithHeadingRow
                 DB::commit();
             } catch (\Exception $e) {
                 DB::rollback();
-                dd($e->getMessage());
+                dd($e);
                 Alert::error('Error', $e->getMessage());
 
                 return redirect()->back();

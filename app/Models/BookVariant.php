@@ -32,7 +32,6 @@ class BookVariant extends Model implements HasMedia
 
     protected $fillable = [
         'book_id',
-        'parent_id',
         'code',
         'name',
         'type',
@@ -86,14 +85,14 @@ class BookVariant extends Model implements HasMedia
 
     public function getShortNameAttribute()
     {
-        $name = $this->mapel->name .' - '. $this->kelas->name.' - '. $this->halaman->name;
+        $name = $this->mapel?->name .' - '. $this->kelas?->name.' - '. $this->halaman?->name;
 
         return $name;
     }
 
     public function getBookTypeAttribute()
     {
-        $name = BookVariant::TYPE_SELECT[$this->type];
+        $name = BookVariant::TYPE_SELECT[$this->type] ?? '';
 
         return $name;
     }

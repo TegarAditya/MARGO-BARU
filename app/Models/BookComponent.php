@@ -101,7 +101,7 @@ class BookComponent extends Model
 
     public function kelas()
     {
-        return $this->belongsTo(Kela::class, 'kelas_id');
+        return $this->belongsTo(Kelas::class, 'kelas_id');
     }
 
     public function halaman()

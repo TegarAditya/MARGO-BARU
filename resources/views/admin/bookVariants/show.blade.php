@@ -23,7 +23,7 @@
                             {{ trans('cruds.bookVariant.fields.code') }}
                         </th>
                         <td>
-                            {{ $bookVariant->code }}
+                            <b>{{ $bookVariant->code }}</b>
                         </td>
                     </tr>
                     <tr>
@@ -68,6 +68,22 @@
                     </tr>
                     <tr>
                         <th>
+                            Isi
+                        </th>
+                        <td>
+                            {{ $bookVariant->isi?->name ?? '' }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>
+                            Cover
+                        </th>
+                        <td>
+                            {{ $bookVariant->cover?->name ?? '' }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>
                             {{ trans('cruds.bookVariant.fields.price') }}
                         </th>
                         <td>
@@ -90,6 +106,17 @@
                             <b>{{ angka($bookVariant->stock) }} {{ $bookVariant->unit->name ?? '' }}<b>
                         </td>
                     </tr>
+                    <tr>
+                        <th>
+                            Components
+                        </th>
+                        <td>
+                            @foreach($bookVariant->components as $key => $components)
+                                <span class="label label-info">{{ $components->name }} - <b>{{ $components->stock }} {{ $components->unit->name }}</b></span>
+                                <br>
+                            @endforeach
+                        </td>
+                    </tr>
                 </tbody>
             </table>
             <h3 class="mt-5 mb-3">History Product Movement</h3>
@@ -99,39 +126,43 @@
                         <tr>
                             <th></th>
                             <th>
-                                {{ trans('cruds.stockMovement.fields.type') }}
+                                Move
                             </th>
                             <th>
-                                {{ trans('cruds.stockMovement.fields.reference') }}
+                                Reference
                             </th>
                             <th>
-                                {{ trans('cruds.stockMovement.fields.quantity') }}
+                                Quantity
                             </th>
                             <th>
                                 Stock
                             </th>
                             <th>
-                                {{ trans('cruds.stockMovement.fields.created_at') }}
+                                Date
                             </th>
                         </tr>
                     </thead>
                     <tbody>
                         @php
-                            $stock_actual = $product->stock;
+                            $stock_actual = $bookVariant->stock;
                         @endphp
                         @foreach($stockMovements as $key => $stockMovement)
                             <tr data-entry-id="{{ $stockMovement->id }}">
                                 <td></td>
                                 <td>
-                                    {{ App\Models\StockMovement::TYPE_SELECT[$stockMovement->type] ?? '' }}
+                                    {{ App\Models\StockMovement::MOVEMENT_TYPE_SELECT[$stockMovement->type] ?? '' }}
                                 </td>
                                 <td>
-                                    @if ($stockMovement->type == 'order')
-                                        {{ $stockMovement->referensi->no_order }}
-                                    @elseif ($stockMovement->type == 'faktur')
-                                        {{ $stockMovement->referensi->no_invoice }}
-                                    @elseif ($stockMovement->type == 'adjustment')
-                                        {{ $stockMovement->referensi->date.'('.App\Models\StockAdjustment::OPERATION_SELECT[$stockMovement->referensi->operation] .')' }}
+                                    @if ($stockMovement->transaction_type == 'adjustment')
+                                        {{ 'Adjustment Tanggal :'. $stockMovement->reference->date }}
+                                    @elseif ($stockMovement->transaction_type == 'delivery')
+                                        {{ $stockMovement->reference->no_suratjalan}}
+                                    @elseif ($stockMovement->transaction_type == 'retur')
+                                        {{ $stockMovement->reference->no_retur }}
+                                    @elseif ($stockMovement->transaction_type == 'cetak')
+                                        {{ $stockMovement->reference->no_spc }}
+                                    @elseif ($stockMovement->transaction_type == 'produksi')
+                                        {{ $stockMovement->reference->no_spk }}
                                     @endif
                                 </td>
                                 <td>

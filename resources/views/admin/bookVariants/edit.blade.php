@@ -10,6 +10,26 @@
         <form method="POST" action="{{ route("admin.book-variants.update", [$bookVariant->id]) }}" enctype="multipart/form-data">
             @method('PUT')
             @csrf
+            <div class="row">
+                <div class="col-6">
+
+                </div>
+                <div class="col-6">
+
+                </div>
+                <div class="col-6">
+
+                </div>
+                <div class="col-6">
+
+                </div>
+                <div class="col-6">
+
+                </div>
+                <div class="col-6">
+
+                </div>
+            </div>
             <div class="form-group">
                 <label class="required" for="book_id">{{ trans('cruds.bookVariant.fields.book') }}</label>
                 <select class="form-control select2 {{ $errors->has('book') ? 'is-invalid' : '' }}" name="book_id" id="book_id" required>
@@ -21,18 +41,6 @@
                     <span class="text-danger">{{ $errors->first('book') }}</span>
                 @endif
                 <span class="help-block">{{ trans('cruds.bookVariant.fields.book_helper') }}</span>
-            </div>
-            <div class="form-group">
-                <label for="parent_id">{{ trans('cruds.bookVariant.fields.parent') }}</label>
-                <select class="form-control select2 {{ $errors->has('parent') ? 'is-invalid' : '' }}" name="parent_id" id="parent_id">
-                    @foreach($parents as $id => $entry)
-                        <option value="{{ $id }}" {{ (old('parent_id') ? old('parent_id') : $bookVariant->parent->id ?? '') == $id ? 'selected' : '' }}>{{ $entry }}</option>
-                    @endforeach
-                </select>
-                @if($errors->has('parent'))
-                    <span class="text-danger">{{ $errors->first('parent') }}</span>
-                @endif
-                <span class="help-block">{{ trans('cruds.bookVariant.fields.parent_helper') }}</span>
             </div>
             <div class="form-group">
                 <label class="required">{{ trans('cruds.bookVariant.fields.type') }}</label>
@@ -178,6 +186,22 @@
                     <span class="text-danger">{{ $errors->first('cost') }}</span>
                 @endif
                 <span class="help-block">{{ trans('cruds.bookVariant.fields.cost_helper') }}</span>
+            </div>
+            <div class="form-group">
+                <label for="components">Components</label>
+                <div style="padding-bottom: 4px">
+                    <span class="btn btn-info btn-xs select-all" style="border-radius: 0">{{ trans('global.select_all') }}</span>
+                    <span class="btn btn-info btn-xs deselect-all" style="border-radius: 0">{{ trans('global.deselect_all') }}</span>
+                </div>
+                <select class="form-control select2 {{ $errors->has('components') ? 'is-invalid' : '' }}" name="components[]" id="components" multiple>
+                    @foreach($components as $id => $component)
+                        <option value="{{ $id }}" {{ (in_array($id, old('components', [])) || $bookVariant->components->contains($id)) ? 'selected' : '' }}>{{ $component }}</option>
+                    @endforeach
+                </select>
+                @if($errors->has('components'))
+                    <span class="text-danger">{{ $errors->first('components') }}</span>
+                @endif
+                <span class="help-block">{{ trans('cruds.bookComponent.fields.components_helper') }}</span>
             </div>
             <div class="form-group">
                 <label for="photo">{{ trans('cruds.bookVariant.fields.photo') }}</label>

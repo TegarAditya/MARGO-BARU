@@ -191,7 +191,7 @@
                 </div>
                 <select class="form-control select2 {{ $errors->has('components') ? 'is-invalid' : '' }}" name="components[]" id="components" multiple>
                     @foreach($components as $id => $component)
-                        <option value="{{ $id }}" {{ (in_array($id, old('components', [])) || $bookComponent->components->contains($id)) ? 'selected' : '' }}>{{ $component }}</option>
+                        <option value="{{ $id }}" {{ (in_array($id, old('components', [])) || $bookComponent->material_of->contains($id)) ? 'selected' : '' }}>{{ $component }}</option>
                     @endforeach
                 </select>
                 @if($errors->has('components'))

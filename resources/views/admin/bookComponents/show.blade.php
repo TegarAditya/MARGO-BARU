@@ -153,11 +153,12 @@
                     </tr>
                     <tr>
                         <th>
-                            {{ trans('cruds.bookComponent.fields.components') }}
+                            Material Of
                         </th>
                         <td>
-                            @foreach($bookComponent->components as $key => $components)
+                            @foreach($bookComponent->material_of as $key => $components)
                                 <span class="label label-info">{{ $components->code }}</span>
+                                <br>
                             @endforeach
                         </td>
                     </tr>
