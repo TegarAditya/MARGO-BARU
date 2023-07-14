@@ -11,6 +11,7 @@ use App\Models\FinishingItem;
 use App\Models\Semester;
 use App\Models\Vendor;
 use App\Models\BookVariant;
+use App\Models\Halaman;
 use Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -28,23 +29,24 @@ class FinishingController extends Controller
         abort_if(Gate::denies('finishing_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         if ($request->ajax()) {
-            $query = Finishing::with(['semester', 'vendor'])->select(sprintf('%s.*', (new Finishing)->table));
+            $query = Finishing::with(['semester', 'vendor'])->select(sprintf('%s.*', (new Finishing)->table))->latest();
+            if (!empty($request->vendor)) {
+                $query->where('vendor_id', $request->vendor);
+            }
+            if (!empty($request->semester)) {
+                $query->where('semester_id', $request->semester);
+            }
             $table = Datatables::of($query);
 
             $table->addColumn('placeholder', '&nbsp;');
             $table->addColumn('actions', '&nbsp;');
 
             $table->editColumn('actions', function ($row) {
-                $viewGate      = 'finishing_show';
-                $editGate      = 'finishing_edit';
-                $deleteGate    = 'finishing_delete';
-                $crudRoutePart = 'finishings';
-
                 $btn = '
                     <a class="px-1" href="'.route('admin.finishings.show', $row->id).'" title="Show">
                         <i class="fas fa-eye text-success fa-lg"></i>
                     </a>
-                    <a class="px-1" href="'.route('admin.finishings.printSpk', $row->id).'" title="Print SPK">
+                    <a class="px-1" href="'.route('admin.finishings.printSpk', $row->id).'" title="Print SPK" target="_blank">
                         <i class="fas fa-print text-secondary fa-lg"></i>
                     </a>
                     <a class="px-1" href="'.route('admin.finishings.edit', $row->id).'" title="Edit">
@@ -71,7 +73,7 @@ class FinishingController extends Controller
             });
 
             $table->editColumn('total_cost', function ($row) {
-                return $row->total_cost ? $row->total_cost : '';
+                return $row->total_cost ? money($row->total_cost) : '';
             });
             $table->editColumn('total_oplah', function ($row) {
                 return $row->total_oplah ? $row->total_oplah : '';
@@ -85,7 +87,11 @@ class FinishingController extends Controller
             return $table->make(true);
         }
 
-        return view('admin.finishings.index');
+        $vendors = Vendor::where('type', 'finishing')->get()->pluck('full_name', 'id')->prepend('All', '');
+
+        $semesters = Semester::orderBy('code', 'DESC')->where('status', 1)->pluck('name', 'id')->prepend('All', '');
+
+        return view('admin.finishings.index', compact('vendors', 'semesters'));
     }
 
     public function create()
@@ -128,13 +134,18 @@ class FinishingController extends Controller
                 'semester_id' => $semester,
                 'vendor_id' => $vendor,
                 'estimasi_oplah' => array_sum($quantities),
-                'total_cost' => array_sum($quantities) * 100,
                 'note' => $note
             ]);
+
+            $total_cost = 0;
 
             for ($i = 0; $i < count($products); $i++) {
                 $product = BookVariant::find($products[$i]);
                 $quantity = $quantities[$i];
+
+                $halaman = Halaman::find($product->halaman_id)->value;
+                $cost = $this->costFinishing($halaman, $quantity);
+                $total_cost += $cost;
 
                 $finishing_item = FinishingItem::create([
                     'finishing_id' => $finishing->id,
@@ -142,7 +153,7 @@ class FinishingController extends Controller
                     'product_id' => $product->id,
                     'estimasi' => $quantity,
                     'quantity'=> $quantity,
-                    'cost' => 0,
+                    'cost' => $cost,
                     'done' => 0,
                 ]);
 
@@ -154,6 +165,9 @@ class FinishingController extends Controller
                     StockService::updateStock($item->id, -1 * $quantity);
                 }
             }
+
+            $finishing->total_cost = $total_cost;
+            $finishing->save();
 
             DB::commit();
 
@@ -206,6 +220,7 @@ class FinishingController extends Controller
         $products = $validatedData['products'];
         $quantities = $validatedData['quantities'];
         $finishing_items = $validatedData['finishing_items'];
+        $total_cost = 0;
 
         DB::beginTransaction();
         try {
@@ -214,12 +229,17 @@ class FinishingController extends Controller
                 $quantity = $quantities[$i];
                 $finishing_item = $finishing_items[$i];
 
+                $halaman = Halaman::find($product->halaman_id)->value;
+                $cost = $this->costFinishing($halaman, $quantity);
+                $total_cost += $cost;
+
                 if ($finishing_item) {
                     $detail = FinishingItem::find($finishing_item);
                     $old_quantity = $detail->estimasi;
                     $detail->update([
                         'estimasi' => $quantity,
                         'quantity' => $quantity,
+                        'cost' => $cost,
                     ]);
 
                     EstimationService::editMovement('out', 'finishing', $finishing->id, $product->id, -1 * $quantity, $product->type);
@@ -236,7 +256,7 @@ class FinishingController extends Controller
                         'product_id' => $product->id,
                         'estimasi' => $quantity,
                         'quantity'=> $quantity,
-                        'cost' => 0,
+                        'cost' => $cost,
                         'done' => 0,
                     ]);
 
@@ -253,7 +273,7 @@ class FinishingController extends Controller
             $finishing->update([
                 'date' => $date,
                 'estimasi_oplah' => array_sum($quantities),
-                'total_cost' => array_sum($quantities) * 100,
+                'total_cost' => $total_cost,
                 'note' => $note
             ]);
 
@@ -389,5 +409,25 @@ class FinishingController extends Controller
         $finishing_items = FinishingItem::with('product')->where('finishing_id', $finishing->id)->get();
 
         return view('admin.finishings.spk', compact('finishing', 'finishing_items'));
+    }
+
+    function costFinishing($halaman, $quantity)
+    {
+        if ($halaman <= 64) {
+            return 45 * $quantity;
+        }
+        if ($halaman <= 80) {
+            return 50 * $quantity;
+        }
+        if ($halaman <= 96) {
+            return 55 * $quantity;
+        }
+        if ($halaman <= 112) {
+            return 60 * $quantity;
+        }
+        if ($halaman <= 128) {
+            return 65 * $quantity;
+        }
+
     }
 }

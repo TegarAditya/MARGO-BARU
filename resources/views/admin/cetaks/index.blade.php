@@ -17,7 +17,21 @@
     <div class="card-body">
         <form id="filterform">
             <div class="row">
-                <div class="col-6">
+                <div class="col-4">
+                    <div class="form-group">
+                        <label for="semester_id">{{ trans('cruds.cetak.fields.semester') }}</label>
+                        <select class="form-control select2 {{ $errors->has('semester') ? 'is-invalid' : '' }}" name="semester_id" id="semester_id">
+                            @foreach($semesters as $id => $entry)
+                                <option value="{{ $id }}" {{ old('semester_id') == $id ? 'selected' : '' }}>{{ $entry }}</option>
+                            @endforeach
+                        </select>
+                        @if($errors->has('semester'))
+                            <span class="text-danger">{{ $errors->first('semester') }}</span>
+                        @endif
+                        <span class="help-block">{{ trans('cruds.cetak.fields.semester_helper') }}</span>
+                    </div>
+                </div>
+                <div class="col-4">
                     <div class="form-group">
                         <label for="vendor_id">{{ trans('cruds.cetak.fields.vendor') }}</label>
                         <select class="form-control select2 {{ $errors->has('vendor') ? 'is-invalid' : '' }}" name="vendor_id" id="vendor_id">
@@ -31,7 +45,7 @@
                         <span class="help-block">{{ trans('cruds.cetak.fields.vendor_helper') }}</span>
                     </div>
                 </div>
-                <div class="col-6">
+                <div class="col-4">
                     <div class="form-group">
                         <label>{{ trans('cruds.cetak.fields.type') }}</label>
                         <select class="form-control {{ $errors->has('type') ? 'is-invalid' : '' }}" name="type" id="type">
@@ -108,6 +122,7 @@ $(function () {
         data: function(data) {
             data.type = $('#type').val(),
             data.vendor = $('#vendor_id').val()
+            data.semester = $('#semester_id').val()
         }
     },
     columns: [
@@ -126,17 +141,16 @@ $(function () {
     order: [[ 1, 'desc' ]],
     pageLength: 50,
   };
-  let table = $('.datatable-Cetak').DataTable(dtOverrideGlobals);
-  $('a[data-toggle="tab"]').on('shown.bs.tab click', function(e){
-      $($.fn.dataTable.tables(true)).DataTable()
-          .columns.adjust();
-  });
+    let table = $('.datatable-Cetak').DataTable(dtOverrideGlobals);
+    $('a[data-toggle="tab"]').on('shown.bs.tab click', function(e){
+        $($.fn.dataTable.tables(true)).DataTable()
+            .columns.adjust();
+    });
 
-  $("#filterform").submit(function(event) {
+    $("#filterform").submit(function(event) {
         event.preventDefault();
         table.ajax.reload();
     });
-
 });
 
 </script>

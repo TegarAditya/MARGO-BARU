@@ -31,13 +31,16 @@ class CetakController extends Controller
         abort_if(Gate::denies('cetak_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         if ($request->ajax()) {
-            $query = Cetak::with(['semester', 'vendor'])->select(sprintf('%s.*', (new Cetak)->table));
+            $query = Cetak::with(['semester', 'vendor'])->select(sprintf('%s.*', (new Cetak)->table))->latest();
 
             if (!empty($request->type)) {
                 $query->where('type', $request->type);
             }
             if (!empty($request->vendor)) {
                 $query->where('vendor_id', $request->vendor);
+            }
+            if (!empty($request->semester)) {
+                $query->where('semester_id', $request->semester);
             }
 
             $table = Datatables::of($query);
@@ -96,7 +99,9 @@ class CetakController extends Controller
 
         $vendors = Vendor::where('type', 'cetak')->get()->pluck('full_name', 'id')->prepend('All', '');
 
-        return view('admin.cetaks.index', compact('vendors'));
+        $semesters = Semester::orderBy('code', 'DESC')->where('status', 1)->pluck('name', 'id')->prepend('All', '');
+
+        return view('admin.cetaks.index', compact('vendors', 'semesters'));
     }
 
     public function create()
