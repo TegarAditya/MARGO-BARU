@@ -84,8 +84,8 @@
                     </li>
                 @endcan
                 @can('general_master_access')
-                    <li class="nav-item has-treeview {{ request()->is("admin/units*") ? "menu-open" : "" }} {{ request()->is("admin/settings*") ? "menu-open" : "" }} {{ request()->is("admin/warehouses*") ? "menu-open" : "" }} {{ request()->is("admin/vendors*") ? "menu-open" : "" }}">
-                        <a class="nav-link nav-dropdown-toggle {{ request()->is("admin/units*") ? "active" : "" }} {{ request()->is("admin/settings*") ? "active" : "" }} {{ request()->is("admin/warehouses*") ? "active" : "" }} {{ request()->is("admin/vendors*") ? "active" : "" }}" href="#">
+                    <li class="nav-item has-treeview {{ request()->is("admin/units*") ? "menu-open" : "" }} {{ request()->is("admin/settings*") ? "menu-open" : "" }} {{ request()->is("admin/warehouses*") ? "menu-open" : "" }}">
+                        <a class="nav-link nav-dropdown-toggle {{ request()->is("admin/units*") ? "active" : "" }} {{ request()->is("admin/settings*") ? "active" : "" }} {{ request()->is("admin/warehouses*") ? "active" : "" }}" href="#">
                             <i class="fa-fw nav-icon fas fa-cogs">
 
                             </i>

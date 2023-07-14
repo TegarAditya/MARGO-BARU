@@ -12,7 +12,7 @@
                 {{session()->get('error-message')}}
             </p>
         @endif
-        
+
         <form method="POST" action="{{ route("admin.stock-adjustments.store") }}" enctype="multipart/form-data">
             @csrf
             <div class="row">
@@ -155,10 +155,10 @@
                                         Code : <strong>${product.code}</strong>
                                     </p>
                                     <p class="mb-0 text-sm">
-                                        Jenjang : <strong>${product.jenjang.name}</strong>
+                                        Jenjang - Kurikulum : <strong>${product.jenjang.name} - ${product.kurikulum.name}</strong>
                                     </p>
                                     <p class="mb-0 text-sm">
-                                        Cover - Isi : <strong>${product.book.cover.name} - ${product.book.kurikulum.name}</strong>
+                                        Cover - Isi : <strong>${product.cover.name} - ${product.kurikulum.name}</strong>
                                     </p>
                                     <p class="mb-0 text-sm">
                                         <strong>STOCK : ${product.stock}</strong>

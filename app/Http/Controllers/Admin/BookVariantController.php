@@ -641,7 +641,7 @@ class BookVariantController extends Controller
     {
         $id = $request->input('id');
 
-        $product = BookVariant::withMin('child as finishing_stock', 'stock')->find($id);
+        $product = BookVariant::withMin('components as finishing_stock', 'stock')->find($id);
         $product->load('book', 'jenjang', 'cover', 'kurikulum', 'estimasi_produksi');
 
         return response()->json($product);

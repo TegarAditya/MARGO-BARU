@@ -162,7 +162,7 @@
                                         Code : <strong>${product.code}</strong>
                                     </p>
                                     <p class="mb-0 text-sm">
-                                        Jenjang - Cover - Isi : <strong>${product.jenjang.name} - ${product.book.cover.name} - ${product.book.kurikulum.name}</strong>
+                                        Jenjang - Kurikulum : <strong>${product.jenjang.name} - ${product.book.kurikulum.name}</strong>
                                     </p>
                                     <p class="mb-0 text-sm">
                                         <strong>STOCK : ${product.stock}</strong>

@@ -149,7 +149,7 @@ class FinishingController extends Controller
                 EstimationService::createMovement('out', 'finishing', $finishing->id, $product->id, -1 * $quantity, $product->type);
                 EstimationService::createProduction($product->id, -1 * $quantity, $product->type);
 
-                foreach($product->child as $item) {
+                foreach($product->components as $item) {
                     StockService::createMovement('out', 'produksi', $finishing->id, $date, $item->id, -1 * $quantity);
                     StockService::updateStock($item->id, -1 * $quantity);
                 }
@@ -177,7 +177,7 @@ class FinishingController extends Controller
 
         $vendors = Vendor::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
-        $finishing_items = FinishingItem::with('product', 'product.child')->where('finishing_id', $finishing->id)->get();
+        $finishing_items = FinishingItem::with('product', 'product.components')->where('finishing_id', $finishing->id)->get();
 
         if ($finishing_items->min('done') > 0) {
             return redirect()->route('admin.finishings.show', $finishing->id);
@@ -225,7 +225,7 @@ class FinishingController extends Controller
                     EstimationService::editMovement('out', 'finishing', $finishing->id, $product->id, -1 * $quantity, $product->type);
                     EstimationService::editProduction($product->id, ($quantity - $old_quantity), $product->type);
 
-                    foreach($product->child as $item) {
+                    foreach($product->components as $item) {
                         StockService::editMovement('out', 'produksi', $finishing->id, $date, $item->id, -1 * $quantity);
                         StockService::updateStock($item->id, ($quantity - $old_quantity));
                     }
@@ -243,7 +243,7 @@ class FinishingController extends Controller
                     EstimationService::createMovement('out', 'finishing', $finishing->id, $product->id, -1 * $quantity, $product->type);
                     EstimationService::createProduction($product->id, -1 * $quantity, $product->type);
 
-                    foreach($product->child as $item) {
+                    foreach($product->components as $item) {
                         StockService::createMovement('out', 'produksi', $finishing->id, $date, $item->id, -1 * $quantity);
                         StockService::updateStock($item->id, -1 * $quantity);
                     }

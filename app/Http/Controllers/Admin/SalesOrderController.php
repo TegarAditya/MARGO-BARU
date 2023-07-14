@@ -143,7 +143,7 @@ class SalesOrderController extends Controller
                 EstimationService::createMovement('in', 'sales_order', $order->id, $product->id, $quantity, $product->type);
                 EstimationService::createProduction($product->id, $quantity, $product->type);
 
-                foreach($product->child as $item) {
+                foreach($product->components as $item) {
                     EstimationService::createMovement('in', 'sales_order', $order->id, $item->id, $quantity, $item->type);
                     EstimationService::createProduction($item->id, $quantity, $item->type);
                 }
@@ -222,7 +222,7 @@ class SalesOrderController extends Controller
                 EstimationService::editMovement('in', 'sales_order', $order->id, $product->id, $quantity, $product->type);
                 EstimationService::editProduction($product->id, ($quantity - $old_quantity), $product->type);
 
-                foreach($product->child as $item) {
+                foreach($product->components as $item) {
                     EstimationService::editMovement('in', 'sales_order', $order->id, $item->id, $quantity, $item->type);
                     EstimationService::editProduction($item->id, ($quantity - $old_quantity), $item->type);
                 }

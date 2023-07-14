@@ -3,7 +3,7 @@
 @can('cetak_create')
     <div style="margin-bottom: 10px;" class="row">
         <div class="col-lg-12">
-            <a class="btn btn-success" href="{{ route('admin.cetaks.create') }}">
+            <a class="btn btn-primary" href="{{ route('admin.cetaks.create') }}">
                 {{ trans('global.add') }} {{ trans('cruds.cetak.title_singular') }}
             </a>
         </div>
@@ -12,6 +12,48 @@
 <div class="card">
     <div class="card-header">
         {{ trans('cruds.cetak.title_singular') }} {{ trans('global.list') }}
+    </div>
+
+    <div class="card-body">
+        <form id="filterform">
+            <div class="row">
+                <div class="col-6">
+                    <div class="form-group">
+                        <label for="vendor_id">{{ trans('cruds.cetak.fields.vendor') }}</label>
+                        <select class="form-control select2 {{ $errors->has('vendor') ? 'is-invalid' : '' }}" name="vendor_id" id="vendor_id">
+                            @foreach($vendors as $id => $entry)
+                                <option value="{{ $id }}" {{ old('vendor_id') == $id ? 'selected' : '' }}>{{ $entry }}</option>
+                            @endforeach
+                        </select>
+                        @if($errors->has('vendor'))
+                            <span class="text-danger">{{ $errors->first('vendor') }}</span>
+                        @endif
+                        <span class="help-block">{{ trans('cruds.cetak.fields.vendor_helper') }}</span>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="form-group">
+                        <label>{{ trans('cruds.cetak.fields.type') }}</label>
+                        <select class="form-control {{ $errors->has('type') ? 'is-invalid' : '' }}" name="type" id="type">
+                            <option value {{ old('type', null) === null ? 'selected' : '' }}>All</option>
+                            @foreach(App\Models\Cetak::TYPE_SELECT as $key => $label)
+                                <option value="{{ $key }}" {{ old('type', '') === (string) $key ? 'selected' : '' }}>{{ $label }}</option>
+                            @endforeach
+                        </select>
+                        @if($errors->has('type'))
+                            <span class="text-danger">{{ $errors->first('type') }}</span>
+                        @endif
+                        <span class="help-block">{{ trans('cruds.cetak.fields.type_helper') }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group mt-3">
+                <button class="btn btn-success" type="submit">
+                    Filter
+                </button>
+            </div>
+        </form>
     </div>
 
     <div class="card-body">
@@ -36,9 +78,9 @@
                     <th>
                         {{ trans('cruds.cetak.fields.type') }}
                     </th>
-                    {{-- <th>
-                        {{ trans('cruds.cetak.fields.note') }}
-                    </th> --}}
+                    <th>
+                        Ongkos Cetak
+                    </th>
                     <th>
                         &nbsp;
                     </th>
@@ -54,45 +96,20 @@
 @section('scripts')
 @parent
 <script>
-    $(function () {
-  let dtButtons = $.extend(true, [], $.fn.dataTable.defaults.buttons)
-@can('cetak_delete')
-  let deleteButtonTrans = '{{ trans('global.datatables.delete') }}';
-  let deleteButton = {
-    text: deleteButtonTrans,
-    url: "{{ route('admin.cetaks.massDestroy') }}",
-    className: 'btn-danger',
-    action: function (e, dt, node, config) {
-      var ids = $.map(dt.rows({ selected: true }).data(), function (entry) {
-          return entry.id
-      });
-
-      if (ids.length === 0) {
-        alert('{{ trans('global.datatables.zero_selected') }}')
-
-        return
-      }
-
-      if (confirm('{{ trans('global.areYouSure') }}')) {
-        $.ajax({
-          headers: {'x-csrf-token': _token},
-          method: 'POST',
-          url: config.url,
-          data: { ids: ids, _method: 'DELETE' }})
-          .done(function () { location.reload() })
-      }
-    }
-  }
-  dtButtons.push(deleteButton)
-@endcan
+$(function () {
 
   let dtOverrideGlobals = {
-    buttons: dtButtons,
     processing: true,
     serverSide: true,
     retrieve: true,
     aaSorting: [],
-    ajax: "{{ route('admin.cetaks.index') }}",
+    ajax: {
+        url: "{{ route('admin.cetaks.index') }}",
+        data: function(data) {
+            data.type = $('#type').val(),
+            data.vendor = $('#vendor_id').val()
+        }
+    },
     columns: [
         { data: 'placeholder', name: 'placeholder' },
         { data: 'no_spc', name: 'no_spc', class: 'text-center' },
@@ -100,7 +117,7 @@
         { data: 'semester_name', name: 'semester.name', class: 'text-center' },
         { data: 'vendor_name', name: 'vendor.name', class: 'text-center' },
         { data: 'type', name: 'type', class: 'text-center' },
-        // { data: 'total_cost', name: 'total_cost' },
+        { data: 'total_cost', name: 'total_cost', class: 'text-right' },
         // { data: 'total_oplah', name: 'total_oplah' },
         // { data: 'note', name: 'note' },
         { data: 'actions', name: '{{ trans('global.actions') }}', class: 'text-center' }
@@ -114,6 +131,11 @@
       $($.fn.dataTable.tables(true)).DataTable()
           .columns.adjust();
   });
+
+  $("#filterform").submit(function(event) {
+        event.preventDefault();
+        table.ajax.reload();
+    });
 
 });
 

@@ -56,11 +56,11 @@
     <thead>
         <th width="1%" class="text-center">No.</th>
         <th>Jenjang</th>
-        <th>Cover</th>
+        <th>Code</th>
         <th>Tema/Mapel</th>
         <th width="1%" class="text-center">Kls</th>
-        <th width="1%" class="text-center">Hal</th>
-        <th class="px-2" width="1%">Jumlah</th>
+        <th class="text-center">UK Plate</th>
+        <th class="px-2" width="1%">Total</th>
     </thead>
 
     <tbody>
@@ -75,10 +75,10 @@
         <tr>
             <td class="px-3">{{ $loop->iteration }}</td>
             <td>{{ $product->jenjang->name ?? '' }} - {{ $product->kurikulum->code ?? '' }}</td>
-            <td>{{ $product->cover->name ?? '' }}</td>
+            <td>{{ $product->code }}</td>
             <td>{{ $product->mapel->name }}</td>
             <td class="text-center">{{ $product->kelas->code ?? '' }}</td>
-            <td class="text-center">{{ $product->halaman->code ?? '' }}</td>
+            <td class="text-center">{{ $item->plate->name ?? '' }}</td>
             <td class="px-3 text-center">{{ angka($item->estimasi) }}</td>
         </tr>
         @endforeach

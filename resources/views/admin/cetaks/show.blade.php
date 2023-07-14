@@ -60,6 +60,15 @@
                                 {{ $cetak->note }}
                             </td>
                         </tr>
+
+                        <tr>
+                            <th>
+                                Ongkos Cetak
+                            </th>
+                            <td>
+                                {{ money($cetak->total_cost) }}
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </section>
@@ -82,6 +91,7 @@
                                     <th>Nama Produk</th>
                                     <th class="text-center px-2" width="1%">Halaman</th>
                                     <th class="text-center px-2" width="1%">SPK</th>
+                                    <th class="text-center px-2" width="10%">Ongkos</th>
                                     <th class="text-center px-2" width="1%">Realisasi</th>
                                 </tr>
                             </thead>
@@ -103,6 +113,7 @@
                                         <td>{{ $product->name }}</td>
                                         <td class="text-center px-2">{{ $product->halaman->code }}</td>
                                         <td class="text-center px-2">{{ angka($item->estimasi) }}</td>
+                                        <td class="text-center px-2">{{ money($item->cost) }}</td>
                                         <td class="text-center px-2">
                                             {{ $item->done ? angka($item->quantity) : 'Not Yet' }}
                                         </td>
@@ -113,6 +124,7 @@
                                 <tr>
                                     <td class="text-center px-3" colspan="3"><strong>Total</strong></td>
                                     <td class="text-center px-2"><strong>{{ angka($totalestimasi) }}</strong></td>
+                                    <td class="text-center px-2"><strong>{{ money($cetak->total_cost) }}</strong></td>
                                     <td class="text-center px-2"><strong>{{ angka($totalrealisasi) }}</strong></td>
                                 </tr>
                             </tfoot>

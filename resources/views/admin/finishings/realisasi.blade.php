@@ -67,7 +67,7 @@
                             <span class="text-danger">{{ $errors->first('note') }}</span>
                         @endif
                         <span class="help-block">{{ trans('cruds.finishing.fields.note_helper') }}</span>
-                    </div>                  
+                    </div>
                 </div> --}}
             </div>
             <hr style="margin: 1.5em -15px;border-color:#ccc" />
@@ -89,7 +89,7 @@
                                     Code : <strong>{{ $product->code }}</strong>
                                 </p>
                                 <p class="mb-0 text-sm">
-                                    Jenjang - Cover - Isi : <strong>{{ $product->jenjang->name }} - {{ $product->cover->name }} - {{ $product->kurikulum->name }}</strong>
+                                    Jenjang - Kurikulum : <strong>{{ $product->jenjang->name }} - {{ $product->cover->name }} - {{ $product->kurikulum->name }}</strong>
                                 </p>
                                 <p class="mb-0 text-sm">
                                     <strong>STOCK : {{ $product->stock }}</strong>

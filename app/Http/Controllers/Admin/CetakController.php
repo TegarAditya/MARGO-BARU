@@ -11,7 +11,9 @@ use App\Models\CetakItem;
 use App\Models\Semester;
 use App\Models\Material;
 use App\Models\Vendor;
+use App\Models\VendorCost;
 use App\Models\BookVariant;
+use App\Models\Halaman;
 use Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -30,6 +32,14 @@ class CetakController extends Controller
 
         if ($request->ajax()) {
             $query = Cetak::with(['semester', 'vendor'])->select(sprintf('%s.*', (new Cetak)->table));
+
+            if (!empty($request->type)) {
+                $query->where('type', $request->type);
+            }
+            if (!empty($request->vendor)) {
+                $query->where('vendor_id', $request->vendor);
+            }
+
             $table = Datatables::of($query);
 
             $table->addColumn('placeholder', '&nbsp;');
@@ -40,7 +50,7 @@ class CetakController extends Controller
                     <a class="px-1" href="'.route('admin.cetaks.show', $row->id).'" title="Show">
                         <i class="fas fa-eye text-success fa-lg"></i>
                     </a>
-                    <a class="px-1" href="'.route('admin.cetaks.printSpc', $row->id).'" title="Print SPC">
+                    <a class="px-1" href="'.route('admin.cetaks.printSpc', $row->id).'" title="Print SPC" target="_blank">
                         <i class="fas fa-print text-secondary fa-lg"></i>
                     </a>
                     <a class="px-1" href="'.route('admin.cetaks.edit', $row->id).'" title="Edit">
@@ -70,7 +80,7 @@ class CetakController extends Controller
                 return $row->type ? Cetak::TYPE_SELECT[$row->type] : '';
             });
             $table->editColumn('total_cost', function ($row) {
-                return $row->total_cost ? $row->total_cost : '';
+                return $row->total_cost ? money($row->total_cost) : '';
             });
             $table->editColumn('total_oplah', function ($row) {
                 return $row->total_oplah ? $row->total_oplah : '';
@@ -84,7 +94,9 @@ class CetakController extends Controller
             return $table->make(true);
         }
 
-        return view('admin.cetaks.index');
+        $vendors = Vendor::where('type', 'cetak')->get()->pluck('full_name', 'id')->prepend('All', '');
+
+        return view('admin.cetaks.index', compact('vendors'));
     }
 
     public function create()
@@ -139,11 +151,23 @@ class CetakController extends Controller
                 'note' => $note
             ]);
 
+            $total_cost = 0;
+
             for ($i = 0; $i < count($products); $i++) {
                 $product = BookVariant::find($products[$i]);
                 $quantity = $quantities[$i];
                 $plate = $plates[$i];
                 $plate_quantity = $plate_quantities[$i];
+
+                if ($type == 'isi') {
+                    $halaman = Halaman::find($product->halaman_id)->value;
+                    $cost = $this->costIsi($halaman, $quantity);
+                } else if ($type == 'cover') {
+                    $vendor = VendorCost::where('vendor_id', $vendor)->where('key', 'cover_cost')->first();
+                    $cost = $this->costCover($vendor ? $vendor->value : 35, $quantity);
+                }
+
+                $total_cost += $cost;
 
                 $cetak_item = CetakItem::create([
                     'cetak_id' => $cetak->id,
@@ -152,6 +176,7 @@ class CetakController extends Controller
                     'halaman_id' => $product->halaman_id,
                     'estimasi' => $quantity,
                     'quantity' => $quantity,
+                    'cost'  => $cost,
                     'plate_id' => $plate,
                     'plate_cost' => $plate_quantity,
                     'done' => 0,
@@ -160,6 +185,9 @@ class CetakController extends Controller
                 EstimationService::createMovement('out', 'cetak', $cetak->id, $product->id, -1 * $quantity, $product->type);
                 EstimationService::createProduction($product->id, -1 * $quantity, $product->type);
             }
+
+            $cetak->total_cost = $total_cost;
+            $cetak->save();
 
             DB::commit();
 
@@ -218,6 +246,9 @@ class CetakController extends Controller
         $plates = $validatedData['plates'];
         $plate_quantities = $validatedData['plate_quantities'];
         $cetak_items = $validatedData['cetak_items'];
+        $type = $cetak->type;
+        $vendor = $cetak->vendor_id;
+        $total_cost = 0;
 
         DB::beginTransaction();
         try {
@@ -228,12 +259,23 @@ class CetakController extends Controller
                 $plate_quantity = $plate_quantities[$i];
                 $cetak_item = $cetak_items[$i];
 
+                if ($type == 'isi') {
+                    $halaman = Halaman::find($product->halaman_id)->value;
+                    $cost = $this->costIsi($halaman, $quantity);
+                } else if ($type == 'cover') {
+                    $vendor = VendorCost::where('vendor_id', $vendor)->where('key', 'cover_cost')->first();
+                    $cost = $this->costCover($vendor ? $vendor->value : 35, $quantity);
+                }
+
+                $total_cost += $cost;
+
                 if ($cetak_item) {
                     $detail = CetakItem::find($cetak_item);
                     $old_quantity = $detail->estimasi;
                     $detail->update([
                         'estimasi' => $quantity,
                         'quantity' => $quantity,
+                        'cost' => $cost,
                         'plate_id' => $plate,
                         'plate_cost' => $plate_quantity,
                     ]);
@@ -248,6 +290,7 @@ class CetakController extends Controller
                         'halaman_id' => $product->halaman_id,
                         'estimasi' => $quantity,
                         'quantity' => $quantity,
+                        'cost' => $cost,
                         'plate_id' => $plate,
                         'plate_cost' => $plate_quantity,
                         'done' => 0,
@@ -261,6 +304,7 @@ class CetakController extends Controller
             $cetak->update([
                 'date' => $date,
                 'estimasi_oplah' => array_sum($quantities),
+                'total_cost' => $total_cost,
                 'note' => $note
             ]);
 
@@ -395,7 +439,15 @@ class CetakController extends Controller
 
         $cetak_items = $cetak_items->sortBy('product.kelas_id')->sortBy('product.mapel_id')->sortBy('product.kurikulum_id')->sortBy('product.jenjang_id');
 
-        return view('admin.cetaks.spc', compact('cetak', 'cetak_items'));
+        if($cetak->type == 'isi') {
+            return view('admin.cetaks.spc_isi', compact('cetak', 'cetak_items'));
+        }
+
+        if($cetak->type == 'cover') {
+            return view('admin.cetaks.spc_cover', compact('cetak', 'cetak_items'));
+        }
+
+        return view('admin.cetaks.spc_isi', compact('cetak', 'cetak_items'));
     }
 
     function costIsi($halaman, $quantity)

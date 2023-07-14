@@ -37,6 +37,10 @@ class CetakItem extends Model
         'deleted_at',
     ];
 
+    protected $casts = [
+        'cost' => 'double',
+    ];
+
     protected function serializeDate(DateTimeInterface $date)
     {
         return $date->format('Y-m-d H:i:s');

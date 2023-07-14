@@ -94,7 +94,7 @@
                                     Code : <strong>{{ $product->code }}</strong>
                                 </p>
                                 <p class="mb-0 text-sm">
-                                    Jenjang - Cover - Isi : <strong>{{ $product->jenjang->name }} - {{ $product->cover->name }} - {{ $product->kurikulum->name }}</strong>
+                                    Jenjang - Kurikulum : <strong>{{ $product->jenjang->name }} - {{ $product->cover->name }} - {{ $product->kurikulum->name }}</strong>
                                 </p>
                                 <p class="mb-0 text-sm">
                                     <strong>ESTIMASI : {{ $product->estimasi_produksi ? ($product->estimasi_produksi->estimasi + $item->estimasi) : 0 }}</strong>
@@ -250,7 +250,7 @@ $(document).ready(function() {
                                     Code : <strong>${product.code}</strong>
                                 </p>
                                 <p class="mb-0 text-sm">
-                                    Jenjang - Cover - Isi : <strong>${product.jenjang.name} - ${product.cover.name} - ${product.kurikulum.name}</strong>
+                                    Jenjang - Kurikulum : <strong>${product.jenjang.name} - ${product.kurikulum.name}</strong>
                                 </p>
                                 <p class="mb-0 text-sm">
                                     <strong>ESTIMASI : ${product.estimasi_produksi.estimasi}</strong>

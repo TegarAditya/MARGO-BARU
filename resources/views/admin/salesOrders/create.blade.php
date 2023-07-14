@@ -168,10 +168,10 @@
                                         Code : <strong>${product.code}</strong>
                                     </p>
                                     <p class="mb-0 text-sm">
-                                        Jenjang : <strong>${product.jenjang.name}</strong>
+                                        Jenjang - Kurikulum : <strong>${product.jenjang.name} - ${product.kurikulum.name}</strong>
                                     </p>
                                     <p class="mb-0 text-sm">
-                                        Cover - Isi : <strong>${product.book.cover.name} - ${product.book.kurikulum.name}</strong>
+                                        Cover - Isi : <strong>${product.cover.name} - ${product.isi.name}</strong>
                                     </p>
                                 </div>
                                 <div class="col offset-1 row align-items-end align-self-center">
