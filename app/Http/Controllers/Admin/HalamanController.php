@@ -50,6 +50,9 @@ class HalamanController extends Controller
             $table->editColumn('name', function ($row) {
                 return $row->name ? $row->name : '';
             });
+            $table->editColumn('value', function ($row) {
+                return $row->value ? $row->value : '';
+            });
 
             $table->rawColumns(['actions', 'placeholder']);
 

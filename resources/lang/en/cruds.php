@@ -293,6 +293,8 @@ return [
             'updated_at_helper' => ' ',
             'deleted_at'        => 'Deleted at',
             'deleted_at_helper' => ' ',
+            'value'             => 'Value',
+            'value_helper'      => ' ',
         ],
     ],
     'generalMaster' => [
@@ -1206,6 +1208,30 @@ return [
             'components'         => 'Material Of',
             'components_helper'  => ' ',
         ],
+    ],
+    'vendorCost' => [
+        'title'          => 'Vendor Cost',
+        'title_singular' => 'Vendor Cost',
+        'fields'         => [
+            'id'                => 'ID',
+            'id_helper'         => ' ',
+            'vendor'            => 'Vendor',
+            'vendor_helper'     => ' ',
+            'key'               => 'Key',
+            'key_helper'        => ' ',
+            'value'             => 'Value',
+            'value_helper'      => ' ',
+            'created_at'        => 'Created at',
+            'created_at_helper' => ' ',
+            'updated_at'        => 'Updated at',
+            'updated_at_helper' => ' ',
+            'deleted_at'        => 'Deleted at',
+            'deleted_at_helper' => ' ',
+        ],
+    ],
+    'vendorMenu' => [
+        'title'          => 'Vendor',
+        'title_singular' => 'Vendor',
     ],
 
 ];

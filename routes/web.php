@@ -244,6 +244,12 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     Route::post('vendors/process-csv-import', 'VendorController@processCsvImport')->name('vendors.processCsvImport');
     Route::resource('vendors', 'VendorController');
 
+    // Vendor Cost
+    Route::delete('vendor-costs/destroy', 'VendorCostController@massDestroy')->name('vendor-costs.massDestroy');
+    Route::post('vendor-costs/parse-csv-import', 'VendorCostController@parseCsvImport')->name('vendor-costs.parseCsvImport');
+    Route::post('vendor-costs/process-csv-import', 'VendorCostController@processCsvImport')->name('vendor-costs.processCsvImport');
+    Route::resource('vendor-costs', 'VendorCostController');
+
     // Cetak
     Route::delete('cetaks/destroy', 'CetakController@massDestroy')->name('cetaks.massDestroy');
     Route::get('cetaks/{cetak}/realisasi', 'CetakController@realisasi')->name('cetaks.realisasi');

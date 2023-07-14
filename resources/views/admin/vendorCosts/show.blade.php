@@ -3,13 +3,13 @@
 
 <div class="card">
     <div class="card-header">
-        {{ trans('global.show') }} {{ trans('cruds.halaman.title') }}
+        {{ trans('global.show') }} {{ trans('cruds.vendorCost.title') }}
     </div>
 
     <div class="card-body">
         <div class="form-group">
             <div class="form-group">
-                <a class="btn btn-default" href="{{ route('admin.halaman.index') }}">
+                <a class="btn btn-default" href="{{ route('admin.vendor-costs.index') }}">
                     {{ trans('global.back_to_list') }}
                 </a>
             </div>
@@ -17,32 +17,32 @@
                 <tbody>
                     <tr>
                         <th>
-                            {{ trans('cruds.halaman.fields.code') }}
+                            {{ trans('cruds.vendorCost.fields.vendor') }}
                         </th>
                         <td>
-                            {{ $halaman->code }}
+                            {{ $vendorCost->vendor->code ?? '' }}
                         </td>
                     </tr>
                     <tr>
                         <th>
-                            {{ trans('cruds.halaman.fields.name') }}
+                            {{ trans('cruds.vendorCost.fields.key') }}
                         </th>
                         <td>
-                            {{ $halaman->name }}
+                            {{ $vendorCost->key }}
                         </td>
                     </tr>
                     <tr>
                         <th>
-                            {{ trans('cruds.halaman.fields.value') }}
+                            {{ trans('cruds.vendorCost.fields.value') }}
                         </th>
                         <td>
-                            {{ $halaman->value }}
+                            {{ $vendorCost->value }}
                         </td>
                     </tr>
                 </tbody>
             </table>
             <div class="form-group">
-                <a class="btn btn-default" href="{{ route('admin.halaman.index') }}">
+                <a class="btn btn-default" href="{{ route('admin.vendor-costs.index') }}">
                     {{ trans('global.back_to_list') }}
                 </a>
             </div>

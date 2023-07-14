@@ -4,15 +4,14 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateHalamenTable extends Migration
+class CreateVendorCostsTable extends Migration
 {
     public function up()
     {
-        Schema::create('halamen', function (Blueprint $table) {
+        Schema::create('vendor_costs', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('code')->nullable();
-            $table->string('name');
-            $table->integer('value');
+            $table->string('key');
+            $table->decimal('value', 15, 2);
             $table->timestamps();
             $table->softDeletes();
         });

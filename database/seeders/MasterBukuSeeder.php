@@ -13,17 +13,17 @@ class MasterBukuSeeder extends Seeder
      */
     public function run(): void
     {
-        $halaman = "INSERT INTO `halamen` (`CODE`, `NAME`) VALUES
-        ('48', 'HALAMAN 48'),
-        ('64', 'HALAMAN 64'),
-        ('72', 'HALAMAN 72'),
-        ('80', 'HALAMAN 80'),
-        ('88', 'HALAMAN 88'),
-        ('96', 'HALAMAN 96'),
-        ('112', 'HALAMAN 112'),
-        ('112(BENDING)', 'HALAMAN 112(BENDING)'),
-        ('120', 'HALAMAN 120'),
-        ('128', 'HALAMAN 128');";
+        $halaman = "INSERT INTO `halamen` (`CODE`, `NAME`, `VALUE`) VALUES
+        ('48', 'HALAMAN 48', '48'),
+        ('64', 'HALAMAN 64', '64'),
+        ('72', 'HALAMAN 72', '72'),
+        ('80', 'HALAMAN 80', '80'),
+        ('88', 'HALAMAN 88', '88'),
+        ('96', 'HALAMAN 96', '96'),
+        ('112', 'HALAMAN 112', '112'),
+        ('112(BENDING)', 'HALAMAN 112(BENDING)', '112'),
+        ('120', 'HALAMAN 120', '120'),
+        ('128', 'HALAMAN 128', '128');";
 
         DB::unprepared($halaman);
 

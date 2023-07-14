@@ -71,4 +71,48 @@ if (! function_exists('terbilang')) {
     }
 }
 
+if (! function_exists('costIsi')) {
+    function costIsi($halaman, $quantity)
+    {
+        $kat = $halaman / 16;
+        
+        if ($quantity >= 5000) {
+           $cost = $kat * 25 * $quantity;
+        } else {
+            $cost = $kat * (25 * (5000/$quantity)) * $quantity;
+        }
+
+        return $cost;
+    }
+}
+
+if (! function_exists('costCover')) {
+    function costCover($cost, $quantity)
+    {
+        return $cost * $quantity;
+    }
+}
+
+if (! function_exists('costFinishing')) {
+    function costFinishing($halaman, $quantity)
+    {
+        if ($halaman <= 64) {
+            return 45 * $quantity;
+        }
+        if ($halaman <= 80) {
+            return 50 * $quantity;
+        }
+        if ($halaman <= 96) {
+            return 55 * $quantity;
+        }
+        if ($halaman <= 112) {
+            return 60 * $quantity;
+        }
+        if ($halaman <= 128) {
+            return 65 * $quantity;
+        }
+
+    }
+}
+
 ?>

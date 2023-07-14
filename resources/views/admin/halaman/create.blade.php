@@ -26,6 +26,14 @@
                 <span class="help-block">{{ trans('cruds.halaman.fields.name_helper') }}</span>
             </div>
             <div class="form-group">
+                <label class="required" for="value">{{ trans('cruds.halaman.fields.value') }}</label>
+                <input class="form-control {{ $errors->has('value') ? 'is-invalid' : '' }}" type="number" name="value" id="value" value="{{ old('value', '') }}" step="1" required>
+                @if($errors->has('value'))
+                    <span class="text-danger">{{ $errors->first('value') }}</span>
+                @endif
+                <span class="help-block">{{ trans('cruds.halaman.fields.value_helper') }}</span>
+            </div>
+            <div class="form-group">
                 <button class="btn btn-danger" type="submit">
                     {{ trans('global.save') }}
                 </button>

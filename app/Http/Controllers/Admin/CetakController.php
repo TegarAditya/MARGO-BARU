@@ -397,4 +397,22 @@ class CetakController extends Controller
 
         return view('admin.cetaks.spc', compact('cetak', 'cetak_items'));
     }
+
+    function costIsi($halaman, $quantity)
+    {
+        $kat = $halaman / 16;
+
+        if ($quantity >= 5000) {
+           $cost = $kat * 25 * $quantity;
+        } else {
+            $cost = $kat * (25 * (5000/$quantity)) * $quantity;
+        }
+
+        return $cost;
+    }
+
+    function costCover($cost, $quantity)
+    {
+        return $cost * $quantity;
+    }
 }

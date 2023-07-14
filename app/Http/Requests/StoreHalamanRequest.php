@@ -25,6 +25,12 @@ class StoreHalamanRequest extends FormRequest
                 'string',
                 'required',
             ],
+            'value' => [
+                'required',
+                'integer',
+                'min:-2147483648',
+                'max:2147483647',
+            ],
         ];
     }
 }

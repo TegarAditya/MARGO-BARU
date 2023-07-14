@@ -8,11 +8,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Halaman extends Model
+class VendorCost extends Model
 {
     use SoftDeletes, Auditable, HasFactory;
 
-    public $table = 'halamen';
+    public $table = 'vendor_costs';
 
     protected $dates = [
         'created_at',
@@ -21,8 +21,8 @@ class Halaman extends Model
     ];
 
     protected $fillable = [
-        'code',
-        'name',
+        'vendor_id',
+        'key',
         'value',
         'created_at',
         'updated_at',
@@ -32,5 +32,10 @@ class Halaman extends Model
     protected function serializeDate(DateTimeInterface $date)
     {
         return $date->format('Y-m-d H:i:s');
+    }
+
+    public function vendor()
+    {
+        return $this->belongsTo(Vendor::class, 'vendor_id');
     }
 }

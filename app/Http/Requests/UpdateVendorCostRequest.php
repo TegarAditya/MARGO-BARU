@@ -2,34 +2,31 @@
 
 namespace App\Http\Requests;
 
-use App\Models\Halaman;
+use App\Models\VendorCost;
 use Gate;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Response;
 
-class UpdateHalamanRequest extends FormRequest
+class UpdateVendorCostRequest extends FormRequest
 {
     public function authorize()
     {
-        return Gate::allows('halaman_edit');
+        return Gate::allows('vendor_cost_edit');
     }
 
     public function rules()
     {
         return [
-            'code' => [
-                'string',
-                'nullable',
+            'vendor_id' => [
+                'required',
+                'integer',
             ],
-            'name' => [
+            'key' => [
                 'string',
                 'required',
             ],
             'value' => [
                 'required',
-                'integer',
-                'min:-2147483648',
-                'max:2147483647',
             ],
         ];
     }
