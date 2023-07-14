@@ -28,6 +28,25 @@ class BookVariant extends Model implements HasMedia
         'L' => 'LKS',
         'P' => 'Pegangan Guru',
         'K' => 'Kunci',
+        'I' => 'Isi LKS',
+        'C' => 'Cover LKS',
+        'S' => 'Isi Pegangan Guru',
+        'V' => 'Cover Pegangan Guru',
+        'U' => 'Isi Kunci',
+    ];
+
+    public const LKS_TYPE = [
+        'C' => 'Cover LKS',
+        'I' => 'Isi LKS',
+    ];
+
+    public const PG_TYPE = [
+        'V' => 'Cover PG',
+        'S' => 'Isi PG',
+    ];
+
+    public const KUNCI_TYPE = [
+        'U' => 'Isi Kunci',
     ];
 
     protected $fillable = [
@@ -80,7 +99,12 @@ class BookVariant extends Model implements HasMedia
 
     public function components()
     {
-        return $this->belongsToMany(BookComponent::class);
+        return $this->belongsToMany(BookVariant::class, 'book_parent_book_child','child_id', 'parent_id');
+    }
+
+    public function material_of()
+    {
+        return $this->belongsToMany(BookVariant::class, 'book_parent_book_child', 'parent_id', 'child_id');
     }
 
     public function getShortNameAttribute()
@@ -100,16 +124,6 @@ class BookVariant extends Model implements HasMedia
     public function book()
     {
         return $this->belongsTo(Book::class, 'book_id');
-    }
-
-    public function parent()
-    {
-        return $this->belongsTo(self::class, 'parent_id');
-    }
-
-    public function child()
-    {
-        return $this->hasMany(self::class, 'parent_id');
     }
 
     public function jenjang()
@@ -197,5 +211,47 @@ class BookVariant extends Model implements HasMedia
         });
 
         return $files;
+    }
+
+    public static function generateCode($key, $code)
+    {
+        $base = substr($code, 0, 14);
+        $isi = substr($code, 15, 3);
+        $cover = substr($code, 18, 3);
+
+        if (!$cover) {
+            $cover = $isi;
+        }
+
+        if ($key == 'I' || $key == 'S' || $key == 'K' || $key == 'U') {
+            return $key. '-' . $base. '/'. $isi;
+        }
+
+        if ($key == 'C' || $key == 'V') {
+            return $key. '-' . $base. '/'. $cover;
+        }
+    }
+
+    public static function generateName($key, $jenjang_id, $kurikulum_id, $mapel_id, $kelas_id, $semester_id, $isi_id, $cover_id)
+    {
+        $jenjang = Jenjang::find($jenjang_id)->name ?? 'Tidak Ada';
+        $kurikulum = Kurikulum::find($kurikulum_id)->name ?? 'Tidak Ada';
+        $mapel = Mapel::find($mapel_id)->name ?? 'Tidak Ada';
+        $kelas = Kelas::find($kelas_id)->name ?? 'Tidak Ada';
+        $semester = Semester::find($semester_id)->name ?? 'Tidak Ada';
+        $isi = Isi::find($isi_id)->name ?? 'Tidak Ada';
+        $cover = Cover::find($cover_id)->name ?? 'Tidak Ada';
+
+        if ($key == 'K') {
+            return BookVariant::TYPE_SELECT[$key]. ' - '. $jenjang. ' - '. $kurikulum. ' - '. $mapel. ' - ' .$kelas. ' - '. $semester. ' - ('. $isi .') ';
+        }
+
+        if ($key == 'I' || $key == 'S' || $key == 'U') {
+            return BookComponent::TYPE_SELECT[$key]. ' - '. $jenjang. ' - '. $kurikulum. ' - '. $mapel. ' - ' .$kelas. ' - '. $semester. ' - ('. $isi .') ';
+        }
+
+        if ($key == 'C' || $key == 'V') {
+            return BookComponent::TYPE_SELECT[$key]. ' - '. $jenjang. ' - '. $kurikulum. ' - '. $mapel. ' - ' .$kelas. ' - '. $semester. ' - ('. $cover .') ';
+        }
     }
 }

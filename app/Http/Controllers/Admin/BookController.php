@@ -165,7 +165,7 @@ class BookController extends Controller
                     ]);
 
                     foreach(BookComponent::LKS_TYPE as $key => $label) {
-                        $component = BookComponent::updateOrCreate([
+                        $component = BookVariant::updateOrCreate([
                             'code' => BookComponent::generateCode($key, $code),
                             'type' => $key,
                         ],

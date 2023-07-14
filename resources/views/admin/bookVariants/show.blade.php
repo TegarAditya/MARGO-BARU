@@ -111,7 +111,7 @@
                             Components
                         </th>
                         <td>
-                            @foreach($bookVariant->components as $key => $components)
+                            @foreach($bookVariant->child as $key => $components)
                                 <span class="label label-info">{{ $components->name }} - <b>{{ $components->stock }} {{ $components->unit->name }}</b></span>
                                 <br>
                             @endforeach

@@ -9,7 +9,6 @@ use App\Http\Requests\StoreBookVariantRequest;
 use App\Http\Requests\UpdateBookVariantRequest;
 use App\Models\Book;
 use App\Models\BookVariant;
-use App\Models\BookComponent;
 use App\Models\Halaman;
 use App\Models\Jenjang;
 use App\Models\Kurikulum;
@@ -38,7 +37,7 @@ class BookVariantController extends Controller
         abort_if(Gate::denies('book_variant_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         if ($request->ajax()) {
-            $query = BookVariant::with(['book', 'parent', 'jenjang', 'semester', 'kurikulum', 'halaman', 'warehouse', 'unit'])->select(sprintf('%s.*', (new BookVariant)->table));
+            $query = BookVariant::with(['book', 'jenjang', 'semester', 'kurikulum', 'halaman', 'warehouse', 'unit'])->select(sprintf('%s.*', (new BookVariant)->table));
 
             if (!empty($request->type)) {
                 $query->where('type', $request->type);
@@ -150,8 +149,6 @@ class BookVariantController extends Controller
 
         $books = Book::pluck('code', 'id')->prepend(trans('global.pleaseSelect'), '');
 
-        $parents = BookVariant::pluck('code', 'id')->prepend(trans('global.pleaseSelect'), '');
-
         $jenjangs = Jenjang::pluck('code', 'id')->prepend(trans('global.pleaseSelect'), '');
 
         $kurikulums = Kurikulum::pluck('code', 'id')->prepend(trans('global.pleaseSelect'), '');
@@ -170,7 +167,7 @@ class BookVariantController extends Controller
 
         $units = Unit::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
-        return view('admin.bookVariants.create', compact('books', 'covers', 'halamen', 'isis', 'jenjangs', 'kelas', 'kurikulums', 'mapels', 'parents', 'semesters', 'units'));
+        return view('admin.bookVariants.create', compact('books', 'covers', 'halamen', 'isis', 'jenjangs', 'kelas', 'kurikulums', 'mapels', 'semesters', 'units'));
     }
 
     public function store(StoreBookVariantRequest $request)
@@ -194,8 +191,6 @@ class BookVariantController extends Controller
 
         $books = Book::pluck('code', 'id')->prepend(trans('global.pleaseSelect'), '');
 
-        $parents = BookVariant::pluck('code', 'id')->prepend(trans('global.pleaseSelect'), '');
-
         $jenjangs = Jenjang::pluck('code', 'id')->prepend(trans('global.pleaseSelect'), '');
 
         $kurikulums = Kurikulum::pluck('code', 'id')->prepend(trans('global.pleaseSelect'), '');
@@ -214,11 +209,11 @@ class BookVariantController extends Controller
 
         $units = Unit::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
-        $components = BookComponent::pluck('name', 'id');
+        $components = BookVariant::where('warehouse_id', 2)->pluck('name', 'id');
 
-        $bookVariant->load('book', 'parent', 'jenjang', 'kurikulum', 'isi', 'cover', 'mapel', 'kelas', 'halaman', 'semester', 'warehouse', 'unit');
+        $bookVariant->load('book', 'jenjang', 'kurikulum', 'isi', 'cover', 'mapel', 'kelas', 'halaman', 'semester', 'warehouse', 'unit');
 
-        return view('admin.bookVariants.edit', compact('bookVariant', 'books', 'covers', 'halamen', 'isis', 'jenjangs', 'kelas', 'kurikulums', 'mapels', 'parents', 'semesters', 'units', 'components'));
+        return view('admin.bookVariants.edit', compact('bookVariant', 'books', 'covers', 'halamen', 'isis', 'jenjangs', 'kelas', 'kurikulums', 'mapels', 'semesters', 'units', 'components'));
     }
 
     public function update(UpdateBookVariantRequest $request, BookVariant $bookVariant)
@@ -250,7 +245,7 @@ class BookVariantController extends Controller
     {
         abort_if(Gate::denies('book_variant_show'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $bookVariant->load('book', 'parent', 'jenjang', 'semester', 'kurikulum', 'halaman', 'warehouse', 'unit', 'components');
+        $bookVariant->load('book', 'jenjang', 'semester', 'kurikulum', 'halaman', 'warehouse', 'unit', 'components');
 
         $stockMovements = StockMovement::with(['product'])->where('product_id', $bookVariant->id)->orderBy('created_at', 'DESC')->get();
 

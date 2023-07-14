@@ -86,13 +86,13 @@ class BookImport implements ToCollection, WithHeadingRow
                         'status' => 1,
                     ]);
 
-                    foreach(BookComponent::LKS_TYPE as $key => $label) {
-                        $component = BookComponent::updateOrCreate([
-                            'code' => BookComponent::generateCode($key, $code),
+                    foreach(BookVariant::LKS_TYPE as $key => $label) {
+                        $component = BookVariant::updateOrCreate([
+                            'code' => BookVariant::generateCode($key, $code),
                             'type' => $key,
                         ],
                         [
-                            'name' => BookComponent::generateName($key, $jenjang->id, $kurikulum->id, $mapel->id, $kelas->id, $semester->id, $isi->id, $cover->id),
+                            'name' => BookVariant::generateName($key, $jenjang->id, $kurikulum->id, $mapel->id, $kelas->id, $semester->id, $isi->id, $cover->id),
                             'jenjang_id' => $jenjang->id,
                             'kurikulum_id' => $kurikulum->id,
                             'isi_id' => ($key == 'I')  ? $isi->id : null,
@@ -136,13 +136,13 @@ class BookImport implements ToCollection, WithHeadingRow
                         'status' => 1,
                     ]);
 
-                    foreach(BookComponent::PG_TYPE as $key => $label) {
-                        $component = BookComponent::updateOrCreate([
-                            'code' => BookComponent::generateCode($key, $code),
+                    foreach(BookVariant::PG_TYPE as $key => $label) {
+                        $component = BookVariant::updateOrCreate([
+                            'code' => BookVariant::generateCode($key, $code),
                             'type' => $key,
                         ],
                         [
-                            'name' => BookComponent::generateName($key, $jenjang->id, $kurikulum->id, $mapel->id, $kelas->id, $semester->id, $isi->id, $cover->id),
+                            'name' => BookVariant::generateName($key, $jenjang->id, $kurikulum->id, $mapel->id, $kelas->id, $semester->id, $isi->id, $cover->id),
                             'jenjang_id' => $jenjang->id,
                             'kurikulum_id' => $kurikulum->id,
                             'isi_id' => ($key == 'S')  ? $isi->id : null,
@@ -164,12 +164,12 @@ class BookImport implements ToCollection, WithHeadingRow
 
                 if ($kunci_status) {
                     $kunci = BookVariant::updateOrCreate([
-                        'code' => BookComponent::generateCode('K', $code),
+                        'code' => BookVariant::generateCode('K', $code),
                         'type' => 'K',
                     ],
                     [
                         'book_id' => $buku->id,
-                        'name' => BookComponent::generateName('K', $jenjang->id, $kurikulum->id, $mapel->id, $kelas->id, $semester->id, $isi->id, $cover->id),
+                        'name' => BookVariant::generateName('K', $jenjang->id, $kurikulum->id, $mapel->id, $kelas->id, $semester->id, $isi->id, $cover->id),
                         'jenjang_id' => $jenjang->id,
                         'semester_id' => $semester->id,
                         'kurikulum_id' => $kurikulum->id,
@@ -186,13 +186,13 @@ class BookImport implements ToCollection, WithHeadingRow
                         'status' => 1,
                     ]);
 
-                    foreach(BookComponent::KUNCI_TYPE as $key => $label) {
-                        $component = BookComponent::updateOrCreate([
-                            'code' => BookComponent::generateCode($key, $code),
+                    foreach(BookVariant::KUNCI_TYPE as $key => $label) {
+                        $component = BookVariant::updateOrCreate([
+                            'code' => BookVariant::generateCode($key, $code),
                             'type' => $key,
                         ],
                         [
-                            'name' => BookComponent::generateName($key, $jenjang->id, $kurikulum->id, $mapel->id, $kelas->id, $semester->id, $isi->id, $cover->id),
+                            'name' => BookVariant::generateName($key, $jenjang->id, $kurikulum->id, $mapel->id, $kelas->id, $semester->id, $isi->id, $cover->id),
                             'jenjang_id' => $jenjang->id,
                             'kurikulum_id' => $kurikulum->id,
                             'isi_id' => ($key == 'U')  ? $isi->id : null,
