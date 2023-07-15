@@ -245,7 +245,7 @@ class BookVariantController extends Controller
     {
         abort_if(Gate::denies('book_variant_show'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $bookVariant->load('book', 'jenjang', 'semester', 'kurikulum', 'halaman', 'warehouse', 'unit', 'components');
+        $bookVariant->load('book', 'jenjang', 'semester', 'kurikulum', 'halaman', 'warehouse', 'unit', 'components', 'isi', 'cover');
 
         $stockMovements = StockMovement::with(['product'])->where('product_id', $bookVariant->id)->orderBy('created_at', 'DESC')->get();
 
@@ -360,7 +360,7 @@ class BookVariantController extends Controller
         $id = $request->input('id');
 
         $product = BookVariant::find($id);
-        $product->load('book', 'jenjang', 'book.cover', 'book.kurikulum');
+        $product->load('book', 'jenjang', 'cover', 'kurikulum', 'isi');
 
         return response()->json($product);
     }
@@ -415,7 +415,7 @@ class BookVariantController extends Controller
                 ->where('sales_orders.salesperson_id', $salesperson)
                 ->where('sales_orders.payment_type', $type)
                 ->first(['book_variants.*', 'sales_orders.quantity as estimasi', 'sales_orders.moved as terkirim', 'sales_orders.id as order_id']);
-        $product->load('book', 'jenjang', 'book.cover', 'book.kurikulum');
+        $product->load('book', 'jenjang', 'cover', 'kurikulum', 'isi');
 
         return response()->json($product);
     }
@@ -456,7 +456,7 @@ class BookVariantController extends Controller
                 ->where('book_variants.id', $id)
                 ->where('delivery_order_items.delivery_order_id', $delivery)
                 ->first(['book_variants.*', 'delivery_order_items.quantity as quantity', 'delivery_order_items.id as delivery_item_id', 'sales_orders.quantity as estimasi', 'sales_orders.moved as terkirim']);
-        $product->load('book', 'jenjang', 'book.cover', 'book.kurikulum');
+        $product->load('book', 'jenjang', 'isi', 'cover', 'kurikulum');
 
         return response()->json($product);
     }
@@ -503,7 +503,7 @@ class BookVariantController extends Controller
                     'sales_orders.retur as retur', 'sales_orders.id as order_id'
                 ]);
 
-        $product->load('book', 'jenjang', 'book.cover', 'book.kurikulum');
+        $product->load('book', 'jenjang', 'isi', 'cover', 'kurikulum');
 
         return response()->json($product);
     }
@@ -544,7 +544,7 @@ class BookVariantController extends Controller
                 ->where('return_good_items.retur_id', $retur)
                 ->first(['book_variants.*', 'return_good_items.quantity as quantity', 'return_good_items.id as retur_item_id',
                     'sales_orders.retur as retur', 'sales_orders.moved as terkirim']);
-        $product->load('book', 'jenjang', 'book.cover', 'book.kurikulum');
+        $product->load('book', 'jenjang', 'isi', 'cover', 'kurikulum');
 
         return response()->json($product);
     }
@@ -584,7 +584,7 @@ class BookVariantController extends Controller
                 ->where('book_variants.id', $id)
                 ->where('stock_adjustment_details.stock_adjustment_id', $adjustment)
                 ->first(['book_variants.*', 'stock_adjustment_details.quantity as quantity', 'stock_adjustment_details.id as adjustment_detail_id']);
-        $product->load('book', 'jenjang', 'book.cover', 'book.kurikulum');
+        $product->load('book', 'jenjang', 'isi', 'cover', 'kurikulum');
 
         return response()->json($product);
     }
@@ -632,7 +632,7 @@ class BookVariantController extends Controller
         $id = $request->input('id');
 
         $product = BookVariant::find($id);
-        $product->load('book', 'jenjang', 'cover', 'kurikulum', 'estimasi_produksi');
+        $product->load('book', 'jenjang', 'cover', 'kurikulum', 'estimasi_produksi', 'isi');
 
         return response()->json($product);
     }
@@ -642,7 +642,7 @@ class BookVariantController extends Controller
         $id = $request->input('id');
 
         $product = BookVariant::withMin('components as finishing_stock', 'stock')->find($id);
-        $product->load('book', 'jenjang', 'cover', 'kurikulum', 'estimasi_produksi');
+        $product->load('book', 'jenjang', 'cover', 'kurikulum', 'estimasi_produksi', 'isi');
 
         return response()->json($product);
     }

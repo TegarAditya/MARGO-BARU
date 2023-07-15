@@ -18,7 +18,7 @@ class UpdateBookVariantRequest extends FormRequest
     {
         return [
             'book_id' => [
-                'required',
+                'nullable',
                 'integer',
             ],
             'type' => [
@@ -47,7 +47,7 @@ class UpdateBookVariantRequest extends FormRequest
                 'max:2147483647',
             ],
             'components' => [
-                'required',
+                'nullable',
                 'array'
             ]
         ];

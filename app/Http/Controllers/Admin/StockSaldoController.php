@@ -13,6 +13,8 @@ use Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Yajra\DataTables\Facades\DataTables;
+use Carbon\Carbon;
+use Alert;
 
 class StockSaldoController extends Controller
 {
@@ -91,6 +93,37 @@ class StockSaldoController extends Controller
 
     public function store(StoreStockSaldoRequest $request)
     {
+        $bookvariant = BookVariant::all();
+
+        $start = Carbon::now()->startOfMonth();
+        $end = Carbon::now()->endOfMonth();
+
+        $lastmonth = Carbon::now()->subMonth()->format('mY');
+        $periode = $start->format('d F Y') .' -  '. $end->format('d F Y');
+        $code = $start->format('mY');
+
+        foreach($bookvariant as $book) {
+            $before = StockSaldo::where('kode', $lastmonth)->where('product_id', $book->id)->first();
+
+            if ($before) {
+                $qty_awal = $before->qty_akhir;
+            } else {
+                $qty_awal = 0;
+            }
+
+            StockSalso::create([
+                'code' => $code,
+                'product_id' => $book->id,
+                'periode' => $periode,
+                'start_date' => $start,
+                'end_date' => $end,
+                'qty_awal' => $qty_awal,
+                'in' => 0,
+                'out' => 0,
+                'qty_akhir' => $qty_awal,
+            ]);
+        }
+
         $stockSaldo = StockSaldo::create($request->all());
 
         return redirect()->route('admin.stock-saldos.index');

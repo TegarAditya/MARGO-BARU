@@ -39,6 +39,7 @@ class SalesOrderImport implements ToCollection, WithHeadingRow
                     'jenjang_id' => $product->jenjang_id,
                     'kurikulum_id' => $product->kurikulum_id
                 ], [
+                    'no_order' => SalesOrder::generateNoOrder($semester, $salesperson, $payment_type),
                     'quantity' => DB::raw("quantity + $quantity"),
                     'moved' => 0,
                     'retur' => 0
@@ -47,7 +48,7 @@ class SalesOrderImport implements ToCollection, WithHeadingRow
                 EstimationService::createMovement('in', 'sales_order', $order->id, $product->id, $quantity, $product->type);
                 EstimationService::createProduction($product->id, $quantity, $product->type);
 
-                foreach($product->child as $item) {
+                foreach($product->components as $item) {
                     EstimationService::createMovement('in', 'sales_order', $order->id, $item->id, $quantity, $item->type);
                     EstimationService::createProduction($item->id, $quantity, $item->type);
                 }

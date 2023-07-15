@@ -63,9 +63,7 @@ class SettingController extends Controller
     {
         abort_if(Gate::denies('setting_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $update_bies = User::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
-
-        return view('admin.settings.create', compact('update_bies'));
+        return view('admin.settings.create');
     }
 
     public function store(StoreSettingRequest $request)
@@ -79,11 +77,7 @@ class SettingController extends Controller
     {
         abort_if(Gate::denies('setting_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $update_bies = User::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
-
-        $setting->load('update_by');
-
-        return view('admin.settings.edit', compact('setting', 'update_bies'));
+        return view('admin.settings.edit', compact('setting'));
     }
 
     public function update(UpdateSettingRequest $request, Setting $setting)
@@ -96,8 +90,6 @@ class SettingController extends Controller
     public function show(Setting $setting)
     {
         abort_if(Gate::denies('setting_show'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-
-        $setting->load('update_by');
 
         return view('admin.settings.show', compact('setting'));
     }

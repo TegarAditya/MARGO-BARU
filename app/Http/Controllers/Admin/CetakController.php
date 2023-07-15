@@ -169,7 +169,7 @@ class CetakController extends Controller
                     $cost = $this->costIsi($halaman, $quantity);
                 } else if ($type == 'cover') {
                     $vendor = VendorCost::where('vendor_id', $vendor)->where('key', 'cover_cost')->first();
-                    $cost = $this->costCover($vendor ? $vendor->value : 35, $quantity);
+                    $cost = $this->costCover($vendor ? $vendor->value : 50, $quantity);
                 }
 
                 $total_cost += $cost;

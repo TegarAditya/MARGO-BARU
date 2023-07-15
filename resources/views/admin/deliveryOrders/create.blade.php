@@ -185,7 +185,7 @@
                                         Code : <strong>${product.code}</strong>
                                     </p>
                                     <p class="mb-0 text-sm">
-                                        Jenjang - Kurikulum : <strong>${product.jenjang.name} - ${product.book.kurikulum.name}</strong>
+                                        Jenjang - Kurikulum : <strong>${product.jenjang.name} - ${product.kurikulum.name}</strong>
                                     </p>
                                     <p class="mb-0 text-sm">
                                         <strong>ESTIMASI : ${product.estimasi}</strong>

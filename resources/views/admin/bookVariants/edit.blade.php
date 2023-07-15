@@ -32,7 +32,7 @@
             </div>
             <div class="form-group">
                 <label class="required" for="book_id">{{ trans('cruds.bookVariant.fields.book') }}</label>
-                <select class="form-control select2 {{ $errors->has('book') ? 'is-invalid' : '' }}" name="book_id" id="book_id" required>
+                <select class="form-control select2 {{ $errors->has('book') ? 'is-invalid' : '' }}" name="book_id" id="book_id">
                     @foreach($books as $id => $entry)
                         <option value="{{ $id }}" {{ (old('book_id') ? old('book_id') : $bookVariant->book->id ?? '') == $id ? 'selected' : '' }}>{{ $entry }}</option>
                     @endforeach
