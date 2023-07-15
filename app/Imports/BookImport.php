@@ -79,7 +79,7 @@ class BookImport implements ToCollection, WithHeadingRow
                         'halaman_id' => $halaman->id,
                         'semester_id' => $semester->id,
                         'warehouse_id' => 1,
-                        'stock' => $row['stok'],
+                        'stock' => 0,
                         'unit_id' => 1,
                         'price' => $row['harga'],
                         'cost' => $row['hpp'],

@@ -14,6 +14,9 @@ use App\Models\Vendor;
 use App\Models\VendorCost;
 use App\Models\BookVariant;
 use App\Models\Halaman;
+use App\Models\Jenjang;
+use App\Models\Isi;
+use App\Models\Cover;
 use Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -112,7 +115,9 @@ class CetakController extends Controller
 
         $vendors = Vendor::where('type', 'cetak')->get()->pluck('full_name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
-        return view('admin.cetaks.create', compact('semesters', 'vendors'));
+        $jenjangs = Jenjang::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+
+        return view('admin.cetaks.create', compact('semesters', 'vendors', 'jenjangs'));
     }
 
     public function store(Request $request)
@@ -122,6 +127,7 @@ class CetakController extends Controller
             'date' => 'required',
             'semester_id' => 'required',
             'vendor_id' => 'required',
+            'jenjang_id' => 'required',
             'type' => 'required',
             'note' => 'nullable',
             'products' => 'required|array',
@@ -137,6 +143,7 @@ class CetakController extends Controller
         $date = $validatedData['date'];
         $semester = $validatedData['semester_id'];
         $vendor = $validatedData['vendor_id'];
+        $jenjang = $validatedData['jenjang_id'];
         $type = $validatedData['type'];
         $note = $validatedData['note'];
         $products = $validatedData['products'];
@@ -151,6 +158,7 @@ class CetakController extends Controller
                 'date' => $date,
                 'semester_id' => $semester,
                 'vendor_id' => $vendor,
+                'jenjang_id' => $jenjang,
                 'type' => $type,
                 'estimasi_oplah' => array_sum($quantities),
                 'note' => $note
@@ -216,15 +224,17 @@ class CetakController extends Controller
 
         $vendors = Vendor::where('type', 'cetak')->get()->pluck('full_name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
+        $jenjangs = Jenjang::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+
         $materials = Material::where('category', 'plate')->whereHas('vendors', function ($q) use ($cetak) {
             $q->where('id', $cetak->vendor_id);
         })->orderBy('code', 'ASC')->pluck('name', 'id');
 
-        $cetak->load('semester', 'vendor');
+        $cetak->load('semester', 'vendor', 'jenjang');
 
         $cetak_items = CetakItem::with('product', 'semester', 'product.estimasi_produksi')->where('cetak_id', $cetak->id)->orderBy('product_id')->get();
 
-        return view('admin.cetaks.edit', compact('cetak', 'cetak_items', 'semesters', 'vendors', 'materials'));
+        return view('admin.cetaks.edit', compact('cetak', 'cetak_items', 'semesters', 'vendors', 'materials', 'jenjangs'));
     }
 
     public function update(Request $request, Cetak $cetak)
@@ -440,7 +450,7 @@ class CetakController extends Controller
     {
         $cetak->load('semester', 'vendor');
 
-        $cetak_items = CetakItem::with('product')->where('cetak_id', $cetak->id)->get();
+        $cetak_items = CetakItem::with('product', 'product.jenjang', 'product.isi', 'product.cover', 'product.kurikulum')->where('cetak_id', $cetak->id)->get();
 
         $cetak_items = $cetak_items->sortBy('product.kelas_id')->sortBy('product.mapel_id')->sortBy('product.kurikulum_id')->sortBy('product.jenjang_id');
 
@@ -471,5 +481,27 @@ class CetakController extends Controller
     function costCover($cost, $quantity)
     {
         return $cost * $quantity;
+    }
+
+    public function getIsiCover(Request $request)
+    {
+        $type = $request->input('type');
+
+        if ($type == 'isi') {
+            $isi_cover = Isi::all();
+        } else {
+            $isi_cover = Cover::all();
+        }
+
+        $formattedItems = [];
+
+        foreach ($isi_cover as $item) {
+            $formattedItems[] = [
+                'id' => $item->id,
+                'text' => $item->code . ' - ' . $item->name,
+            ];
+        }
+
+        return response()->json($formattedItems);
     }
 }

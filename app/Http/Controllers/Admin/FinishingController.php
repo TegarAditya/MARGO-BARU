@@ -12,6 +12,7 @@ use App\Models\Semester;
 use App\Models\Vendor;
 use App\Models\BookVariant;
 use App\Models\Halaman;
+use App\Models\Jenjang;
 use Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -102,7 +103,9 @@ class FinishingController extends Controller
 
         $vendors = Vendor::where('type', 'finishing')->get()->pluck('full_name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
-        return view('admin.finishings.create', compact('semesters', 'vendors'));
+        $jenjangs = Jenjang::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+
+        return view('admin.finishings.create', compact('semesters', 'vendors', 'jenjangs'));
     }
 
     public function store(Request $request)
@@ -111,6 +114,7 @@ class FinishingController extends Controller
         $validatedData = $request->validate([
             'date' => 'required',
             'semester_id' => 'required',
+            'jenjang_id' => 'required',
             'vendor_id' => 'required',
             'note' => 'nullable',
             'products' => 'required|array',
@@ -122,6 +126,7 @@ class FinishingController extends Controller
         $date = $validatedData['date'];
         $semester = $validatedData['semester_id'];
         $vendor = $validatedData['vendor_id'];
+        $jenjang = $validatedData['jenjang_id'];
         $note = $validatedData['note'];
         $products = $validatedData['products'];
         $quantities = $validatedData['quantities'];
@@ -132,6 +137,7 @@ class FinishingController extends Controller
                 'no_spk' => Finishing::generateNoSPK($semester, $vendor),
                 'date' => $date,
                 'semester_id' => $semester,
+                'jenjang_id' => $jenjang,
                 'vendor_id' => $vendor,
                 'estimasi_oplah' => array_sum($quantities),
                 'note' => $note
@@ -191,15 +197,17 @@ class FinishingController extends Controller
 
         $vendors = Vendor::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
+        $jenjangs = Jenjang::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+
         $finishing_items = FinishingItem::with('product', 'product.components')->where('finishing_id', $finishing->id)->get();
 
         if ($finishing_items->min('done') > 0) {
             return redirect()->route('admin.finishings.show', $finishing->id);
         }
 
-        $finishing->load('semester', 'vendor');
+        $finishing->load('semester', 'vendor', 'jenjang');
 
-        return view('admin.finishings.edit', compact('finishing', 'semesters', 'vendors', 'finishing_items'));
+        return view('admin.finishings.edit', compact('finishing', 'semesters', 'vendors', 'finishing_items', 'jenjangs'));
     }
 
     public function update(Request $request, Finishing $finishing)

@@ -36,6 +36,7 @@ class Cetak extends Model
         'date',
         'semester_id',
         'vendor_id',
+        'jenjang_id',
         'type',
         'total_cost',
         'estimasi_oplah',
@@ -75,6 +76,11 @@ class Cetak extends Model
     public function vendor()
     {
         return $this->belongsTo(Vendor::class, 'vendor_id');
+    }
+
+    public function jenjang()
+    {
+        return $this->belongsTo(Jenjang::class, 'jenjang_id');
     }
 
     public static function generateNoSPC($semester, $vendor, $type) {

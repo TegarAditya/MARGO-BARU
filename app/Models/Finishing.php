@@ -31,6 +31,7 @@ class Finishing extends Model
         'date',
         'semester_id',
         'vendor_id',
+        'jenjang_id',
         'total_cost',
         'estimasi_oplah',
         'total_oplah',
@@ -65,6 +66,11 @@ class Finishing extends Model
     public function vendor()
     {
         return $this->belongsTo(Vendor::class, 'vendor_id');
+    }
+
+    public function jenjang()
+    {
+        return $this->belongsTo(Jenjang::class, 'jenjang_id');
     }
 
     public static function generateNoSPK($semester, $vendor) {

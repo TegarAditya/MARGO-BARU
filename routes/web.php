@@ -255,6 +255,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     Route::get('cetaks/{cetak}/realisasi', 'CetakController@realisasi')->name('cetaks.realisasi');
     Route::put('cetaks/realisasi/{cetak}', 'CetakController@realisasiStore')->name('cetaks.realiasasiStore');
     Route::get('cetaks/print-spc/{cetak}', 'CetakController@printSpc')->name('cetaks.printSpc');
+    Route::get('cetaks/isi-cover', 'CetakController@getIsiCover')->name('cetaks.getIsiCover');
     Route::resource('cetaks', 'CetakController');
 
     // Cetak Item

@@ -74,6 +74,21 @@
                         <span class="help-block">{{ trans('cruds.cetak.fields.type_helper') }}</span>
                     </div>
                 </div>
+                <div class="col-6">
+                    <div class="form-group">
+                        <label class="required" for="jenjang_id">{{ trans('cruds.bookVariant.fields.jenjang') }}</label>
+                        <select class="form-control select2 {{ $errors->has('jenjang') ? 'is-invalid' : '' }}" name="jenjang_id" id="jenjang_id" disabled>
+                            @foreach($jenjangs as $id => $entry)
+                                <option value="{{ $id }}" {{ (old('jenjang_id') ? old('jenjang_id') : $cetak->jenjang_id ?? '') == $id ? 'selected' : '' }}>{{ $entry }}</option>
+                            @endforeach
+                        </select>
+                        @if($errors->has('jenjang'))
+                            <span class="text-danger">{{ $errors->first('jenjang') }}</span>
+                        @endif
+                        <span class="help-block">{{ trans('cruds.bookVariant.fields.jenjang_helper') }}</span>
+                    </div>
+                </div>
+                <input type="hidden" id="isi_cover_id" name="isi_cover_id" value="{{ ($cetak->type == 'isi') ? $cetak_items->first()->product->isi_id : $cetak_items->first()->product->cover_id }}">
                 <div class="col-12">
                     <div class="form-group">
                         <label for="note">{{ trans('cruds.cetak.fields.note') }}</label>
@@ -251,7 +266,9 @@
                     data: function(params) {
                         return {
                             q: params.term,
-                            type: $('#type').val()
+                            type: $('#type').val(),
+                            jenjang: $('#jenjang_id').val(),
+                            cover_isi: $('#isi_cover_id').val()
                         };
                     },
                     processResults: function(data) {

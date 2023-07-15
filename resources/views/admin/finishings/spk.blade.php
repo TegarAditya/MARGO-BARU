@@ -1,7 +1,7 @@
 @extends('layouts.print')
 
 @section('header.center')
-<h6>SURAT PERINTAH KERJA</h6>
+<h6>SURAT PERINTAH KERJA FINISHING</h6>
 @endsection
 
 @section('header.left')
@@ -18,6 +18,12 @@
             <td><strong>Tanggal</strong></td>
             <td>:</td>
             <td>{{ $finishing->date }}</td>
+        </tr>
+
+        <tr>
+            <td><strong>Jenjang</strong></td>
+            <td>:</td>
+            <td>{{ $finishing->jenjang->name }}</td>
         </tr>
 
     </tbody>
@@ -49,12 +55,12 @@
 <table cellspacing="0" cellpadding="0" class="table table-sm table-bordered" style="width: 100%">
     <thead>
         <th width="1%" class="text-center">No.</th>
-        <th>Jenjang</th>
+        {{-- <th>Jenjang</th> --}}
         <th>Cover</th>
         <th>Tema/Mapel</th>
         <th width="1%" class="text-center">Kls</th>
         <th width="1%" class="text-center">Hal</th>
-        <th class="px-2" width="1%">Jumlah</th>
+        <th class="text-center" width="10%">Jumlah</th>
     </thead>
 
     <tbody>
@@ -68,7 +74,7 @@
             @endphp
         <tr>
             <td class="px-3">{{ $loop->iteration }}</td>
-            <td>{{ $product->jenjang->name ?? '' }} - {{ $product->kurikulum->code ?? '' }}</td>
+            {{-- <td>{{ $product->jenjang->name ?? '' }} - {{ $product->kurikulum->code ?? '' }}</td> --}}
             <td>{{ $product->cover->name ?? '' }}</td>
             <td>{{ $product->mapel->name }}</td>
             <td class="text-center">{{ $product->kelas->code ?? '' }}</td>
@@ -79,7 +85,7 @@
     </tbody>
     <tfoot>
         <tr>
-            <th colspan="6" class="text-center"><strong>TOTAL</strong></th>
+            <th colspan="5" class="text-center"><strong>TOTAL</strong></th>
             <th class="text-center"><strong>{{ angka($total_item) }}</strong></th>
         </tr>
     </tfoot>

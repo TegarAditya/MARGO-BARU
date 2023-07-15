@@ -1,7 +1,7 @@
 @extends('layouts.print')
 
 @section('header.center')
-<h6>SURAT PERINTAH KERJA</h6>
+<h6>SURAT PERINTAH KERJA {{ strtoupper($cetak->type) }}</h6>
 @endsection
 
 @section('header.left')
@@ -21,9 +21,15 @@
         </tr>
 
         <tr>
-            <td><strong>Tipe Cetak</strong></td>
+            <td><strong>Jenjang</strong></td>
             <td>:</td>
-            <td>Cetak {{ strtoupper($cetak->type) }}</td>
+            <td>{{ $cetak->jenjang->name }}</td>
+        </tr>
+
+        <tr>
+            <td><strong>{{ ucfirst($cetak->type) }}</strong></td>
+            <td>:</td>
+            <td>{{ $cetak_items->first()->product->cover->name }}</td>
         </tr>
 
     </tbody>
@@ -55,7 +61,6 @@
 <table cellspacing="0" cellpadding="0" class="table table-sm table-bordered" style="width: 100%">
     <thead>
         <th width="1%" class="text-center">No.</th>
-        <th>Jenjang</th>
         <th>Code</th>
         <th>Tema/Mapel</th>
         <th width="1%" class="text-center">Kls</th>
@@ -74,7 +79,6 @@
             @endphp
         <tr>
             <td class="px-3">{{ $loop->iteration }}</td>
-            <td>{{ $product->jenjang->name ?? '' }} - {{ $product->kurikulum->code ?? '' }}</td>
             <td>{{ $product->code }}</td>
             <td>{{ $product->mapel->name }}</td>
             <td class="text-center">{{ $product->kelas->code ?? '' }}</td>
@@ -85,7 +89,7 @@
     </tbody>
     <tfoot>
         <tr>
-            <th colspan="6" class="text-center"><strong>TOTAL</strong></th>
+            <th colspan="5" class="text-center"><strong>TOTAL</strong></th>
             <th class="text-center"><strong>{{ angka($total_item) }}</strong></th>
         </tr>
     </tfoot>

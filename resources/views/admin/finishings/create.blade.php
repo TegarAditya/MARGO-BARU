@@ -58,6 +58,20 @@
                         <span class="help-block">{{ trans('cruds.finishing.fields.vendor_helper') }}</span>
                     </div>
                 </div>
+                <div class="col-6">
+                    <div class="form-group">
+                        <label class="required" for="jenjang_id">{{ trans('cruds.bookVariant.fields.jenjang') }}</label>
+                        <select class="form-control select2 {{ $errors->has('jenjang') ? 'is-invalid' : '' }}" name="jenjang_id" id="jenjang_id" required>
+                            @foreach($jenjangs as $id => $entry)
+                                <option value="{{ $id }}" {{ old('jenjang_id') == $id ? 'selected' : '' }}>{{ $entry }}</option>
+                            @endforeach
+                        </select>
+                        @if($errors->has('jenjang'))
+                            <span class="text-danger">{{ $errors->first('jenjang') }}</span>
+                        @endif
+                        <span class="help-block">{{ trans('cruds.bookVariant.fields.jenjang_helper') }}</span>
+                    </div>
+                </div>
                 <div class="col-12">
                     <div class="form-group">
                         <label for="note">{{ trans('cruds.finishing.fields.note') }}</label>
@@ -108,7 +122,9 @@
                     delay: 250,
                     data: function(params) {
                         return {
-                            q: params.term
+                            q: params.term,
+                            type: 'finishing',
+                            jenjang: $('#jenjang_id').val()
                         };
                     },
                     processResults: function(data) {

@@ -593,6 +593,12 @@ class BookVariantController extends Controller
     {
         $query = $request->input('q');
         $type = $request->input('type');
+        $jenjang = $request->input('jenjang');
+        $cover_isi = $request->input('cover_isi');
+
+        if(empty($type)) {
+            return response()->json([]);
+        }
 
         $query = BookVariant::whereHas('estimasi_produksi', function ($q) {
                     $q->where('estimasi', '>', 0);
@@ -601,14 +607,24 @@ class BookVariantController extends Controller
                     ->orWhere('name', 'LIKE', "%{$query}%");
                 });
 
-        if (!empty($type)) {
+        if ($type == 'isi') {
+            $query->whereIn('type', ['I', 'S', 'U']);
+        } else if ($type == 'cover') {
+            $query->whereIn('type', ['C', 'V']);
+        } else if ($type == 'finishing') {
+            $query->whereIn('type', ['L', 'P', 'K']);
+        }
+
+        if (!empty($jenjang)) {
+            $query->where('jenjang_id', $jenjang);
+        }
+
+        if (!empty($cover_isi)) {
             if ($type == 'isi') {
-                $query->whereIn('type', ['I', 'S']);
+                $query->where('isi_id', $cover_isi);
             } else if ($type == 'cover') {
-                $query->whereIn('type', ['C', 'V']);
+                $query->where('cover_id', $cover_isi);
             }
-        } else {
-            $query->whereIn('type', ['L', 'P']);
         }
 
         $products = $query->orderBy('code', 'ASC')->get();

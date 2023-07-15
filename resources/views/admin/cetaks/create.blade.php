@@ -79,6 +79,27 @@
                         <span class="help-block">{{ trans('cruds.cetak.fields.type_helper') }}</span>
                     </div>
                 </div>
+                <div class="col-6">
+                    <div class="form-group">
+                        <label class="required" for="jenjang_id">{{ trans('cruds.bookVariant.fields.jenjang') }}</label>
+                        <select class="form-control select2 {{ $errors->has('jenjang') ? 'is-invalid' : '' }}" name="jenjang_id" id="jenjang_id" required>
+                            @foreach($jenjangs as $id => $entry)
+                                <option value="{{ $id }}" {{ old('jenjang_id') == $id ? 'selected' : '' }}>{{ $entry }}</option>
+                            @endforeach
+                        </select>
+                        @if($errors->has('jenjang'))
+                            <span class="text-danger">{{ $errors->first('jenjang') }}</span>
+                        @endif
+                        <span class="help-block">{{ trans('cruds.bookVariant.fields.jenjang_helper') }}</span>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="form-group">
+                        <label class="required" for="isi_cover_id">Isi / Cover</label>
+                        <select id="isi_cover_id" class="form-control select2" name="isi_cover_id" style="width: 100%;" required>
+                        </select>
+                    </div>
+                </div>
                 <div class="col-12">
                     <div class="form-group">
                         <label for="note">{{ trans('cruds.cetak.fields.note') }}</label>
@@ -129,7 +150,9 @@
                     data: function(params) {
                         return {
                             q: params.term,
-                            type: $('#type').val()
+                            type: $('#type').val(),
+                            jenjang: $('#jenjang_id').val(),
+                            cover_isi: $('#isi_cover_id').val()
                         };
                     },
                     processResults: function(data) {
@@ -139,6 +162,25 @@
                     },
                     cache: true
                 }
+        });
+
+        $('#type').on('change', function() {
+            $('#isi_cover_id').select2({
+                ajax: {
+                    url: "{{ route('admin.cetaks.getIsiCover') }}",
+                    data: function() {
+                        return {
+                            type: $('#type').val()
+                        };
+                    },
+                    dataType: 'json',
+                    processResults: function(data) {
+                        return {
+                            results: data
+                        };
+                    }
+                }
+            });
         });
 
         function formatProduct(product) {
