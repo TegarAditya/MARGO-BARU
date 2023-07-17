@@ -109,6 +109,8 @@ return [
             'updated_at_helper'  => ' ',
             'deleted_at'         => 'Deleted at',
             'deleted_at_helper'  => ' ',
+            'group_area'         => 'Group Area',
+            'group_area_helper'  => ' ',
         ],
     ],
     'salesperson' => [
@@ -1232,6 +1234,26 @@ return [
     'vendorMenu' => [
         'title'          => 'Vendor',
         'title_singular' => 'Vendor',
+    ],
+    'groupArea' => [
+        'title'          => 'Group Area',
+        'title_singular' => 'Group Area',
+        'fields'         => [
+            'id'                => 'ID',
+            'id_helper'         => ' ',
+            'code'              => 'Code',
+            'code_helper'       => ' ',
+            'name'              => 'Name',
+            'name_helper'       => ' ',
+            'provinsi'          => 'Provinsi',
+            'provinsi_helper'   => ' ',
+            'created_at'        => 'Created at',
+            'created_at_helper' => ' ',
+            'updated_at'        => 'Updated at',
+            'updated_at_helper' => ' ',
+            'deleted_at'        => 'Deleted at',
+            'deleted_at_helper' => ' ',
+        ],
     ],
 
 ];

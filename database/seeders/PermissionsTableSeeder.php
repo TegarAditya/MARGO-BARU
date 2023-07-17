@@ -976,8 +976,28 @@ class PermissionsTableSeeder extends Seeder
             ],
             [
                 'id'    => 242,
-                'title' => 'profile_password_edit',
+                'title' => 'group_area_create',
             ],
+            [
+                'id'    => 243,
+                'title' => 'group_area_edit',
+            ],
+            [
+                'id'    => 244,
+                'title' => 'group_area_show',
+            ],
+            [
+                'id'    => 245,
+                'title' => 'group_area_delete',
+            ],
+            [
+                'id'    => 246,
+                'title' => 'group_area_access',
+            ],
+            [
+                'id'    => 247,
+                'title' => 'profile_password_edit',
+            ]
         ];
 
         Permission::insert($permissions);

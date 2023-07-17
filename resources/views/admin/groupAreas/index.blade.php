@@ -1,35 +1,38 @@
 @extends('layouts.admin')
 @section('content')
-@can('marketing_area_create')
+@can('group_area_create')
     <div style="margin-bottom: 10px;" class="row">
         <div class="col-lg-12">
-            <a class="btn btn-success" href="{{ route('admin.marketing-areas.create') }}">
-                {{ trans('global.add') }} {{ trans('cruds.marketingArea.title_singular') }}
+            <a class="btn btn-success" href="{{ route('admin.group-areas.create') }}">
+                {{ trans('global.add') }} {{ trans('cruds.groupArea.title_singular') }}
             </a>
             <button class="btn btn-warning" data-toggle="modal" data-target="#csvImportModal">
                 {{ trans('global.app_csvImport') }}
             </button>
-            @include('csvImport.modal', ['model' => 'MarketingArea', 'route' => 'admin.marketing-areas.parseCsvImport'])
+            @include('csvImport.modal', ['model' => 'GroupArea', 'route' => 'admin.group-areas.parseCsvImport'])
         </div>
     </div>
 @endcan
 <div class="card">
     <div class="card-header">
-        {{ trans('cruds.marketingArea.title_singular') }} {{ trans('global.list') }}
+        {{ trans('cruds.groupArea.title_singular') }} {{ trans('global.list') }}
     </div>
 
     <div class="card-body">
-        <table class=" table table-bordered table-striped table-hover ajaxTable datatable datatable-MarketingArea">
+        <table class=" table table-bordered table-striped table-hover ajaxTable datatable datatable-GroupArea">
             <thead>
                 <tr>
                     <th width="10">
 
                     </th>
                     <th>
-                        {{ trans('cruds.marketingArea.fields.name') }}
+                        {{ trans('cruds.groupArea.fields.code') }}
                     </th>
                     <th>
-                        {{ trans('cruds.marketingArea.fields.group_area') }}
+                        {{ trans('cruds.groupArea.fields.name') }}
+                    </th>
+                    <th>
+                        {{ trans('cruds.groupArea.fields.provinsi') }}
                     </th>
                     <th>
                         &nbsp;
@@ -48,11 +51,11 @@
 <script>
     $(function () {
   let dtButtons = $.extend(true, [], $.fn.dataTable.defaults.buttons)
-@can('marketing_area_delete')
+@can('group_area_delete')
   let deleteButtonTrans = '{{ trans('global.datatables.delete') }}';
   let deleteButton = {
     text: deleteButtonTrans,
-    url: "{{ route('admin.marketing-areas.massDestroy') }}",
+    url: "{{ route('admin.group-areas.massDestroy') }}",
     className: 'btn-danger',
     action: function (e, dt, node, config) {
       var ids = $.map(dt.rows({ selected: true }).data(), function (entry) {
@@ -84,18 +87,19 @@
     serverSide: true,
     retrieve: true,
     aaSorting: [],
-    ajax: "{{ route('admin.marketing-areas.index') }}",
+    ajax: "{{ route('admin.group-areas.index') }}",
     columns: [
       { data: 'placeholder', name: 'placeholder' },
+{ data: 'code', name: 'code' },
 { data: 'name', name: 'name' },
-{ data: 'group_area_code', name: 'group_area.code' },
+{ data: 'provinsi', name: 'provinsi' },
 { data: 'actions', name: '{{ trans('global.actions') }}' }
     ],
     orderCellsTop: true,
     order: [[ 1, 'desc' ]],
-    pageLength: 25,
+    pageLength: 50,
   };
-  let table = $('.datatable-MarketingArea').DataTable(dtOverrideGlobals);
+  let table = $('.datatable-GroupArea').DataTable(dtOverrideGlobals);
   $('a[data-toggle="tab"]').on('shown.bs.tab click', function(e){
       $($.fn.dataTable.tables(true)).DataTable()
           .columns.adjust();

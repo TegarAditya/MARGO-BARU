@@ -285,8 +285,8 @@
                     </li>
                 @endcan
                 @can('sale_access')
-                    <li class="nav-item has-treeview {{ request()->is("admin/marketing-areas*") ? "menu-open" : "" }} {{ request()->is("admin/salespeople*") ? "menu-open" : "" }} {{ request()->is("admin/addresses*") ? "menu-open" : "" }}">
-                        <a class="nav-link nav-dropdown-toggle {{ request()->is("admin/marketing-areas*") ? "active" : "" }} {{ request()->is("admin/salespeople*") ? "active" : "" }} {{ request()->is("admin/addresses*") ? "active" : "" }}" href="#">
+                    <li class="nav-item has-treeview {{ request()->is("admin/group-areas*") ? "menu-open" : "" }} {{ request()->is("admin/marketing-areas*") ? "menu-open" : "" }} {{ request()->is("admin/salespeople*") ? "menu-open" : "" }} {{ request()->is("admin/addresses*") ? "menu-open" : "" }}">
+                        <a class="nav-link nav-dropdown-toggle {{ request()->is("admin/group-areas*") ? "active" : "" }} {{ request()->is("admin/marketing-areas*") ? "active" : "" }} {{ request()->is("admin/salespeople*") ? "active" : "" }} {{ request()->is("admin/addresses*") ? "active" : "" }}" href="#">
                             <i class="fa-fw nav-icon fas fa-users">
 
                             </i>
@@ -296,6 +296,18 @@
                             </p>
                         </a>
                         <ul class="nav nav-treeview">
+                            @can('group_area_access')
+                                <li class="nav-item">
+                                    <a href="{{ route("admin.group-areas.index") }}" class="nav-link {{ request()->is("admin/group-areas") || request()->is("admin/group-areas/*") ? "active" : "" }}">
+                                        <i class="fa-fw nav-icon far fa-map">
+
+                                        </i>
+                                        <p>
+                                            {{ trans('cruds.groupArea.title') }}
+                                        </p>
+                                    </a>
+                                </li>
+                            @endcan
                             @can('marketing_area_access')
                                 <li class="nav-item">
                                     <a href="{{ route("admin.marketing-areas.index") }}" class="nav-link {{ request()->is("admin/marketing-areas") || request()->is("admin/marketing-areas/*") ? "active" : "" }}">

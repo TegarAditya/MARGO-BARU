@@ -2,29 +2,31 @@
 
 namespace App\Http\Requests;
 
-use App\Models\MarketingArea;
+use App\Models\GroupArea;
 use Gate;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Response;
 
-class UpdateMarketingAreaRequest extends FormRequest
+class StoreGroupAreaRequest extends FormRequest
 {
     public function authorize()
     {
-        return Gate::allows('marketing_area_edit');
+        return Gate::allows('group_area_create');
     }
 
     public function rules()
     {
         return [
+            'code' => [
+                'string',
+                'nullable',
+            ],
             'name' => [
                 'string',
                 'required',
-                'unique:marketing_areas,name,' . request()->route('marketing_area')->id,
             ],
-            'group_area_id' => [
+            'provinsi' => [
                 'required',
-                'integer',
             ],
         ];
     }

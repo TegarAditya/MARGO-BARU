@@ -28,6 +28,12 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     // Audit Logs
     Route::resource('audit-logs', 'AuditLogsController', ['except' => ['create', 'store', 'edit', 'update', 'destroy']]);
 
+    // Group Area
+    Route::delete('group-areas/destroy', 'GroupAreaController@massDestroy')->name('group-areas.massDestroy');
+    Route::post('group-areas/parse-csv-import', 'GroupAreaController@parseCsvImport')->name('group-areas.parseCsvImport');
+    Route::post('group-areas/process-csv-import', 'GroupAreaController@processCsvImport')->name('group-areas.processCsvImport');
+    Route::resource('group-areas', 'GroupAreaController');
+
     // Marketing Area
     Route::delete('marketing-areas/destroy', 'MarketingAreaController@massDestroy')->name('marketing-areas.massDestroy');
     Route::post('marketing-areas/parse-csv-import', 'MarketingAreaController@parseCsvImport')->name('marketing-areas.parseCsvImport');

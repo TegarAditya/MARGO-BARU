@@ -7,6 +7,7 @@ use App\Http\Controllers\Traits\CsvImportTrait;
 use App\Http\Requests\MassDestroyMarketingAreaRequest;
 use App\Http\Requests\StoreMarketingAreaRequest;
 use App\Http\Requests\UpdateMarketingAreaRequest;
+use App\Models\GroupArea;
 use App\Models\MarketingArea;
 use Gate;
 use Illuminate\Http\Request;
@@ -22,7 +23,7 @@ class MarketingAreaController extends Controller
         abort_if(Gate::denies('marketing_area_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         if ($request->ajax()) {
-            $query = MarketingArea::query()->select(sprintf('%s.*', (new MarketingArea)->table));
+            $query = MarketingArea::with(['group_area'])->select(sprintf('%s.*', (new MarketingArea)->table));
             $table = Datatables::of($query);
 
             $table->addColumn('placeholder', '&nbsp;');
@@ -46,8 +47,11 @@ class MarketingAreaController extends Controller
             $table->editColumn('name', function ($row) {
                 return $row->name ? $row->name : '';
             });
+            $table->addColumn('group_area_code', function ($row) {
+                return $row->group_area ? $row->group_area->code : '';
+            });
 
-            $table->rawColumns(['actions', 'placeholder']);
+            $table->rawColumns(['actions', 'placeholder', 'group_area']);
 
             return $table->make(true);
         }
@@ -59,7 +63,9 @@ class MarketingAreaController extends Controller
     {
         abort_if(Gate::denies('marketing_area_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        return view('admin.marketingAreas.create');
+        $group_areas = GroupArea::pluck('code', 'id')->prepend(trans('global.pleaseSelect'), '');
+
+        return view('admin.marketingAreas.create', compact('group_areas'));
     }
 
     public function store(StoreMarketingAreaRequest $request)
@@ -73,7 +79,11 @@ class MarketingAreaController extends Controller
     {
         abort_if(Gate::denies('marketing_area_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        return view('admin.marketingAreas.edit', compact('marketingArea'));
+        $group_areas = GroupArea::pluck('code', 'id')->prepend(trans('global.pleaseSelect'), '');
+
+        $marketingArea->load('group_area');
+
+        return view('admin.marketingAreas.edit', compact('group_areas', 'marketingArea'));
     }
 
     public function update(UpdateMarketingAreaRequest $request, MarketingArea $marketingArea)
@@ -86,6 +96,8 @@ class MarketingAreaController extends Controller
     public function show(MarketingArea $marketingArea)
     {
         abort_if(Gate::denies('marketing_area_show'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+
+        $marketingArea->load('group_area');
 
         return view('admin.marketingAreas.show', compact('marketingArea'));
     }

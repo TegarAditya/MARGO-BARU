@@ -22,6 +22,10 @@ class StoreMarketingAreaRequest extends FormRequest
                 'required',
                 'unique:marketing_areas',
             ],
+            'group_area_id' => [
+                'required',
+                'integer',
+            ],
         ];
     }
 }

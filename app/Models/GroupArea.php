@@ -8,11 +8,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class MarketingArea extends Model
+class GroupArea extends Model
 {
     use SoftDeletes, Auditable, HasFactory;
 
-    public $table = 'marketing_areas';
+    public $table = 'group_areas';
 
     protected $dates = [
         'created_at',
@@ -21,21 +21,22 @@ class MarketingArea extends Model
     ];
 
     protected $fillable = [
+        'code',
         'name',
-        'description',
-        'group_area_id',
+        'provinsi',
         'created_at',
         'updated_at',
         'deleted_at',
     ];
 
+    public const PROVINSI_SELECT = [
+        'jateng' => 'Jawa Tengah',
+        'jatim'  => 'Jawa Timur',
+        'jabar'  => 'Jawa Barat',
+    ];
+
     protected function serializeDate(DateTimeInterface $date)
     {
         return $date->format('Y-m-d H:i:s');
-    }
-
-    public function group_area()
-    {
-        return $this->belongsTo(GroupArea::class, 'group_area_id');
     }
 }

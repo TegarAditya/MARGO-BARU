@@ -3,13 +3,13 @@
 
 <div class="card">
     <div class="card-header">
-        {{ trans('global.show') }} {{ trans('cruds.marketingArea.title') }}
+        {{ trans('global.show') }} {{ trans('cruds.groupArea.title') }}
     </div>
 
     <div class="card-body">
         <div class="form-group">
             <div class="form-group">
-                <a class="btn btn-default" href="{{ route('admin.marketing-areas.index') }}">
+                <a class="btn btn-default" href="{{ route('admin.group-areas.index') }}">
                     {{ trans('global.back_to_list') }}
                 </a>
             </div>
@@ -17,32 +17,32 @@
                 <tbody>
                     <tr>
                         <th>
-                            {{ trans('cruds.marketingArea.fields.name') }}
+                            {{ trans('cruds.groupArea.fields.code') }}
                         </th>
                         <td>
-                            {{ $marketingArea->name }}
+                            {{ $groupArea->code }}
                         </td>
                     </tr>
                     <tr>
                         <th>
-                            {{ trans('cruds.marketingArea.fields.description') }}
+                            {{ trans('cruds.groupArea.fields.name') }}
                         </th>
                         <td>
-                            {{ $marketingArea->description }}
+                            {{ $groupArea->name }}
                         </td>
                     </tr>
                     <tr>
                         <th>
-                            {{ trans('cruds.marketingArea.fields.group_area') }}
+                            {{ trans('cruds.groupArea.fields.provinsi') }}
                         </th>
                         <td>
-                            {{ $marketingArea->group_area->code ?? '' }}
+                            {{ App\Models\GroupArea::PROVINSI_SELECT[$groupArea->provinsi] ?? '' }}
                         </td>
                     </tr>
                 </tbody>
             </table>
             <div class="form-group">
-                <a class="btn btn-default" href="{{ route('admin.marketing-areas.index') }}">
+                <a class="btn btn-default" href="{{ route('admin.group-areas.index') }}">
                     {{ trans('global.back_to_list') }}
                 </a>
             </div>
