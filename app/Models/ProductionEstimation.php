@@ -24,8 +24,6 @@ class ProductionEstimation extends Model
         'product_id',
         'type',
         'estimasi',
-        'isi',
-        'cover',
         'created_at',
         'updated_at',
         'deleted_at',
@@ -38,6 +36,8 @@ class ProductionEstimation extends Model
         'P' => 'Pegangan Guru',
         'S' => 'Isi PG',
         'V' => 'Cover PG',
+        'K' => 'Kunci',
+        'U' => 'Isi Kunci',
     ];
 
     protected function serializeDate(DateTimeInterface $date)

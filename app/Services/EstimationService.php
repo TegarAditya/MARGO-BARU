@@ -29,20 +29,12 @@ class EstimationService
 
         if ($production) {
             $production->estimasi += $quantity;
-
-            if ($type == 'L' | $type == 'P') {
-                $production->isi += $quantity;
-                $production->cover += $quantity;
-            }
-
             $production->save();
         } else {
             $new = ProductionEstimation::create([
                 'product_id' => $product,
                 'type' => $type,
                 'estimasi' => $quantity,
-                'isi' => ($type == 'L' | $type == 'P') ? $quantity : null,
-                'cover' => ($type == 'L' | $type == 'P') ? $quantity : null
             ]);
         }
     }
@@ -68,12 +60,6 @@ class EstimationService
 
         if ($production) {
             $production->estimasi += $quantity;
-
-            if ($type == 'L' | $type == 'P') {
-                $production->isi += $quantity;
-                $production->cover += $quantity;
-            }
-
             $production->save();
         }
     }

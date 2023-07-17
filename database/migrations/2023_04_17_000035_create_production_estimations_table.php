@@ -12,8 +12,6 @@ class CreateProductionEstimationsTable extends Migration
             $table->bigIncrements('id');
             $table->string('type');
             $table->integer('estimasi')->nullable();
-            $table->integer('isi')->nullable();
-            $table->integer('cover')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });
