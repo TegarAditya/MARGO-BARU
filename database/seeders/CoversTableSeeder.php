@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\Cover;
+use App\Models\Setting;
 
 class CoversTableSeeder extends Seeder
 {
@@ -83,6 +84,12 @@ class CoversTableSeeder extends Seeder
         'created_at'=>NULL,
         'updated_at'=>NULL,
         'deleted_at'=>NULL
+        ] );
+
+        Setting::create( [
+            'key'=>'current_semester',
+            'value'=>'11',
+            'is_json'=> 0,
         ] );
     }
 }

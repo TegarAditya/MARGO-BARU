@@ -23,6 +23,13 @@ if (! function_exists('money')) {
     }
 }
 
+if (! function_exists('setting')) {
+    function setting($setting)
+    {
+        return App\Models\Setting::key($setting);
+    }
+}
+
 if (! function_exists('angka')) {
     function angka($angka)
     {

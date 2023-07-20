@@ -18,8 +18,8 @@ class DatabaseSeeder extends Seeder
             SemesterTableSeeder::class,
             UnitTableSeeder::class,
             WarehouseTableSeeder::class,
-            CoversTableSeeder::class,
-            MasterBukuSeeder::class
+            MasterBukuSeeder::class,
+            CoversTableSeeder::class
         ]);
     }
 }
