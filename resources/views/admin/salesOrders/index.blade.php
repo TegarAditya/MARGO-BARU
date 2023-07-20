@@ -138,8 +138,8 @@
     ajax: {
         url: "{{ route('admin.sales-orders.index') }}",
         data: function(data) {
-            data.salesperson = $('#salesperson_id').val()
-            data.semester = $('#semester_id').val()
+            data.salesperson = $('#salesperson_id').val(),
+            data.semester = $('#semester_id').val(),
             data.payment_type = $('#payment_type').val()
         }
     },
@@ -152,7 +152,7 @@
         { data: 'actions', name: '{{ trans('global.actions') }}', class: 'text-center' }
     ],
     orderCellsTop: true,
-    order: [[ 2, 'desc' ]],
+    // order: [[ 2, 'desc' ]],
     pageLength: 25,
   };
   let table = $('.datatable-SalesOrder').DataTable(dtOverrideGlobals);

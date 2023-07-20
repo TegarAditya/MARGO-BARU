@@ -28,7 +28,15 @@ class InvoiceController extends Controller
         abort_if(Gate::denies('invoice_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         if ($request->ajax()) {
-            $query = Invoice::with(['delivery_order', 'semester', 'salesperson'])->select(sprintf('%s.*', (new Invoice)->table));
+            $query = Invoice::with(['delivery_order', 'semester', 'salesperson'])->select(sprintf('%s.*', (new Invoice)->table))->latest();
+
+            if (!empty($request->salesperson)) {
+                $query->where('salesperson_id', $request->salesperson);
+            }
+            if (!empty($request->semester)) {
+                $query->where('semester_id', $request->semester);
+            }
+
             $table = Datatables::of($query);
 
             $table->addColumn('placeholder', '&nbsp;');
@@ -89,7 +97,11 @@ class InvoiceController extends Controller
             return $table->make(true);
         }
 
-        return view('admin.invoices.index');
+        $semesters = Semester::orderBy('code', 'DESC')->where('status', 1)->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+
+        $salespeople = Salesperson::get()->pluck('short_name', 'id')->prepend(trans('global.pleaseSelect'), '');
+
+        return view('admin.invoices.index', compact('salespeople', 'semesters'));
     }
 
     public function create()
@@ -121,23 +133,23 @@ class InvoiceController extends Controller
             'date' => 'required',
             'delivery' =>'required|exists:delivery_orders,id',
             // 'note' => 'nullable',
-            'nominal' => 'numeric|min:1',
-            'total_price' => 'numeric|min:1',
-            'total_diskon' => 'numeric|min:1',
+            'nominal' => 'numeric|min:0',
+            'total_price' => 'numeric|min:0',
+            'total_diskon' => 'numeric|min:0',
             'delivery_items' => 'required|array',
             'delivery_items.*' => 'exists:delivery_order_items,id',
             'products' => 'required|array',
             'products.*' => 'exists:book_variants,id',
             'prices' => 'required|array',
-            'prices.*' => 'numeric|min:1',
+            'prices.*' => 'numeric|min:0',
             'diskons' => 'nullable|array',
             'diskons.*' => 'numeric|min:0',
             'quantities' => 'required|array',
             'quantities.*' => 'numeric|min:1',
             'subtotals' => 'required|array',
-            'subtotals.*' => 'numeric|min:1',
+            'subtotals.*' => 'numeric|min:0',
             'subdiscounts' => 'required|array',
-            'subdiscounts.*' => 'numeric|min:1',
+            'subdiscounts.*' => 'numeric|min:0',
         ]);
 
         $date = $validatedData['date'];
@@ -251,7 +263,7 @@ class InvoiceController extends Controller
                 'created_by_id' => auth()->user()->id
             ]);
 
-            $note = 'Faktur From '. $no_faktur. '. Catatan :'. $note;
+            $note = 'Faktur From '. $invoice->no_faktur. '. Catatan :'. $note;
 
             TransactionService::createTransaction($date, $note, $salesperson, $semester, 'faktur', $invoice->id, $invoice->no_faktur, $nominal, 'debet');
 
@@ -262,6 +274,8 @@ class InvoiceController extends Controller
             return redirect()->route('admin.invoices.index');
         } catch (\Exception $e) {
             DB::rollback();
+
+            dd($e);
 
             return redirect()->back()->with('error-message', $e->getMessage())->withInput();
         }

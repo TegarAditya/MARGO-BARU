@@ -23,7 +23,7 @@ class HalamanController extends Controller
         abort_if(Gate::denies('halaman_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         if ($request->ajax()) {
-            $query = Halaman::query()->select(sprintf('%s.*', (new Halaman)->table));
+            $query = Halaman::query()->select(sprintf('%s.*', (new Halaman)->table))->latest();
             $table = Datatables::of($query);
 
             $table->addColumn('placeholder', '&nbsp;');

@@ -33,6 +33,14 @@ class ReturnGoodController extends Controller
 
         if ($request->ajax()) {
             $query = ReturnGood::with(['salesperson', 'semester'])->select(sprintf('%s.*', (new ReturnGood)->table));
+
+            if (!empty($request->salesperson)) {
+                $query->where('salesperson_id', $request->salesperson);
+            }
+            if (!empty($request->semester)) {
+                $query->where('semester_id', $request->semester);
+            }
+
             $table = Datatables::of($query);
 
             $table->addColumn('placeholder', '&nbsp;');
@@ -66,7 +74,7 @@ class ReturnGoodController extends Controller
             });
 
             $table->editColumn('nominal', function ($row) {
-                return $row->nominal ? $row->nominal : '';
+                return $row->nominal ? money($row->nominal) : '';
             });
 
             $table->rawColumns(['actions', 'placeholder', 'salesperson', 'semester']);
@@ -74,7 +82,11 @@ class ReturnGoodController extends Controller
             return $table->make(true);
         }
 
-        return view('admin.returnGoods.index');
+        $semesters = Semester::orderBy('code', 'DESC')->where('status', 1)->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+
+        $salespeople = Salesperson::get()->pluck('short_name', 'id')->prepend(trans('global.pleaseSelect'), '');
+
+        return view('admin.returnGoods.index', compact('semesters', 'salespeople'));
     }
 
     public function create()
@@ -164,10 +176,10 @@ class ReturnGoodController extends Controller
                         'discount' => 0,
                         'total_discount' => 0
                     ]);
-                
+
                 $invoices = Invoice::where('salesperson_id', $salesperson)->where('semester_id', $semester)->get();
                 $note_transaksi = 'Diskon di cancel karena retur no '.$retur->no_retur;
-                
+
                 foreach($invoices as $invoice) {
                     $total = $invoice->total;
                     if ($invoice->retur) {
@@ -191,7 +203,7 @@ class ReturnGoodController extends Controller
             return redirect()->route('admin.return-goods.index');
         } catch (\Exception $e) {
             DB::rollback();
-            
+
             dd($e);
 
             return redirect()->back()->with('error-message', $e->getMessage())->withInput();

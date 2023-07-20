@@ -36,7 +36,7 @@ class DeliveryOrderController extends Controller
             if (!empty($request->semester)) {
                 $query->where('semester_id', $request->semester);
             }
-            if (!empty($request->semester)) {
+            if (!empty($request->payment_type)) {
                 $query->where('payment_type', $request->payment_type);
             }
 
@@ -58,13 +58,7 @@ class DeliveryOrderController extends Controller
                     </a>
                 ';
 
-                if ($row->faktur) {
-                    $btn = $btn. '
-                        <a class="px-1" href="'.route('admin.delivery-orders.printSj', $row->id).'" title="Generate Invoice" target="_blank">
-                            <i class="fas fa-tasks text-danger fa-lg"></i>
-                        </a>
-                    ';
-                } else {
+                if (!$row->faktur) {
                     $btn = $btn. '
                         <a class="px-1" href="'.route('admin.invoices.generate', $row->id).'" title="Generate Invoice">
                             <i class="fas fa-receipt text-danger fa-lg"></i>

@@ -88,11 +88,11 @@
     columns: [
         { data: 'placeholder', name: 'placeholder' },
         { data: 'code', name: 'code', class: 'text-center' },
-        { data: 'name', name: 'name' },
+        { data: 'name', name: 'name', class: 'text-center' },
         { data: 'actions', name: '{{ trans('global.actions') }}', class: 'text-center' }
     ],
     orderCellsTop: true,
-    order: [[ 2, 'asc' ]],
+    // order: [[ 2, 'asc' ]],
     pageLength: 25,
   };
   let table = $('.datatable-Halaman').DataTable(dtOverrideGlobals);

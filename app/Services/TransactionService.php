@@ -4,13 +4,15 @@ namespace App\Services;
 use Carbon\Carbon;
 use DB;
 use App\Models\Transaction;
+use App\Models\Salesperson;
+use App\Events\TransactionUpdated;
 
 class TransactionService
 {
     public static function createTransaction($date, $description, $salesperson, $semester,
         $type, $reference, $reference_no, $amount, $category)
     {
-        $estimation = Transaction::create([
+        $transaction = Transaction::create([
             'date' => Carbon::now()->format('d-m-Y'),
             'description' => $description,
             'salesperson_id' => $salesperson,
@@ -23,6 +25,8 @@ class TransactionService
             'category' => $category,
             'status' => 0,
         ]);
+
+        event(new TransactionUpdated($transaction));
     }
 
     public static function editTransaction($date, $description, $salesperson, $semester,
@@ -46,7 +50,7 @@ class TransactionService
             'reversal_of_id' => $reversal->id
         ]);
 
-        $transaksi = Transaction::create([
+        $transaction = Transaction::create([
             'date' => Carbon::now()->format('d-m-Y'),
             'description' => $description,
             'salesperson_id' => $salesperson,
@@ -59,5 +63,7 @@ class TransactionService
             'category' => $category,
             'status' => 0,
         ]);
+
+        event(new TransactionUpdated($transaction));
     }
 }

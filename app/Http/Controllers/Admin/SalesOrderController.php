@@ -31,7 +31,8 @@ class SalesOrderController extends Controller
 
         if ($request->ajax()) {
             // $query = SalesOrder::with(['semester', 'salesperson', 'product', 'jenjang', 'kurikulum'])->select(sprintf('%s.*', (new SalesOrder)->table));
-            $query = SalesOrder::select('no_order', 'semester_id', 'salesperson_id', 'payment_type')->distinct()->with(['semester', 'salesperson']);
+            $query = SalesOrder::select('no_order', 'semester_id', 'salesperson_id', 'payment_type')->distinct()->with(['semester', 'salesperson'])
+                ->orderBy('semester_id', 'DESC')->OrderBy('salesperson_id', 'ASC');
 
             if (!empty($request->salesperson)) {
                 $query->where('salesperson_id', $request->salesperson);

@@ -42,16 +42,6 @@ class Salesperson extends Model
         return $date->format('Y-m-d H:i:s');
     }
 
-    public function marketing_area()
-    {
-        return $this->belongsTo(MarketingArea::class, 'marketing_area_id');
-    }
-
-    public function estimasi()
-    {
-        return $this->hasMany(SalesOrder::class);
-    }
-
     public function getFullNameAttribute()
     {
         $name = $this->code. ' - '. $this->name. ' - '. $this->marketing_area?->name;
@@ -64,5 +54,35 @@ class Salesperson extends Model
         $name = $this->name. ' - '. $this->marketing_area?->name;
 
         return $name;
+    }
+
+    public function marketing_area()
+    {
+        return $this->belongsTo(MarketingArea::class, 'marketing_area_id');
+    }
+
+    public function estimasi()
+    {
+        return $this->hasMany(SalesOrder::class);
+    }
+
+    public function invoices()
+    {
+        return $this->hasMany(Invoice::class);
+    }
+
+    public function payments()
+    {
+        return $this->hasMany(Payment::class);
+    }
+
+    public function transactions()
+    {
+        return $this->hasMany(Transaction::class);
+    }
+
+    public function transaction_total()
+    {
+        return $this->hasOne(TransactionTotal::class);
     }
 }

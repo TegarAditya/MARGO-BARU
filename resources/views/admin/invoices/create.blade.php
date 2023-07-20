@@ -107,7 +107,7 @@
                         <div class="form-group text-field m-0">
                             <div class="text-field-input px-2 py-0">
                                 <span class="mr-1">Rp</span>
-                                <input type="hidden" name="nominal" value="0" />
+                                <input type="hidden" name="nominal" value="1" />
                                 <input class="form-control" type="text" id="nominal_text" name="nominal_text" min="1">
                                 <label for="nominal_text" class="text-field-border"></label>
                             </div>

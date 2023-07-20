@@ -996,8 +996,20 @@ class PermissionsTableSeeder extends Seeder
             ],
             [
                 'id'    => 247,
+                'title' => 'transaction_total_show',
+            ],
+            [
+                'id'    => 248,
+                'title' => 'transaction_total_access',
+            ],
+            [
+                'id'    => 249,
+                'title' => 'sales_billing_access',
+            ],
+            [
+                'id'    => 250,
                 'title' => 'profile_password_edit',
-            ]
+            ],
         ];
 
         Permission::insert($permissions);

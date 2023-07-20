@@ -226,6 +226,9 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     Route::delete('rekap-billings/destroy', 'RekapBillingController@massDestroy')->name('rekap-billings.massDestroy');
     Route::resource('rekap-billings', 'RekapBillingController');
 
+    // Sales Billing
+    Route::resource('sales-billings', 'SalesBillingController');
+
     // Payment
     Route::delete('payments/destroy', 'PaymentController@massDestroy')->name('payments.massDestroy');
     Route::get('payments/get-tagihan', 'PaymentController@getTagihan')->name('payments.getTagihan');
@@ -236,6 +239,9 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     Route::delete('transactions/destroy', 'TransactionController@massDestroy')->name('transactions.massDestroy');
     Route::resource('transactions', 'TransactionController');
 
+    // Transaction Total
+    Route::resource('transaction-totals', 'TransactionTotalController', ['except' => ['create', 'store', 'edit', 'update', 'destroy']]);
+    
     // Sales Report
     Route::delete('sales-reports/destroy', 'SalesReportController@massDestroy')->name('sales-reports.massDestroy');
     Route::resource('sales-reports', 'SalesReportController');

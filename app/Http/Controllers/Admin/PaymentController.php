@@ -27,7 +27,19 @@ class PaymentController extends Controller
         abort_if(Gate::denies('payment_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         if ($request->ajax()) {
-            $query = Payment::with(['salesperson', 'semester'])->select(sprintf('%s.*', (new Payment)->table));
+            $query = Payment::with(['salesperson', 'semester'])->select(sprintf('%s.*', (new Payment)->table))->latest();
+
+            if (!empty($request->salesperson)) {
+                $query->where('salesperson_id', $request->salesperson);
+            }
+            if (!empty($request->semester)) {
+                $query->where('semester_id', $request->semester);
+            }
+
+            if (!empty($request->payment_method)) {
+                $query->where('payment_method', $request->payment_method);
+            }
+
             $table = Datatables::of($query);
 
             $table->addColumn('placeholder', '&nbsp;');
@@ -76,7 +88,11 @@ class PaymentController extends Controller
             return $table->make(true);
         }
 
-        return view('admin.payments.index');
+        $semesters = Semester::orderBy('code', 'DESC')->where('status', 1)->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+
+        $salespeople = Salesperson::get()->pluck('short_name', 'id')->prepend(trans('global.pleaseSelect'), '');
+
+        return view('admin.payments.index', compact('semesters', 'salespeople'));
     }
 
     public function create()

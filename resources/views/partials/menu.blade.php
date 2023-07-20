@@ -591,8 +591,8 @@
                     </li>
                 @endcan
                 @can('tagihan_access')
-                    <li class="nav-item has-treeview {{ request()->is("admin/invoices*") ? "menu-open" : "" }} {{ request()->is("admin/invoice-items*") ? "menu-open" : "" }} {{ request()->is("admin/rekap-billings*") ? "menu-open" : "" }}">
-                        <a class="nav-link nav-dropdown-toggle {{ request()->is("admin/invoices*") ? "active" : "" }} {{ request()->is("admin/invoice-items*") ? "active" : "" }} {{ request()->is("admin/rekap-billings*") ? "active" : "" }}" href="#">
+                    <li class="nav-item has-treeview {{ request()->is("admin/sales-billings*") ? "menu-open" : "" }} {{ request()->is("admin/invoices*") ? "menu-open" : "" }} {{ request()->is("admin/invoices*") ? "menu-open" : "" }} {{ request()->is("admin/invoice-items*") ? "menu-open" : "" }} {{ request()->is("admin/rekap-billings*") ? "menu-open" : "" }}">
+                        <a class="nav-link nav-dropdown-toggle {{ request()->is("admin/sales-billings*") ? "active" : "" }} {{ request()->is("admin/invoices*") ? "active" : "" }} {{ request()->is("admin/invoice-items*") ? "active" : "" }} {{ request()->is("admin/rekap-billings*") ? "active" : "" }}" href="#">
                             <i class="fa-fw nav-icon fas fa-file-invoice">
 
                             </i>
@@ -622,6 +622,18 @@
                                         </i>
                                         <p>
                                             {{ trans('cruds.rekapBilling.title') }}
+                                        </p>
+                                    </a>
+                                </li>
+                            @endcan
+                            @can('sales_billing_access')
+                                <li class="nav-item">
+                                    <a href="{{ route("admin.sales-billings.index") }}" class="nav-link {{ request()->is("admin/sales-billings") || request()->is("admin/sales-billings/*") ? "active" : "" }}">
+                                        <i class="fa-fw nav-icon fas fa-hand-holding-usd">
+
+                                        </i>
+                                        <p>
+                                            {{ trans('cruds.salesBilling.title') }}
                                         </p>
                                     </a>
                                 </li>
@@ -657,8 +669,8 @@
                     </li>
                 @endcan
                 @can('transaksi_access')
-                    <li class="nav-item has-treeview {{ request()->is("admin/transactions*") ? "menu-open" : "" }} {{ request()->is("admin/sales-reports*") ? "menu-open" : "" }}">
-                        <a class="nav-link nav-dropdown-toggle {{ request()->is("admin/transactions*") ? "active" : "" }} {{ request()->is("admin/sales-reports*") ? "active" : "" }}" href="#">
+                    <li class="nav-item has-treeview {{ request()->is("admin/transaction-totals*") ? "menu-open" : "" }} {{ request()->is("admin/transactions*") ? "menu-open" : "" }} {{ request()->is("admin/sales-reports*") ? "menu-open" : "" }}">
+                        <a class="nav-link nav-dropdown-toggle {{ request()->is("admin/transaction-totals*") ? "active" : "" }} {{ request()->is("admin/transactions*") ? "active" : "" }} {{ request()->is("admin/sales-reports*") ? "active" : "" }} " href="#">
                             <i class="fa-fw nav-icon fas fa-file-signature">
 
                             </i>
@@ -680,6 +692,18 @@
                                     </a>
                                 </li>
                             @endcan
+                            {{-- @can('transaction_total_access')
+                                <li class="nav-item">
+                                    <a href="{{ route("admin.transaction-totals.index") }}" class="nav-link {{ request()->is("admin/transaction-totals") || request()->is("admin/transaction-totals/*") ? "active" : "" }}">
+                                        <i class="fa-fw nav-icon fas fa-money-check">
+
+                                        </i>
+                                        <p>
+                                            {{ trans('cruds.transactionTotal.title') }}
+                                        </p>
+                                    </a>
+                                </li>
+                            @endcan --}}
                             @can('sales_report_access')
                                 <li class="nav-item">
                                     <a href="{{ route("admin.sales-reports.index") }}" class="nav-link {{ request()->is("admin/sales-reports") || request()->is("admin/sales-reports/*") ? "active" : "" }}">

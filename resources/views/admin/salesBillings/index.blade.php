@@ -3,30 +3,11 @@
 
 <div class="card">
     <div class="card-header">
-        <strong>REKAP BILLING {{ $semester->name }}</strong>
+        {{ trans('cruds.salesBilling.title') }}
     </div>
+
     <div class="card-body">
-        <form method="GET" action="{{ route("admin.rekap-billings.index") }}">
-            <div class="row">
-                <div class="col row">
-                    <div class="col-4">
-                        <div class="form-group mb-0">
-                            <label class="small mb-0" for="semester">Semester</label>
-                            <select class="form-control select2 {{ $errors->has('semester') ? 'is-invalid' : '' }}" name="semester" id="semester">
-                                @foreach($semesters as $id => $entry)
-                                    <option value="{{ $id }}" {{ (old('semester') ? old('semester') : request()->get('semester') ?? '') == $id ? 'selected' : '' }}>{{ $entry }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                    </div>
-
-                <div class="col-auto align-self-end">
-                    <button type="submit" class="btn btn-success">Filter</button>
-                </div>
-            </div>
-        </form>
-
-        <div class="table-responsive mt-5">
+        <div class="table-responsive mt-2">
             <table class="table table-bordered table-striped table-hover datatable-saldo">
                 <thead>
                     <tr>
@@ -38,7 +19,7 @@
                         <th>Pembayaran</th>
                         <th>Potongan</th>
                         <th>Piutang</th>
-                        <th></th>
+                        {{-- <th></th> --}}
                     </tr>
                 </thead>
                 <tbody>
@@ -52,29 +33,37 @@
                 @endphp
                 @foreach ($sales as $item)
                     @php
-                        $total_pengambilan += $item->pengambilan;
-                        $total_diskon += $item->diskon;
-                        $total_retur += $item->retur;
-                        $total_bayar += $item->bayar;
-                        $total_potongan += $item->potongan;
+                        $transaksi = $item->transaction_total;
 
-                        $piutang = $item->pengambilan - ($item->diskon + $item->retur + $item->bayar + $item->potongan);
+                        $pengambilan = $transaksi ? $transaksi->total_invoice : 0;
+                        $diskon = $transaksi ? $transaksi->total_diskon : 0;
+                        $retur = $transaksi ? $transaksi->total_retur : 0;
+                        $bayar = $transaksi ? $transaksi->total_bayar : 0;
+                        $potongan = $transaksi ? $transaksi->total_potongan : 0;
+
+                        $total_pengambilan += $pengambilan;
+                        $total_diskon += $diskon;
+                        $total_retur += $retur;
+                        $total_bayar += $bayar;
+                        $total_potongan += $potongan;
+
+                        $piutang = $pengambilan - ($diskon + $retur + $bayar + $potongan);
                         $total_piutang += $piutang;
                     @endphp
                     <tr>
                         <td></td>
                         <td>{{ $item->full_name }}</td>
-                        <td class="text-right">{{ money($item->pengambilan) }}</td>
-                        <td class="text-right">{{ money($item->diskon) }}</td>
-                        <td class="text-right">{{ money($item->retur) }}</td>
-                        <td class="text-right">{{ money($item->bayar) }}</td>
-                        <td class="text-right">{{ money($item->potongan) }}</td>
+                        <td class="text-right">{{ money($pengambilan) }}</td>
+                        <td class="text-right">{{ money($diskon) }}</td>
+                        <td class="text-right">{{ money($retur) }}</td>
+                        <td class="text-right">{{ money($bayar) }}</td>
+                        <td class="text-right">{{ money($potongan) }}</td>
                         <td class="text-right">{{ money($piutang) }}</td>
-                        <td class="text-center">
+                        {{-- <td class="text-center">
                             <a class="px-1" href="{{ route('admin.salespeople.show', $item->id) }}.'" title="Show">
                                 <i class="fas fa-eye fa-lg"></i>
                             </a>
-                        </td>
+                        </td> --}}
                     </tr>
                 @endforeach
                 </tbody>
@@ -89,7 +78,7 @@
                         <td class="text-right">{{ money($total_bayar) }}</td>
                         <td class="text-right">{{ money($total_potongan) }}</td>
                         <td class="text-right">{{ money($total_piutang) }}</td>
-                        <td></td>
+                        {{-- <td></td> --}}
                     </tr>
                 </tfoot>
             </table>
