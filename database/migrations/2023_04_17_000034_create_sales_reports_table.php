@@ -10,7 +10,7 @@ class CreateSalesReportsTable extends Migration
     {
         Schema::create('sales_reports', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('code')->unique();
+            $table->string('code');
             $table->string('periode');
             $table->date('start_date');
             $table->date('end_date');

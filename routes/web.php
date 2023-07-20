@@ -244,6 +244,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     
     // Sales Report
     Route::delete('sales-reports/destroy', 'SalesReportController@massDestroy')->name('sales-reports.massDestroy');
+    Route::post('sales-reports/generate', 'SalesReportController@generate')->name('sales-reports.generate');
     Route::resource('sales-reports', 'SalesReportController');
 
     // Production Estimation

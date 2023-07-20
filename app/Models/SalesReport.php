@@ -24,20 +24,12 @@ class SalesReport extends Model
         'deleted_at',
     ];
 
-    public const TYPE_SELECT = [
-        'kirim'  => 'Pengambilan',
-        'retur'  => 'Retur',
-        'bayar'  => 'Pembayaran',
-        'diskon' => 'Potongan',
-    ];
-
     protected $fillable = [
         'code',
         'periode',
         'salesperson_id',
         'start_date',
         'end_date',
-        'type',
         'saldo_awal',
         'debet',
         'kredit',
@@ -77,5 +69,10 @@ class SalesReport extends Model
     public function setEndDateAttribute($value)
     {
         $this->attributes['end_date'] = $value ? Carbon::createFromFormat(config('panel.date_format'), $value)->format('Y-m-d') : null;
+    }
+
+    public function details()
+    {
+        return $this->hasMany(SalesReportDetail::class);
     }
 }
