@@ -89,4 +89,10 @@ class SalesOrder extends Model
 
         return $code;
     }
+
+    public static function generateNoOrderTemp($semester) {
+        $semester = Semester::find($semester);
+        $code = 'ORD/SALES/TYPE/'.$semester?->code;
+        return $code;
+    }
 }

@@ -13,8 +13,8 @@ class CreateSalesOrdersTable extends Migration
             $table->string('no_order')->nullable();
             $table->string('payment_type');
             $table->integer('quantity');
-            $table->integer('moved')->nullable();
-            $table->integer('retur')->nullable();
+            $table->integer('moved')->default(0);
+            $table->integer('retur')->default(0);
             $table->timestamps();
             $table->softDeletes();
         });

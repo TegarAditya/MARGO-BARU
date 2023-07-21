@@ -1,9 +1,8 @@
 @extends('layouts.admin')
 @section('content')
-
 <div class="card">
     <div class="card-header">
-        {{ trans('global.create') }} {{ trans('cruds.salesOrder.title_singular') }}
+        <h1>Formulir Estimasi Sales</h1>
     </div>
 
     <div class="card-body">
@@ -19,16 +18,12 @@
             <div class="row">
                 <div class="col-6">
                     <div class="form-group">
-                        <label class="required" for="semester_id">{{ trans('cruds.salesOrder.fields.semester') }}</label>
-                        <select class="form-control select2 {{ $errors->has('semester') ? 'is-invalid' : '' }}" name="semester_id" id="semester_id" required>
-                            @foreach($semesters as $id => $entry)
-                                <option value="{{ $id }}" {{ old('semester_id') == $id ? 'selected' : '' }}>{{ $entry }}</option>
-                            @endforeach
-                        </select>
-                        @if($errors->has('semester'))
-                            <span class="text-danger">{{ $errors->first('semester') }}</span>
+                        <label class="required" for="no_order">No Order</label>
+                        <input class="form-control {{ $errors->has('no_order') ? 'is-invalid' : '' }}" type="text" name="no_order" id="no_order" value="{{ old('no_order', $no_order) }}" readonly>
+                        @if($errors->has('no_order'))
+                            <span class="text-danger">{{ $errors->first('no_order') }}</span>
                         @endif
-                        <span class="help-block">{{ trans('cruds.salesOrder.fields.semester_helper') }}</span>
+                        <span class="help-block"></span>
                     </div>
                 </div>
                 <div class="col-6">
@@ -58,6 +53,22 @@
                             <span class="text-danger">{{ $errors->first('payment_type') }}</span>
                         @endif
                         <span class="help-block">{{ trans('cruds.salesOrder.fields.payment_type_helper') }}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-6">
+                    <div class="form-group">
+                        <label>{{ trans('cruds.salesOrder.fields.semester') }}</label>
+                        <select class="form-control select2 {{ $errors->has('semester') ? 'is-invalid' : '' }}" name="semester_id" id="semester_id">
+                            @foreach($semesters as $id => $entry)
+                                <option value="{{ $id }}" {{ (old('semester_id') ? old('semester_id') : setting('current_semester') ?? '') == $id ? 'selected' : '' }}>{{ $entry }}</option>
+                            @endforeach
+                        </select>
+                        @if($errors->has('semester'))
+                            <span class="text-danger">{{ $errors->first('semester') }}</span>
+                        @endif
+                        <span class="help-block">{{ trans('cruds.salesOrder.fields.semester_helper') }}</span>
                     </div>
                 </div>
                 <div class="col-6">
@@ -113,6 +124,7 @@
                     data: function(params) {
                         return {
                             q: params.term,
+                            semester: $('#semester_id').val(),
                             jenjang: $('#jenjang_id').val()
                         };
                     },

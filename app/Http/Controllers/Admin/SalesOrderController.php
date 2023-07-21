@@ -22,6 +22,7 @@ use DB;
 use Alert;
 use Carbon\Carbon;
 use App\Services\EstimationService;
+use App\Imports\SalesOrderImport;
 
 class SalesOrderController extends Controller
 {
@@ -51,10 +52,10 @@ class SalesOrderController extends Controller
 
             $table->editColumn('actions', function ($row) {
                 return '
-                    <a class="px-1" href="'.route('admin.sales-orders.show', ['salesperson' => $row->salesperson_id, 'semester' => $row->semester_id, 'payment_type' => $row->payment_type]).'" title="Show">
+                    <a class="px-1" href="'.route('admin.sales-orders.show', ['salesperson' => $row->salesperson_id, 'semester' => $row->semester_id]).'" title="Show">
                         <i class="fas fa-eye text-success fa-lg"></i>
                     </a>
-                    <a class="px-1" href="'.route('admin.sales-orders.estimasi', ['salesperson' => $row->salesperson_id, 'semester' => $row->semester_id, 'payment_type' => $row->payment_type]).'" target="_blank" title="Show" >
+                    <a class="px-1" href="'.route('admin.sales-orders.estimasi', ['salesperson' => $row->salesperson_id, 'semester' => $row->semester_id]).'" target="_blank" title="Show" >
                         <i class="fas fa-print text-secondary fa-lg"></i>
                     </a>
                     <a class="px-1" href="'.route('admin.sales-orders.edit', ['salesperson' => $row->salesperson_id, 'semester' => $row->semester_id, 'payment_type' => $row->payment_type]).'" title="Edit">
@@ -97,14 +98,16 @@ class SalesOrderController extends Controller
 
         $jenjangs = Jenjang::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
-        return view('admin.salesOrders.create', compact('jenjangs', 'salespeople', 'semesters'));
+        $no_order = SalesOrder::generateNoOrderTemp(setting('current_semester'));
+
+        return view('admin.salesOrders.create', compact('jenjangs', 'salespeople', 'semesters', 'no_order'));
     }
 
     public function store(Request $request)
     {
         // Validate the form data
         $validatedData = $request->validate([
-            'semester_id' =>'required',
+            // 'semester_id' =>'required',
             'salesperson_id' => 'required',
             'payment_type' => 'required',
             'jenjang_id' => 'nullable',
@@ -114,7 +117,7 @@ class SalesOrderController extends Controller
             'quantities.*' => 'numeric|min:1',
         ]);
 
-        $semester = $validatedData['semester_id'];
+        $semester = setting('current_semester');
         $salesperson = $validatedData['salesperson_id'];
         $payment_type = $validatedData['payment_type'];
         $products = $validatedData['products'];
@@ -130,23 +133,23 @@ class SalesOrderController extends Controller
                 $order = SalesOrder::updateOrCreate([
                     'semester_id' => $semester,
                     'salesperson_id' => $salesperson,
-                    'payment_type' => $payment_type,
                     'product_id' => $product->id,
                     'jenjang_id' => $product->jenjang_id,
                     'kurikulum_id' => $product->kurikulum_id
                 ], [
+                    'payment_type' => $payment_type,
                     'no_order' => SalesOrder::generateNoOrder($semester, $salesperson, $payment_type),
                     'quantity' => DB::raw("quantity + $quantity"),
-                    'moved' => 0,
-                    'retur' => 0
                 ]);
 
-                EstimationService::createMovement('in', 'sales_order', $order->id, $product->id, $quantity, $product->type);
-                EstimationService::createProduction($product->id, $quantity, $product->type);
+                if ($product->semester_id == $semester) {
+                    EstimationService::createMovement('in', 'sales_order', $order->id, $product->id, $quantity, $product->type);
+                    EstimationService::createProduction($product->id, $quantity, $product->type);
 
-                foreach($product->components as $item) {
-                    EstimationService::createMovement('in', 'sales_order', $order->id, $item->id, $quantity, $item->type);
-                    EstimationService::createProduction($item->id, $quantity, $item->type);
+                    foreach($product->components as $item) {
+                        EstimationService::createMovement('in', 'sales_order', $order->id, $item->id, $quantity, $item->type);
+                        EstimationService::createProduction($item->id, $quantity, $item->type);
+                    }
                 }
             }
 
@@ -193,11 +196,14 @@ class SalesOrderController extends Controller
          $validatedData = $request->validate([
             'products' => 'required|array',
             'products.*' => 'exists:book_variants,id',
+            'payment_types' => 'required|array',
+            'quantities.*' => 'numeric|min:1',
             'quantities' => 'required|array',
             'quantities.*' => 'numeric|min:1',
         ]);
         $products = $validatedData['products'];
         $quantities = $validatedData['quantities'];
+        $types = $validatedData['payment_types'];
         $today = Carbon::now()->format('d-m-Y');
         $semester = $salesOrder->semester_id;
         $salesperson = $salesOrder->salesperson_id;
@@ -207,6 +213,7 @@ class SalesOrderController extends Controller
         try {
             for ($i = 0; $i < count($products); $i++) {
                 $product = BookVariant::find($products[$i]);
+                $type = $types[$i];
                 $quantity = $quantities[$i];
 
                 $order = SalesOrder::where('semester_id', $semester)
@@ -216,7 +223,10 @@ class SalesOrderController extends Controller
                         ->first();
 
                 $old_quantity = $order->quantity;
-
+                if ($type !== $order->payment_type) {
+                    $order->no_order = SalesOrder::generateNoOrder($semester, $salesperson, $type);
+                    $order->payment_type = $type;
+                }
                 $order->quantity = $quantity;
                 $order->save();
 
@@ -247,20 +257,16 @@ class SalesOrderController extends Controller
 
         $semester = $request->semester;
         $salesperson = $request->salesperson;
-        $payment_type = $request->payment_type;
+        // $payment_type = $request->payment_type;
 
         $orders = SalesOrder::where('salesperson_id', $salesperson)
             ->where('semester_id', $semester)
-            ->where('payment_type', $payment_type)
+            // ->where('payment_type', $payment_type)
             ->get();
 
         $salesOrder = $orders->first();
 
         $salesOrder->load('semester', 'salesperson', 'product', 'jenjang', 'kurikulum');
-
-        if ($request->print) {
-            return view('admin.salesOrders.prints.estimasi', compact('salesOrder', 'orders'));
-        }
 
         return view('admin.salesOrders.show', compact('salesOrder', 'orders'));
     }
@@ -293,7 +299,7 @@ class SalesOrderController extends Controller
         ]);
 
         try {
-            Excel::import(new BookImport(), $file);
+            Excel::import(new SalesOrderImport(), $file);
         } catch (\Exception $e) {
             Alert::error('Error', $e->getMessage());
             return redirect()->back();
@@ -305,7 +311,7 @@ class SalesOrderController extends Controller
 
     public function template_import()
     {
-        $filepath = public_path('import-template\SALES_ORDER_TEMPLATE.xlsx');
+        $filepath = public_path('import-template\TEMPLATE_ESTIMASI_SALES.xlsx');
         return response()->download($filepath);
     }
 
@@ -313,11 +319,11 @@ class SalesOrderController extends Controller
     {
         $semester = $request->semester;
         $salesperson = $request->salesperson;
-        $payment_type = $request->payment_type;
+        // $payment_type = $request->payment_type;
 
         $orders = SalesOrder::where('salesperson_id', $salesperson)
             ->where('semester_id', $semester)
-            ->where('payment_type', $payment_type)
+            // ->where('payment_type', $payment_type)
             ->get();
 
         $salesOrder = $orders->first();

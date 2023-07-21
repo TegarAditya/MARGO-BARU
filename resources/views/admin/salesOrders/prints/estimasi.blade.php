@@ -63,7 +63,7 @@
                         <td>{{ $product->mapel->name }}</td>
                         <td class="text-center">{{ $product->kelas->code }}</td>
                         <td class="text-center">{{ $product->halaman->code }}</td>
-                        <td class="text-center">{{ angka($sisa)}}</td>
+                        <td class="text-center">{{ angka(max($sisa, 0))}}</td>
                     </tr>
                 @endforeach
             </tbody>

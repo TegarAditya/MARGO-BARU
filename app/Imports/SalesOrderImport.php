@@ -23,8 +23,8 @@ class SalesOrderImport implements ToCollection, WithHeadingRow
     public function collection(Collection $rows)
     {
         foreach ($rows as $row) {
-            $semester = Semester::where('code', $row['semester'])->first();
             $salesperson = Salesperson::where('code', $row['sales'])->first();
+            $semester = setting('current_semester');
             $product = BookVariant::where('code', $row['buku'])->first();
             $payment_type = $row['pembayaran'];
             $quantity = $row['estimasi'];
@@ -34,23 +34,26 @@ class SalesOrderImport implements ToCollection, WithHeadingRow
                 $order = SalesOrder::updateOrCreate([
                     'semester_id' => $semester,
                     'salesperson_id' => $salesperson,
-                    'payment_type' => SalesOrder::PAYMENT_TYPE_SELECT[$payment_type],
+
                     'product_id' => $product->id,
                     'jenjang_id' => $product->jenjang_id,
                     'kurikulum_id' => $product->kurikulum_id
                 ], [
+                    'payment_type' => SalesOrder::PAYMENT_TYPE_SELECT[$payment_type],
                     'no_order' => SalesOrder::generateNoOrder($semester, $salesperson, $payment_type),
                     'quantity' => DB::raw("quantity + $quantity"),
                     'moved' => 0,
                     'retur' => 0
                 ]);
 
-                EstimationService::createMovement('in', 'sales_order', $order->id, $product->id, $quantity, $product->type);
-                EstimationService::createProduction($product->id, $quantity, $product->type);
+                if ($product->semester_id === $semester) {
+                    EstimationService::createMovement('in', 'sales_order', $order->id, $product->id, $quantity, $product->type);
+                    EstimationService::createProduction($product->id, $quantity, $product->type);
 
-                foreach($product->components as $item) {
-                    EstimationService::createMovement('in', 'sales_order', $order->id, $item->id, $quantity, $item->type);
-                    EstimationService::createProduction($item->id, $quantity, $item->type);
+                    foreach($product->components as $item) {
+                        EstimationService::createMovement('in', 'sales_order', $order->id, $item->id, $quantity, $item->type);
+                        EstimationService::createProduction($item->id, $quantity, $item->type);
+                    }
                 }
 
                 DB::commit();

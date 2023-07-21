@@ -328,12 +328,17 @@ class BookVariantController extends Controller
     public function getBooks(Request $request)
     {
         $query = $request->input('q');
+        $semester = $request->input('semester');
         $jenjang = $request->input('jenjang');
 
         $query = BookVariant::whereIn('type', ['L', 'P'])->where(function($q) use ($query) {
                     $q->where('code', 'LIKE', "%{$query}%")
                     ->orWhere('name', 'LIKE', "%{$query}%");
                 })->orderBy('code', 'ASC');
+
+        if (!empty($semester)) {
+            $query->where('semester_id', $semester);
+        }
 
         if (!empty($jenjang)) {
             $query->where('jenjang_id', $jenjang);
@@ -414,7 +419,7 @@ class BookVariantController extends Controller
                 ->where('sales_orders.semester_id', $semester)
                 ->where('sales_orders.salesperson_id', $salesperson)
                 ->where('sales_orders.payment_type', $type)
-                ->first(['book_variants.*', 'sales_orders.quantity as estimasi', 'sales_orders.moved as terkirim', 'sales_orders.id as order_id']);
+                ->first(['book_variants.*', 'sales_orders.quantity as estimasi', 'sales_orders.moved as terkirim', 'sales_orders.id as order_id', 'sales_orders.payment_type as payment_type']);
         $product->load('book', 'jenjang', 'cover', 'kurikulum', 'isi');
 
         return response()->json($product);

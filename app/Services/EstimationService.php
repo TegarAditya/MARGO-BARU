@@ -48,9 +48,11 @@ class EstimationService
                     ->where('type', $type)
                     ->first();
 
-        $estimation->movement_date = Carbon::now()->format('d-m-Y');
-        $estimation->quantity = $quantity;
-        $estimation->save();
+        if ($estimation) {
+            $estimation->movement_date = Carbon::now()->format('d-m-Y');
+            $estimation->quantity = $quantity;
+            $estimation->save();
+        }
     }
     //Edit movement menggunakan quantity baru
     //Edit production menggunakan quantity selisih

@@ -3,7 +3,7 @@
 
 <div class="card">
     <div class="card-header">
-        {{ trans('global.edit') }} {{ trans('cruds.salesOrder.title_singular') }}
+        <h1>Formulir Edit Estimasi Sales</h1>
     </div>
 
     <div class="card-body">
@@ -18,6 +18,16 @@
             @method('PUT')
             @csrf
             <div class="row">
+                <div class="col-6">
+                    <div class="form-group">
+                        <label class="required" for="no_order">No Order</label>
+                        <input class="form-control {{ $errors->has('no_order') ? 'is-invalid' : '' }}" type="text" name="no_order" id="no_order" value="{{ old('no_order', $salesOrder->no_order) }}" readonly>
+                        @if($errors->has('no_order'))
+                            <span class="text-danger">{{ $errors->first('no_order') }}</span>
+                        @endif
+                        <span class="help-block"></span>
+                    </div>
+                </div>
                 <div class="col-6">
                     <div class="form-group">
                         <label class="required" for="semester_id">{{ trans('cruds.salesOrder.fields.semester') }}</label>
@@ -149,7 +159,7 @@
                                         <td>{{ $product->name }}</td>
                                         <td class="text-center">{{ $product->halaman->code }}</td>
                                         <td class="text-center">{{ angka($order->quantity) }}</td>
-                                        <td class="text-center">{{ angka($sisa)}}</td>
+                                        <td class="text-center">{{ angka(max($sisa, 0))}}</td>
                                     </tr>
                                 @endforeach
 
@@ -243,7 +253,7 @@
                     var formHtml = `
                         <div class="item-product" id="product-${product.id}">
                             <div class="row">
-                                <div class="col-8 align-self-center">
+                                <div class="col-6 align-self-center">
                                     <h6 class="text-sm product-name mb-1">(${product.book_type}) ${product.short_name}</h6>
                                     <p class="mb-0 text-sm">
                                         Code : <strong>${product.code}</strong>
@@ -259,6 +269,15 @@
                                     </p>
                                 </div>
                                 <div class="col offset-1 row align-items-end align-self-center">
+                                    <div class="col" style="min-width: 160px">
+                                        <p class="mb-0 text-sm">Payment Type</p>
+                                        <div class="form-group text-field m-0">
+                                            <select class="form-control text-center select2" name="payment_types[]" style="width: 100%;" tabIndex="-1" required>
+                                                <option value="cash" ${product.payment_type == 'cash' ? 'selected' : ''}>Cash</option>
+                                                <option value="retur" ${product.payment_type == 'retur' ? 'selected' : ''}>Retur</option>
+                                            </select>
+                                        </div>
+                                    </div>
                                     <div class="col" style="max-width: 160px">
                                         <p class="mb-0 text-sm">Estimasi</p>
                                         <div class="form-group text-field m-0">
