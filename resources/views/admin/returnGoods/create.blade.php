@@ -3,7 +3,7 @@
 
 <div class="card">
     <div class="card-header">
-        {{ trans('global.create') }} {{ trans('cruds.returnGood.title_singular') }}
+        <h1>Faktur Retur</h1>
     </div>
 
     <div class="card-body">
@@ -20,7 +20,7 @@
                 <div class="col-6">
                     <div class="form-group">
                         <label class="required" for="no_retur">{{ trans('cruds.returnGood.fields.no_retur') }}</label>
-                        <input class="form-control {{ $errors->has('no_retur') ? 'is-invalid' : '' }}" type="text" name="no_retur" id="no_retur" value="{{ old('no_retur', '') }}" readonly placeholder="(Otomatis)">
+                        <input class="form-control {{ $errors->has('no_retur') ? 'is-invalid' : '' }}" type="text" name="no_retur" id="no_retur" value="{{ old('no_retur', $no_retur) }}" readonly>
                         @if($errors->has('no_retur'))
                             <span class="text-danger">{{ $errors->first('no_retur') }}</span>
                         @endif

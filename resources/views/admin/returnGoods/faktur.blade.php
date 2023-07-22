@@ -1,7 +1,7 @@
 @extends('layouts.print')
 
 @section('header.center')
-<h6>FAKTUR Retur</h6>
+<h6>FAKTUR RETUR</h6>
 @endsection
 
 @section('header.left')
@@ -19,7 +19,7 @@
             <td>{{ Carbon\Carbon::parse($retur->date)->format('d-m-Y') }}</td>
         </tr>
 
-        
+
     </tbody>
 </table>
 @stop

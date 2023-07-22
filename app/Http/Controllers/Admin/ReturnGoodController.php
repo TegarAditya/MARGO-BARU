@@ -47,18 +47,17 @@ class ReturnGoodController extends Controller
             $table->addColumn('actions', '&nbsp;');
 
             $table->editColumn('actions', function ($row) {
-                $viewGate      = 'return_good_show';
-                $editGate      = 'return_good_edit';
-                $deleteGate    = 'return_good_delete';
-                $crudRoutePart = 'return-goods';
-
-                return view('partials.datatablesActions', compact(
-                    'viewGate',
-                    'editGate',
-                    'deleteGate',
-                    'crudRoutePart',
-                    'row'
-                ));
+                return '
+                    <a class="px-1" href="'.route('admin.return-goods.show', $row->id).'" title="Show">
+                        <i class="fas fa-eye text-success fa-lg"></i>
+                    </a>
+                    <a class="px-1" href="'.route('admin.return-goods.print-faktur', $row->id).'" target="_blank" title="Print Faktur" >
+                        <i class="fas fa-print text-secondary fa-lg"></i>
+                    </a>
+                    <a class="px-1" href="'.route('admin.return-goods.edit', $row->id).'" title="Edit">
+                        <i class="fas fa-edit fa-lg"></i>
+                    </a>
+                ';
             });
 
             $table->editColumn('no_retur', function ($row) {
@@ -97,7 +96,9 @@ class ReturnGoodController extends Controller
 
         $salespeople = Salesperson::whereHas('estimasi')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
-        return view('admin.returnGoods.create', compact('salespeople', 'semesters'));
+        $no_retur = ReturnGood::generateNoRetur(setting('current_semester'));
+
+        return view('admin.returnGoods.create', compact('salespeople', 'semesters', 'no_retur'));
     }
 
     public function store(Request $request)
@@ -125,7 +126,7 @@ class ReturnGoodController extends Controller
         DB::beginTransaction();
         try {
             $retur = ReturnGood::create([
-                'no_retur' => ReturnGood::generateNoRetur($semester),
+                'no_retur' => ReturnGood::generateNoRetur(setting('current_semester')),
                 'date' => $date,
                 'semester_id' => $semester,
                 'salesperson_id' => $salesperson,

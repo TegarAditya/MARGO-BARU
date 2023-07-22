@@ -3,7 +3,7 @@
 
 <div class="card">
     <div class="card-header">
-        {{ trans('global.edit') }} {{ trans('cruds.returnGood.title_singular') }}
+        <h1>Edit Faktur Retur</h1>
     </div>
 
     <div class="card-body">
