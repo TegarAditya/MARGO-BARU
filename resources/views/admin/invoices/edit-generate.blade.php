@@ -3,7 +3,7 @@
 
 <div class="card">
     <div class="card-header">
-        <h1>Formulir Edit Faktur Penjualan</h1>
+        {{ trans('global.edit') }} {{ trans('cruds.invoice.title_singular') }}
     </div>
 
     <div class="card-body">
@@ -58,10 +58,32 @@
                 </div>
             </div>
             <div id="product-form">
+                @php
+                    $nominal = 0;
+                    $total = 0;
+                    $total_discount = 0;
+                @endphp
                 @foreach ($invoice_item as $item)
                     @php
                         $product = $item->product;
-                    @endphp
+                        $item_delivery = $delivery_item->where('product_id', $item->product_id)->first();
+
+                        if ($item_delivery->quantity !== $item->quantity) {
+                            $quantity = $item_delivery->quantity;
+                        } else {
+                            $quantity = $item->quantity;
+                        }
+
+                        $discount = $item->discount;
+
+                        $subtotal = $product->price * $quantity;
+                        $total += $subtotal;
+
+                        $subdiscount = $discount * $quantity;
+                        $total_discount += $subdiscount;
+
+                        $nominal = $total - $total_discount;
+                        @endphp
                     <div class="item-product" id="product-{{$item->product_id}}">
                         <div class="row">
                             <div class="col-4 align-self-center">
@@ -94,8 +116,8 @@
                                     <p class="mb-0 text-sm">Quantity</p>
                                     <div class="form-group text-field m-0">
                                         <div class="text-field-input px-2 py-0">
-                                            <input class="quantity" type="hidden" name="quantities[]" value="{{ $item->quantity }}">
-                                            <input class="form-control text-center quantity_text" type="text" name="quantity_text[]" value="{{ angka($item->quantity) }}" readonly tabindex="-1">
+                                            <input class="quantity" type="hidden" name="quantities[]" value="{{ $quantity }}">
+                                            <input class="form-control text-center quantity_text" type="text" name="quantity_text[]" value="{{ angka($quantity) }}" readonly tabindex="-1">
                                             <label class="text-field-border"></label>
                                         </div>
                                     </div>
@@ -105,21 +127,21 @@
                                     <div class="form-group text-field m-0">
                                         <div class="text-field-input px-2 py-0 pr-3">
                                             <span class="text-sm mr-1">Rp</span>
-                                            <input class="diskon" type="hidden" name="diskons[]" data-max="{{ $product->price }}" value="{{ $item->discount }}">
-                                            <input class="form-control text-right diskon_text" type="text" name="diskon_text[]" value="{{ angka($item->discount) }}" required>
+                                            <input class="diskon" type="hidden" name="diskons[]" data-max="{{ $product->price }}" value="{{ $discount }}">
+                                            <input class="form-control text-right diskon_text" type="text" name="diskon_text[]" value="{{ angka($discount) }}" required>
                                             <label class="text-field-border"></label>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col text-right pl-2">
-                                    <input class="subtotal" type="hidden" name="subtotals[]" value="{{ $item->total }}">
+                                    <input class="subtotal" type="hidden" name="subtotals[]" value="{{ $subtotal }}">
                                     <p class="text-sm mb-0"><b>Total</b></p>
-                                    <p class="m-0 product-subtotal">{{ money($item->total) }}</p>
+                                    <p class="m-0 product-subtotal">{{ money($subtotal) }}</p>
                                 </div>
                                 <div class="col text-right pl-2">
-                                    <input class="subdiskon" type="hidden" name="subdiscounts[]" value="{{ $item->total_discount }}">
+                                    <input class="subdiskon" type="hidden" name="subdiscounts[]" value="{{ $subdiscount }}">
                                     <p class="text-sm mb-0"><b>Discount</b></p>
-                                    <p class="m-0 product-subdiskon">{{ money($item->total_discount) }}</p>
+                                    <p class="m-0 product-subdiskon">{{ money($subdiscount) }}</p>
                                 </div>
                             </div>
                         </div>
@@ -132,8 +154,8 @@
                     </div>
                     <div class="col-2 text-right">
                         <p class="mb-1">
-                            <input class="total_price" type="hidden" name="total_price" id="total_price" value="{{ $invoice->total }}">
-                            <strong class="product-total-price">{{ money($invoice->total) }}</strong>
+                            <input class="total_price" type="hidden" name="total_price" id="total_price" value="{{ $total }}">
+                            <strong class="product-total-price">{{ money($total) }}</strong>
                         </p>
                     </div>
                 </div>
@@ -143,8 +165,8 @@
                     </div>
                     <div class="col-2 text-right">
                         <p class="mb-1">
-                            <input class="total_diskon" type="hidden" name="total_diskon" id="total_diskon" value="{{ $invoice->discount }}">
-                            <strong class="product-total-diskon">{{ money($invoice->discount) }}</strong>
+                            <input class="total_diskon" type="hidden" name="total_diskon" id="total_diskon" value="{{ $total_discount }}">
+                            <strong class="product-total-diskon">{{ money($total_discount) }}</strong>
                         </p>
                     </div>
                 </div>
@@ -154,8 +176,8 @@
                     </div>
                     <div class="col-2 text-right">
                         <p class="mb-1">
-                            <input class="subtotal" type="hidden" name="nominal" id="nominal" value="{{ $invoice->nominal }}">
-                            <strong class="product-total-nominal">{{ money($invoice->nominal) }}</strong>
+                            <input class="subtotal" type="hidden" name="nominal" id="nominal" value="{{ $nominal }}">
+                            <strong class="product-total-nominal">{{ money($nominal) }}</strong>
                         </p>
                     </div>
                 </div>

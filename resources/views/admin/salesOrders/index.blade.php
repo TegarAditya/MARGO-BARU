@@ -2,7 +2,7 @@
 @section('content')
 <div class="row mb-4">
     <div class="col-12">
-        <h1 class="m-0 bold">Estimasi Sales</h1>
+        <h1 class="m-0">Estimasi Sales</h1>
     </div>
 </div>
 @can('sales_order_create')

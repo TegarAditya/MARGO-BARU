@@ -101,7 +101,9 @@ class DeliveryOrderController extends Controller
 
         $salespeople = Salesperson::whereHas('estimasi')->get()->pluck('full_name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
-        return view('admin.deliveryOrders.create', compact('salespeople', 'semesters'));
+        $no_suratjalan = DeliveryOrder::generateNoSJ(setting('current_semester'));
+
+        return view('admin.deliveryOrders.create', compact('salespeople', 'semesters', 'no_suratjalan'));
     }
 
     public function store(Request $request)
@@ -109,7 +111,7 @@ class DeliveryOrderController extends Controller
         // Validate the form data
         $validatedData = $request->validate([
             'date' => 'required',
-            'semester_id' =>'required',
+            // 'semester_id' =>'required',
             'salesperson_id' => 'required',
             'payment_type' => 'required',
             'orders' => 'required|array',
@@ -121,7 +123,7 @@ class DeliveryOrderController extends Controller
         ]);
 
         $date = $validatedData['date'];
-        $semester = $validatedData['semester_id'];
+        $semester = setting('current_semester');
         $salesperson = $validatedData['salesperson_id'];
         $payment_type = $validatedData['payment_type'];
         $products = $validatedData['products'];
@@ -228,9 +230,9 @@ class DeliveryOrderController extends Controller
 
             DB::commit();
 
-            Alert::success('Success', 'Delivery Order berhasil di simpan');
+            Alert::success('Success', 'Silahkan Update Invoicenya Juga')->showConfirmButton('Oke', '#3085d6');
 
-            return redirect()->route('admin.delivery-orders.index');
+            return redirect()->route('admin.invoices.generate', $deliveryOrder->id);
         } catch (\Exception $e) {
             DB::rollback();
 

@@ -114,7 +114,9 @@ class InvoiceController extends Controller
 
         $salespeople = Salesperson::whereHas('estimasi')->get()->pluck('full_name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
-        return view('admin.invoices.create', compact('delivery_orders', 'salespeople', 'semesters'));
+        $no_faktur = Invoice::generateNoInvoice(setting('current_semester'));
+
+        return view('admin.invoices.create', compact('delivery_orders', 'salespeople', 'semesters', 'no_faktur'));
     }
 
     public function generate(DeliveryOrder $delivery)
@@ -123,7 +125,19 @@ class InvoiceController extends Controller
 
         $delivery_item = DeliveryOrderItem::with('delivery_order', 'product', 'product.book', 'sales_order')->where('delivery_order_id', $delivery->id)->orderBy('product_id', 'ASC')->get();
 
-        return view('admin.invoices.generate', compact('delivery', 'delivery_item'));
+        $invoice = Invoice::where('type', 'jual')->where('delivery_order_id', $delivery->id)->first();
+
+        if ($invoice) {
+            $invoice->load('delivery_order', 'semester', 'salesperson');
+
+            $invoice_item = InvoiceItem::with('product', 'product.book', 'delivery_order')->where('invoice_id', $invoice->id)->orderBy('product_id', 'ASC')->get();
+
+            return view('admin.invoices.edit-generate', compact('invoice', 'invoice_item', 'delivery_item'));
+        }
+
+        $no_faktur = Invoice::generateNoInvoice($delivery_order->semester_id);
+
+        return view('admin.invoices.generate', compact('delivery', 'delivery_item', 'no_faktur'));
     }
 
     public function store(Request $request)
@@ -233,7 +247,7 @@ class InvoiceController extends Controller
             'date' => 'required',
             'type' => 'required',
             'salesperson_id' =>'required',
-            'semester_id' =>'required',
+            // 'semester_id' =>'required',
             'delivery_order_id' =>'required|exists:delivery_orders,id',
             'note' => 'required',
             'nominal' => 'numeric|min:1',
@@ -242,7 +256,7 @@ class InvoiceController extends Controller
         $date = $validatedData['date'];
         $type = $validatedData['type'];
         $salesperson = $validatedData['salesperson_id'];
-        $semester = $validatedData['semester_id'];
+        $semester = setting('current_semester');
         $delivery = $validatedData['delivery_order_id'];
         $note = $validatedData['note'];
         $nominal = $validatedData['nominal'];

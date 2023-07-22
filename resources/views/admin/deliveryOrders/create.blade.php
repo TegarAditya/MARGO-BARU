@@ -3,7 +3,7 @@
 
 <div class="card">
     <div class="card-header">
-        {{ trans('global.create') }} {{ trans('cruds.deliveryOrder.title_singular') }}
+        <h1>Formulir Pengiriman</h1>
     </div>
 
     <div class="card-body">
@@ -20,7 +20,7 @@
                 <div class="col-6">
                     <div class="form-group">
                         <label class="required" for="no_suratjalan">{{ trans('cruds.deliveryOrder.fields.no_suratjalan') }}</label>
-                        <input class="form-control {{ $errors->has('no_suratjalan') ? 'is-invalid' : '' }}" type="text" name="no_suratjalan" id="no_suratjalan" value="{{ old('no_suratjalan', '') }}" readonly placeholder="(Otomatis)">
+                        <input class="form-control {{ $errors->has('no_suratjalan') ? 'is-invalid' : '' }}" type="text" name="no_suratjalan" id="no_suratjalan" value="{{ old('no_suratjalan', $no_suratjalan) }}" readonly>
                         @if($errors->has('no_suratjalan'))
                             <span class="text-danger">{{ $errors->first('no_suratjalan') }}</span>
                         @endif
@@ -37,7 +37,7 @@
                         <span class="help-block">{{ trans('cruds.deliveryOrder.fields.date_helper') }}</span>
                     </div>
                 </div>
-                <div class="col-6">
+                {{-- <div class="col-6">
                     <div class="form-group">
                         <label class="required" for="semester_id">{{ trans('cruds.deliveryOrder.fields.semester') }}</label>
                         <select class="form-control select2 {{ $errors->has('semester') ? 'is-invalid' : '' }}" name="semester_id" id="semester_id" required>
@@ -50,7 +50,7 @@
                         @endif
                         <span class="help-block">{{ trans('cruds.deliveryOrder.fields.semester_helper') }}</span>
                     </div>
-                </div>
+                </div> --}}
                 <div class="col-6">
                     <div class="form-group">
                         <label class="required" for="salesperson_id">{{ trans('cruds.deliveryOrder.fields.salesperson') }}</label>
@@ -121,7 +121,7 @@
                     data: function(params) {
                         return {
                             q: params.term,
-                            semester: $('#semester_id').val(),
+                            // semester: $('#semester_id').val(),
                             salesperson: $('#salesperson_id').val(),
                             type: $('#payment_type').val(),
                             jenjang: $('#jenjang_id').val()

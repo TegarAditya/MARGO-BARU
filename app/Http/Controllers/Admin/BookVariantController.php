@@ -373,7 +373,7 @@ class BookVariantController extends Controller
     public function getEstimasi(Request $request)
     {
         $query = $request->input('q');
-        $semester = $request->input('semester');
+        $semester = setting('current_semester');
         $salesperson = $request->input('salesperson');
         $type = $request->input('type');
         $jenjang = $request->input('jenjang');
@@ -410,7 +410,7 @@ class BookVariantController extends Controller
     public function getInfoEstimasi(Request $request)
     {
         $id = $request->input('id');
-        $semester = $request->input('semester');
+        $semester = setting('current_semester');
         $salesperson = $request->input('salesperson');
         $type = $request->input('type');
 

@@ -3,7 +3,7 @@
 
 <div class="card">
     <div class="card-header">
-        {{ trans('global.create') }} {{ trans('cruds.invoice.title_singular') }}
+        <h1>Formulir Faktur Penjualan</h1>
     </div>
 
     <div class="card-body">
@@ -19,7 +19,7 @@
                 <div class="col-6">
                     <div class="form-group">
                         <label class="required" for="no_faktur">{{ trans('cruds.invoice.fields.no_faktur') }}</label>
-                        <input class="form-control {{ $errors->has('no_faktur') ? 'is-invalid' : '' }}" type="text" name="no_faktur" id="no_faktur" value="{{ old('no_faktur', '') }}" readonly placeholder="(Otomatis)">
+                        <input class="form-control {{ $errors->has('no_faktur') ? 'is-invalid' : '' }}" type="text" name="no_faktur" id="no_faktur" value="{{ old('no_faktur', $no_faktur) }}" readonly>
                         @if($errors->has('no_faktur'))
                             <span class="text-danger">{{ $errors->first('no_faktur') }}</span>
                         @endif
@@ -50,7 +50,7 @@
                         <span class="help-block">{{ trans('cruds.invoice.fields.salesperson_helper') }}</span>
                     </div>
                 </div>
-                <div class="col-6">
+                {{-- <div class="col-6">
                     <div class="form-group">
                         <label class="required" for="semester_id">{{ trans('cruds.invoice.fields.semester') }}</label>
                         <select class="form-control select2 {{ $errors->has('semester') ? 'is-invalid' : '' }}" name="semester_id" id="semester_id" required>
@@ -63,7 +63,7 @@
                         @endif
                         <span class="help-block">{{ trans('cruds.invoice.fields.semester_helper') }}</span>
                     </div>
-                </div>
+                </div> --}}
                 <div class="col-6">
                     <div class="form-group">
                         <label for="delivery_order_id">{{ trans('cruds.invoice.fields.delivery_order') }}</label>
@@ -136,7 +136,7 @@
                 url: "{{ route('admin.delivery-orders.getDeliveryOrder') }}",
                 data: function() {
                     return {
-                        semester: $('#semester_id').val(),
+                        // semester: $('#semester_id').val(),
                         salesperson: $('#salesperson_id').val()
                     };
                 },

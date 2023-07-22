@@ -1,6 +1,10 @@
 @extends('layouts.admin')
 @section('content')
-
+<div class="row mb-4">
+    <div class="col-12">
+        <h2 class="m-0 bold">Surat Jalan No {{ $deliveryOrder->no_suratjalan }}</h2>
+    </div>
+</div>
 <div class="card">
     <div class="card-header">
         {{ trans('global.show') }} {{ trans('cruds.deliveryOrder.title_singular') }}

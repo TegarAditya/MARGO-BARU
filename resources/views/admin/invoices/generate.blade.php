@@ -3,7 +3,7 @@
 
 <div class="card">
     <div class="card-header">
-        {{ trans('global.create') }} {{ trans('cruds.invoice.title_singular') }}
+        <h1>Formulir Faktur Penjualan</h1>
     </div>
 
     <div class="card-body">
@@ -21,7 +21,7 @@
                 <div class="col-6">
                     <div class="form-group">
                         <label class="required" for="no_faktur">{{ trans('cruds.invoice.fields.no_faktur') }}</label>
-                        <input class="form-control {{ $errors->has('no_faktur') ? 'is-invalid' : '' }}" type="text" name="no_faktur" id="no_faktur" value="{{ old('no_faktur', '') }}" placeholder="(Otomatis)" readonly>
+                        <input class="form-control {{ $errors->has('no_faktur') ? 'is-invalid' : '' }}" type="text" name="no_faktur" id="no_faktur" value="{{ old('no_faktur', $no_faktur) }}" readonly>
                         @if($errors->has('no_faktur'))
                             <span class="text-danger">{{ $errors->first('no_faktur') }}</span>
                         @endif

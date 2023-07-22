@@ -1,5 +1,10 @@
 @extends('layouts.admin')
 @section('content')
+<div class="row mb-4">
+    <div class="col-12">
+        <h1 class="m-0 bold">Pengiriman / Surat Jalan</h1>
+    </div>
+</div>
 @can('delivery_order_create')
     <div style="margin-bottom: 10px;" class="row">
         <div class="col-lg-12">
