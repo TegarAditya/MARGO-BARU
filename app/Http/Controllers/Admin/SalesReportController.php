@@ -38,17 +38,27 @@ class SalesReportController extends Controller
             $table->addColumn('salesperson_name', function ($row) {
                 return $row->salesperson ? $row->salesperson->name : '';
             });
+
             $table->editColumn('saldo_awal', function ($row) {
-                return $row->saldo_awal ? money($row->saldo_awal) : '';
+                return $row->saldo_awal ? $row->saldo_awal : '';
             });
-            $table->editColumn('debet', function ($row) {
-                return $row->debet ? money($row->debet) : '';
+            $table->editColumn('jual', function ($row) {
+                return $row->jual ? $row->jual : '';
             });
-            $table->editColumn('kredit', function ($row) {
-                return $row->kredit ? money($row->kredit) : '';
+            $table->editColumn('diskon', function ($row) {
+                return $row->diskon ? $row->diskon : '';
+            });
+            $table->editColumn('retur', function ($row) {
+                return $row->retur ? $row->retur : '';
+            });
+            $table->editColumn('bayar', function ($row) {
+                return $row->bayar ? $row->bayar : '';
+            });
+            $table->editColumn('potongan', function ($row) {
+                return $row->potongan ? $row->potongan : '';
             });
             $table->editColumn('saldo_akhir', function ($row) {
-                return $row->saldo_akhir ? money($row->saldo_akhir) : '';
+                return $row->saldo_akhir ? $row->saldo_akhir : '';
             });
 
             $table->rawColumns(['placeholder', 'salesperson']);
@@ -127,7 +137,7 @@ class SalesReportController extends Controller
         $start = Carbon::now()->startOfMonth();
         $end = Carbon::now()->endOfMonth();
         $lastmonth = Carbon::now()->subMonth()->format('mY');
-        
+
         $code = $start->format('mY');
         $periode = $start->format('d F Y') .' -  '. $end->format('d F Y');
         $start_date = $start->format('d-m-Y');
@@ -139,7 +149,7 @@ class SalesReportController extends Controller
         try {
             foreach($transactions as $transaction) {
                 $before = SalesReport::where('code', $lastmonth)->where('salesperson_id', $transaction->id)->first();
-    
+
                 if ($before) {
                     $saldo_awal = $before->saldo_akhir;
                 } else {
@@ -224,7 +234,7 @@ class SalesReportController extends Controller
             DB::commit();
 
             Alert::success('Success', 'Saldo bulan ini berhasil digenerate');
-    
+
             return redirect()->route('admin.sales-reports.index');
         } catch (\Exception $e) {
             DB::rollback();

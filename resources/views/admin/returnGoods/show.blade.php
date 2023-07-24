@@ -17,7 +17,7 @@
                     <div class="card-body px-3 py-2">
                         <div class="row">
                             <div class="col-6 mb-1">
-                                <span class="badge badge-warning">Faktur Retur</span>
+                                <span class="badge badge-danger">Faktur Retur</span>
                             </div>
 
                             <div class="col-6 text-right">

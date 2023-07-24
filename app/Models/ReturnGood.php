@@ -54,6 +54,11 @@ class ReturnGood extends Model
         $this->attributes['date'] = $value ? Carbon::createFromFormat(config('panel.date_format'), $value)->format('Y-m-d') : null;
     }
 
+    public function retur_items()
+    {
+        return $this->hasMany(ReturnGoodItem::class, 'retur_id');
+    }
+
     public function salesperson()
     {
         return $this->belongsTo(Salesperson::class, 'salesperson_id');

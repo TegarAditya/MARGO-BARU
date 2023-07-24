@@ -591,8 +591,8 @@
                     </li>
                 @endcan
                 @can('tagihan_access')
-                    <li class="nav-item has-treeview {{ request()->is("admin/sales-billings*") ? "menu-open" : "" }} {{ request()->is("admin/invoices*") ? "menu-open" : "" }} {{ request()->is("admin/invoices*") ? "menu-open" : "" }} {{ request()->is("admin/invoice-items*") ? "menu-open" : "" }} {{ request()->is("admin/rekap-billings*") ? "menu-open" : "" }}">
-                        <a class="nav-link nav-dropdown-toggle {{ request()->is("admin/sales-billings*") ? "active" : "" }} {{ request()->is("admin/invoices*") ? "active" : "" }} {{ request()->is("admin/invoice-items*") ? "active" : "" }} {{ request()->is("admin/rekap-billings*") ? "active" : "" }}" href="#">
+                    <li class="nav-item has-treeview {{ request()->is("admin/bills*") ? "menu-open" : "" }} {{ request()->is("admin/sales-billings*") ? "menu-open" : "" }} {{ request()->is("admin/invoices*") ? "menu-open" : "" }} {{ request()->is("admin/invoices*") ? "menu-open" : "" }} {{ request()->is("admin/invoice-items*") ? "menu-open" : "" }} {{ request()->is("admin/rekap-billings*") ? "menu-open" : "" }}">
+                        <a class="nav-link nav-dropdown-toggle {{ request()->is("admin/bills*") ? "active" : "" }} {{ request()->is("admin/sales-billings*") ? "active" : "" }} {{ request()->is("admin/invoices*") ? "active" : "" }} {{ request()->is("admin/invoice-items*") ? "active" : "" }} {{ request()->is("admin/rekap-billings*") ? "active" : "" }}" href="#">
                             <i class="fa-fw nav-icon fas fa-file-invoice">
 
                             </i>
@@ -614,6 +614,18 @@
                                     </a>
                                 </li>
                             @endcan
+                            @can('bill_access')
+                                <li class="nav-item">
+                                    <a href="{{ route("admin.bills.index") }}" class="nav-link {{ request()->is("admin/bills") || request()->is("admin/bills/*") ? "active" : "" }}">
+                                        <i class="fa-fw nav-icon fas fa-flag">
+
+                                        </i>
+                                        <p>
+                                            {{ trans('cruds.bill.title') }}
+                                        </p>
+                                    </a>
+                                </li>
+                            @endcan
                             @can('rekap_billing_access')
                                 <li class="nav-item">
                                     <a href="{{ route("admin.rekap-billings.index") }}" class="nav-link {{ request()->is("admin/rekap-billings") || request()->is("admin/rekap-billings/*") ? "active" : "" }}">
@@ -621,7 +633,7 @@
 
                                         </i>
                                         <p>
-                                            {{ trans('cruds.rekapBilling.title') }}
+                                            Billing Sales
                                         </p>
                                     </a>
                                 </li>

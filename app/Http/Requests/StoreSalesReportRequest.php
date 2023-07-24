@@ -41,12 +41,6 @@ class StoreSalesReportRequest extends FormRequest
             'saldo_awal' => [
                 'required',
             ],
-            'debet' => [
-                'required',
-            ],
-            'kredit' => [
-                'required',
-            ],
             'saldo_akhir' => [
                 'required',
             ],

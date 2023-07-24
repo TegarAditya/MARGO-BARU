@@ -12,6 +12,9 @@ use Symfony\Component\HttpFoundation\Response;
 use App\Models\Transaction;
 use App\Models\Salesperson;
 use App\Models\Semester;
+use App\Models\Invoice;
+use App\Models\ReturnGood;
+use App\Models\Payment;
 use DB;
 use Carbon\Carbon;
 
@@ -42,58 +45,18 @@ class RekapBillingController extends Controller
         return view('admin.rekapBillings.index', compact('sales','semesters', 'semester'));
     }
 
-    public function create()
+    public function billing(Request $request)
     {
-        abort_if(Gate::denies('rekap_billing_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        $salesperson = $request->salesperson;
+        $semester = $request->semester ? $request->semester : setting('current_semester');
 
-        return view('admin.rekapBillings.create');
-    }
+        $invoices = Invoice::with('invoice_items')->where('salesperson_id', $salesperson)->where('semester_id', $semester)->get();
+        $returs = ReturnGood::with('retur_items')->where('salesperson_id', $salesperson)->where('semester_id', $semester)->get();
+        $payments = Payment::where('salesperson_id', $salesperson)->where('semester_id', $semester)->get();
 
-    public function store(StoreRekapBillingRequest $request)
-    {
-        $rekapBilling = RekapBilling::create($request->all());
+        $salesperson = Salesperson::find($salesperson);
+        $semester = Semester::find($semester);
 
-        return redirect()->route('admin.rekap-billings.index');
-    }
-
-    public function edit(RekapBilling $rekapBilling)
-    {
-        abort_if(Gate::denies('rekap_billing_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-
-        return view('admin.rekapBillings.edit', compact('rekapBilling'));
-    }
-
-    public function update(UpdateRekapBillingRequest $request, RekapBilling $rekapBilling)
-    {
-        $rekapBilling->update($request->all());
-
-        return redirect()->route('admin.rekap-billings.index');
-    }
-
-    public function show(RekapBilling $rekapBilling)
-    {
-        abort_if(Gate::denies('rekap_billing_show'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-
-        return view('admin.rekapBillings.show', compact('rekapBilling'));
-    }
-
-    public function destroy(RekapBilling $rekapBilling)
-    {
-        abort_if(Gate::denies('rekap_billing_delete'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-
-        $rekapBilling->delete();
-
-        return back();
-    }
-
-    public function massDestroy(MassDestroyRekapBillingRequest $request)
-    {
-        $rekapBillings = RekapBilling::find(request('ids'));
-
-        foreach ($rekapBillings as $rekapBilling) {
-            $rekapBilling->delete();
-        }
-
-        return response(null, Response::HTTP_NO_CONTENT);
+        return view('admin.rekapBillings.billing', compact('salesperson', 'semester', 'invoices', 'returs', 'payments'));
     }
 }

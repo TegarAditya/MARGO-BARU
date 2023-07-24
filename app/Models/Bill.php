@@ -3,18 +3,17 @@
 namespace App\Models;
 
 use App\Traits\Auditable;
-use App\Traits\CreatedUpdatedBy;
 use Carbon\Carbon;
 use DateTimeInterface;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class SalesReport extends Model
+class Bill extends Model
 {
-    use SoftDeletes, Auditable, HasFactory, CreatedUpdatedBy;
+    use SoftDeletes, Auditable, HasFactory;
 
-    public $table = 'sales_reports';
+    public $table = 'bills';
 
     protected $dates = [
         'start_date',
@@ -26,7 +25,7 @@ class SalesReport extends Model
 
     protected $fillable = [
         'code',
-        'periode',
+        'semester_id',
         'salesperson_id',
         'start_date',
         'end_date',
@@ -45,6 +44,11 @@ class SalesReport extends Model
     protected function serializeDate(DateTimeInterface $date)
     {
         return $date->format('Y-m-d H:i:s');
+    }
+
+    public function semester()
+    {
+        return $this->belongsTo(Semester::class, 'semester_id');
     }
 
     public function salesperson()

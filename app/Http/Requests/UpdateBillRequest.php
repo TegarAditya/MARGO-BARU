@@ -2,16 +2,16 @@
 
 namespace App\Http\Requests;
 
-use App\Models\SalesReport;
+use App\Models\Bill;
 use Gate;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Response;
 
-class UpdateSalesReportRequest extends FormRequest
+class UpdateBillRequest extends FormRequest
 {
     public function authorize()
     {
-        return Gate::allows('sales_report_edit');
+        return Gate::allows('bill_edit');
     }
 
     public function rules()
@@ -20,11 +20,11 @@ class UpdateSalesReportRequest extends FormRequest
             'code' => [
                 'string',
                 'required',
-                'unique:sales_reports,code,' . request()->route('sales_report')->id,
+                'unique:bills,code,' . request()->route('bill')->id,
             ],
-            'periode' => [
-                'string',
+            'semester_id' => [
                 'required',
+                'integer',
             ],
             'salesperson_id' => [
                 'required',

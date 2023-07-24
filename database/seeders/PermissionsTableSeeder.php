@@ -1008,6 +1008,22 @@ class PermissionsTableSeeder extends Seeder
             ],
             [
                 'id'    => 250,
+                'title' => 'bill_create',
+            ],
+            [
+                'id'    => 251,
+                'title' => 'bill_edit',
+            ],
+            [
+                'id'    => 252,
+                'title' => 'bill_show',
+            ],
+            [
+                'id'    => 253,
+                'title' => 'bill_access',
+            ],
+            [
+                'id'    => 254,
                 'title' => 'profile_password_edit',
             ],
         ];

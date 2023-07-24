@@ -3,7 +3,7 @@
 
 <div class="card">
     <div class="card-header">
-        <strong>REKAP BILLING {{ $semester->name }}</strong>
+        <strong>BILLING {{ $semester->name }}</strong>
     </div>
     <div class="card-body">
         <form method="GET" action="{{ route("admin.rekap-billings.index") }}">
@@ -37,7 +37,6 @@
                         <th>Retur</th>
                         <th>Pembayaran</th>
                         <th>Potongan</th>
-                        <th>Piutang</th>
                         <th></th>
                     </tr>
                 </thead>
@@ -48,7 +47,6 @@
                     $total_retur = 0;
                     $total_bayar = 0;
                     $total_potongan = 0;
-                    $total_piutang = 0;
                 @endphp
                 @foreach ($sales as $item)
                     @php
@@ -57,9 +55,6 @@
                         $total_retur += $item->retur;
                         $total_bayar += $item->bayar;
                         $total_potongan += $item->potongan;
-
-                        $piutang = $item->pengambilan - ($item->diskon + $item->retur + $item->bayar + $item->potongan);
-                        $total_piutang += $piutang;
                     @endphp
                     <tr>
                         <td></td>
@@ -69,9 +64,8 @@
                         <td class="text-right">{{ money($item->retur) }}</td>
                         <td class="text-right">{{ money($item->bayar) }}</td>
                         <td class="text-right">{{ money($item->potongan) }}</td>
-                        <td class="text-right">{{ money($piutang) }}</td>
                         <td class="text-center">
-                            <a class="px-1" href="{{ route('admin.salespeople.show', $item->id) }}.'" title="Show">
+                            <a class="px-1" href="{{ route('admin.rekap-billings.billing', ['salesperson' => $item->id, 'semester' => $semester->id]) }}" title="Show" target="_blank">
                                 <i class="fas fa-eye fa-lg"></i>
                             </a>
                         </td>
@@ -88,7 +82,6 @@
                         <td class="text-right">{{ money($total_retur) }}</td>
                         <td class="text-right">{{ money($total_bayar) }}</td>
                         <td class="text-right">{{ money($total_potongan) }}</td>
-                        <td class="text-right">{{ money($total_piutang) }}</td>
                         <td></td>
                     </tr>
                 </tfoot>

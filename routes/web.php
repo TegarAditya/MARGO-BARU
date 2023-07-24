@@ -223,8 +223,11 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     Route::resource('return-good-items', 'ReturnGoodItemController');
 
     // Rekap Billing
-    Route::delete('rekap-billings/destroy', 'RekapBillingController@massDestroy')->name('rekap-billings.massDestroy');
-    Route::resource('rekap-billings', 'RekapBillingController');
+    Route::get('rekap-billings/billing', 'RekapBillingController@billing')->name('rekap-billings.billing');
+    Route::resource('rekap-billings', 'RekapBillingController', ['only' => ['index']]);
+
+    // Bill
+    Route::resource('bills', 'BillController', ['except' => ['destroy']]);
 
     // Sales Billing
     Route::resource('sales-billings', 'SalesBillingController');
@@ -241,7 +244,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
 
     // Transaction Total
     Route::resource('transaction-totals', 'TransactionTotalController', ['except' => ['create', 'store', 'edit', 'update', 'destroy']]);
-    
+
     // Sales Report
     Route::delete('sales-reports/destroy', 'SalesReportController@massDestroy')->name('sales-reports.massDestroy');
     Route::post('sales-reports/generate', 'SalesReportController@generate')->name('sales-reports.generate');
