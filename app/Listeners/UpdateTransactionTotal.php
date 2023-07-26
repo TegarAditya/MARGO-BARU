@@ -26,6 +26,7 @@ class UpdateTransactionTotal
     {
         $transaction = $event->transaction;
         $salesperson = $transaction->salesperson_id;
+        $semester = $transaction->semester_id;
 
         $sum_amount = Transaction::where('salesperson_id', $salesperson)
                     ->select('type', DB::raw('SUM(amount) as total_amount'))

@@ -24,6 +24,7 @@ class Material extends Model
     public const CATEGORY_SELECT = [
         'paper' => 'Kertas',
         'plate' => 'Plate',
+        'chemical' => 'Chemical',
     ];
 
     protected $fillable = [

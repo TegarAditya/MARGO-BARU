@@ -9,12 +9,22 @@ use App\Http\Requests\UpdateStockSaldoRequest;
 use App\Models\BookVariant;
 use App\Models\Material;
 use App\Models\StockSaldo;
+use App\Models\Halaman;
+use App\Models\Jenjang;
+use App\Models\Kurikulum;
+use App\Models\Semester;
+use App\Models\Unit;
+use App\Models\Isi;
+use App\Models\Cover;
+use App\Models\Kelas;
+use App\Models\Mapel;
 use Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Yajra\DataTables\Facades\DataTables;
 use Carbon\Carbon;
 use Alert;
+use DB;
 
 class StockSaldoController extends Controller
 {
@@ -23,26 +33,30 @@ class StockSaldoController extends Controller
         abort_if(Gate::denies('stock_saldo_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         if ($request->ajax()) {
-            $query = StockSaldo::with(['product', 'material'])->select(sprintf('%s.*', (new StockSaldo)->table));
+            $query = StockSaldo::whereHas('product', function ($q) use ($request) {
+                if (!empty($request->type)) {
+                    $q->where('type', $request->type);
+                }
+                if (!empty($request->jenjang)) {
+                    $q->where('jenjang_id', $request->jenjang);
+                }
+                if (!empty($request->isi)) {
+                    $q->where('isi_id', $request->isi);
+                }
+                if (!empty($request->cover)) {
+                    $q->where('cover_id', $request->cover);
+                }
+                if (!empty($request->kelas)) {
+                    $q->where('kelas_id', $request->kelas);
+                }
+                if (!empty($request->mapel)) {
+                    $q->where('mapel_id', $request->mapel);
+                }
+                $q->orderBy('mapel_id', 'ASC')->orderBy('kelas_id', 'ASC');
+            })->with(['product'])->select(sprintf('%s.*', (new StockSaldo)->table));
             $table = Datatables::of($query);
 
             $table->addColumn('placeholder', '&nbsp;');
-            $table->addColumn('actions', '&nbsp;');
-
-            $table->editColumn('actions', function ($row) {
-                $viewGate      = 'stock_saldo_show';
-                $editGate      = 'stock_saldo_edit';
-                $deleteGate    = 'stock_saldo_delete';
-                $crudRoutePart = 'stock-saldos';
-
-                return view('partials.datatablesActions', compact(
-                    'viewGate',
-                    'editGate',
-                    'deleteGate',
-                    'crudRoutePart',
-                    'row'
-                ));
-            });
 
             $table->editColumn('code', function ($row) {
                 return $row->code ? $row->code : '';
@@ -51,33 +65,41 @@ class StockSaldoController extends Controller
                 return $row->product ? $row->product->code : '';
             });
 
-            $table->addColumn('material_code', function ($row) {
-                return $row->material ? $row->material->code : '';
-            });
-
             $table->editColumn('periode', function ($row) {
                 return $row->periode ? $row->periode : '';
             });
 
             $table->editColumn('qty_awal', function ($row) {
-                return $row->qty_awal ? $row->qty_awal : '';
+                return $row->qty_awal ? angka($row->qty_awal) : 0;
             });
             $table->editColumn('in', function ($row) {
-                return $row->in ? $row->in : '';
+                return $row->in ? angka($row->in) : 0;
             });
             $table->editColumn('out', function ($row) {
-                return $row->out ? $row->out : '';
+                return $row->out ? angka($row->out) : 0;
             });
             $table->editColumn('qty_akhir', function ($row) {
-                return $row->qty_akhir ? $row->qty_akhir : '';
+                return $row->qty_akhir ? angka($row->qty_akhir) : 0;
             });
 
-            $table->rawColumns(['actions', 'placeholder', 'product', 'material']);
+            $table->rawColumns(['placeholder', 'product']);
 
             return $table->make(true);
         }
 
-        return view('admin.stockSaldos.index');
+        $jenjangs = Jenjang::pluck('name', 'id')->prepend('All', '');
+
+        $mapels = Mapel::pluck('name', 'id')->prepend('All', '');
+
+        $kelas = Kelas::pluck('name', 'id')->prepend('All', '');
+
+        $covers = Cover::pluck('name', 'id')->prepend('All', '');
+
+        $isis = Isi::pluck('name', 'id')->prepend('All', '');
+
+        $periode = StockSaldo::groupBy('code', 'periode')->pluck('periode', 'code');
+
+        return view('admin.stockSaldos.index', compact('covers', 'jenjangs', 'kelas', 'mapels', 'isis', 'periode'));
     }
 
     public function create()
@@ -91,10 +113,8 @@ class StockSaldoController extends Controller
         return view('admin.stockSaldos.create', compact('materials', 'products'));
     }
 
-    public function store(StoreStockSaldoRequest $request)
+    public function store(Request $request)
     {
-        $bookvariant = BookVariant::all();
-
         $start = Carbon::now()->startOfMonth();
         $end = Carbon::now()->endOfMonth();
 
@@ -102,8 +122,19 @@ class StockSaldoController extends Controller
         $periode = $start->format('d F Y') .' -  '. $end->format('d F Y');
         $code = $start->format('mY');
 
+        $semester = setting('current_semester');
+
+        $bookvariant = BookVariant::withSum(['movement as in' => function ($q) use ($start, $end) {
+                    $q->where('movement_type', 'in')->whereBetween('movement_date', [$start, $end])->select(DB::raw('COALESCE(SUM(quantity), 0)'));
+                }], 'quantity')->withSum(['movement as out' => function ($q) use ($start, $end) {
+                    $q->where('movement_type', 'out')->whereBetween('movement_date', [$start, $end])->select(DB::raw('COALESCE(SUM(quantity), 0)'));
+                }], 'quantity')->where(function($q) use ($semester) {
+                    $q->where('semester_id', $semester)
+                    ->orWhere('stock' , '>', 0);
+                })->whereIn('type', ['L', 'P', 'K'])->get();
+
         foreach($bookvariant as $book) {
-            $before = StockSaldo::where('kode', $lastmonth)->where('product_id', $book->id)->first();
+            $before = StockSaldo::where('code', $lastmonth)->where('product_id', $book->id)->first();
 
             if ($before) {
                 $qty_awal = $before->qty_akhir;
@@ -111,20 +142,19 @@ class StockSaldoController extends Controller
                 $qty_awal = 0;
             }
 
-            StockSalso::create([
+            StockSaldo::updateOrCreate([
                 'code' => $code,
                 'product_id' => $book->id,
+            ], [
                 'periode' => $periode,
-                'start_date' => $start,
-                'end_date' => $end,
+                'start_date' => $start->format('d-m-Y'),
+                'end_date' => $end->format('d-m-Y'),
                 'qty_awal' => $qty_awal,
-                'in' => 0,
-                'out' => 0,
-                'qty_akhir' => $qty_awal,
+                'in' => $book->in,
+                'out' => $book->out,
+                'qty_akhir' => $qty_awal + ($book->in - $book->out),
             ]);
         }
-
-        $stockSaldo = StockSaldo::create($request->all());
 
         return redirect()->route('admin.stock-saldos.index');
     }
