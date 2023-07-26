@@ -196,6 +196,11 @@ class BookVariant extends Model implements HasMedia
         return $this->hasMany(StockAdjustmentDetail::class, 'product_id');
     }
 
+    public function finishing()
+    {
+        return $this->hasMany(FinishingItem::class, 'product_id');
+    }
+
     public function estimasi_produksi()
     {
         return $this->hasOne(ProductionEstimation::class, 'product_id');

@@ -73,6 +73,11 @@ class Finishing extends Model
         return $this->belongsTo(Jenjang::class, 'jenjang_id');
     }
 
+    public function finishing_items()
+    {
+        return $this->hasMany(FinishingItem::class, 'finishing_id');
+    }
+
     public static function generateNoSPK($semester, $vendor) {
         $data = self::where('semester_id', $semester)->count();
         $semester = Semester::find($semester);
@@ -81,6 +86,18 @@ class Finishing extends Model
         $no = !$data ? 1 : ($data + 1);
 
         $prefix = 'SPK.F/'. $vendor->code .'/'.self::BULAN_ROMAWI[Date::now()->format('n')].'/'.strtoupper($semester->code).'/';
+        $code = $prefix.sprintf("%06d", $no);
+
+        return $code;
+    }
+
+    public static function generateNoSPKTemp($semester) {
+        $data = self::where('semester_id', $semester)->count();
+        $semester = Semester::find($semester);
+
+        $no = !$data ? 1 : ($data + 1);
+
+        $prefix = 'SPK.F/VENDOR/'.self::BULAN_ROMAWI[Date::now()->format('n')].'/'.strtoupper($semester->code).'/';
         $code = $prefix.sprintf("%06d", $no);
 
         return $code;

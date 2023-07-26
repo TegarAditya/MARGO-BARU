@@ -96,6 +96,18 @@ class Cetak extends Model
         return $code;
     }
 
+    public static function generateNoSPCTemp($semester) {
+        $data = self::where('semester_id', $semester)->count();
+        $semester = Semester::find($semester);
+
+        $no = !$data ? 1 : ($data + 1);
+
+        $prefix = 'SPC.TYPE/VENDOR/'.self::BULAN_ROMAWI[Date::now()->format('n')].'/'.strtoupper($semester->code).'/';
+        $code = $prefix.sprintf("%06d", $no);
+
+        return $code;
+    }
+
     public function cetak_items()
     {
         return $this->hasMany(CetakItem::class, 'cetak_id');

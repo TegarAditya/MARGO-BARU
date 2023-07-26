@@ -135,6 +135,8 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     Route::get('book-variants/get-cetak', 'BookVariantController@getCetak')->name('book-variants.getCetak');
     Route::get('book-variants/get-info-cetak', 'BookVariantController@getInfoCetak')->name('book-variants.getInfoCetak');
     Route::get('book-variants/get-info-finishing', 'BookVariantController@getInfoFinishing')->name('book-variants.getInfoFinishing');
+    Route::get('book-variants/get-list-finishing', 'BookVariantController@getListFinishing')->name('book-variants.getListFinishing');
+    Route::get('book-variants/get-list-finishing-info', 'BookVariantController@getInfoFinishingDetail')->name('book-variants.getListFinishingInfo');
     Route::resource('book-variants', 'BookVariantController');
 
     // Book Component
@@ -280,6 +282,8 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
 
     // Finishing
     Route::delete('finishings/destroy', 'FinishingController@massDestroy')->name('finishings.massDestroy');
+    Route::get('finishings/masuk', 'FinishingController@masuk')->name('finishings.masuk');
+    Route::post('finishings/masuk', 'FinishingController@masukStore')->name('finishings.masukstore');
     Route::get('finishings/{finishing}/realisasi', 'FinishingController@realisasi')->name('finishings.realisasi');
     Route::put('finishings/realisasi/{finishing}', 'FinishingController@realisasiStore')->name('finishings.realiasasiStore');
     Route::get('finishings/print-spk/{finishing}', 'FinishingController@printSpk')->name('finishings.printSpk');

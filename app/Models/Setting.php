@@ -43,7 +43,7 @@ class Setting extends Model
         try {
             $result = json_decode($setting->value);
         } catch (\Exception $e) {
-            // 
+            //
         }
 
         return $result;
@@ -51,9 +51,9 @@ class Setting extends Model
 
     /**
      * Load all settings with formatted keys and values
-     * 
+     *
      * @return object `{ "key" => "value" }`
-     * 
+     *
      * @example string `$settings = Setting::mapWithKeys();`
      */
     public static function mapWithKeys(): Collection
@@ -65,7 +65,7 @@ class Setting extends Model
                 try {
                     $value = json_decode($item->value);
                 } catch (\Exception $e) {
-                    // 
+                    //
                 }
             }
 

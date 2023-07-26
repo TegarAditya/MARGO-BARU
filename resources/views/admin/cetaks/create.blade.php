@@ -3,7 +3,7 @@
 
 <div class="card">
     <div class="card-header">
-        {{ trans('global.create') }} {{ trans('cruds.cetak.title_singular') }}
+        <h1>Formulir SPK Cetak</h1>
     </div>
 
     <div class="card-body">
@@ -19,7 +19,7 @@
                 <div class="col-6">
                     <div class="form-group">
                         <label class="required" for="no_spc">{{ trans('cruds.cetak.fields.no_spc') }}</label>
-                        <input class="form-control {{ $errors->has('no_spc') ? 'is-invalid' : '' }}" type="text" name="no_spc" id="no_spc" value="{{ old('no_spc', '') }}" readonly placeholder="(Otomatis)">
+                        <input class="form-control {{ $errors->has('no_spc') ? 'is-invalid' : '' }}" type="text" name="no_spc" id="no_spc" value="{{ old('no_spc', $no_spc) }}" readonly>
                         @if($errors->has('no_spc'))
                             <span class="text-danger">{{ $errors->first('no_spc') }}</span>
                         @endif
@@ -34,20 +34,6 @@
                             <span class="text-danger">{{ $errors->first('date') }}</span>
                         @endif
                         <span class="help-block">{{ trans('cruds.cetak.fields.date_helper') }}</span>
-                    </div>
-                </div>
-                <div class="col-6">
-                    <div class="form-group">
-                        <label class="required" for="semester_id">{{ trans('cruds.cetak.fields.semester') }}</label>
-                        <select class="form-control select2 {{ $errors->has('semester') ? 'is-invalid' : '' }}" name="semester_id" id="semester_id" required>
-                            @foreach($semesters as $id => $entry)
-                                <option value="{{ $id }}" {{ old('semester_id') == $id ? 'selected' : '' }}>{{ $entry }}</option>
-                            @endforeach
-                        </select>
-                        @if($errors->has('semester'))
-                            <span class="text-danger">{{ $errors->first('semester') }}</span>
-                        @endif
-                        <span class="help-block">{{ trans('cruds.cetak.fields.semester_helper') }}</span>
                     </div>
                 </div>
                 <div class="col-6">

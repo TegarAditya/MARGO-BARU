@@ -3,7 +3,7 @@
 
 <div class="card">
     <div class="card-header">
-        {{ trans('global.edit') }} {{ trans('cruds.finishing.title_singular') }}
+        <h1>Formulir Edit SPK</h1>
     </div>
 
     <div class="card-body">
@@ -29,20 +29,6 @@
                             <span class="text-danger">{{ $errors->first('date') }}</span>
                         @endif
                         <span class="help-block">{{ trans('cruds.finishing.fields.date_helper') }}</span>
-                    </div>
-                </div>
-                <div class="col-6">
-                    <div class="form-group">
-                        <label class="required" for="semester_id">{{ trans('cruds.finishing.fields.semester') }}</label>
-                        <select class="form-control select2 {{ $errors->has('semester') ? 'is-invalid' : '' }}" name="semester_id" id="semester_id" disabled>
-                            @foreach($semesters as $id => $entry)
-                                <option value="{{ $id }}" {{ (old('semester_id') ? old('semester_id') : $finishing->semester->id ?? '') == $id ? 'selected' : '' }}>{{ $entry }}</option>
-                            @endforeach
-                        </select>
-                        @if($errors->has('semester'))
-                            <span class="text-danger">{{ $errors->first('semester') }}</span>
-                        @endif
-                        <span class="help-block">{{ trans('cruds.finishing.fields.semester_helper') }}</span>
                     </div>
                 </div>
                 <div class="col-6">

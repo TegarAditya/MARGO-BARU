@@ -20,6 +20,7 @@ use App\Models\Kelas;
 use App\Models\Mapel;
 use App\Models\SalesOrder;
 use App\Models\StockMovement;
+use App\Models\FinishingItem;
 use Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -664,6 +665,56 @@ class BookVariantController extends Controller
 
         $product = BookVariant::withMin('components as finishing_stock', 'stock')->find($id);
         $product->load('book', 'jenjang', 'cover', 'kurikulum', 'estimasi_produksi', 'isi');
+
+        return response()->json($product);
+    }
+
+    public function getListFinishing(Request $request)
+    {
+        $query = $request->input('q');
+        $vendor = $request->input('vendor');
+        $jenjang = $request->input('jenjang');
+
+        $query = FinishingItem::join('book_variants', 'book_variants.id', '=', 'finishing_items.product_id')
+                    ->join('finishings', 'finishing_items.finishing_id', '=', 'finishings.id')
+                    ->where(function($q) use ($query) {
+                        $q->where('book_variants.code', 'LIKE', "%{$query}%")
+                        ->orWhere('book_variants.name', 'LIKE', "%{$query}%");
+                    })
+                    ->where('finishing_items.done', 0)
+                    ->orderBy('book_variants.code', 'ASC');
+
+                    if (!empty($jenjang)) {
+                        $query->where('book_variants.jenjang_id', $jenjang);
+                    }
+
+                    if (!empty($vendor)) {
+                        $query->where('finishings.vendor_id', $vendor);
+                    }
+
+        $products = $query->get(['book_variants.*', 'finishings.no_spk as finishing_spk', 'finishing_items.id as finishing_item_id']);
+
+        $formattedProducts = [];
+
+        foreach ($products as $product) {
+            $formattedProducts[] = [
+                'id' => $product->id,
+                'finishing_item_id' => $product->finishing_item_id,
+                'finishing_spk' => $product->finishing_spk,
+                'text' => $product->code,
+                'stock' => $product->stock,
+                'name' => $product->name,
+            ];
+        }
+
+        return response()->json($formattedProducts);
+    }
+
+    public function getInfoFinishingDetail(Request $request)
+    {
+        $id = $request->input('id');
+
+        $product = FinishingItem::with('finishing', 'product', 'product.jenjang', 'product.cover', 'product.kurikulum', 'product.isi')->find($id);
 
         return response()->json($product);
     }

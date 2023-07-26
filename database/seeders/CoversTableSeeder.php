@@ -90,6 +90,8 @@ class CoversTableSeeder extends Seeder
             'key'=>'current_semester',
             'value'=>'11',
             'is_json'=> 0,
+            'created_by_id' => 1,
+            'created_by_id' => 1,
         ] );
     }
 }

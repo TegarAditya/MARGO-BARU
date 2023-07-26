@@ -3,33 +3,13 @@
 
 <div class="card">
     <div class="card-header">
-        <h1>Formulir SPK Finishing</h1>
+        <h1>Formulir Buku Masuk Finishing</h1>
     </div>
 
     <div class="card-body">
-        <form method="POST" action="{{ route("admin.finishings.store") }}" enctype="multipart/form-data">
+        <form method="POST" action="{{ route("admin.finishings.masukstore") }}" enctype="multipart/form-data">
             @csrf
             <div class="row">
-                <div class="col-6">
-                    <div class="form-group">
-                        <label class="required" for="no_spk">{{ trans('cruds.finishing.fields.no_spk') }}</label>
-                        <input class="form-control {{ $errors->has('no_spk') ? 'is-invalid' : '' }}" type="text" name="no_spk" id="no_spk" value="{{ old('no_spk', $no_spk) }}" readonly>
-                        @if($errors->has('no_spk'))
-                            <span class="text-danger">{{ $errors->first('no_spk') }}</span>
-                        @endif
-                        <span class="help-block">{{ trans('cruds.finishing.fields.no_spk_helper') }}</span>
-                    </div>
-                </div>
-                <div class="col-6">
-                    <div class="form-group">
-                        <label class="required" for="date">{{ trans('cruds.finishing.fields.date') }}</label>
-                        <input class="form-control date {{ $errors->has('date') ? 'is-invalid' : '' }}" type="text" name="date" id="date" value="{{ old('date') }}" required>
-                        @if($errors->has('date'))
-                            <span class="text-danger">{{ $errors->first('date') }}</span>
-                        @endif
-                        <span class="help-block">{{ trans('cruds.finishing.fields.date_helper') }}</span>
-                    </div>
-                </div>
                 <div class="col-6">
                     <div class="form-group">
                         <label class="required" for="vendor_id">{{ trans('cruds.finishing.fields.vendor') }}</label>
@@ -56,16 +36,6 @@
                             <span class="text-danger">{{ $errors->first('jenjang') }}</span>
                         @endif
                         <span class="help-block">{{ trans('cruds.bookVariant.fields.jenjang_helper') }}</span>
-                    </div>
-                </div>
-                <div class="col-12">
-                    <div class="form-group">
-                        <label for="note">{{ trans('cruds.finishing.fields.note') }}</label>
-                        <textarea class="form-control {{ $errors->has('note') ? 'is-invalid' : '' }}" name="note" id="note">{{ old('note') }}</textarea>
-                        @if($errors->has('note'))
-                            <span class="text-danger">{{ $errors->first('note') }}</span>
-                        @endif
-                        <span class="help-block">{{ trans('cruds.finishing.fields.note_helper') }}</span>
                     </div>
                 </div>
             </div>
@@ -103,13 +73,13 @@
             templateResult: formatProduct,
             templateSelection: formatProductSelection,
             ajax: {
-                    url: "{{ route('admin.book-variants.getCetak') }}",
+                    url: "{{ route('admin.book-variants.getListFinishing') }}",
                     dataType: 'json',
                     delay: 250,
                     data: function(params) {
                         return {
                             q: params.term,
-                            type: 'finishing',
+                            vendor: $('#vendor_id').val(),
                             jenjang: $('#jenjang_id').val()
                         };
                     },
@@ -127,7 +97,7 @@
                 return product.text;
             }
 
-            var productInfo = $('<span>' + product.text + '</span><br><small class="stock-info">' + product.name + '</small><br><small class="stock-info">Stock: ' + product.stock + '</small>');
+            var productInfo = $('<span>' + product.text + '</span><br><small class="stock-info">' + product.finishing_spk + '</small><br><small class="stock-info">' + product.name + '</small>');
             return productInfo;
         }
 
@@ -136,7 +106,7 @@
         }
 
         $('#product-search').on('select2:select', function(e) {
-            var productId = e.params.data.id;
+            var productId = e.params.data.finishing_item_id;
 
             if ($('#product-' + productId).length > 0) {
                 // Product is already added, show an error message using SweetAlert
@@ -152,56 +122,46 @@
             }
 
             $.ajax({
-                url: "{{ route('admin.book-variants.getInfoFinishing') }}",
+                url: "{{ route('admin.book-variants.getListFinishingInfo') }}",
                 type: 'GET',
                 dataType: 'json',
                 data: {
                     id: productId,
                 },
-                success: function(product) {
-                    if (product.finishing_stock <= 0) {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Stock Isi/Cover Kosong!',
-                            showConfirmButton: false,
-                            timer: 2000
-                        });
-
-                        return;
-                    }
-
+                success: function(item) {
                     var formHtml = `
-                        <div class="item-product" id="product-${product.id}">
+                        <div class="item-product" id="product-${item.id}">
                             <div class="row">
                                 <div class="col-6 align-self-center">
-                                    <h6 class="text-sm product-name mb-1">(${product.book_type}) ${product.short_name}</h6>
+                                    <h6 class="text-sm product-name mb-1">(${item.product.book_type}) ${item.product.short_name}</h6>
                                     <p class="mb-0 text-sm">
-                                        Code : <strong>${product.code}</strong>
+                                        Code : <strong>${item.product.code}</strong>
                                     </p>
                                     <p class="mb-0 text-sm">
-                                        Jenjang - Kurikulum : <strong>${product.jenjang.name} - ${product.kurikulum.name}</strong>
+                                        Jenjang - Kurikulum : <strong>${item.product.jenjang.name} - ${item.product.kurikulum.name}</strong>
                                     </p>
                                     <p class="mb-0 text-sm">
-                                        <strong>ESTIMASI : ${product.estimasi_produksi.estimasi}</strong>
+                                        <strong>No SPK Finishing : ${item.finishing.no_spk}</strong>
                                     </p>
                                     <p class="mb-0 text-sm">
-                                        <strong>STOCK COVER/ISI : ${product.finishing_stock}</strong>
+                                        <strong>SPK Finishing : ${item.estimasi}</strong>
                                     </p>
                                 </div>
                                 <div class="col offset-1 row align-items-end align-self-center">
-                                    <input type="hidden" name="products[]" value="${product.id}">
-                                    <div class="col" style="max-width: 210px">
-                                        <p class="mb-0 text-sm">Quantity</p>
+                                    <input type="hidden" name="products[]" value="${item.product_id}">
+                                    <input type="hidden" name="finishing_items[]" value="${ item.id }">
+                                    <div class="col" style="max-width: 160px">
+                                        <p class="mb-0 text-sm">Realisasi</p>
                                         <div class="form-group text-field m-0">
                                             <div class="text-field-input px-2 py-0">
-                                                <input class="quantity" type="hidden" name="quantities[]" data-max="${Math.min(product.estimasi_produksi.estimasi, product.finishing_stock)}" value="1">
-                                                <input class="form-control text-center quantity_text" type="text" name="quantity_text[]" value="1" required>
+                                                <input class="quantity" type="hidden" name="quantities[]" value="${ item.quantity }">
+                                                <input class="form-control text-center quantity_text" type="text" name="quantity_text[]" value="${ item.quantity }" required>
                                                 <label class="text-field-border"></label>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="col-auto pl-5">
-                                        <button type="button" class="btn btn-danger btn-sm product-delete" data-product-id="${product.id}" tabIndex="-1">
+                                        <button type="button" class="btn btn-danger btn-sm product-delete" data-product-id="${item.id}" tabIndex="-1">
                                             <i class="fa fa-trash"></i>
                                         </button>
                                     </div>

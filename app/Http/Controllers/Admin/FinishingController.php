@@ -99,13 +99,13 @@ class FinishingController extends Controller
     {
         abort_if(Gate::denies('finishing_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $semesters = Semester::orderBy('code', 'DESC')->where('status', 1)->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
-
         $vendors = Vendor::where('type', 'finishing')->get()->pluck('full_name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
         $jenjangs = Jenjang::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
-        return view('admin.finishings.create', compact('semesters', 'vendors', 'jenjangs'));
+        $no_spk = Finishing::generateNoSPKTemp(setting('current_semester'));
+
+        return view('admin.finishings.create', compact('vendors', 'jenjangs', 'no_spk'));
     }
 
     public function store(Request $request)
@@ -113,7 +113,7 @@ class FinishingController extends Controller
         // Validate the form data
         $validatedData = $request->validate([
             'date' => 'required',
-            'semester_id' => 'required',
+            // 'semester_id' => 'required',
             'jenjang_id' => 'required',
             'vendor_id' => 'required',
             'note' => 'nullable',
@@ -124,7 +124,7 @@ class FinishingController extends Controller
         ]);
 
         $date = $validatedData['date'];
-        $semester = $validatedData['semester_id'];
+        $semester = setting('current_semester');
         $vendor = $validatedData['vendor_id'];
         $jenjang = $validatedData['jenjang_id'];
         $note = $validatedData['note'];
@@ -193,8 +193,6 @@ class FinishingController extends Controller
     {
         abort_if(Gate::denies('finishing_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $semesters = Semester::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
-
         $vendors = Vendor::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
         $jenjangs = Jenjang::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
@@ -207,7 +205,7 @@ class FinishingController extends Controller
 
         $finishing->load('semester', 'vendor', 'jenjang');
 
-        return view('admin.finishings.edit', compact('finishing', 'semesters', 'vendors', 'finishing_items', 'jenjangs'));
+        return view('admin.finishings.edit', compact('finishing', 'vendors', 'finishing_items', 'jenjangs'));
     }
 
     public function update(Request $request, Finishing $finishing)
@@ -338,15 +336,13 @@ class FinishingController extends Controller
     {
         abort_if(Gate::denies('finishing_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $semesters = Semester::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
-
         $vendors = Vendor::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
         $finishing->load('semester', 'vendor');
 
         $finishing_items = FinishingItem::with('product', 'semester')->where('finishing_id', $finishing->id)->orderBy('product_id')->get();
 
-        return view('admin.finishings.realisasi', compact('finishing', 'semesters', 'vendors', 'finishing_items'));
+        return view('admin.finishings.realisasi', compact('finishing', 'vendors', 'finishing_items'));
     }
 
     public function realisasiStore(Request $request, Finishing $finishing)
@@ -399,6 +395,72 @@ class FinishingController extends Controller
             DB::commit();
 
             Alert::success('Success', 'Finishing Order berhasil di simpan');
+
+            return redirect()->route('admin.finishings.index');
+        } catch (\Exception $e) {
+            DB::rollback();
+
+            dd($e);
+
+            return redirect()->back()->with('error-message', $e->getMessage())->withInput();
+        }
+    }
+
+    public function masuk()
+    {
+        $vendors = Vendor::where('type', 'finishing')->get()->pluck('full_name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $jenjangs = Jenjang::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+
+        return view('admin.finishings.masuk', compact('vendors', 'jenjangs'));
+    }
+
+    public function masukStore(Request $request)
+    {
+        $validatedData = $request->validate([
+            'products' => 'required|array',
+            'products.*' => 'exists:book_variants,id',
+            'finishing_items' => 'required|array',
+            'finishing_items.*' => 'exists:finishing_items,id',
+            'quantities' => 'required|array',
+            'quantities.*' => 'numeric|min:1',
+        ]);
+
+        $products = $validatedData['products'];
+        $finishing_items = $validatedData['finishing_items'];
+        $quantities = $validatedData['quantities'];
+        $date = Carbon::now()->format('d-m-Y');
+        $finishing = collect();
+
+        DB::beginTransaction();
+        try {
+            for ($i = 0; $i < count($products); $i++) {
+                $finishing_item = FinishingItem::with('finishing')->find($finishing_items[$i]);
+
+                $finishing->push($finishing_item->finishing_id);
+
+                $product = $products[$i];
+                $quantity = $quantities[$i];
+
+                $finishing_item->update([
+                    'quantity' => $quantity,
+                    'done' => 1
+                ]);
+
+                StockService::createMovement('in', 'produksi', $finishing_item->finishing->id, $date, $product, $quantity);
+                StockService::updateStock($product, $quantity);
+            }
+
+            $finishings = Finishing::whereIn('id', $finishing->unique())->get();
+            
+            foreach($finishings as $item) {
+                $item->update([
+                    'total_oplah' => $item->finishing_items->sum('quantity'),
+                ]);
+            }
+
+            DB::commit();
+
+            Alert::success('Success', 'Buku Masuk Finishing berhasil di simpan');
 
             return redirect()->route('admin.finishings.index');
         } catch (\Exception $e) {

@@ -34,7 +34,7 @@ class CetakController extends Controller
         abort_if(Gate::denies('cetak_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         if ($request->ajax()) {
-            $query = Cetak::with(['semester', 'vendor'])->select(sprintf('%s.*', (new Cetak)->table))->latest();
+            $query = Cetak::with(['semester', 'vendor', 'cetak_items'])->select(sprintf('%s.*', (new Cetak)->table))->latest();
 
             if (!empty($request->type)) {
                 $query->where('type', $request->type);
@@ -66,6 +66,11 @@ class CetakController extends Controller
                         <i class="fas fa-tasks text-danger fa-lg"></i>
                     </a>
                 ';
+                // if($row->cetak_items->where('done', 0)->count()) {
+                //     $btn .= '<a class="px-1" href="'.route('admin.cetaks.realisasi', $row->id).'" title="Realisasi">
+                //         <i class="fas fa-tasks text-danger fa-lg"></i>
+                //     </a>';
+                // }
 
                 return $btn;
             });
@@ -117,7 +122,9 @@ class CetakController extends Controller
 
         $jenjangs = Jenjang::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
-        return view('admin.cetaks.create', compact('semesters', 'vendors', 'jenjangs'));
+        $no_spc = Cetak::generateNoSPCTemp(setting('current_semester'));
+
+        return view('admin.cetaks.create', compact('semesters', 'vendors', 'jenjangs', 'no_spc'));
     }
 
     public function store(Request $request)
@@ -125,7 +132,7 @@ class CetakController extends Controller
         // Validate the form data
         $validatedData = $request->validate([
             'date' => 'required',
-            'semester_id' => 'required',
+            // 'semester_id' => 'required',
             'vendor_id' => 'required',
             'jenjang_id' => 'required',
             'type' => 'required',
@@ -141,7 +148,7 @@ class CetakController extends Controller
         ]);
 
         $date = $validatedData['date'];
-        $semester = $validatedData['semester_id'];
+        $semester = setting('current_semester');
         $vendor = $validatedData['vendor_id'];
         $jenjang = $validatedData['jenjang_id'];
         $type = $validatedData['type'];

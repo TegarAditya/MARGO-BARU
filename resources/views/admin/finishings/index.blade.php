@@ -1,10 +1,18 @@
 @extends('layouts.admin')
 @section('content')
+<div class="row mb-4">
+    <div class="col-12">
+        <h1 class="m-0 bold">Produksi Finishing Buku</h1>
+    </div>
+</div>
 @can('finishing_create')
     <div style="margin-bottom: 10px;" class="row">
         <div class="col-lg-12">
-            <a class="btn btn-primary" href="{{ route('admin.finishings.create') }}">
+            <a class="btn btn-primary mr-2" href="{{ route('admin.finishings.create') }}">
                 {{ trans('global.add') }} {{ trans('cruds.finishing.title_singular') }}
+            </a>
+            <a class="btn btn-danger" href="{{ route('admin.finishings.masuk') }}">
+                Input Buku Masuk
             </a>
         </div>
     </div>
@@ -123,12 +131,12 @@ $(function () {
         $($.fn.dataTable.tables(true)).DataTable()
             .columns.adjust();
     });
-    
+
     $("#filterform").submit(function(event) {
         event.preventDefault();
         table.ajax.reload();
     });
-    
+
 });
 
 </script>

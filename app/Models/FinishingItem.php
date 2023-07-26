@@ -51,4 +51,9 @@ class FinishingItem extends Model
     {
         return $this->belongsTo(BookVariant::class, 'product_id');
     }
+
+    public function finishing()
+    {
+        return $this->belongsTo(Finishing::class, 'finishing_id');
+    }
 }

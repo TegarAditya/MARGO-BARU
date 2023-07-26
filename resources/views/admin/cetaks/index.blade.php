@@ -1,5 +1,10 @@
 @extends('layouts.admin')
 @section('content')
+<div class="row mb-4">
+    <div class="col-12">
+        <h1 class="m-0 bold">Produksi Cetak Isi & Cover</h1>
+    </div>
+</div>
 @can('cetak_create')
     <div style="margin-bottom: 10px;" class="row">
         <div class="col-lg-12">

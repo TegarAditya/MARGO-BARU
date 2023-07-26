@@ -1,6 +1,10 @@
 @extends('layouts.admin')
 @section('content')
-
+<div class="row mb-4">
+    <div class="col-12">
+        <h1 class="m-0 bold">Produksi Finishing Buku</h1>
+    </div>
+</div>
 <div class="card">
     <div class="card-header">
         {{ trans('global.show') }} {{ trans('cruds.finishing.title') }}
