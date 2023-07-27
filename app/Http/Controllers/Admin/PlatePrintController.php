@@ -46,18 +46,20 @@ class PlatePrintController extends Controller
             $table->addColumn('actions', '&nbsp;');
 
             $table->editColumn('actions', function ($row) {
-                $viewGate      = 'plate_print_show';
-                $editGate      = 'plate_print_edit';
-                $deleteGate    = 'plate_print_delete';
-                $crudRoutePart = 'plate-prints';
+                $btn = '
+                    <a class="px-1" href="'.route('admin.plate-prints.show', $row->id).'" title="Show">
+                        <i class="fas fa-eye text-success fa-lg"></i>
+                    </a>
+                    <a class="px-1" href="'.route('admin.plate-prints.printSpk', $row->id).'" title="Print SPK" target="_blank">
+                        <i class="fas fa-print text-secondary fa-lg"></i>
+                    </a>
+                ';
 
-                return view('partials.datatablesActions', compact(
-                    'viewGate',
-                    'editGate',
-                    'deleteGate',
-                    'crudRoutePart',
-                    'row'
-                ));
+                // <a class="px-1" href="'.route('admin.cetaks.edit', $row->id).'" title="Edit">
+                //         <i class="fas fa-edit fa-lg"></i>
+                //     </a>
+
+                return $btn;
             });
 
             $table->editColumn('no_spk', function ($row) {
@@ -221,7 +223,7 @@ class PlatePrintController extends Controller
     {
         abort_if(Gate::denies('plate_print_show'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $platePrint->load('semester', 'vendor', );
+        $platePrint->load('semester', 'vendor');
 
         $items = PlatePrintItem::with('product')->where('plate_print_id', $platePrint->id)->get();
 
@@ -246,5 +248,16 @@ class PlatePrintController extends Controller
         }
 
         return response(null, Response::HTTP_NO_CONTENT);
+    }
+
+    public function printSpk(PlatePrint $plate, Request $request)
+    {
+        $plate->load('semester', 'vendor');
+
+        $items = PlatePrintItem::with('product', 'product.jenjang', 'product.isi', 'product.cover', 'product.kurikulum')->where('plate_print_id', $plate->id)->get();
+
+        $items = $items->sortBy('product.kelas_id')->sortBy('product.mapel_id')->sortBy('product.kurikulum_id')->sortBy('product.jenjang_id');
+
+        return view('admin.platePrints.spk', compact('plate', 'items'));
     }
 }

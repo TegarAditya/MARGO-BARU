@@ -234,6 +234,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
 
     // Plate Print
     Route::delete('plate-prints/destroy', 'PlatePrintController@massDestroy')->name('plate-prints.massDestroy');
+    Route::get('plate-prints/print-spk/{plate}', 'PlatePrintController@printSpk')->name('plate-prints.printSpk');
     Route::resource('plate-prints', 'PlatePrintController');
 
     // Sales Billing
