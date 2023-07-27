@@ -10,6 +10,7 @@ use App\Http\Requests\UpdateMaterialRequest;
 use App\Models\Material;
 use App\Models\Unit;
 use App\Models\Vendor;
+use App\Models\BookVariant;
 use Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -28,7 +29,17 @@ class MaterialsController extends Controller
         abort_if(Gate::denies('material_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         if ($request->ajax()) {
-            $query = Material::with(['unit', 'warehouse'])->select(sprintf('%s.*', (new Material)->table));
+            $query = Material::with(['unit', 'warehouse', 'vendors'])->select(sprintf('%s.*', (new Material)->table));
+
+            if (!empty($request->category)) {
+                $query->where('category', $request->category);
+            }
+            if (!empty($request->vendor)) {
+                $query->whereHas('vendors', function ($q) use ($request) {
+                    $q->where('id', $request->vendor);
+                });
+            }
+
             $table = Datatables::of($query);
 
             $table->addColumn('placeholder', '&nbsp;');
@@ -56,17 +67,17 @@ class MaterialsController extends Controller
                 return $row->name ? $row->name : '';
             });
             $table->addColumn('unit_name', function ($row) {
-                return $row->unit ? $row->unit->name : '';
+                return $row->unit ? $row->unit->code : '';
             });
 
             $table->editColumn('stock', function ($row) {
-                return $row->stock ? $row->stock : '';
+                return $row->stock ? angka($row->stock) : 0;
             });
 
             $table->editColumn('vendor', function ($row) {
                 $labels = [];
                 foreach ($row->vendors as $vendor) {
-                    $labels[] = sprintf('<span class="label label-info label-many">%s</span>', $vendor->name);
+                    $labels[] = sprintf('<span class="label label-info label-many">%s</span>;', $vendor->name);
                 }
 
                 return implode(' ', $labels);
@@ -77,7 +88,9 @@ class MaterialsController extends Controller
             return $table->make(true);
         }
 
-        return view('admin.materials.index');
+        $vendors = Vendor::where('type', 'cetak')->get()->pluck('full_name', 'id')->prepend('All', '');
+
+        return view('admin.materials.index', compact('vendors'));
     }
 
     public function create()
@@ -173,10 +186,28 @@ class MaterialsController extends Controller
 
     public function getPlates(Request $request) {
         $vendor = $request->input('vendor');
+        $product = BookVariant::find($request->input('product'));
 
-        $materials = Material::where('category', 'plate')->whereHas('vendors', function ($q) use ($vendor) {
+        $materials = Material::where('category', 'printed_plate')
+                ->where('code', 'LIKE', '%'.$product->code.'%')
+                ->whereHas('vendors', function ($q) use ($vendor) {
                     $q->where('id', $vendor);
                 })->orderBy('code', 'ASC')->get();
+
+        $formattedMaterials = [];
+
+        foreach ($materials as $material) {
+            $formattedMaterials[] = [
+                'id' => $material->id,
+                'text' => '('. $material->stock .') '.$material->code,
+            ];
+        }
+
+        return response()->json($formattedMaterials);
+    }
+
+    public function getChemicals(Request $request) {
+        $materials = Material::where('category', 'chemical')->orderBy('code', 'ASC')->get();
 
         $formattedMaterials = [];
 

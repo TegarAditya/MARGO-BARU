@@ -26,6 +26,48 @@
     </div>
 
     <div class="card-body">
+        <form id="filterform">
+            <div class="row">
+                <div class="col-6">
+                    <div class="form-group">
+                        <label>{{ trans('cruds.material.fields.category') }}</label>
+                        <select class="form-control {{ $errors->has('category') ? 'is-invalid' : '' }}" name="category" id="category">
+                            <option value {{ old('category', null) === null ? 'selected' : '' }}>All</option>
+                            @foreach(App\Models\Material::CATEGORY_SELECT as $key => $label)
+                                <option value="{{ $key }}" {{ old('category', '') === (string) $key ? 'selected' : '' }}>{{ $label }}</option>
+                            @endforeach
+                        </select>
+                        @if($errors->has('category'))
+                            <span class="text-danger">{{ $errors->first('category') }}</span>
+                        @endif
+                        <span class="help-block">{{ trans('cruds.material.fields.category_helper') }}</span>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="form-group">
+                        <label for="vendor_id">{{ trans('cruds.platePrint.fields.vendor') }}</label>
+                        <select class="form-control select2 {{ $errors->has('vendor') ? 'is-invalid' : '' }}" name="vendor_id" id="vendor_id">
+                            @foreach($vendors as $id => $entry)
+                                <option value="{{ $id }}" {{ old('vendor_id') == $id ? 'selected' : '' }}>{{ $entry }}</option>
+                            @endforeach
+                        </select>
+                        @if($errors->has('vendor'))
+                            <span class="text-danger">{{ $errors->first('vendor') }}</span>
+                        @endif
+                        <span class="help-block">{{ trans('cruds.platePrint.fields.vendor_helper') }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group mt-3">
+                <button class="btn btn-primary" type="submit">
+                    Filter
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <div class="card-body">
         <table class=" table table-bordered table-striped table-hover ajaxTable datatable datatable-Material">
             <thead>
                 <tr>
@@ -45,6 +87,9 @@
                         {{ trans('cruds.material.fields.stock') }}
                     </th>
                     <th>
+                        {{ trans('cruds.material.fields.vendor') }}
+                    </th>
+                    <th>
                         &nbsp;
                     </th>
                 </tr>
@@ -59,55 +104,29 @@
 @section('scripts')
 @parent
 <script>
-    $(function () {
-  let dtButtons = $.extend(true, [], $.fn.dataTable.defaults.buttons)
-@can('material_delete')
-  let deleteButtonTrans = '{{ trans('global.datatables.delete') }}';
-  let deleteButton = {
-    text: deleteButtonTrans,
-    url: "{{ route('admin.materials.massDestroy') }}",
-    className: 'btn-danger',
-    action: function (e, dt, node, config) {
-      var ids = $.map(dt.rows({ selected: true }).data(), function (entry) {
-          return entry.id
-      });
-
-      if (ids.length === 0) {
-        alert('{{ trans('global.datatables.zero_selected') }}')
-
-        return
-      }
-
-      if (confirm('{{ trans('global.areYouSure') }}')) {
-        $.ajax({
-          headers: {'x-csrf-token': _token},
-          method: 'POST',
-          url: config.url,
-          data: { ids: ids, _method: 'DELETE' }})
-          .done(function () { location.reload() })
-      }
-    }
-  }
-  dtButtons.push(deleteButton)
-@endcan
-
+$(function () {
   let dtOverrideGlobals = {
-    buttons: dtButtons,
     processing: true,
     serverSide: true,
     retrieve: true,
     aaSorting: [],
-    ajax: "{{ route('admin.materials.index') }}",
+    ajax: {
+            url: "{{ route('admin.materials.index') }}",
+            data: function(data) {
+                data.category = $('#category').val(),
+                data.vendor = $('#vendor_id').val()
+            }
+        },
     columns: [
-      { data: 'placeholder', name: 'placeholder' },
-{ data: 'code', name: 'code' },
-{ data: 'name', name: 'name' },
-{ data: 'unit_name', name: 'unit.name' },
-{ data: 'stock', name: 'stock' },
-{ data: 'actions', name: '{{ trans('global.actions') }}' }
+        { data: 'placeholder', name: 'placeholder' },
+        { data: 'code', name: 'code', class: 'text-center' },
+        { data: 'name', name: 'name' },
+        { data: 'unit_name', name: 'unit.name', class: 'text-center' },
+        { data: 'stock', name: 'stock', class: 'text-center' },
+        { data: 'vendor', name: 'vendor', class: 'text-center' },
+        { data: 'actions', name: '{{ trans('global.actions') }}' }
     ],
     orderCellsTop: true,
-    order: [[ 1, 'desc' ]],
     pageLength: 25,
   };
   let table = $('.datatable-Material').DataTable(dtOverrideGlobals);
@@ -116,6 +135,10 @@
           .columns.adjust();
   });
 
+  $("#filterform").submit(function(event) {
+        event.preventDefault();
+        table.ajax.reload();
+    });
 });
 
 </script>

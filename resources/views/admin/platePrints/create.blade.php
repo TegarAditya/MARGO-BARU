@@ -3,42 +3,36 @@
 
 <div class="card">
     <div class="card-header">
-        <h1>Formulir SPK Cetak</h1>
+        <h1>Formulir SPK Cetak Plate</h1>
     </div>
 
     <div class="card-body">
-        @if (session()->has('error-message'))
-            <p class="text-danger">
-                {{session()->get('error-message')}}
-            </p>
-        @endif
-
-        <form method="POST" action="{{ route("admin.cetaks.store") }}" enctype="multipart/form-data">
+        <form method="POST" action="{{ route("admin.plate-prints.store") }}" enctype="multipart/form-data">
             @csrf
             <div class="row">
                 <div class="col-6">
                     <div class="form-group">
-                        <label class="required" for="no_spc">{{ trans('cruds.cetak.fields.no_spc') }}</label>
-                        <input class="form-control {{ $errors->has('no_spc') ? 'is-invalid' : '' }}" type="text" name="no_spc" id="no_spc" value="{{ old('no_spc', $no_spc) }}" readonly>
-                        @if($errors->has('no_spc'))
-                            <span class="text-danger">{{ $errors->first('no_spc') }}</span>
+                        <label class="required" for="no_spk">{{ trans('cruds.platePrint.fields.no_spk') }}</label>
+                        <input class="form-control {{ $errors->has('no_spk') ? 'is-invalid' : '' }}" type="text" name="no_spk" id="no_spk" value="{{ old('no_spk', $no_spk) }}" readonly required>
+                        @if($errors->has('no_spk'))
+                            <span class="text-danger">{{ $errors->first('no_spk') }}</span>
                         @endif
-                        <span class="help-block">{{ trans('cruds.cetak.fields.no_spc_helper') }}</span>
+                        <span class="help-block">{{ trans('cruds.platePrint.fields.no_spk_helper') }}</span>
                     </div>
                 </div>
                 <div class="col-6">
                     <div class="form-group">
-                        <label class="required" for="date">{{ trans('cruds.cetak.fields.date') }}</label>
+                        <label class="required" for="date">{{ trans('cruds.platePrint.fields.date') }}</label>
                         <input class="form-control date {{ $errors->has('date') ? 'is-invalid' : '' }}" type="text" name="date" id="date" value="{{ old('date') }}" required>
                         @if($errors->has('date'))
                             <span class="text-danger">{{ $errors->first('date') }}</span>
                         @endif
-                        <span class="help-block">{{ trans('cruds.cetak.fields.date_helper') }}</span>
+                        <span class="help-block">{{ trans('cruds.platePrint.fields.date_helper') }}</span>
                     </div>
                 </div>
                 <div class="col-6">
                     <div class="form-group">
-                        <label class="required" for="vendor_id">{{ trans('cruds.cetak.fields.vendor') }}</label>
+                        <label class="required" for="vendor_id">{{ trans('cruds.platePrint.fields.vendor') }}</label>
                         <select class="form-control select2 {{ $errors->has('vendor') ? 'is-invalid' : '' }}" name="vendor_id" id="vendor_id" required>
                             @foreach($vendors as $id => $entry)
                                 <option value="{{ $id }}" {{ old('vendor_id') == $id ? 'selected' : '' }}>{{ $entry }}</option>
@@ -47,7 +41,7 @@
                         @if($errors->has('vendor'))
                             <span class="text-danger">{{ $errors->first('vendor') }}</span>
                         @endif
-                        <span class="help-block">{{ trans('cruds.cetak.fields.vendor_helper') }}</span>
+                        <span class="help-block">{{ trans('cruds.platePrint.fields.vendor_helper') }}</span>
                     </div>
                 </div>
                 <div class="col-6">
@@ -88,12 +82,12 @@
                 </div>
                 <div class="col-12">
                     <div class="form-group">
-                        <label for="note">{{ trans('cruds.cetak.fields.note') }}</label>
+                        <label for="note">{{ trans('cruds.platePrint.fields.note') }}</label>
                         <textarea class="form-control {{ $errors->has('note') ? 'is-invalid' : '' }}" name="note" id="note">{{ old('note') }}</textarea>
                         @if($errors->has('note'))
                             <span class="text-danger">{{ $errors->first('note') }}</span>
                         @endif
-                        <span class="help-block">{{ trans('cruds.cetak.fields.note_helper') }}</span>
+                        <span class="help-block">{{ trans('cruds.platePrint.fields.note_helper') }}</span>
                     </div>
                 </div>
             </div>
@@ -209,7 +203,7 @@
                     var formHtml = `
                         <div class="item-product" id="product-${product.id}">
                             <div class="row">
-                                <div class="col-5 align-self-center">
+                                <div class="col-4 align-self-center">
                                     <h6 class="text-sm product-name mb-1">(${product.book_type}) ${product.short_name}</h6>
                                     <p class="mb-0 text-sm">
                                         Code : <strong>${product.code}</strong>
@@ -226,15 +220,15 @@
                                 </div>
                                 <div class="col offset-1 row align-items-end align-self-center">
                                     <input type="hidden" name="products[]" value="${product.id}">
-                                    <div class="col" style="min-width: 240px">
+                                    <div class="col" style="min-width: 180px">
                                         <p class="mb-0 text-sm">Plate</p>
                                         <div class="form-group text-field m-0">
-                                            <select class="form-control text-center plates select2" name="plates[]" style="width: 100%;" tabIndex="-1" data-product="${product.id}" required>
+                                            <select class="form-control text-center plates select2" name="plates[]" style="width: 100%;" tabIndex="-1" required>
                                                 <option></option>
                                             </select>
                                         </div>
                                     </div>
-                                    <div class="col" style="max-width: 160px">
+                                    <div class="col" style="min-width: 100px">
                                         <p class="mb-0 text-sm">Jumlah Plate</p>
                                         <div class="form-group text-field m-0">
                                             <div class="text-field-input px-2 py-0">
@@ -244,12 +238,19 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col" style="max-width: 160px">
-                                        <p class="mb-0 text-sm">Cetak</p>
+                                    <div class="col" style="min-width: 180px">
+                                        <p class="mb-0 text-sm">Chemical</p>
+                                        <div class="form-group text-field m-0">
+                                            <select class="form-control text-center chemical select2" name="chemicals[]" style="width: 100%;" tabIndex="-1" required>
+                                                <option></option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col" style="min-width: 100px">
+                                        <p class="mb-0 text-sm">Jumlah Liter</p>
                                         <div class="form-group text-field m-0">
                                             <div class="text-field-input px-2 py-0">
-                                                <input class="quantity" type="hidden" name="quantities[]" data-max="${product.estimasi_produksi.estimasi}" value="1">
-                                                <input class="form-control text-center quantity_text" type="text" name="quantity_text[]" value="1" required>
+                                                <input class="form-control text-center chemical_quantity" type="number" name="chemical_quantities[]" value="1" step="0.1" required>
                                                 <label class="text-field-border"></label>
                                             </div>
                                         </div>
@@ -275,75 +276,34 @@
                             url: "{{ route('admin.materials.getPlates') }}",
                             data: function() {
                                 return {
-                                    vendor: $('#vendor_id').val(),
-                                    product: $(this).data('product')
+                                    vendor: $('#vendor_id').val()
                                 };
                             },
                             dataType: 'json',
                             processResults: function(data) {
-                                if (data.length > 0) {
-                                    // If data is not empty, return the processed results
-                                    return {
-                                        results: data
-                                    };
-                                } else {
-                                    // If data is empty, show the SweetAlert alert and return empty results
-                                    Swal.fire({
-                                        title: 'Plate Not Found',
-                                        text: 'Plate Belum Dicetak',
-                                        icon: 'warning',
-                                        showCancelButton: true,
-                                        confirmButtonText: 'Okay',
-                                        cancelButtonText: 'Cancel'
-                                    });
+                                return {
+                                    results: data
+                                };
+                            }
+                        }
+                    });
 
-                                    return {
-                                        results: []
-                                    };
-                                }
+                    $('.chemical').select2({
+                        ajax: {
+                            url: "{{ route('admin.materials.getChemicals') }}",
+                            dataType: 'json',
+                            processResults: function(data) {
+                                return {
+                                    results: data
+                                };
                             }
                         }
                     });
 
                     productItem.each(function(index, item) {
                         var product = $(item);
-                        var quantity = product.find('.quantity');
-                        var quantityText = product.find('.quantity_text');
                         var plateQuantity = product.find('.plate_quantity');
                         var plateQuantityText = product.find('.plate_quantity_text');
-                        var max = quantity.data('max');
-
-                        quantityText.on('input change', function(e) {
-                            var value = numeral(e.target.value);
-
-                            quantityText.val(value.format('0,0'));
-                            quantity.val(value.value()).trigger('change');
-                        }).trigger('change');
-
-                        quantity.on('change', function(e) {
-                            var el = $(e.currentTarget);
-                            var valueNum = parseInt(el.val());
-                            if (valueNum < 1) {
-                                el.val(1);
-                                quantityText.val(1).trigger('change');
-                            }
-
-                            if (valueNum > max) {
-                                Swal.fire({
-                                    title: 'Quantity Exceeded',
-                                    text: 'The input quantity exceeds the maximum allowed.',
-                                    icon: 'warning',
-                                    showCancelButton: true,
-                                    confirmButtonText: 'I Know',
-                                    cancelButtonText: 'Cancel'
-                                }).then((result) => {
-                                    if (result.isConfirmed) {
-                                        max = valueNum;
-                                        quantity.data('max', valueNum);
-                                    }
-                                });
-                            }
-                        }).trigger('change');
 
                         plateQuantityText.on('input', function(e) {
                             var value = numeral(e.target.value);
@@ -372,14 +332,6 @@
             var productId = $(this).data('product-id');
             $('#product-' + productId).remove();
         });
-
-        function showEmptyDataAlert() {
-            swal({
-                title: 'No data found!',
-                text: 'The list is empty.',
-                icon: 'warning'
-            });
-        }
     });
 </script>
 @endsection

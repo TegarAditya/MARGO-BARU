@@ -30,6 +30,7 @@ class StockMovement extends Model
         'retur'      => 'Retur',
         'cetak'      => 'Cetak',
         'produksi'   => 'Produksi',
+        'plating'   => 'Cetak Plate',
     ];
 
     public const MOVEMENT_TYPE_SELECT = [

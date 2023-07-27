@@ -732,8 +732,8 @@
                     </li>
                 @endcan
                 @can('produksi_access')
-                    <li class="nav-item has-treeview {{ request()->is("admin/cetaks*") ? "menu-open" : "" }} {{ request()->is("admin/cetak-items*") ? "menu-open" : "" }} {{ request()->is("admin/finishings*") ? "menu-open" : "" }} {{ request()->is("admin/finishing-items*") ? "menu-open" : "" }}">
-                        <a class="nav-link nav-dropdown-toggle {{ request()->is("admin/cetaks*") ? "active" : "" }} {{ request()->is("admin/cetak-items*") ? "active" : "" }} {{ request()->is("admin/finishings*") ? "active" : "" }} {{ request()->is("admin/finishing-items*") ? "active" : "" }}" href="#">
+                    <li class="nav-item has-treeview {{ request()->is("admin/plate-prints*") ? "menu-open" : "" }} {{ request()->is("admin/cetaks*") ? "menu-open" : "" }} {{ request()->is("admin/cetak-items*") ? "menu-open" : "" }} {{ request()->is("admin/finishings*") ? "menu-open" : "" }} {{ request()->is("admin/finishing-items*") ? "menu-open" : "" }}">
+                        <a class="nav-link nav-dropdown-toggle {{ request()->is("admin/plate-prints*") ? "active" : "" }} {{ request()->is("admin/cetaks*") ? "active" : "" }} {{ request()->is("admin/cetak-items*") ? "active" : "" }} {{ request()->is("admin/finishings*") ? "active" : "" }} {{ request()->is("admin/finishing-items*") ? "active" : "" }}" href="#">
                             <i class="fa-fw nav-icon fas fa-print">
 
                             </i>
@@ -743,6 +743,18 @@
                             </p>
                         </a>
                         <ul class="nav nav-treeview">
+                            @can('plate_print_access')
+                                <li class="nav-item">
+                                    <a href="{{ route("admin.plate-prints.index") }}" class="nav-link {{ request()->is("admin/plate-prints") || request()->is("admin/plate-prints/*") ? "active" : "" }}">
+                                        <i class="fa-fw nav-icon fas fa-dolly-flatbed">
+
+                                        </i>
+                                        <p>
+                                            {{ trans('cruds.platePrint.title') }}
+                                        </p>
+                                    </a>
+                                </li>
+                            @endcan
                             @can('cetak_access')
                                 <li class="nav-item">
                                     <a href="{{ route("admin.cetaks.index") }}" class="nav-link {{ request()->is("admin/cetaks") || request()->is("admin/cetaks/*") ? "active" : "" }}">

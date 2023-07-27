@@ -1023,7 +1023,27 @@ class PermissionsTableSeeder extends Seeder
                 'title' => 'bill_access',
             ],
             [
-                'id'    => 254,
+                'id'    => 263,
+                'title' => 'plate_print_create',
+            ],
+            [
+                'id'    => 264,
+                'title' => 'plate_print_edit',
+            ],
+            [
+                'id'    => 265,
+                'title' => 'plate_print_show',
+            ],
+            [
+                'id'    => 266,
+                'title' => 'plate_print_delete',
+            ],
+            [
+                'id'    => 267,
+                'title' => 'plate_print_access',
+            ],
+            [
+                'id'    => 273,
                 'title' => 'profile_password_edit',
             ],
         ];

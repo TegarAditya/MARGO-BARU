@@ -169,6 +169,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     Route::post('materials/import', 'MaterialsController@import')->name('materials.import');
     Route::get('materials/template-import', 'MaterialsController@template_import')->name('materials.templateImport');
     Route::get('materials/get-plates', 'MaterialsController@getPlates')->name('materials.getPlates');
+    Route::get('materials/get-checmicals', 'MaterialsController@getChemicals')->name('materials.getChemicals');
     Route::resource('materials', 'MaterialsController');
 
     // Stock Adjustment Detail
@@ -230,6 +231,10 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
 
     // Bill
     Route::resource('bills', 'BillController', ['except' => ['destroy']]);
+
+    // Plate Print
+    Route::delete('plate-prints/destroy', 'PlatePrintController@massDestroy')->name('plate-prints.massDestroy');
+    Route::resource('plate-prints', 'PlatePrintController');
 
     // Sales Billing
     Route::resource('sales-billings', 'SalesBillingController');

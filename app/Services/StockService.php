@@ -57,4 +57,53 @@ class StockService
             'quantity' => $quantity,
         ]);
     }
+
+    public static function createMovementMaterial($type_movement, $transaction_type, $reference, $date,  $product, $quantity)
+    {
+        $estimation = StockMovement::create([
+            'warehouse' => 2,
+            'movement_date' => Carbon::now()->format('d-m-Y'),
+            'movement_type' => $type_movement,
+            'transaction_type' => $transaction_type,
+            'reference_id' => $reference,
+            'reference_date' => $date,
+            'material_id' => $product,
+            'quantity' => $quantity,
+        ]);
+    }
+
+    public static function updateStockMaterial($product_id, $quantity) {
+        $product = Material::where('id', $product_id)->update([
+            'stock' => DB::raw("stock + $quantity")
+        ]);
+    }
+
+    public static function editMovementMaterial($type_movement, $transaction_type, $reference, $date, $product, $quantity)
+    {
+        $reversal = StockMovement::where('transaction_type', $transaction_type)->where('reference_id', $reference)
+                    ->where('material_id', $product)->orderBy('id', 'DESC')->first();
+
+        StockMovement::create([
+            'warehouse' => 2,
+            'movement_date' => Carbon::now()->format('d-m-Y'),
+            'movement_type' => 'revisi',
+            'transaction_type' => $transaction_type,
+            'reference_id' => $reference,
+            'reference_date' => $date,
+            'material_id' => $product,
+            'quantity' => -1 * $reversal->quantity,
+            'reversal_of_id' => $reversal->id
+        ]);
+
+        $stock = StockMovement::create([
+            'warehouse' => 2,
+            'movement_date' => Carbon::now()->format('d-m-Y'),
+            'movement_type' => $type_movement,
+            'transaction_type' => $transaction_type,
+            'reference_id' => $reference,
+            'reference_date' => $date,
+            'material_id' => $product,
+            'quantity' => $quantity,
+        ]);
+    }
 }
