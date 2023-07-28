@@ -101,7 +101,9 @@ class InvoiceController extends Controller
 
         $salespeople = Salesperson::get()->pluck('short_name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
-        return view('admin.invoices.index', compact('salespeople', 'semesters'));
+        $delivery_orders = DeliveryOrder::where('faktur', 0)->get();
+
+        return view('admin.invoices.index', compact('salespeople', 'semesters', 'delivery_orders'));
     }
 
     public function create()
@@ -135,7 +137,7 @@ class InvoiceController extends Controller
             return view('admin.invoices.edit-generate', compact('invoice', 'invoice_item', 'delivery_item'));
         }
 
-        $no_faktur = Invoice::generateNoInvoice($delivery_order->semester_id);
+        $no_faktur = Invoice::generateNoInvoice($delivery->semester_id);
 
         return view('admin.invoices.generate', compact('delivery', 'delivery_item', 'no_faktur'));
     }

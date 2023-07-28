@@ -13,6 +13,8 @@ class AddRelationshipFieldsToBillsTable extends Migration
             $table->foreign('semester_id', 'semester_fk_8784588')->references('id')->on('semesters');
             $table->unsignedBigInteger('salesperson_id')->nullable();
             $table->foreign('salesperson_id', 'salesperson_fk_8784589')->references('id')->on('salespeople');
+            $table->unsignedBigInteger('previous_id')->nullable();
+            $table->foreign('previous_id', 'previous_fk_8800338')->references('id')->on('bills');
         });
     }
 }

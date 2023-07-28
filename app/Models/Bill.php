@@ -16,19 +16,15 @@ class Bill extends Model
     public $table = 'bills';
 
     protected $dates = [
-        'start_date',
-        'end_date',
         'created_at',
         'updated_at',
         'deleted_at',
     ];
 
     protected $fillable = [
-        'code',
         'semester_id',
         'salesperson_id',
-        'start_date',
-        'end_date',
+        'previous_id',
         'saldo_awal',
         'jual',
         'diskon',
@@ -56,23 +52,8 @@ class Bill extends Model
         return $this->belongsTo(Salesperson::class, 'salesperson_id');
     }
 
-    public function getStartDateAttribute($value)
+    public function previous()
     {
-        return $value ? Carbon::parse($value)->format(config('panel.date_format')) : null;
-    }
-
-    public function setStartDateAttribute($value)
-    {
-        $this->attributes['start_date'] = $value ? Carbon::createFromFormat(config('panel.date_format'), $value)->format('Y-m-d') : null;
-    }
-
-    public function getEndDateAttribute($value)
-    {
-        return $value ? Carbon::parse($value)->format(config('panel.date_format')) : null;
-    }
-
-    public function setEndDateAttribute($value)
-    {
-        $this->attributes['end_date'] = $value ? Carbon::createFromFormat(config('panel.date_format'), $value)->format('Y-m-d') : null;
+        return $this->belongsTo(self::class, 'previous_id');
     }
 }

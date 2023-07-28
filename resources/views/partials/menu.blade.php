@@ -621,7 +621,7 @@
 
                                         </i>
                                         <p>
-                                            {{ trans('cruds.bill.title') }}
+                                            Billing
                                         </p>
                                     </a>
                                 </li>

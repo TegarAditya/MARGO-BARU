@@ -15,7 +15,6 @@ class CreateTransactionTotalsTable extends Migration
             $table->decimal('total_retur', 15, 2);
             $table->decimal('total_bayar', 15, 2);
             $table->decimal('total_potongan', 15, 2);
-            $table->decimal('total_piutang', 15, 2);
             $table->timestamps();
             $table->softDeletes();
         });

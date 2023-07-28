@@ -6,6 +6,10 @@
  * @return response()
  */
 
+use App\Models\Setting;
+use App\Models\Semester;
+
+
 if (! function_exists('formatCurrency')) {
     function formatCurrency($amount, $currency)
     {
@@ -97,6 +101,26 @@ if (! function_exists('costFinishing')) {
             return 65 * $quantity;
         }
 
+    }
+}
+
+if (! function_exists('prevSemester')) {
+    function prevSemester($semester_id)
+    {
+        $semester = Semester::find($semester_id);
+
+        $satu = substr($semester->code, 0, 2);
+        $dua = substr($semester->code, 2, 4);
+
+        if ($satu == '01') {
+            $gasal = '02';
+            $tahun = $dua - 1;
+        } else {
+            $gasal = '01';
+            $tahun = $dua;
+        }
+
+        return Semester::where('code', $gasal . $tahun)->first()->id;
     }
 }
 
