@@ -17,6 +17,8 @@ use App\Models\Halaman;
 use App\Models\Jenjang;
 use App\Models\Isi;
 use App\Models\Cover;
+use App\Models\PlatePrint;
+use App\Models\PlatePrintItem;
 use Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -142,7 +144,7 @@ class CetakController extends Controller
             'quantities' => 'required|array',
             'quantities.*' => 'numeric|min:1',
             'plates' => 'required|array',
-            'plates.*' => 'exists:materials,id',
+            'plates.*' => 'nullable',
             'plate_quantities' => 'required|array',
             'plate_quantities.*' => 'numeric|min:1',
         ]);
@@ -171,6 +173,17 @@ class CetakController extends Controller
                 'note' => $note
             ]);
 
+            $print_plate = PlatePrint::create([
+                'no_spk' => $cetak->no_spc,
+                'date' => $date,
+                'semester_id' => $semester,
+                'vendor_id' => $vendor,
+                'customer' => null,
+                'type' => 'internal',
+                'fee' => 0,
+                'note' => "Tolong Periksa dengan Seksama SPK nya",
+            ]);
+
             $total_cost = 0;
 
             for ($i = 0; $i < count($products); $i++) {
@@ -197,9 +210,20 @@ class CetakController extends Controller
                     'estimasi' => $quantity,
                     'quantity' => $quantity,
                     'cost'  => $cost,
-                    'plate_id' => $plate,
+                    'plate_id' => $plate == 0 ? null : $plate,
                     'plate_cost' => $plate_quantity,
                     'done' => 0,
+                ]);
+
+                $print_plate_item = PlatePrintItem::create([
+                    'plate_print_id' => $print_plate->id,
+                    'semester_id' => $semester,
+                    'product_id' => $product->id,
+                    'plate_id' => $plate == 0 ? null : $plate,
+                    'estimasi' => $plate_quantity,
+                    'realisasi' => $plate_quantity,
+                    'note' => null,
+                    'status' => 'created'
                 ]);
 
                 EstimationService::createMovement('out', 'cetak', $cetak->id, $product->id, -1 * $quantity, $product->type);
@@ -241,6 +265,14 @@ class CetakController extends Controller
 
         $cetak_items = CetakItem::with('product', 'semester', 'product.estimasi_produksi')->where('cetak_id', $cetak->id)->orderBy('product_id')->get();
 
+        $print_plate = PlatePrint::where('no_spk', $cetak->no_spc)->whereHas('details', function ($q) {
+            $q->whereNot('status', 'created');
+        })->first();
+
+        if ($print_plate) {
+            Alert::warning('Warning', 'Perintah Plate sudah dieksekusi, tidak disarankan untuk di edit');
+        }
+
         return view('admin.cetaks.edit', compact('cetak', 'cetak_items', 'semesters', 'vendors', 'materials', 'jenjangs'));
     }
 
@@ -274,6 +306,8 @@ class CetakController extends Controller
 
         DB::beginTransaction();
         try {
+            $print_plate = PlatePrint::where('no_spk', $cetak->no_spc)->first();
+
             for ($i = 0; $i < count($products); $i++) {
                 $product = BookVariant::find($products[$i]);
                 $quantity = $quantities[$i];
@@ -302,6 +336,12 @@ class CetakController extends Controller
                         'plate_cost' => $plate_quantity,
                     ]);
 
+                    $print_plate_item = PlatePrintItem::where('product_id', $product->id)->update([
+                        'plate_id' => $plate,
+                        'estimasi' => $plate_quantity,
+                        'realisasi' => $plate_quantity
+                    ]);
+
                     EstimationService::editMovement('out', 'cetak', $cetak->id, $product->id, -1 * $quantity, $product->type);
                     EstimationService::editProduction($product->id, ($quantity - $old_quantity), $product->type);
                 } else {
@@ -316,6 +356,17 @@ class CetakController extends Controller
                         'plate_id' => $plate,
                         'plate_cost' => $plate_quantity,
                         'done' => 0,
+                    ]);
+
+                    $print_plate_item = PlatePrintItem::create([
+                        'plate_print_id' => $print_plate->id,
+                        'semester_id' => $semester,
+                        'product_id' => $product->id,
+                        'plate_id' => $plate,
+                        'estimasi' => $plate_quantity,
+                        'realisasi' => 0,
+                        'note' => null,
+                        'status' => 'created'
                     ]);
 
                     EstimationService::createMovement('out', 'cetak', $cetak->id, $product->id, -1 * $quantity, $product->type);

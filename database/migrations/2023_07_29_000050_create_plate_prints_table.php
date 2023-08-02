@@ -12,7 +12,9 @@ class CreatePlatePrintsTable extends Migration
             $table->bigIncrements('id');
             $table->string('no_spk')->unique();
             $table->date('date');
+            $table->string('customer')->nullable();
             $table->string('type');
+            $table->decimal('fee', 15, 2);
             $table->longText('note')->nullable();
             $table->timestamps();
             $table->softDeletes();

@@ -1043,8 +1043,12 @@ class PermissionsTableSeeder extends Seeder
                 'title' => 'plate_print_access',
             ],
             [
-                'id'    => 273,
+                'id'    => 268,
                 'title' => 'profile_password_edit',
+            ],
+            [
+                'id'    => 273,
+                'title' => 'aquarium_access',
             ],
         ];
 

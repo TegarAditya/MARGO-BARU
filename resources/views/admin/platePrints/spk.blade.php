@@ -31,24 +31,37 @@
 @stop
 
 @section('header.right')
-<table cellspacing="0" cellpadding="0" class="text-sm" style="width: 10cm">
-    <tbody>
-        <tr>
-            <td><strong>Nama Vendor</strong></td>
-            <td>:</td>
-            <td>{{ $plate->vendor->name }}</td>
-        </tr>
+@if ($plate->type == 'internal')
+    <table cellspacing="0" cellpadding="0" class="text-sm" style="width: 10cm">
+        <tbody>
+            <tr>
+                <td><strong>Nama Vendor</strong></td>
+                <td>:</td>
+                <td>{{ $plate->vendor->name }}</td>
+            </tr>
 
-        <tr>
-            <td><strong>Perusahaan</strong></td>
-            <td>:</td>
-            <td>
-                {{ $plate->vendor->company }}
-            </td>
-        </tr>
+            <tr>
+                <td><strong>Perusahaan</strong></td>
+                <td>:</td>
+                <td>
+                    {{ $plate->vendor->company }}
+                </td>
+            </tr>
 
-    </tbody>
-</table>
+        </tbody>
+    </table>
+@else
+    <table cellspacing="0" cellpadding="0" class="text-sm" style="width: 10cm">
+        <tbody>
+            <tr>
+                <td><strong>Nama Customer</strong></td>
+                <td>:</td>
+                <td>{{ $plate->customer}}</td>
+            </tr>
+        </tbody>
+    </table>
+@endif
+
 @endsection
 
 @section('content')
@@ -58,27 +71,21 @@
         <th class="text-center">Tema/Mapel</th>
         <th class="text-center">UK Plate</th>
         <th class="text-center" width="1%">Quantity</th>
-        <th class="text-center">Chemical</th>
-        <th class="text-center" width="1%">Quantity</th>
     </thead>
 
     <tbody>
         @php
             $totalplate = 0;
-            $totalchemical = 0;
         @endphp
         @foreach ($items as $item)
             @php
             $totalplate += $item->plate_qty;
-            $totalchemical += $item->chemical_qty;
             @endphp
         <tr>
             <td class="px-3">{{ $loop->iteration }}</td>
-            <td>{{ $item->product->short_name }}</td>
-            <td  class="text-center">{{ $item->plate->name }}</td>
+            <td class="text-center">{{ $item->product ? $item->product->name : $item->product_text }}</td>
+            <td class="text-center">{{ $item->plate ? $item->plate->name : 'Belum Tahu' }}</td>
             <td class="text-center">{{ angka($item->plate_qty) }}</td>
-            <td class="text-center">{{ $item->chemical->name }}</td>
-            <td class="text-center">{{ $item->chemical_qty }}</td>
         </tr>
         @endforeach
     </tbody>
@@ -86,8 +93,6 @@
         <tr>
             <td class="text-center px-3" colspan="3"><strong>Total</strong></td>
             <td class="text-center px-2"><strong>{{ angka($totalplate) }}</strong></td>
-            <td></td>
-            <td class="text-center px-2"><strong>{{ $totalchemical }}</strong></td>
         </tr>
     </tfoot>
 </table>

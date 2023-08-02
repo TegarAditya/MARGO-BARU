@@ -131,6 +131,7 @@
                                     <p class="mb-0 text-sm">Plate</p>
                                     <div class="form-group text-field m-0">
                                         <select class="form-control text-center plates select2" name="plates[]" style="width: 100%;" tabIndex="-1" required>
+                                            <option value="">Belum Tahu</option>
                                             @foreach($materials as $id => $entry)
                                                 <option value="{{ $id }}" {{ $item->plate_id == $id ? 'selected' : '' }}>{{ $entry }}</option>
                                             @endforeach

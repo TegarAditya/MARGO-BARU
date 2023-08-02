@@ -12,7 +12,7 @@ class CreateStockMovementsTable extends Migration
             $table->bigIncrements('id');
             $table->date('movement_date');
             $table->string('movement_type');
-            $table->float('quantity', 17, 2);
+            $table->float('quantity', 17, 4);
             $table->string('transaction_type')->nullable();
             $table->date('reference_date');
             $table->timestamps();

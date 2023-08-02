@@ -6,6 +6,7 @@ use DB;
 use App\Models\SalesOrder;
 use App\Models\BookVariant;
 use App\Models\StockMovement;
+use App\Models\Material;
 
 class StockService
 {
@@ -104,6 +105,62 @@ class StockService
             'reference_date' => $date,
             'material_id' => $product,
             'quantity' => $quantity,
+        ]);
+    }
+
+    public static function printPlate($reference, $date, $plate, $realisasi)
+    {
+        Material::where('id', $plate)->update([
+            'stock' => DB::raw("stock - $realisasi")
+        ]);
+
+        StockMovement::create([
+            'warehouse' => 2,
+            'movement_date' => Carbon::now()->format('d-m-Y'),
+            'movement_type' => 'out',
+            'transaction_type' => 'plating',
+            'reference_id' => $reference,
+            'reference_date' => $date,
+            'material_id' => $plate,
+            'quantity' => $realisasi,
+        ]);
+
+        
+        $gum = Material::where('code', 'GUM')->first();
+        $gum_qty = 2.5 * $realisasi;
+        
+        StockMovement::create([
+            'warehouse' => 2,
+            'movement_date' => Carbon::now()->format('d-m-Y'),
+            'movement_type' => 'out',
+            'transaction_type' => 'plating',
+            'reference_id' => $reference,
+            'reference_date' => $date,
+            'material_id' => $gum->id,
+            'quantity' => $gum_qty,
+        ]);
+        
+        $gum->update([
+            'stock' => DB::raw("stock - $gum_qty")
+        ]);
+
+        
+        $developer = Material::where('code', 'DEVELOPER')->first();
+        $developer_qty = 15 * $realisasi;
+
+        StockMovement::create([
+            'warehouse' => 2,
+            'movement_date' => Carbon::now()->format('d-m-Y'),
+            'movement_type' => 'out',
+            'transaction_type' => 'plating',
+            'reference_id' => $reference,
+            'reference_date' => $date,
+            'material_id' => $developer->id,
+            'quantity' => $developer_qty,
+        ]);
+
+        $developer->update([
+            'stock' => DB::raw("stock - $developer_qty")
         ]);
     }
 }

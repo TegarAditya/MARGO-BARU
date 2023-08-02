@@ -22,19 +22,10 @@
 
                     </th>
                     <th>
-                        {{ trans('cruds.bill.fields.code') }}
-                    </th>
-                    <th>
                         {{ trans('cruds.bill.fields.semester') }}
                     </th>
                     <th>
                         {{ trans('cruds.bill.fields.salesperson') }}
-                    </th>
-                    <th>
-                        {{ trans('cruds.bill.fields.start_date') }}
-                    </th>
-                    <th>
-                        {{ trans('cruds.bill.fields.end_date') }}
                     </th>
                     <th>
                         {{ trans('cruds.bill.fields.saldo_awal') }}
@@ -83,20 +74,17 @@
     aaSorting: [],
     ajax: "{{ route('admin.bills.index') }}",
     columns: [
-      { data: 'placeholder', name: 'placeholder' },
-{ data: 'code', name: 'code' },
-{ data: 'semester_name', name: 'semester.name' },
-{ data: 'salesperson_name', name: 'salesperson.name' },
-{ data: 'start_date', name: 'start_date' },
-{ data: 'end_date', name: 'end_date' },
-{ data: 'saldo_awal', name: 'saldo_awal' },
-{ data: 'jual', name: 'jual' },
-{ data: 'diskon', name: 'diskon' },
-{ data: 'retur', name: 'retur' },
-{ data: 'bayar', name: 'bayar' },
-{ data: 'potongan', name: 'potongan' },
-{ data: 'saldo_akhir', name: 'saldo_akhir' },
-{ data: 'actions', name: '{{ trans('global.actions') }}' }
+        { data: 'placeholder', name: 'placeholder' },
+        { data: 'semester_name', name: 'semester.name' },
+        { data: 'salesperson_name', name: 'salesperson.name' },
+        { data: 'saldo_awal', name: 'saldo_awal' },
+        { data: 'jual', name: 'jual' },
+        { data: 'diskon', name: 'diskon' },
+        { data: 'retur', name: 'retur' },
+        { data: 'bayar', name: 'bayar' },
+        { data: 'potongan', name: 'potongan' },
+        { data: 'saldo_akhir', name: 'saldo_akhir' },
+        { data: 'actions', name: '{{ trans('global.actions') }}' }
     ],
     orderCellsTop: true,
     order: [[ 4, 'desc' ]],

@@ -92,7 +92,7 @@
                         {{ trans('cruds.platePrint.fields.semester') }}
                     </th>
                     <th>
-                        {{ trans('cruds.platePrint.fields.vendor') }}
+                        {{ trans('cruds.platePrint.fields.type') }}
                     </th>
                     <th>
                         &nbsp;
@@ -128,7 +128,7 @@ $(function () {
         { data: 'no_spk', name: 'no_spk', class: 'text-center' },
         { data: 'date', name: 'date', class: 'text-center' },
         { data: 'semester_name', name: 'semester.name', class: 'text-center' },
-        { data: 'vendor_code', name: 'vendor.code', class: 'text-center' },
+        { data: 'type', name: 'type', class: 'text-center' },
         { data: 'actions', name: '{{ trans('global.actions') }}', class: 'text-center' }
     ],
     orderCellsTop: true,

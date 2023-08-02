@@ -273,7 +273,7 @@
 
                     $('.plates').select2({
                         ajax: {
-                            url: "{{ route('admin.materials.getPlates') }}",
+                            url: "{{ route('admin.materials.getPlateRaws') }}",
                             data: function() {
                                 return {
                                     vendor: $('#vendor_id').val()

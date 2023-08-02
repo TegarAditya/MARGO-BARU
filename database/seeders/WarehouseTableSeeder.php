@@ -24,6 +24,11 @@ class WarehouseTableSeeder extends Seeder
                 'name'  => 'Gudang Bahan Setengah Jadi Margo Mitro Joyo',
                 'address' => 'Ceplukan, RT 1/16, Wonorejo, Gondangrejo, Karanganyar, Jawa Tengah'
             ],
+            [
+                'code'  => 'GUDANG03',
+                'name'  => 'Gudang Plate Matang Margo Mitro Joyo',
+                'address' => 'Ceplukan, RT 1/16, Wonorejo, Gondangrejo, Karanganyar, Jawa Tengah'
+            ],
         ];
         Warehouse::insert($warehouses);
     }

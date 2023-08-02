@@ -99,7 +99,7 @@ class MaterialsController extends Controller
 
         $units = Unit::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
-        $vendors = Vendor::pluck('name', 'id');
+        $vendors = Vendor::where('type', 'cetak')->pluck('name', 'id');
 
         return view('admin.materials.create', compact('units', 'vendors'));
     }
@@ -118,7 +118,7 @@ class MaterialsController extends Controller
 
         $units = Unit::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
-        $vendors = Vendor::pluck('name', 'id');
+        $vendors = Vendor::where('type', 'cetak')->pluck('name', 'id');
 
         $material->load('unit', 'warehouse', 'vendors');
 
@@ -185,6 +185,29 @@ class MaterialsController extends Controller
     }
 
     public function getPlates(Request $request) {
+        $query = $request->input('q');
+
+        $materials = Material::where('category', 'plate')->where(function($q) use ($query) {
+            $q->where('code', 'LIKE', "%{$query}%")
+            ->orWhere('name', 'LIKE', "%{$query}%");
+        })->orderBy('code', 'ASC')->get();
+
+        $formattedMaterials = [];
+
+        foreach ($materials as $material) {
+            $formattedMaterials[] = [
+                'id' => $material->id,
+                'text' => $material->code .' - '.$material->name,
+                'stock' => $material->stock,
+                'code' => $material->code,
+                'name' => $material->name,
+            ];
+        }
+
+        return response()->json($formattedMaterials);
+    }
+
+    public function getPrintedPlates(Request $request) {
         $vendor = $request->input('vendor');
         $product = BookVariant::find($request->input('product'));
 
@@ -200,6 +223,30 @@ class MaterialsController extends Controller
             $formattedMaterials[] = [
                 'id' => $material->id,
                 'text' => '('. $material->stock .') '.$material->code,
+            ];
+        }
+
+        return response()->json($formattedMaterials);
+    }
+
+    public function getPlateRaws(Request $request) {
+        $vendor = $request->input('vendor');
+
+        $materials = Material::where('category', 'plate')->whereHas('vendors', function ($q) use ($vendor) {
+                    $q->where('id', $vendor);
+                })->orderBy('code', 'ASC')->get();
+
+        $formattedMaterials = [];
+
+        $formattedMaterials[] = [
+            'id' => 0,
+            'text' => 'Belum Tahu',
+        ];
+
+        foreach ($materials as $material) {
+            $formattedMaterials[] = [
+                'id' => $material->id,
+                'text' => '['. $material->stock .'] '.$material->name,
             ];
         }
 

@@ -53,11 +53,16 @@ class PlatePrintController extends Controller
                     <a class="px-1" href="'.route('admin.plate-prints.printSpk', $row->id).'" title="Print SPK" target="_blank">
                         <i class="fas fa-print text-secondary fa-lg"></i>
                     </a>
+                    <a class="px-1" href="'.route('admin.plate-prints.printSpk', $row->id).'?done=1" title="Print SPK Yang Telah Selesai" target="_blank">
+                        <i class="fas fa-print text-danger fa-lg"></i>
+                    </a>
                 ';
 
-                // <a class="px-1" href="'.route('admin.cetaks.edit', $row->id).'" title="Edit">
-                //         <i class="fas fa-edit fa-lg"></i>
-                //     </a>
+                if ($row->type == 'external') {
+                    $btn .= '<a class="px-1" href="'.route('admin.plate-prints.edit', $row->id).'" title="Edit">
+                        <i class="fas fa-edit fa-lg"></i>
+                    </a>';
+                }
 
                 return $btn;
             });
@@ -72,6 +77,10 @@ class PlatePrintController extends Controller
 
             $table->addColumn('vendor_code', function ($row) {
                 return $row->vendor ? $row->vendor->name : '';
+            });
+
+            $table->editColumn('type', function ($row) {
+                return $row->type ? PlatePrint::TYPE_SELECT[$row->type] : '';
             });
 
             $table->editColumn('note', function ($row) {
@@ -96,11 +105,11 @@ class PlatePrintController extends Controller
 
         $vendors = Vendor::where('type', 'cetak')->get()->pluck('full_name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
-        $no_spk = PlatePrint::generateNoSPKTemp(setting('current_semester'));
+        $no_spk = PlatePrint::generateNoSPK(setting('current_semester'));
 
         $jenjangs = Jenjang::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
-        return view('admin.platePrints.create', compact('vendors','jenjangs', 'no_spk'));
+        return view('admin.platePrints.sell', compact('vendors','jenjangs', 'no_spk'));
     }
 
     public function store(Request $request)
@@ -108,81 +117,52 @@ class PlatePrintController extends Controller
         // Validate the form data
         $validatedData = $request->validate([
             'date' => 'required',
-            'vendor_id' => 'required',
-            'type' => 'required',
+            'customer' => 'required',
+            'bayar' => 'required|min:0',
             'note' => 'nullable',
-            'products' => 'required|array',
-            'products.*' => 'exists:book_variants,id',
             'plates' => 'required|array',
             'plates.*' => 'exists:materials,id',
             'plate_quantities' => 'required|array',
             'plate_quantities.*' => 'numeric|min:1',
-            'chemicals' => 'required|array',
-            'chemicals.*' => 'exists:materials,id',
-            'chemical_quantities' => 'required|array',
-            'chemical_quantities.*' => 'numeric|min:1',
+            'mapels' => 'required|array',
         ]);
 
         $date = $validatedData['date'];
+        $customer = $validatedData['customer'];
+        $bayar = $validatedData['bayar'];
         $semester = setting('current_semester');
-        $vendor = $validatedData['vendor_id'];
-        $type = $validatedData['type'];
         $note = $validatedData['note'];
-        $products = $validatedData['products'];
         $plates = $validatedData['plates'];
         $plate_quantities = $validatedData['plate_quantities'];
-        $chemicals = $validatedData['chemicals'];
-        $chemical_quantities = $validatedData['chemical_quantities'];
+        $mapels = $validatedData['mapels'];
 
         DB::beginTransaction();
         try {
             $cetak = PlatePrint::create([
-                'no_spk' => PlatePrint::generateNoSPK($semester, $vendor),
+                'no_spk' => PlatePrint::generateNoSPK($semester),
                 'date' => $date,
-                'type' => $type,
+                'type' => 'external',
                 'semester_id' => $semester,
-                'vendor_id' => $vendor,
-                'note' => $note
+                'customer' => $customer,
+                'fee' => $bayar,
+                'note' => $note,
             ]);
 
-            for ($i = 0; $i < count($products); $i++) {
-                $product = BookVariant::find($products[$i]);
-                $plate = Material::find($plates[$i]);
-                $chemical = Material::find($chemicals[$i]);
-
+            for ($i = 0; $i < count($plates); $i++) {
+                $mapel = $mapels[$i];
+                $plate = $plates[$i];
                 $plate_quantity = $plate_quantities[$i];
-                $chemical_quantity = $chemical_quantities[$i];
 
                 $cetak_item = PlatePrintItem::create([
                     'plate_print_id' => $cetak->id,
                     'semester_id' => $semester,
-                    'vendor_id' => $vendor,
-                    'product_id' => $product->id,
-                    'plate_id' => $plate->id,
-                    'plate_qty' => $plate_quantity,
-                    'chemical_id' => $chemical->id,
-                    'chemical_qty' => $chemical_quantity,
+                    'product_text' => $mapel,
+                    'plate_id' => $plate,
+                    'estimasi' => $plate_quantity,
+                    'realisasi' => $plate_quantity,
+                    'note' => null,
+                    'status' => 'created',
                 ]);
-
-                $material = Material::updateOrCreate([
-                    'code' => $plate->code.'|'. $product->code,
-                ], [
-                    'name' => $plate->name .' ('. $product->name .')',
-                    'category' => 'printed_plate',
-                    'unit_id' => $plate->unit_id,
-                    'cost' => 0,
-                    'stock' => DB::raw("stock + $plate_quantity"),
-                    'warehouse_id' => 2,
-                ]);
-
-                $material->vendors()->sync($plate->vendors->pluck('id')->toArray());
-
-                StockService::createMovementMaterial('in', 'plating', $cetak->id, $date, $material->id, $plate_quantity);
-
-                StockService::createMovementMaterial('out', 'plating', $cetak->id, $date, $plate->id, -1 * $plate_quantity);
-                StockService::updateStockMaterial($plate->id, -1 * $plate_quantity);
-                StockService::createMovementMaterial('out', 'plating', $cetak->id, $date, $chemical->id, -1 * $chemical_quantity);
-                StockService::updateStockMaterial($chemical->id, -1 * $chemical_quantity);
             }
 
             DB::commit();
@@ -209,11 +189,89 @@ class PlatePrintController extends Controller
 
         $platePrint->load('semester', 'vendor');
 
-        return view('admin.platePrints.edit', compact('platePrint', 'semesters', 'vendors'));
+        $plate_items = PlatePrintItem::with('plate')->where('plate_print_id', $platePrint->id)->get();
+
+        if ($plate_items->whereIn('status', ['accepted', 'done'])->count() > 0) {
+            Alert::error('Warning', 'Data Plate Order Sudah Dikonfirmasi, Sebaiknya tidak diedit lagi');
+        }
+
+        return view('admin.platePrints.edit', compact('platePrint', 'semesters', 'vendors', 'plate_items'));
     }
 
-    public function update(UpdatePlatePrintRequest $request, PlatePrint $platePrint)
+    public function update(Request $request, PlatePrint $platePrint)
     {
+        // Validate the form data
+        $validatedData = $request->validate([
+            'date' => 'required',
+            'customer' => 'required',
+            'bayar' => 'required|min:0',
+            'note' => 'nullable',
+            'plates' => 'required|array',
+            'plates.*' => 'exists:materials,id',
+            'plate_quantities' => 'required|array',
+            'plate_quantities.*' => 'numeric|min:1',
+            'plate_items' => 'required|array',
+            'mapels' => 'required|array',
+        ]);
+
+        $date = $validatedData['date'];
+        $customer = $validatedData['customer'];
+        $bayar = $validatedData['bayar'];
+        $note = $validatedData['note'];
+        $plates = $validatedData['plates'];
+        $plate_quantities = $validatedData['plate_quantities'];
+        $plate_items = $validatedData['plate_items'];
+        $mapels = $validatedData['mapels'];
+
+        DB::beginTransaction();
+        try {
+            for ($i = 0; $i < count($plates); $i++) {
+                $mapel = $mapels[$i];
+                $plate = $plates[$i];
+                $plate_item = $plate_items[$i];
+                $plate_quantity = $plate_quantities[$i];
+
+                if ($plate_item) {
+                    $print_plate_item = PlatePrintItem::where('id', $plate_item)->update([
+                        'product_text' => $mapel,
+                        'plate_id' => $plate,
+                        'estimasi' => $plate_quantity,
+                        'realisasi' => $plate_quantity
+                    ]);
+                } else {
+                    $print_plate_item = PlatePrintItem::create([
+                        'plate_print_id' => $platePrint->id,
+                        'semester_id' => $platePrint->semester_id,
+                        'product_text' => $mapel,
+                        'plate_id' => $plate,
+                        'estimasi' => $plate_quantity,
+                        'realisasi' => $plate_quantity,
+                        'note' => null,
+                        'status' => 'created',
+                    ]);
+                }
+            }
+
+            $platePrint->update([
+                'date' => $date,
+                'customer' => $customer,
+                'fee' => $bayar,
+                'note' => $note,
+            ]);
+
+            DB::commit();
+
+            Alert::success('Success', 'Cetak Plate Order berhasil di simpan');
+
+            return redirect()->route('admin.plate-prints.index');
+        } catch (\Exception $e) {
+            DB::rollback();
+
+            dd($e);
+
+            return redirect()->back()->with('error-message', $e->getMessage())->withInput();
+        }
+
         $platePrint->update($request->all());
 
         return redirect()->route('admin.plate-prints.index');
@@ -254,7 +312,13 @@ class PlatePrintController extends Controller
     {
         $plate->load('semester', 'vendor');
 
-        $items = PlatePrintItem::with('product', 'product.jenjang', 'product.isi', 'product.cover', 'product.kurikulum')->where('plate_print_id', $plate->id)->get();
+        $query= PlatePrintItem::with('product', 'product.jenjang', 'product.isi', 'product.cover', 'product.kurikulum')->where('plate_print_id', $plate->id);
+
+        if (!empty($request->done)) {
+            $query->where('status', 'done');
+        }
+
+        $items = $query->get();
 
         $items = $items->sortBy('product.kelas_id')->sortBy('product.mapel_id')->sortBy('product.kurikulum_id')->sortBy('product.jenjang_id');
 

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Traits\Auditable;
 use Carbon\Carbon;
+use App\Traits\CreatedUpdatedBy;
 use DateTimeInterface;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -12,16 +13,11 @@ use Illuminate\Support\Facades\Date;
 
 class PlatePrint extends Model
 {
-    use SoftDeletes, Auditable, HasFactory;
+    use SoftDeletes, Auditable, HasFactory, CreatedUpdatedBy;
 
     public $table = 'plate_prints';
 
     public const BULAN_ROMAWI = array(1=>"I","II","III", "IV", "V","VI","VII","VIII","IX","X", "XI","XII");
-
-    public const TYPE_SELECT = [
-        'isi'   => 'Isi',
-        'cover' => 'Cover',
-    ];
 
     protected $dates = [
         'date',
@@ -30,13 +26,22 @@ class PlatePrint extends Model
         'deleted_at',
     ];
 
+    public const TYPE_SELECT = [
+        'internal' => 'Internal',
+        'external' => 'External',
+    ];
+
     protected $fillable = [
         'no_spk',
         'date',
-        'type',
         'semester_id',
         'vendor_id',
+        'customer',
+        'type',
+        'fee',
         'note',
+        'created_by_id',
+        'updated_by_id',
         'created_at',
         'updated_at',
         'deleted_at',
@@ -72,26 +77,13 @@ class PlatePrint extends Model
         return $this->hasMany(PlatePrintItem::class, 'plate_print_id');
     }
 
-    public static function generateNoSPK($semester, $vendor) {
-        $data = self::where('semester_id', $semester)->count();
-        $semester = Semester::find($semester);
-        $vendor = Vendor::find($vendor);
-
-        $no = !$data ? 1 : ($data + 1);
-
-        $prefix = 'SPK.P/'. $vendor->code .'/'.self::BULAN_ROMAWI[Date::now()->format('n')].'/'.strtoupper($semester->code).'/';
-        $code = $prefix.sprintf("%06d", $no);
-
-        return $code;
-    }
-
-    public static function generateNoSPKTemp($semester) {
+    public static function generateNoSPK($semester) {
         $data = self::where('semester_id', $semester)->count();
         $semester = Semester::find($semester);
 
         $no = !$data ? 1 : ($data + 1);
 
-        $prefix = 'SPK.P/VENDOR/'.self::BULAN_ROMAWI[Date::now()->format('n')].'/'.strtoupper($semester->code).'/';
+        $prefix = 'SPK.P/MMJ/'.self::BULAN_ROMAWI[Date::now()->format('n')].'/'.strtoupper($semester->code).'/';
         $code = $prefix.sprintf("%06d", $no);
 
         return $code;

@@ -41,9 +41,6 @@ class BillController extends Controller
                 ));
             });
 
-            $table->editColumn('code', function ($row) {
-                return $row->code ? $row->code : '';
-            });
             $table->addColumn('semester_name', function ($row) {
                 return $row->semester ? $row->semester->name : '';
             });
@@ -80,64 +77,6 @@ class BillController extends Controller
         }
 
         return view('admin.bills.index');
-    }
-
-    public function generate(Request $request) {
-        $transactions = Salesperson::with('transaction_total')->get();
-
-        DB::beginTransaction();
-        try {
-            foreach($transactions as $transaction) {
-                $before = SalesReport::where('code', $lastmonth)->where('salesperson_id', $transaction->id)->first();
-
-                if ($before) {
-                    $saldo_awal = $before->saldo_akhir;
-                } else {
-                    $saldo_awal = 0;
-                }
-
-                $transaksi = $transaction->transaction_total;
-
-                $pengambilan = $transaksi ? $transaksi->total_invoice : 0;
-                $diskon = $transaksi ? $transaksi->total_diskon : 0;
-                $retur = $transaksi ? $transaksi->total_retur : 0;
-                $bayar = $transaksi ? $transaksi->total_bayar : 0;
-                $potongan = $transaksi ? $transaksi->total_potongan : 0;
-
-                $debet = $pengambilan;
-                $kredit = $diskon + $retur + $bayar + $potongan;
-
-                $saldo_akhir = $debet - $kredit;
-
-                $sales_report = SalesReport::updateOrCreate(
-                    [
-                        'code' => $code,
-                        'salesperson_id' => $transaction->id
-                    ],
-                    [
-                        'periode' => $periode,
-                        'start_date' => $start_date,
-                        'end_date' => $end_date,
-                        'saldo_awal' => $saldo_awal,
-                        'debet' => $debet,
-                        'kredit' => $kredit,
-                        'saldo_akhir' => $saldo_akhir,
-                    ]
-                );
-            }
-
-            DB::commit();
-
-            Alert::success('Success', 'Saldo bulan ini berhasil digenerate');
-
-            return redirect()->route('admin.sales-reports.index');
-        } catch (\Exception $e) {
-            DB::rollback();
-
-            dd($e);
-
-            return redirect()->back()->with('error-message', $e->getMessage())->withInput();
-        }
     }
 
     public function create()

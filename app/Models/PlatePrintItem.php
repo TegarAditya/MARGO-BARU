@@ -19,15 +19,27 @@ class PlatePrintItem extends Model
         'deleted_at',
     ];
 
+    public const STATUS_SELECT = [
+        'created'  => 'SPK Dibuat',
+        'accepted' => 'SPK Diterima',
+        'done'     => 'SPK Diselesaikan',
+    ];
+
     protected $fillable = [
         'plate_print_id',
         'semester_id',
-        'vendor_id',
         'product_id',
+        'product_text',
         'plate_id',
-        'plate_qty',
-        'chemical_id',
-        'chemical_qty',
+        'estimasi',
+        'realisasi',
+        'note',
+        'status',
+        'check_mapel',
+        'check_kelas',
+        'check_kurikulum',
+        'check_kolomnama',
+        'check_naskah',
         'created_at',
         'updated_at',
         'deleted_at',
@@ -48,11 +60,6 @@ class PlatePrintItem extends Model
         return $this->belongsTo(Semester::class, 'semester_id');
     }
 
-    public function vendor()
-    {
-        return $this->belongsTo(Vendor::class, 'vendor_id');
-    }
-
     public function product()
     {
         return $this->belongsTo(BookVariant::class, 'product_id');
@@ -61,10 +68,5 @@ class PlatePrintItem extends Model
     public function plate()
     {
         return $this->belongsTo(Material::class, 'plate_id');
-    }
-
-    public function chemical()
-    {
-        return $this->belongsTo(Material::class, 'chemical_id');
     }
 }

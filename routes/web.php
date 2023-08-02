@@ -169,6 +169,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     Route::post('materials/import', 'MaterialsController@import')->name('materials.import');
     Route::get('materials/template-import', 'MaterialsController@template_import')->name('materials.templateImport');
     Route::get('materials/get-plates', 'MaterialsController@getPlates')->name('materials.getPlates');
+    Route::get('materials/get-plate-raws', 'MaterialsController@getPlateRaws')->name('materials.getPlateRaws');
     Route::get('materials/get-checmicals', 'MaterialsController@getChemicals')->name('materials.getChemicals');
     Route::resource('materials', 'MaterialsController');
 
@@ -236,6 +237,12 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     Route::delete('plate-prints/destroy', 'PlatePrintController@massDestroy')->name('plate-prints.massDestroy');
     Route::get('plate-prints/print-spk/{plate}', 'PlatePrintController@printSpk')->name('plate-prints.printSpk');
     Route::resource('plate-prints', 'PlatePrintController');
+
+    // Aquarium
+    Route::get('aquarium/realisasi/{plate}', 'AquariumController@realisasi')->name('aquarium.realisasi');
+    Route::put('aquarium/realisasi/{plate}', 'AquariumController@realisasiStore')->name('aquarium.realisasiStore');
+    Route::get('aquarium/working', 'AquariumController@working')->name('aquarium.working');
+    Route::resource('aquarium', 'AquariumController', ['except' => ['create', 'store', 'destroy']]);
 
     // Sales Billing
     Route::resource('sales-billings', 'SalesBillingController');

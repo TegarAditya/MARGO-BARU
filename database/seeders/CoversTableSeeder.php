@@ -88,7 +88,7 @@ class CoversTableSeeder extends Seeder
 
         Setting::create( [
             'key'=>'current_semester',
-            'value'=>'11',
+            'value'=> 9,
             'is_json'=> 0,
             'created_by_id' => 1,
             'updated_by_id' => 1,

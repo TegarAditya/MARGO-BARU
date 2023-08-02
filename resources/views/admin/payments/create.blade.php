@@ -221,7 +221,6 @@ $(document).ready(function() {
 
     bayarText.on('change keyup blur paste', function(e) {
         var value = numeral(e.target.value);
-        console.log(value.format('0,0'));
         bayarText.val(value.format('0,0'));
         bayar.val(value.value()).trigger('change');
     }).trigger('change');
