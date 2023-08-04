@@ -99,6 +99,8 @@ class StockMovement extends Model
             return $this->belongsTo(Cetak::class, 'reference_id');
         } else if ($this->transaction_type === 'produksi') {
             return $this->belongsTo(Finishing::class, 'reference_id');
+        } else if ($this->transaction_type === 'plating') {
+            return $this->belongsTo(PlatePrint::class, 'reference_id');
         }
     }
 

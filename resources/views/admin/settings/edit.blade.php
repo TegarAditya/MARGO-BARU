@@ -38,18 +38,6 @@
                 <span class="help-block">{{ trans('cruds.setting.fields.is_json_helper') }}</span>
             </div>
             <div class="form-group">
-                <label for="update_by_id">{{ trans('cruds.setting.fields.update_by') }}</label>
-                <select class="form-control select2 {{ $errors->has('update_by') ? 'is-invalid' : '' }}" name="update_by_id" id="update_by_id">
-                    @foreach($update_bies as $id => $entry)
-                        <option value="{{ $id }}" {{ (old('update_by_id') ? old('update_by_id') : $setting->update_by->id ?? '') == $id ? 'selected' : '' }}>{{ $entry }}</option>
-                    @endforeach
-                </select>
-                @if($errors->has('update_by'))
-                    <span class="text-danger">{{ $errors->first('update_by') }}</span>
-                @endif
-                <span class="help-block">{{ trans('cruds.setting.fields.update_by_helper') }}</span>
-            </div>
-            <div class="form-group">
                 <button class="btn btn-danger" type="submit">
                     {{ trans('global.save') }}
                 </button>

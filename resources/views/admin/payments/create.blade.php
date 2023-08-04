@@ -42,6 +42,21 @@
                 </div>
                 <div class="col-6">
                     <div class="form-group">
+                        <label>{{ trans('cruds.payment.fields.payment_method') }}</label>
+                        <select class="form-control {{ $errors->has('payment_method') ? 'is-invalid' : '' }}" name="payment_method" id="payment_method">
+                            <option value disabled {{ old('payment_method', null) === null ? 'selected' : '' }}>{{ trans('global.pleaseSelect') }}</option>
+                            @foreach(App\Models\Payment::PAYMENT_METHOD_SELECT as $key => $label)
+                                <option value="{{ $key }}" {{ old('payment_method', '') === (string) $key ? 'selected' : '' }}>{{ $label }}</option>
+                            @endforeach
+                        </select>
+                        @if($errors->has('payment_method'))
+                            <span class="text-danger">{{ $errors->first('payment_method') }}</span>
+                        @endif
+                        <span class="help-block">{{ trans('cruds.payment.fields.payment_method_helper') }}</span>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="form-group">
                         <label class="required" for="salesperson_id">{{ trans('cruds.payment.fields.salesperson') }}</label>
                         <select class="form-control select2 {{ $errors->has('salesperson') ? 'is-invalid' : '' }}" name="salesperson_id" id="salesperson_id" required>
                             @foreach($salespeople as $id => $entry)
@@ -54,7 +69,7 @@
                         <span class="help-block">{{ trans('cruds.payment.fields.salesperson_helper') }}</span>
                     </div>
                 </div>
-                <div class="col-6">
+                {{-- <div class="col-6">
                     <div class="form-group">
                         <label class="required" for="semester_id">{{ trans('cruds.payment.fields.semester') }}</label>
                         <select class="form-control select2 {{ $errors->has('semester') ? 'is-invalid' : '' }}" name="semester_id" id="semester_id" required>
@@ -67,51 +82,9 @@
                         @endif
                         <span class="help-block">{{ trans('cruds.payment.fields.semester_helper') }}</span>
                     </div>
-                </div>
+                </div> --}}
                 <div class="col-12">
-                    <div class="detail-tagihan mt-3 mb-4" style="display: none;">
-                        <p class="mb-0 font-weight-bold">Detail Tagihan dan Pembayaran</p>
-
-                        <div class="row">
-                            <div class="col-auto">
-                                <p class="mb-0">
-                                    <small class="font-weight-bold">Total Tagihan</small>
-                                    <br />
-                                    <span class="tagihan-total"></span>
-                                </p>
-                            </div>
-
-                            <div class="col-auto">
-                                <p class="mb-0">
-                                    <small class="font-weight-bold">Total Pembayaran</small>
-                                    <br />
-                                    <span class="tagihan-saldo"></span>
-                                </p>
-                            </div>
-
-                            <div class="col-auto">
-                                <p class="mb-0">
-                                    <small class="font-weight-bold">Sisa Tagihan</small>
-                                    <br />
-                                    <span class="tagihan-sisa"></span>
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-6">
-                    <div class="form-group">
-                        <label>{{ trans('cruds.payment.fields.payment_method') }}</label>
-                        <select class="form-control {{ $errors->has('payment_method') ? 'is-invalid' : '' }}" name="payment_method" id="payment_method">
-                            <option value disabled {{ old('payment_method', null) === null ? 'selected' : '' }}>{{ trans('global.pleaseSelect') }}</option>
-                            @foreach(App\Models\Payment::PAYMENT_METHOD_SELECT as $key => $label)
-                                <option value="{{ $key }}" {{ old('payment_method', '') === (string) $key ? 'selected' : '' }}>{{ $label }}</option>
-                            @endforeach
-                        </select>
-                        @if($errors->has('payment_method'))
-                            <span class="text-danger">{{ $errors->first('payment_method') }}</span>
-                        @endif
-                        <span class="help-block">{{ trans('cruds.payment.fields.payment_method_helper') }}</span>
+                    <div id="tagihan">
                     </div>
                 </div>
                 <div class="col-12">
@@ -278,50 +251,66 @@ $(document).ready(function() {
     });
 
     $('#salesperson_id').on('select2:select', function (e) {
-        var semester = $('#semester_id').val();
         var salesperson = e.params.data.id;
 
-        if (semester && salesperson){
-            getTagihan(semester, salesperson);
-        }
-    });
-
-    $('#semester_id').on('select2:select', function (e) {
-        var semester = e.params.data.id;
-        var salesperson = $('#salesperson_id').val();
-
-        if (semester && salesperson){
-            getTagihan(semester, salesperson);
-        }
-    });
-
-    function getTagihan(semester, salesperson) {
         $.ajax({
             type: "GET",
             url: "{{ route('admin.payments.getTagihan') }}",
             data: {
-                semester: semester,
                 salesperson: salesperson
             },
-            success: function (response) {
-                if (response.status == 'success') {
-                    var total = Math.abs(response.data.tagihan);
-                    var saldo = Math.abs(response.data.bayar);
-                    var sisa = Math.abs(response.data.sisa);
+            success: function (bills) {
+                bills.forEach(bill => {
+                    console.log(bill);
+                    var formHtml = `
+                        <div class="detail-tagihan mt-3 mb-4">
+                            <p class="mb-0 font-weight-bold">Detail Tagihan ${bill.semester.name}</p>
+                            <div class="row">
+                                <div class="col-auto" style="min-width: 160px">
+                                    <p class="mb-0">
+                                        <small class="font-weight-bold">Saldo Awal</small>
+                                        <br />
+                                        <span class="tagihan-total">${convertToRupiah(parseInt(bill.saldo_awal))}</span>
+                                    </p>
+                                </div>
+                                <div class="col-auto" style="min-width: 160px">
+                                    <p class="mb-0">
+                                        <small class="font-weight-bold">Total Tagihan</small>
+                                        <br />
+                                        <span class="tagihan-total">${convertToRupiah(parseInt(bill.jual) - (parseInt(bill.diskon) + parseInt(bill.retur)))}</span>
+                                    </p>
+                                </div>
 
-                    if (!isNaN(total) && !isNaN(saldo) && !isNaN(sisa)) {
-                        tagihanDetail.show();
-                        tagihanTotal.html(numeral(total).format('$0,0'));
-                        tagihanSaldo.html(numeral(saldo).format('$0,0'));
-                        tagihanSisa.html(numeral(sisa).format('$0,0'));
-                    } else {
-                        tagihanDetail.hide();
-                    }
-                } else {
-                    swal("Warning!", response.message, 'error');
-                }
+                                <div class="col-auto"  style="min-width: 160px">
+                                    <p class="mb-0">
+                                        <small class="font-weight-bold">Total Pembayaran</small>
+                                        <br />
+                                        <span class="tagihan-saldo">${convertToRupiah(parseInt(bill.bayar) + parseInt(bill.potongan))}</span>
+                                    </p>
+                                </div>
+
+                                <div class="col-auto"  style="min-width: 160px">
+                                    <p class="mb-0">
+                                        <small class="font-weight-bold">Sisa Tagihan</small>
+                                        <br />
+                                        <span class="tagihan-sisa">${convertToRupiah(parseInt(bill.saldo_akhir))}</span>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    $('#tagihan').prepend(formHtml);
+                });
             }
         });
+    });
+
+    function convertToRupiah(angka)
+    {
+        var rupiah = '';
+        var angkarev = angka.toString().split('').reverse().join('');
+        for(var i = 0; i < angkarev.length; i++) if(i%3 == 0) rupiah += angkarev.substr(i,3)+'.';
+        return 'Rp. '+rupiah.split('',rupiah.length-1).reverse().join('');
     }
 });
 </script>

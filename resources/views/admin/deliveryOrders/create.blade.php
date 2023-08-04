@@ -199,7 +199,7 @@
                                 </div>
                                 <div class="col offset-1 row align-items-end align-self-center">
                                     <div class="col" style="max-width: 160px">
-                                        <p class="mb-0 text-sm">Estimasi</p>
+                                        <p class="mb-0 text-sm">Dikirim</p>
                                         <div class="form-group text-field m-0">
                                             <div class="text-field-input px-2 py-0">
                                                 <input type="hidden" name="products[]" value="${product.id}">

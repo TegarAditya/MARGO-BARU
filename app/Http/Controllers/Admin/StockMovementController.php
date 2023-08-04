@@ -29,11 +29,11 @@ class StockMovementController extends Controller
             });
 
             $table->addColumn('product_code', function ($row) {
-                return $row->product ? $row->product->code : '';
+                return $row->product ? $row->product->code : $row->material->code;
             });
 
             $table->addColumn('product_name', function ($row) {
-                return $row->product ? $row->product->name : '';
+                return $row->product ? $row->product->name : $row->material->name;
             });
 
             $table->addColumn('reference', function ($row) {
@@ -47,7 +47,10 @@ class StockMovementController extends Controller
                     return 'Cetak <a class="px-1" title="Reference" href="'.route('admin.cetaks.show', $row->reference_id).'"><i class="fas fa-eye text-success  fa-lg"></i></a>';
                 } else if ($row->transaction_type == 'produksi') {
                     return 'Produksi <a class="px-1" title="Reference" href="'.route('admin.finishings.show', $row->reference_id).'"><i class="fas fa-eye text-success  fa-lg"></i></a>';
+                } else if ($row->transaction_type == 'plating') {
+                    return 'Produksi <a class="px-1" title="Reference" href="'.route('admin.plate-prints.show', $row->reference_id).'"><i class="fas fa-eye text-success  fa-lg"></i></a>';
                 }
+
             });
 
             $table->editColumn('quantity', function ($row) {
@@ -58,7 +61,7 @@ class StockMovementController extends Controller
                 return $row->transaction_type ? StockMovement::TRANSACTION_TYPE_SELECT[$row->transaction_type] : '';
             });
 
-            $table->rawColumns(['product', 'reference']);
+            $table->rawColumns(['product', 'reference', 'material']);
 
             return $table->make(true);
         }

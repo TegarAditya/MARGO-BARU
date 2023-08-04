@@ -231,6 +231,10 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     Route::resource('rekap-billings', 'RekapBillingController', ['only' => ['index']]);
 
     // Bill
+    Route::post('bills/generate', 'BillController@generate')->name('bills.generate');
+    Route::post('bills/jangka', 'BillController@jangka')->name('bills.jangka');
+    Route::get('bills/billing', 'BillController@billing')->name('bills.billing');
+    Route::get('bills/print-billing', 'BillController@cetakBilling')->name('bills.cetakBilling');
     Route::resource('bills', 'BillController', ['except' => ['destroy']]);
 
     // Plate Print

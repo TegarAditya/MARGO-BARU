@@ -172,25 +172,23 @@ class ReturnGoodController extends Controller
             TransactionService::createTransaction($date, $note, $salesperson, $semester, 'retur', $retur->id, $retur->no_retur, $nominal, 'credit');
 
             if ($flag_cash) {
-                InvoiceItem::where('salesperson_id', $salesperson)->where('semester_id', $semester)
-                    ->update([
-                        'discount' => 0,
-                        'total_discount' => 0
-                    ]);
+                InvoiceItem::where('salesperson_id', $salesperson)->where('semester_id', $semester)->where('discount', '>', 0)
+                ->update([
+                    'discount' => 0,
+                    'total_discount' => 0
+                ]);
 
-                $invoices = Invoice::where('salesperson_id', $salesperson)->where('semester_id', $semester)->get();
+                $invoices = Invoice::where('salesperson_id', $salesperson)->where('semester_id', $semester)->where('discount', '>', 0)->get();
                 $note_transaksi = 'Diskon di cancel karena retur no '.$retur->no_retur;
 
                 foreach($invoices as $invoice) {
                     $total = $invoice->total;
-                    if ($invoice->retur) {
-                        TransactionService::editTransaction($date, $note_transaksi, $salesperson, $semester, 'diskon', $invoice->id, $invoice->no_faktur, 0, 'credit');
-                        $invoice->update([
-                            'discount' => 0,
-                            'nominal' => $total,
-                            'retur' => 1
-                        ]);
-                    }
+                    TransactionService::editTransaction($date, $note_transaksi, $salesperson, $semester, 'diskon', $invoice->id, $invoice->no_faktur, 0, 'credit');
+                    $invoice->update([
+                        'discount' => 0,
+                        'nominal' => $total,
+                        'retur' => 1
+                    ]);
                 }
             }
 

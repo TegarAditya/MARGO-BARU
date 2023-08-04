@@ -12,6 +12,7 @@ use App\Models\Semester;
 use App\Models\Invoice;
 use App\Models\ReturnGood;
 use App\Models\Transaction;
+use App\Models\Bill;
 use Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -112,7 +113,7 @@ class PaymentController extends Controller
         $validatedData = $request->validate([
             'date' => 'required',
             'salesperson_id' => 'required',
-            'semester_id' => 'required',
+            // 'semester_id' => 'required',
             'payment_method' => 'required',
             'bayar' => 'required|numeric|min:1',
             'diskon' => 'nullable|numeric',
@@ -122,30 +123,46 @@ class PaymentController extends Controller
 
         $date = $validatedData['date'];
         $salesperson = $validatedData['salesperson_id'];
-        $semester = $validatedData['semester_id'];
+        $semester = setting('current_semester');
         $payment_method = $validatedData['payment_method'];
         $bayar = $validatedData['bayar'];
         $diskon = $validatedData['diskon'];
         $nominal = $validatedData['nominal'];
         $note = $validatedData['note'];
 
+        $bills = collect([]);
+        $bill = Bill::with('semester')->where('salesperson_id', $salesperson)->where('semester_id', $semester)->first();
+        $bills->push($bill);
+        while($bill->saldo_awal > 0) {
+            $semester = prevSemester($semester);
+            $bill = Bill::with('semester')->where('salesperson_id', $salesperson)->where('semester_id', $semester)->first();
+            $bills->push($bill);
+        }
+
         DB::beginTransaction();
         try {
-            $payment = Payment::create([
-                'no_kwitansi' => Payment::generateNoKwitansi($semester),
-                'date' => $date,
-                'salesperson_id' => $salesperson,
-                'semester_id' => $semester,
-                'paid' => $bayar,
-                'discount' => $diskon,
-                'amount' => $nominal,
-                'payment_method' => $payment_method,
-                'note' => $note
-            ]);
+            foreach($bills->sortBy('created_at') as $bill) {
+                if ($bayar > 0) {
+                    $saldo = $bill->saldo_akhir - $diskon;
+                    $paid = ($bayar < $saldo) ? $bayar : $saldo;
+                    $payment = Payment::create([
+                        'no_kwitansi' => Payment::generateNoKwitansi($bill->semester_id),
+                        'date' => $date,
+                        'salesperson_id' => $salesperson,
+                        'semester_id' => $bill->semester_id,
+                        'paid' => $paid,
+                        'discount' => $diskon,
+                        'amount' => $paid - $diskon,
+                        'payment_method' => $payment_method,
+                        'note' => $note
+                    ]);
+                    TransactionService::createTransaction($date, $note, $salesperson, $bill->semester_id, 'bayar', $payment->id, $payment->no_kwitansi, $paid, 'credit');
+                    TransactionService::createTransaction($date, $note, $salesperson, $bill->semester_id, 'potongan', $payment->id, $payment->no_kwitansi, $diskon, 'credit');
 
-            TransactionService::createTransaction($date, $note, $salesperson, $semester, 'bayar', $payment->id, $payment->no_kwitansi, $bayar, 'credit');
-            TransactionService::createTransaction($date, $note, $salesperson, $semester, 'potongan', $payment->id, $payment->no_kwitansi, $diskon, 'credit');
-
+                    $bayar -= $paid;
+                    $diskon -= $diskon;
+                }
+            }
             DB::commit();
 
             Alert::success('Success', 'Pembayaran berhasil di simpan');
@@ -258,14 +275,18 @@ class PaymentController extends Controller
 
     public function getTagihan(Request $request)
     {
-        $invoice = Invoice::where('salesperson_id', $request->salesperson)->where('semester_id', $request->semester)->sum('nominal');
-        $retur = ReturnGood::where('salesperson_id', $request->salesperson)->where('semester_id', $request->semester)->sum('nominal');
-        $paid = Payment::where('salesperson_id', $request->salesperson)->where('semester_id', $request->semester)->sum('amount');
+        $semester = setting('current_semester');
+        $bills = collect([]);
 
-        $tagihan = ($invoice - $retur);
-        $sisa = $tagihan - $paid;
+        $bill = Bill::with('semester')->where('salesperson_id', $request->salesperson)->where('semester_id', $semester)->first();
+        $bills->push($bill);
+        while($bill->saldo_awal > 0) {
+            $semester = prevSemester($semester);
+            $bill = Bill::with('semester')->where('salesperson_id', $request->salesperson)->where('semester_id', $semester)->first();
+            $bills->push($bill);
+        }
 
-        return response()->json(['status' => 'success', 'message' => 'Data ditemukan', 'data' => ['tagihan' => $tagihan, 'bayar' => $paid, 'sisa' => $sisa]]);
+        return response()->json($bills);
     }
 
     public function kwitansi(Payment $payment)

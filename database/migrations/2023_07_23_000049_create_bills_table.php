@@ -10,7 +10,7 @@ class CreateBillsTable extends Migration
     {
         Schema::create('bills', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->decimal('saldo_awal', 15, 2);
+            $table->decimal('saldo_awal', 15, 2)->default(0);
             $table->decimal('jual', 15, 2)->default(0);
             $table->decimal('diskon', 15, 2)->default(0);
             $table->decimal('retur', 15, 2)->default(0);

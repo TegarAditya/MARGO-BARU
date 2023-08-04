@@ -8,10 +8,18 @@ use App\Http\Requests\UpdateBillRequest;
 use App\Models\Bill;
 use App\Models\Salesperson;
 use App\Models\Semester;
+use App\Models\Transaction;
+use App\Models\Invoice;
+use App\Models\ReturnGood;
+use App\Models\Payment;
 use Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Yajra\DataTables\Facades\DataTables;
+use DB;
+use Alert;
+use Illuminate\Support\Facades\Date;
+use Carbon\Carbon;
 
 class BillController extends Controller
 {
@@ -20,25 +28,24 @@ class BillController extends Controller
         abort_if(Gate::denies('bill_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         if ($request->ajax()) {
-            $query = Bill::with(['semester', 'salesperson'])->select(sprintf('%s.*', (new Bill)->table));
+            $semester = setting('current_semester');
+            $query = Bill::with(['semester', 'salesperson'])->where('semester_id', $semester)->select(sprintf('%s.*', (new Bill)->table));
             $table = Datatables::of($query);
 
             $table->addColumn('placeholder', '&nbsp;');
             $table->addColumn('actions', '&nbsp;');
 
             $table->editColumn('actions', function ($row) {
-                $viewGate      = 'bill_show';
-                $editGate      = 'bill_edit';
-                $deleteGate    = 'bill_delete';
-                $crudRoutePart = 'bills';
+                $btn = '
+                    <a class="px-1" href="'.route('admin.bills.billing', ['salesperson' => $row->salesperson_id]).'" title="Show">
+                        <i class="fas fa-eye text-success fa-lg"></i>
+                    </a>
+                    <a class="px-1" href="'.route('admin.bills.cetakBilling', ['salesperson' => $row->salesperson_id]).'" title="Print Saldo" target="_blank">
+                        <i class="fas fa-print text-secondary fa-lg"></i>
+                    </a>
+                ';
 
-                return view('partials.datatablesActions', compact(
-                    'viewGate',
-                    'editGate',
-                    'deleteGate',
-                    'crudRoutePart',
-                    'row'
-                ));
+                return $btn;
             });
 
             $table->addColumn('semester_name', function ($row) {
@@ -46,29 +53,29 @@ class BillController extends Controller
             });
 
             $table->addColumn('salesperson_name', function ($row) {
-                return $row->salesperson ? $row->salesperson->name : '';
+                return $row->salesperson ? $row->salesperson->full_name : '';
             });
 
             $table->editColumn('saldo_awal', function ($row) {
-                return $row->saldo_awal ? $row->saldo_awal : '';
+                return $row->saldo_awal ? money($row->saldo_awal) : 0;
             });
             $table->editColumn('jual', function ($row) {
-                return $row->jual ? $row->jual : '';
+                return $row->jual ? money($row->jual) : 0;
             });
             $table->editColumn('diskon', function ($row) {
-                return $row->diskon ? $row->diskon : '';
+                return $row->diskon ? money($row->diskon) : 0;
             });
             $table->editColumn('retur', function ($row) {
-                return $row->retur ? $row->retur : '';
+                return $row->retur ? money($row->retur) : 0;
             });
             $table->editColumn('bayar', function ($row) {
-                return $row->bayar ? $row->bayar : '';
+                return $row->bayar ? money($row->bayar) : 0;
             });
             $table->editColumn('potongan', function ($row) {
-                return $row->potongan ? $row->potongan : '';
+                return $row->potongan ? money($row->potongan) : 0;
             });
             $table->editColumn('saldo_akhir', function ($row) {
-                return $row->saldo_akhir ? $row->saldo_akhir : '';
+                return $row->saldo_akhir ? money($row->saldo_akhir) : 0;
             });
 
             $table->rawColumns(['actions', 'placeholder', 'semester', 'salesperson']);
@@ -124,5 +131,205 @@ class BillController extends Controller
         $bill->load('semester', 'salesperson');
 
         return view('admin.bills.show', compact('bill'));
+    }
+
+    public function generate(Request $request)
+    {
+        $semester = setting('current_semester');
+
+        $sales = Salesperson::withSum(['transactions as pengambilan' => function ($q) use ($semester) {
+            $q->where('type', 'faktur')->where('semester_id', $semester)->select(DB::raw('COALESCE(SUM(amount), 0)'));
+        }], 'amount')->withSum(['transactions as diskon' => function ($q) use ($semester) {
+            $q->where('type', 'diskon')->where('semester_id', $semester)->select(DB::raw('COALESCE(SUM(amount), 0)'));
+        }], 'amount')->withSum(['transactions as retur' => function ($q) use ($semester) {
+            $q->where('type', 'retur')->where('semester_id', $semester)->select(DB::raw('COALESCE(SUM(amount), 0)'));
+        }], 'amount')->withSum(['transactions as bayar' => function ($q) use ($semester) {
+            $q->where('type', 'bayar')->where('semester_id', $semester)->select(DB::raw('COALESCE(SUM(amount), 0)'));
+        }], 'amount')->withSum(['transactions as potongan' => function ($q) use ($semester) {
+            $q->where('type', 'potongan')->where('semester_id', $semester)->select(DB::raw('COALESCE(SUM(amount), 0)'));
+        }], 'amount')->get();
+
+        DB::beginTransaction();
+        try {
+            foreach($sales as $sale) {
+
+                $bill = Bill::where('salesperson_id', $sale->id)->where('semester_id', $semester)->first();
+
+                $faktur = $sale->pengambilan;
+                $diskon = $sale->diskon;
+                $retur = $sale->retur;
+                $bayar = $sale->bayar;
+                $potongan = $sale->potongan;
+
+                if ($bill) {
+                    $bill->update([
+                        'saldo_awal' => $bill->previous ? $bill->previous->saldo_akhir : 0,
+                        'jual' => $faktur,
+                        'diskon' => $diskon,
+                        'retur' => $retur,
+                        'bayar' => $bayar,
+                        'potongan' => $potongan,
+                        'saldo_akhir' => $faktur - ($diskon + $retur + $bayar + $potongan),
+                    ]);
+                } else {
+                    $previous = Bill::where('salesperson_id', $sale->id)->where('semester_id', prevSemester($semester))->first();
+
+                    Bill::create([
+                        'semester_id' => $semester,
+                        'salesperson_id' => $sale->id,
+                        'previous_id' => $previous ? $previous->id : null,
+                        'saldo_awal' => $previous ? $previous->saldo_akhir : 0,
+                        'jual' => $faktur,
+                        'diskon' => $diskon,
+                        'retur' => $retur,
+                        'bayar' => $bayar,
+                        'potongan' => $potongan,
+                        'saldo_akhir' => $faktur - ($diskon + $retur + $bayar + $potongan),
+                    ]);
+                }
+            }
+
+            DB::commit();
+
+            Alert::success('Success', 'Billing berhasil di generate');
+
+            return redirect()->route('admin.bills.index');
+        } catch (\Exception $e) {
+            DB::rollback();
+
+            dd($e);
+
+            return redirect()->back()->with('error-message', $e->getMessage())->withInput();
+        }
+    }
+
+    public function jangka(Request $request)
+    {
+        if ($request->has('date') && $request->date && $dates = explode(' - ', $request->date)) {
+            $start = Date::parse($dates[0])->startOfDay();
+            $end = !isset($dates[1]) ? $start->clone()->endOfMonth() : Date::parse($dates[1])->endOfDay();
+        } else {
+            $start = Carbon::now()->startOfMonth();
+            $end = Carbon::now();
+        }
+
+        $saldo_awal = Salesperson::withSum(['transactions as pengambilan' => function ($q) use ($start) {
+            $q->where('type', 'faktur')->where('transaction_date', '<', $start)->select(DB::raw('COALESCE(SUM(amount), 0)'));
+        }], 'amount')->withSum(['transactions as diskon' => function ($q) use ($start) {
+            $q->where('type', 'diskon')->where('transaction_date', '<', $start)->select(DB::raw('COALESCE(SUM(amount), 0)'));
+        }], 'amount')->withSum(['transactions as retur' => function ($q) use ($start) {
+            $q->where('type', 'retur')->where('transaction_date', '<', $start)->select(DB::raw('COALESCE(SUM(amount), 0)'));
+        }], 'amount')->withSum(['transactions as bayar' => function ($q) use ($start) {
+            $q->where('type', 'bayar')->where('transaction_date', '<', $start)->select(DB::raw('COALESCE(SUM(amount), 0)'));
+        }], 'amount')->withSum(['transactions as potongan' => function ($q) use ($start) {
+            $q->where('type', 'potongan')->where('transaction_date', '<', $start)->select(DB::raw('COALESCE(SUM(amount), 0)'));
+        }], 'amount')->get();
+
+        $sales = Salesperson::withSum(['transactions as pengambilan' => function ($q) use ($start, $end) {
+            $q->where('type', 'faktur')->whereBetween('transaction_date', [$start, $end])->select(DB::raw('COALESCE(SUM(amount), 0)'));
+        }], 'amount')->withSum(['transactions as diskon' => function ($q) use ($start, $end) {
+            $q->where('type', 'diskon')->where('transaction_date', [$start, $end])->select(DB::raw('COALESCE(SUM(amount), 0)'));
+        }], 'amount')->withSum(['transactions as retur' => function ($q) use ($start, $end) {
+            $q->where('type', 'retur')->where('transaction_date', [$start, $end])->select(DB::raw('COALESCE(SUM(amount), 0)'));
+        }], 'amount')->withSum(['transactions as bayar' => function ($q) use ($start, $end) {
+            $q->where('type', 'bayar')->where('transaction_date', [$start, $end])->select(DB::raw('COALESCE(SUM(amount), 0)'));
+        }], 'amount')->withSum(['transactions as potongan' => function ($q) use ($start, $end) {
+            $q->where('type', 'potongan')->where('transaction_date', [$start, $end])->select(DB::raw('COALESCE(SUM(amount), 0)'));
+        }], 'amount')->get();
+
+        return view('admin.bills.billing', compact('start', 'end', 'saldo_awal', 'sales'));
+    }
+
+    public function billing(Request $request)
+    {
+        $salesperson = $request->salesperson;
+        $semester = setting('current_semester');
+
+        $invoices = Invoice::with('invoice_items')->where('salesperson_id', $salesperson)->where('semester_id', $semester)->get();
+        $returs = ReturnGood::with('retur_items')->where('salesperson_id', $salesperson)->where('semester_id', $semester)->get();
+        $payments = Payment::where('salesperson_id', $salesperson)->where('semester_id', $semester)->get();
+
+        $bills = collect([]);
+        $invoices_old = collect([]);
+        $returs_old = collect([]);
+        $payments_old = collect([]);
+
+        $bill = Bill::where('salesperson_id', $salesperson)->where('semester_id', $semester)->first();
+
+        $semester_id = $semester;
+        while($bill->saldo_awal > 0) {
+            $semester_id = prevSemester($semester_id);
+            $bill = Bill::where('salesperson_id', $salesperson)->where('semester_id', $semester_id)->first();
+            $bills->push($bill);
+        }
+
+        if ($bills->count() > 0) {
+            foreach($bills as $item) {
+                $faktur = Invoice::with('invoice_items')->where('salesperson_id', $salesperson)->where('semester_id', $item->semester_id)->get();
+                $retur = ReturnGood::with('retur_items')->where('salesperson_id', $salesperson)->where('semester_id', $item->semester_id)->get();
+                $bayar = Payment::where('salesperson_id', $salesperson)->where('semester_id', $item->semester_id)->get();
+
+                $invoices_old->merge($faktur->all());
+                $returs_old->merge($retur->all());
+                $payments_old->merge($bayar->all());
+            }
+        }
+
+        $list_semester = $bills->pluck('semester_id');
+
+        $salesperson = Salesperson::find($salesperson);
+        $semester = Semester::find($semester);
+
+        return view('admin.bills.show', compact('salesperson', 'semester', 'invoices', 'returs', 'payments', 'bills', 'invoices_old', 'returs_old', 'payments_old', 'list_semester'));
+    }
+
+    public function cetakBilling(Request $request)
+    {
+        $salesperson = $request->salesperson;
+        $semester = setting('current_semester');
+
+        $invoices = Invoice::with('invoice_items')->where('salesperson_id', $salesperson)->where('semester_id', $semester)->get();
+        $returs = ReturnGood::with('retur_items')->where('salesperson_id', $salesperson)->where('semester_id', $semester)->get();
+        $payments = Payment::where('salesperson_id', $salesperson)->where('semester_id', $semester)->get();
+        $billing = Bill::where('salesperson_id', $salesperson)->where('semester_id', $semester)->first();
+
+        $bills = collect([]);
+        $invoices_old = collect([]);
+        $returs_old = collect([]);
+        $payments_old = collect([]);
+
+        $bill = Bill::where('salesperson_id', $salesperson)->where('semester_id', $semester)->first();
+
+        $semester_id = $semester;
+        while($bill->saldo_awal > 0) {
+            $semester_id = prevSemester($semester_id);
+            $bill = Bill::where('salesperson_id', $salesperson)->where('semester_id', $semester_id)->first();
+            $bills->push($bill);
+        }
+
+        if ($bills->count() > 0) {
+            foreach($bills as $item) {
+                $faktur = Invoice::with('invoice_items')->where('salesperson_id', $salesperson)->where('semester_id', $item->semester_id)->get();
+                $retur = ReturnGood::with('retur_items')->where('salesperson_id', $salesperson)->where('semester_id', $item->semester_id)->get();
+                $bayar = Payment::where('salesperson_id', $salesperson)->where('semester_id', $item->semester_id)->get();
+
+                foreach($faktur as $item) {
+                    $invoices_old->push($item);
+                }
+                foreach($retur as $item) {
+                    $returs_old->push($item);
+                }
+                foreach($bayar as $item) {
+                    $payments_old->push($item);
+                }
+            }
+        }
+
+        $list_semester = $bills->pluck('semester_id');
+
+        $salesperson = Salesperson::find($salesperson);
+        $semester = Semester::find($semester);
+
+        return view('admin.bills.saldo', compact('salesperson', 'semester', 'invoices', 'returs', 'payments', 'billing', 'bills', 'invoices_old', 'returs_old', 'payments_old', 'list_semester'));
     }
 }
