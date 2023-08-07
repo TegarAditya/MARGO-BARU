@@ -34,6 +34,16 @@
                         </select>
                     </div>
                 </div>
+                <div class="col-4">
+                    <div class="form-group">
+                        <label>NO SPK</label>
+                        <select class="form-control select2 {{ $errors->has('no_spk') ? 'is-invalid' : '' }}" name="no_spk" id="no_spk">
+                            @foreach($spks as $id => $entry)
+                                <option value="{{ $id }}" {{ old('no_spk') == $id ? 'selected' : '' }}>{{ $entry }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
             </div>
 
             <div class="form-group mt-3">
@@ -52,20 +62,23 @@
 
                     </th>
                     <th>
-                        {{ trans('cruds.platePrint.fields.no_spk') }}
+                        Mapel
                     </th>
                     <th>
-                        {{ trans('cruds.platePrint.fields.date') }}
+                        {{ trans('cruds.platePrintItem.fields.plate') }}
                     </th>
                     <th>
-                        {{ trans('cruds.platePrint.fields.semester') }}
+                        Quantity
                     </th>
                     <th>
-                        {{ trans('cruds.platePrint.fields.type') }}
+                        No SPK
                     </th>
                     <th>
                         Vendor / Customer
                     </th>
+                    {{-- <th>
+                        {{ trans('cruds.platePrintItem.fields.status') }}
+                    </th> --}}
                     <th>
                         &nbsp;
                     </th>
@@ -91,19 +104,21 @@ $(function () {
     retrieve: true,
     aaSorting: [],
     ajax: {
-        url: "{{ route('admin.aquarium.index') }}",
+        url: "{{ route('admin.aquarium.task') }}",
         data: function(data) {
             data.type = $('#type').val(),
-            data.vendor = $('#vendor_id').val()
+            data.vendor = $('#vendor_id').val(),
+            data.spk = $('#no_spk').val()
         }
     },
     columns: [
         { data: 'placeholder', name: 'placeholder' },
-        { data: 'no_spk', name: 'no_spk', class: 'text-center' },
-        { data: 'date', name: 'date', class: 'text-center'  },
-        { data: 'semester_name', name: 'semester.name', class: 'text-center'  },
-        { data: 'type', name: 'type', class: 'text-center'  },
-        { data: 'customer', name: 'customer', class: 'text-center'  },
+        { data: 'product_code', name: 'product.code', class: 'text-center' },
+        { data: 'plate_code', name: 'plate.code', class: 'text-center' },
+        { data: 'estimasi', name: 'estimasi', class: 'text-center' },
+        { data: 'plate_print_no_spk', name: 'plate_print.no_spk', class: 'text-center' },
+        { data: 'vendor', name: 'vendor', class: 'text-center' },
+        // { data: 'status', name: 'status', class: 'text-center' },
         { data: 'actions', name: '{{ trans('global.actions') }}', class: 'text-center'  }
     ],
     orderCellsTop: true,
@@ -120,7 +135,7 @@ $(function () {
         event.preventDefault();
         table.ajax.reload();
     });
-  
+
 });
 
 </script>

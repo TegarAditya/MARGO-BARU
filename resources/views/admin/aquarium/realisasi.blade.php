@@ -7,7 +7,7 @@
     </div>
 
     <div class="card-body">
-        <form method="POST" action="{{ route("admin.aquarium.realisasiStore", [$platePrint->id]) }}" enctype="multipart/form-data">
+        <form method="POST" action="{{ route("admin.aquarium.realisasiStore", [$plate_item->id]) }}" enctype="multipart/form-data">
             @method('PUT')
             @csrf
             <div class="row">
@@ -78,115 +78,98 @@
                     </table>
                 </div>
             </div>
-            @if($plate_items->count() > 0)
-                <hr style="margin: 1em -15px;border-color:#ccc" />
-                <div id="product-form">
-                    @foreach ($plate_items as $item)
-                        <div class="item-product" id="product-{{ $item->id }}">
-                            <div class="row">
-                                <div class="col-3 align-self-center">
-                                    <h6 class="text-sm product-name mb-1">{{ $item->product ? $item->product->name : $item->product_text }}</h6>
+            <hr style="margin: 1em -15px;border-color:#ccc" />
+            <div id="product-form">
+                <div class="item-product" id="product-{{ $plate_item->id }}">
+                    <div class="row">
+                        <div class="col-3 align-self-center">
+                            <h6 class="text-sm product-name mb-1">{{ $plate_item->product ? $plate_item->product->name : $plate_item->product_text }}</h6>
+                            <p class="mb-0 text-sm">
+                                Plate : <strong>{{ $plate_item->plate ? $plate_item->plate->name : 'Belum Tahu' }}</strong>
+                            </p>
+                            @if ($plate_item->product)
+                                <p class="mb-0 text-sm">
+                                    Mapel : <strong>{{ $plate_item->product->mapel->name }}</strong>
+                                </p>
+                                <p class="mb-0 text-sm">
+                                    Kelas : <strong>{{ $plate_item->product->kelas->name }}</strong>
+                                </p>
+                                <p class="mb-0 text-sm">
+                                    Halaman : <strong>{{ $plate_item->product->halaman->code }}</strong>
+                                </p>
+                                <p class="mb-0 text-sm">
+                                    Kurikulum : <strong>{{ $plate_item->product->kurikulum->name }}</strong>
+                                </p>
+                                @if ($plate_item->product->cover)
                                     <p class="mb-0 text-sm">
-                                        Plate : <strong>{{ $item->plate ? $item->plate->name : 'Belum Tahu' }}</strong>
+                                        Kolom Nama : <strong>Jangan Lupa !</strong>
                                     </p>
-                                    @if ($item->product)
-                                        <p class="mb-0 text-sm">
-                                            Mapel : <strong>{{ $item->product->mapel->name }}</strong>
-                                        </p>
-                                        <p class="mb-0 text-sm">
-                                            Kelas : <strong>{{ $item->product->kelas->name }}</strong>
-                                        </p>
-                                        <p class="mb-0 text-sm">
-                                            Kurikulum : <strong>{{ $item->product->kurikulum->name }}</strong>
-                                        </p>
-                                        @if ($item->product->cover)
-                                            <p class="mb-0 text-sm">
-                                                Kolom Nama : <strong>Jangan Lupa !</strong>
-                                            </p>
-                                            <p class="mb-0 text-sm">
-                                                Cover : <strong>{{ $item->product->cover->name  }}</strong>
-                                            </p>
-                                        @else
-                                            <p class="mb-0 text-sm">
-                                                Naskah : <strong>{{ $item->product->isi->name  }}</strong>
-                                            </p>
-                                        @endif
+                                    <p class="mb-0 text-sm">
+                                        Cover : <strong>{{ $plate_item->product->cover->name  }}</strong>
+                                    </p>
+                                @else
+                                    <p class="mb-0 text-sm">
+                                        Naskah : <strong>{{ $plate_item->product->isi->name  }}</strong>
+                                    </p>
+                                @endif
 
-                                    @endif
-                                </div>
-                                <div class="col offset-1 align-items-end align-self-center">
-                                    <div class="row mb-3">
-                                        <input type="hidden" name="plate_items[]" value="{{ $item->id }}">
-                                        <input type="hidden" name="plates[]" value="{{ $item->plate_id }}">
-                                        <div class="col" style="min-width: 100px; max-width: 240px">
-                                            <p class="mb-0 text-sm">Estimasi</p>
-                                            <div class="form-group text-field m-0">
-                                                <div class="text-field-input px-2 py-0">
-                                                    <input class="estimasi_quantity" type="hidden" name="estimasi_quantities[]" value="{{ $item->estimasi }}">
-                                                    <input class="form-control text-center estimasi_quantity_text" type="text" name="estimasi_quantity_text[]" value="{{ angka($item->estimasi) }}" tabindex="-1" readonly>
-                                                    <label class="text-field-border"></label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col" style="min-width: 100px; max-width: 240px">
-                                            <p class="mb-0 text-sm">Realisasi</p>
-                                            <div class="form-group text-field m-0">
-                                                <div class="text-field-input px-2 py-0">
-                                                    <input class="plate_quantity" type="hidden" name="plate_quantities[]" value="{{ $item->realisasi }}">
-                                                    <input class="form-control text-center plate_quantity_text" type="text" name="plate_quantity_text[]" value="{{ angka($item->realisasi) }}" required>
-                                                    <label class="text-field-border"></label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="row mb-3">
-                                        <div class="col" style="min-width: 100px">
-                                            <div class="form-group text-field m-0">
-                                                <p class="mb-0 text-sm">Catatan</p>
-                                                <textarea style="min-height: 50px !important" class="form-control" name="notes[]">{{ $item->note }}</textarea>
-                                            </div>
+                            @endif
+                        </div>
+                        <div class="col offset-1 align-items-end align-self-center">
+                            <div class="row mb-3">
+                                <div class="col" style="min-width: 100px; max-width: 240px">
+                                    <p class="mb-0 text-sm">Quantity Pesan</p>
+                                    <div class="form-group text-field m-0">
+                                        <div class="text-field-input px-2 py-0">
+                                            <input class="estimasi_quantity" type="hidden" name="estimasi_quantities[]" value="{{ $plate_item->estimasi }}">
+                                            <input class="form-control text-center estimasi_quantity_text" type="text" name="estimasi_quantity_text[]" value="{{ angka($plate_item->estimasi) }}" tabindex="-1" readonly>
+                                            <label class="text-field-border"></label>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-auto pl-5 align-items-end align-self-center">
-                                    <div class="col-auto" style="max-width: 200px">
-                                        <div class="form-group text-field m-0">
-                                            <div class="text-field-input">
-                                                <input class="done" type="hidden" name="dones[]" value="{{ $item->status == 'done' ? 1 : 0 }}">
-                                                <input class="status bootstrap-switch" type="checkbox" tabindex="-1" value="1" {{ $item->status == 'done' ? 'checked readonly' : '' }} data-on-text="DONE" data-off-text="N/Y">
-                                            </div>
+                                <div class="col" style="min-width: 100px; max-width: 240px">
+                                    <p class="mb-0 text-sm">Realisasi</p>
+                                    <div class="form-group text-field m-0">
+                                        <div class="text-field-input px-2 py-0">
+                                            <input class="plate_quantity" type="hidden" name="plate_quantities[]" value="{{ $plate_item->realisasi }}">
+                                            <input class="form-control text-center plate_quantity_text" type="text" name="plate_quantity_text[]" value="{{ angka($plate_item->realisasi) }}" data-min="{{ $plate_item->realisasi }}" required>
+                                            <label class="text-field-border"></label>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <hr style="margin: 1em -15px;border-color:#ccc" />
+                            <div class="row mb-3">
+                                <div class="col" style="min-width: 100px">
+                                    <div class="form-group text-field m-0">
+                                        <p class="mb-0 text-sm">Catatan</p>
+                                        <textarea style="min-height: 50px !important" class="form-control" name="notes[]">{{ $plate_item->note }}</textarea>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                    @endforeach
-                </div>
-                <div class="row">
-                    <div class="col-6">
-                        <div class="form-group">
-                            <button class="btn btn-danger" type="submit">
-                                Submit
-                            </button>
+                        <div class="col-auto pl-5 align-items-end align-self-center">
+                            <div class="col-auto" style="max-width: 200px">
+                                <div class="form-group text-field m-0">
+                                    <div class="text-field-input">
+                                        <input class="done" type="hidden" name="dones[]" value="{{ $plate_item->status == 'done' ? 1 : 0 }}">
+                                        <input class="status bootstrap-switch" type="checkbox" tabindex="-1" value="1" {{ $plate_item->status == 'done' ? 'checked readonly' : '' }} data-on-text="DONE" data-off-text="N/Y">
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
+                    <hr style="margin: 1em -15px;border-color:#ccc" />
                 </div>
-            @else
-                <h1>SPK Sudah Dikerjakan Semua</h1>
-                <div class="row mt-3">
-
-                    <div class="col">
-                        <a class="btn btn-primary" href="{{ url()->previous() }}">
-                            <i class="fa fa-arrow-left"></i> Back
-                        </a>
-                    </div>
-
-                    <div class="col-auto">
-
+            </div>
+            <div class="row">
+                <div class="col-6">
+                    <div class="form-group">
+                        <button class="btn btn-danger" type="submit">
+                            Submit
+                        </button>
                     </div>
                 </div>
-            @endif
+            </div>
         </form>
     </div>
 </div>
@@ -226,9 +209,10 @@
             plateQuantity.on('change', function(e) {
                 var el = $(e.currentTarget);
                 var valueNum = parseInt(el.val());
-                if (valueNum < 1) {
-                    el.val(1);
-                    plateQuantityText.val(1).trigger('change');
+                var min = parseInt(plateQuantityText.data('min'));  
+                if (valueNum < min) {
+                    el.val(min);
+                    plateQuantityText.val(min).trigger('change');
                 }
             }).trigger('change');
         });

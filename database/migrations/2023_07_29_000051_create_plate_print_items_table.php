@@ -20,6 +20,7 @@ class CreatePlatePrintItemsTable extends Migration
             $table->boolean('check_kurikulum')->default(0)->nullable();
             $table->boolean('check_kolomnama')->default(0)->nullable();
             $table->boolean('check_naskah')->default(0)->nullable();
+            $table->boolean('surat_jalan')->default(0)->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

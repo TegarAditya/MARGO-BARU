@@ -820,7 +820,17 @@
                         <ul class="nav nav-treeview">
                             @can('aquarium_access')
                                 <li class="nav-item">
-                                    <a href="{{ route("admin.aquarium.index") }}" class="nav-link {{ request()->is("admin/aquarium") || request()->is("admin/aquarium") ? "active" : "" }}">
+                                    <a href="{{ route("admin.aquarium.index") }}" class="nav-link {{ request()->is("admin/aquarium") || request()->is("admin/aquarium/show") ? "active" : "" }}">
+                                        <i class="fa-fw nav-icon fas fa-dolly-flatbed">
+
+                                        </i>
+                                        <p>
+                                            All List
+                                        </p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="{{ route("admin.aquarium.task") }}" class="nav-link {{ request()->is("admin/aquarium/task") ? "active" : "" }}">
                                         <i class="fa-fw nav-icon fas fa-dolly-flatbed">
 
                                         </i>
@@ -830,7 +840,7 @@
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="{{ route("admin.aquarium.working") }}" class="nav-link {{ request()->is("admin/aquarium/working") || request()->is("admin/aquarium/*") ? "active" : "" }}">
+                                    <a href="{{ route("admin.aquarium.working") }}" class="nav-link {{ request()->is("admin/aquarium/working") ? "active" : "" }}">
                                         <i class="fa-fw nav-icon fas fa-dolly-flatbed">
 
                                         </i>

@@ -11,6 +11,50 @@
     </div>
 
     <div class="card-body">
+        <form id="filterform">
+            <div class="row">
+                <div class="col-4">
+                    <div class="form-group">
+                        <label>{{ trans('cruds.bookVariant.fields.type') }}</label>
+                        <select class="form-control {{ $errors->has('type') ? 'is-invalid' : '' }}" name="type" id="type">
+                            <option value {{ old('type', null) === null ? 'selected' : '' }}>All</option>
+                            @foreach(App\Models\PlatePrint::TYPE_SELECT as $key => $label)
+                                <option value="{{ $key }}" {{ old('type', '') === (string) $key ? 'selected' : '' }}>{{ $label }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="form-group">
+                        <label>Vendor</label>
+                        <select class="form-control select2 {{ $errors->has('vendor_id') ? 'is-invalid' : '' }}" name="vendor_id" id="vendor_id">
+                            @foreach($vendors as $id => $entry)
+                                <option value="{{ $id }}" {{ old('vendor_id') == $id ? 'selected' : '' }}>{{ $entry }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="form-group">
+                        <label>NO SPK</label>
+                        <select class="form-control select2 {{ $errors->has('no_spk') ? 'is-invalid' : '' }}" name="no_spk" id="no_spk">
+                            @foreach($spks as $id => $entry)
+                                <option value="{{ $id }}" {{ old('no_spk') == $id ? 'selected' : '' }}>{{ $entry }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group mt-3">
+                <button class="btn btn-success" type="submit">
+                    Filter
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <div class="card-body">
         <table class=" table table-bordered table-striped table-hover ajaxTable datatable datatable-PlatePrint">
             <thead>
                 <tr>
@@ -18,20 +62,23 @@
 
                     </th>
                     <th>
-                        {{ trans('cruds.platePrint.fields.no_spk') }}
+                        Mapel
                     </th>
                     <th>
-                        {{ trans('cruds.platePrint.fields.date') }}
+                        {{ trans('cruds.platePrintItem.fields.plate') }}
                     </th>
                     <th>
-                        {{ trans('cruds.platePrint.fields.semester') }}
+                        Quantity
                     </th>
                     <th>
-                        {{ trans('cruds.platePrint.fields.type') }}
+                        No SPK
                     </th>
                     <th>
-                        {{ trans('cruds.platePrint.fields.customer') }}
+                        Vendor / Customer
                     </th>
+                    {{-- <th>
+                        {{ trans('cruds.platePrintItem.fields.status') }}
+                    </th> --}}
                     <th>
                         &nbsp;
                     </th>
@@ -56,14 +103,22 @@ $(function () {
     serverSide: true,
     retrieve: true,
     aaSorting: [],
-    ajax: "{{ route('admin.aquarium.working') }}",
+    ajax: {
+        url: "{{ route('admin.aquarium.working') }}",
+        data: function(data) {
+            data.type = $('#type').val(),
+            data.vendor = $('#vendor_id').val(),
+            data.spk = $('#no_spk').val()
+        }
+    },
     columns: [
         { data: 'placeholder', name: 'placeholder' },
-        { data: 'no_spk', name: 'no_spk', class: 'text-center' },
-        { data: 'date', name: 'date', class: 'text-center'  },
-        { data: 'semester_name', name: 'semester.name', class: 'text-center'  },
-        { data: 'type', name: 'type', class: 'text-center'  },
-        { data: 'customer', name: 'customer', class: 'text-center'  },
+        { data: 'product_code', name: 'product.code', class: 'text-center' },
+        { data: 'plate_code', name: 'plate.code', class: 'text-center' },
+        { data: 'estimasi', name: 'estimasi', class: 'text-center' },
+        { data: 'plate_print_no_spk', name: 'plate_print.no_spk', class: 'text-center' },
+        { data: 'vendor', name: 'vendor', class: 'text-center' },
+        // { data: 'status', name: 'status', class: 'text-center' },
         { data: 'actions', name: '{{ trans('global.actions') }}', class: 'text-center'  }
     ],
     orderCellsTop: true,
@@ -75,6 +130,11 @@ $(function () {
       $($.fn.dataTable.tables(true)).DataTable()
           .columns.adjust();
   });
+
+    $("#filterform").submit(function(event) {
+        event.preventDefault();
+        table.ajax.reload();
+    });
 
 });
 

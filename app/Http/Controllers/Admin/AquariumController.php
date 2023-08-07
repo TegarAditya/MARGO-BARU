@@ -27,10 +27,15 @@ class AquariumController extends Controller
         abort_if(Gate::denies('aquarium_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         if ($request->ajax()) {
-            $query = PlatePrint::with(['semester', 'vendor'])->select(sprintf('%s.*', (new PlatePrint)->table));
-            $query->whereHas('details', function ($q) {
-                $q->where('status', 'created');
-            });
+            $query = PlatePrint::with(['semester', 'vendor'])->select(sprintf('%s.*', (new PlatePrint)->table))->latest();
+            
+            if (!empty($request->type)) {
+                $query->where('type', $request->type);
+            }
+            if (!empty($request->vendor)) {
+                $query->where('vendor_id', $request->vendor);
+            }
+            
             $table = Datatables::of($query);
 
             $table->addColumn('placeholder', '&nbsp;');
@@ -40,9 +45,6 @@ class AquariumController extends Controller
                 $btn = '
                     <a class="px-1" href="'.route('admin.aquarium.show', $row->id).'" title="Show">
                         <i class="fas fa-eye text-success fa-lg"></i>
-                    </a>
-                    <a class="px-1" href="'.route('admin.aquarium.edit', $row->id).'" title="Accept Task">
-                        <i class="fas fa-check text-secondary fa-lg"></i>
                     </a>
                 ';
 
@@ -58,11 +60,11 @@ class AquariumController extends Controller
             });
 
             $table->addColumn('vendor_code', function ($row) {
-                return $row->vendor ? $row->vendor->code : '';
+                return $row->vendor ? $row->vendor->code : $row->customer;
             });
 
             $table->editColumn('customer', function ($row) {
-                return $row->customer ? $row->customer : 'Internal';
+                return $row->vendor ? $row->vendor->code : $row->customer;
             });
 
             $table->editColumn('type', function ($row) {
@@ -78,7 +80,98 @@ class AquariumController extends Controller
             return $table->make(true);
         }
 
-        return view('admin.aquarium.index');
+        $vendors = Vendor::where('type', 'cetak')->get()->pluck('full_name', 'id')->prepend('All', '');
+
+        return view('admin.aquarium.index', compact('vendors'));
+    }
+
+    public function task(Request $request)
+    {
+        abort_if(Gate::denies('aquarium_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+
+        if ($request->ajax()) {
+            $query = PlatePrintItem::with(['plate_print', 'semester'])->where('status', 'created')
+                ->where('semester_id', setting('current_semester'));
+
+            $query->whereHas('plate_print', function ($q) use ($request) {
+                if (!empty($request->type)) {
+                    $q->where('type', $request->type);
+                }
+                if (!empty($request->vendor)) {
+                    $q->where('vendor_id', $request->vendor);
+                }
+                if (!empty($request->spk)) {
+                    $q->where('no_spk', $request->spk);
+                }
+            });
+
+            $query->select(sprintf('%s.*', (new PlatePrintItem)->table));
+            $table = Datatables::of($query);
+
+            $table->addColumn('placeholder', '&nbsp;');
+            $table->addColumn('actions', '&nbsp;');
+
+            $table->editColumn('actions', function ($row) {
+                $btn = '
+                    <a class="px-1" href="'.route('admin.aquarium.edit', $row->id).'" title="Accept Task">
+                        <i class="fas fa-check text-secondary fa-lg"></i>
+                    </a>
+                ';
+
+                // <a class="px-1" href="'.route('admin.aquarium.show', $row->plate_print_id).'" title="Show">
+                //         <i class="fas fa-eye text-success fa-lg"></i>
+                //     </a>
+
+                return $btn;
+            });
+
+            $table->addColumn('plate_print_no_spk', function ($row) {
+                return $row->plate_print ? $row->plate_print->no_spk : '';
+            });
+
+            $table->addColumn('semester_name', function ($row) {
+                return $row->semester ? $row->semester->name : '';
+            });
+
+            $table->addColumn('product_code', function ($row) {
+                return $row->product ? $row->product->name : $row->product_text;
+            });
+
+            $table->addColumn('plate_code', function ($row) {
+                return $row->plate ? $row->plate->name : 'Belum Tahu';
+            });
+
+            $table->addColumn('vendor', function ($row) {
+                return $row->plate_print->vendor ? $row->plate_print->vendor->name : $row->plate_print->customer;
+            });
+
+            $table->editColumn('estimasi', function ($row) {
+                return $row->estimasi ? $row->estimasi : '';
+            });
+
+            $table->editColumn('realisasi', function ($row) {
+                return $row->realisasi ? $row->realisasi : '';
+            });
+
+            $table->editColumn('note', function ($row) {
+                return $row->note ? $row->note : '';
+            });
+
+            $table->editColumn('status', function ($row) {
+                return $row->status ? PlatePrintItem::STATUS_SELECT[$row->status] : '';
+            });
+
+            $table->rawColumns(['actions', 'placeholder', 'plate_print', 'semester', 'product', 'plate', 'vendor']);
+
+            return $table->make(true);
+        }
+
+        $vendors = Vendor::where('type', 'cetak')->get()->pluck('full_name', 'id')->prepend('All', '');
+        $spks = PlatePrint::whereHas('details', function ($q) {
+            $q->where('status', 'created');
+        })->pluck('no_spk', 'id')->prepend('All', '');
+
+        return view('admin.aquarium.task', compact('vendors', 'spks'));
     }
 
     public function working(Request $request)
@@ -86,10 +179,22 @@ class AquariumController extends Controller
         abort_if(Gate::denies('aquarium_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         if ($request->ajax()) {
-            $query = PlatePrint::with(['semester', 'vendor'])->select(sprintf('%s.*', (new PlatePrint)->table));
-            $query->whereHas('details', function ($q) {
-                $q->where('status', 'accepted');
+            $query = PlatePrintItem::with(['plate_print', 'semester'])->where('status', 'accepted')
+                ->where('plate_print_items.semester_id', setting('current_semester'));
+
+            $query->whereHas('plate_print', function ($q) use ($request) {
+                if (!empty($request->type)) {
+                    $q->where('type', $request->type);
+                }
+                if (!empty($request->vendor)) {
+                    $q->where('vendor_id', $request->vendor);
+                }
+                if (!empty($request->spk)) {
+                    $q->where('no_spk', $request->spk);
+                }
             });
+
+            $query->select(sprintf('%s.*', (new PlatePrintItem)->table));
             $table = Datatables::of($query);
 
             $table->addColumn('placeholder', '&nbsp;');
@@ -97,47 +202,65 @@ class AquariumController extends Controller
 
             $table->editColumn('actions', function ($row) {
                 $btn = '
-                    <a class="px-1" href="'.route('admin.aquarium.show', $row->id).'" title="Show">
-                        <i class="fas fa-eye text-success fa-lg"></i>
-                    </a>
                     <a class="px-1" href="'.route('admin.aquarium.realisasi', $row->id).'" title="Realisasi Task">
                         <i class="fas fa-tasks text-danger fa-lg"></i>
                     </a>
                 ';
 
+                // <a class="px-1" href="'.route('admin.aquarium.show', $row->plate_print_id).'" title="Show">
+                //         <i class="fas fa-eye text-success fa-lg"></i>
+                //     </a>
+
                 return $btn;
             });
 
-            $table->editColumn('no_spk', function ($row) {
-                return $row->no_spk ? $row->no_spk : '';
+            $table->addColumn('plate_print_no_spk', function ($row) {
+                return $row->plate_print ? $row->plate_print->no_spk : '';
             });
 
             $table->addColumn('semester_name', function ($row) {
                 return $row->semester ? $row->semester->name : '';
             });
 
-            $table->addColumn('vendor_code', function ($row) {
-                return $row->vendor ? $row->vendor->code : '';
+            $table->addColumn('product_code', function ($row) {
+                return $row->product ? $row->product->name : $row->product_text;
             });
 
-            $table->editColumn('customer', function ($row) {
-                return $row->customer ? $row->customer : 'Internal';
+            $table->addColumn('plate_code', function ($row) {
+                return $row->plate ? $row->plate->name : 'Belum Tahu';
             });
 
-            $table->editColumn('type', function ($row) {
-                return $row->type ? PlatePrint::TYPE_SELECT[$row->type] : '';
+            $table->addColumn('vendor', function ($row) {
+                return $row->plate_print->vendor ? $row->plate_print->vendor->name : $row->plate_print->customer;
             });
 
-            $table->editColumn('fee', function ($row) {
-                return $row->fee ? $row->fee : '';
+            $table->editColumn('estimasi', function ($row) {
+                return $row->estimasi ? $row->estimasi : '';
             });
 
-            $table->rawColumns(['actions', 'placeholder', 'semester', 'vendor']);
+            $table->editColumn('realisasi', function ($row) {
+                return $row->realisasi ? $row->realisasi : '';
+            });
+
+            $table->editColumn('note', function ($row) {
+                return $row->note ? $row->note : '';
+            });
+
+            $table->editColumn('status', function ($row) {
+                return $row->status ? PlatePrintItem::STATUS_SELECT[$row->status] : '';
+            });
+
+            $table->rawColumns(['actions', 'placeholder', 'plate_print', 'semester', 'product', 'plate', 'vendor']);
 
             return $table->make(true);
         }
 
-        return view('admin.aquarium.working');
+        $vendors = Vendor::where('type', 'cetak')->get()->pluck('full_name', 'id')->prepend('All', '');
+        $spks = PlatePrint::whereHas('details', function ($q) {
+            $q->where('status', 'accepted');
+        })->pluck('no_spk', 'id')->prepend('All', '');
+
+        return view('admin.aquarium.working', compact('vendors', 'spks'));
     }
 
 
@@ -160,6 +283,29 @@ class AquariumController extends Controller
     }
 
     public function edit($id)
+    {
+        abort_if(Gate::denies('aquarium_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+
+        $plate_item = PlatePrintItem::with('plate')->find($id);
+
+        $platePrint = PlatePrint::find($plate_item->plate_print_id);
+        $platePrint->load('semester', 'vendor');
+
+        $semesters = Semester::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $vendors = Vendor::pluck('code', 'id')->prepend(trans('global.pleaseSelect'), '');
+
+        if ($platePrint->vendor_id) {
+            $materials = Material::where('category', 'plate')->whereHas('vendors', function ($q) use ($platePrint) {
+                $q->where('id', $platePrint->vendor_id);
+            })->orderBy('code', 'ASC')->pluck('name', 'id');
+        } else {
+            $materials = Material::where('category', 'plate')->orderBy('code', 'ASC')->pluck('name', 'id');
+        }
+
+        return view('admin.aquarium.edit-new', compact('platePrint', 'plate_item', 'semesters', 'vendors', 'materials'));
+    }
+
+    public function editbackup($id)
     {
         abort_if(Gate::denies('aquarium_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
@@ -277,82 +423,76 @@ class AquariumController extends Controller
     {
         abort_if(Gate::denies('aquarium_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $platePrint = PlatePrint::find($id);
+        $plate_item = PlatePrintItem::with('plate')->find($id);
 
+        $platePrint = PlatePrint::find($plate_item->plate_print_id);
         $platePrint->load('semester', 'vendor');
 
-        $plate_items = PlatePrintItem::with('plate')->where('plate_print_id', $platePrint->id)->whereIn('status', ['accepted', 'done'])->get();
+        $semesters = Semester::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $vendors = Vendor::pluck('code', 'id')->prepend(trans('global.pleaseSelect'), '');
 
-        return view('admin.aquarium.realisasi', compact('platePrint', 'plate_items'));
+        if ($platePrint->vendor_id) {
+            $materials = Material::where('category', 'plate')->whereHas('vendors', function ($q) use ($platePrint) {
+                $q->where('id', $platePrint->vendor_id);
+            })->orderBy('code', 'ASC')->pluck('name', 'id');
+        } else {
+            $materials = Material::where('category', 'plate')->orderBy('code', 'ASC')->pluck('name', 'id');
+        }
+
+        return view('admin.aquarium.realisasi', compact('platePrint', 'plate_item', 'semesters', 'vendors', 'materials'));
     }
 
     public function realisasiStore(Request $request, $id)
     {
         // Validate the form data
         $validatedData = $request->validate([
-            'plate_items' => 'required|array',
-            'plate_items.*' => 'exists:plate_print_items,id',
-            'plates' => 'required|array',
-            'plates.*' => 'exists:materials,id',
             'plate_quantities' => 'required|array',
             'plate_quantities.*' => 'numeric|min:1',
             'notes' => 'required|array',
             'dones' => 'required|array',
         ]);
 
-        $plate_items = $validatedData['plate_items'];
-        $plates = $validatedData['plates'];
-        $plate_quantities = $validatedData['plate_quantities'];
-        $notes = $validatedData['notes'];
-        $dones = $validatedData['dones'];
+        $plate_quantity = $validatedData['plate_quantities'];
+        $note = $validatedData['notes'];
+        $done = $validatedData['dones'];
 
-        $printPlate = PlatePrint::find($id);
+        $plate_item = PlatePrintItem::with('plate_print', 'plate')->find($id);
 
         DB::beginTransaction();
         try {
-            for ($i = 0; $i < count($plate_items); $i++) {
-                $plate_item = $plate_items[$i];
-                $plate = $plates[$i];
-                $plate_quantity = $plate_quantities[$i];
-                $note = $notes[$i];
-                $done = $dones[$i];
+            if ($plate_item->status !== 'done' && $done) {
 
-                $plate_print_item = PlatePrintItem::where('id', $plate_item)->first();
-
-                if ($plate_print_item->status == 'done' || !$done) {
-                    continue;
-                }
-
-                $cetak_item = PlatePrintItem::where('id', $plate_item)->update([
-                    'realisasi' => $plate_quantity,
-                    'note' => $note,
-                    'status' =>  $done == 1 ? 'done' : 'accepted',
-                ]);
-
-
-
-                $plate = Material::find($plate);
-
-                if ($printPlate->type == 'internal') {
+                if ($plate_item->plate_print->type == 'internal') {
 
                     $material = Material::updateOrCreate([
-                        'code' => $plate->code.'|'. $plate_print_item->product->code,
+                        'code' => $plate_item->plate->code.'|'. $plate_item->product->code,
                     ], [
-                        'name' => $plate->name .' ('. $plate_print_item->product->name .')',
+                        'name' => $plate_item->plate->name .' ('. $plate_item->product->name .')',
                         'category' => 'printed_plate',
-                        'unit_id' => $plate->unit_id,
+                        'unit_id' => $plate_item->plate->unit_id,
                         'cost' => 0,
-                        'stock' => DB::raw("stock + $plate_print_item->estimasi"),
+                        'stock' => DB::raw("stock + $plate_item->estimasi"),
                         'warehouse_id' => 3,
                     ]);
-
-                    $material->vendors()->syncWithoutDetaching($printPlate->vendor_id);
-
-                    StockService::createMovementMaterial('in', 'plating', $printPlate->id, $printPlate->date, $material->id, $plate_print_item->estimasi);
+    
+                    $material->vendors()->syncWithoutDetaching($plate_item->plate_print->vendor_id);
+    
+                    StockService::createMovementMaterial('in', 'plating', $plate_item->plate_print->id, $plate_item->plate_print->date, $plate_item->plate->id, $plate_item->estimasi);
                 }
-
-                StockService::printPlate($printPlate->id, $printPlate->date, $plate->id, $plate_quantity);
+    
+                StockService::printPlate($plate_item->plate_print->id, $plate_item->plate_print->date, $plate_item->plate->id, $plate_quantity);
+            
+            } else if ($plate_item->status == 'done' && $plate_quantity > $plate_item->realisasi) {
+                
+                $qty = $plate_quantity - $plate_item->realisasi;
+                StockService::printPlate($plate_item->plate_print->id, $plate_item->plate_print->date, $plate_item->plate->id, $qty);
             }
+
+            $plate_item->update([
+                'realisasi' => $plate_quantity,
+                'note' => $note,
+                'status' =>  $done == 1 ? 'done' : 'accepted',
+            ]);
 
             DB::commit();
 

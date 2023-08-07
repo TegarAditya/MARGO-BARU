@@ -91,6 +91,7 @@
                                     <th class="text-center px-2" width="20%">Plate</th>
                                     <th class="text-center px-2" width="10%">Estimasi</th>
                                     <th class="text-center px-2"  width="10%">Status</th>
+                                    <th></th>
                                 </tr>
                             </thead>
 
@@ -108,6 +109,21 @@
                                         <td class="text-center px-2">{{ $item->plate ? $item->plate->name : 'Belum Tahu' }}</td>
                                         <td class="text-center px-2">{{ angka($item->estimasi) }}</td>
                                         <td class="text-center px-2">{{ App\Models\PlatePrintItem::STATUS_SELECT[$item->status] ?? '' }}</td>
+                                        <td class="text-center px-2">
+                                            @if ($item->status == 'created')
+                                            <a class="px-1" href="{{ route('admin.aquarium.edit', $item->id) }}" title="Accept Task">
+                                                <i class="fas fa-check text-primary fa-lg"></i>
+                                            </a>
+                                            @elseif ($item->status == 'accepted')
+                                                <a class="px-1" href=" {{ route('admin.aquarium.realisasi', $item->id) }}" title="Realisasi Task">
+                                                    <i class="fas fa-tasks text-warning fa-lg"></i>
+                                                </a>    
+                                            @else
+                                                <a class="px-1" href=" {{ route('admin.aquarium.realisasi', $item->id) }}" title="Edit Realisasi Task">
+                                                    <i class="fas fa-edit text-danger fa-lg"></i>
+                                                </a>  
+                                            @endif
+                                        </td>
                                     </tr>
                                 @endforeach
                             </tbody>
@@ -115,6 +131,7 @@
                                 <tr>
                                     <td class="text-center px-3" colspan="3"><strong>Total</strong></td>
                                     <td class="text-center px-2"><strong>{{ angka($totalplate) }}</strong></td>
+                                    <td></td>
                                     <td></td>
                                 </tr>
                             </tfoot>

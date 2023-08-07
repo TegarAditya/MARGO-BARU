@@ -245,6 +245,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     // Aquarium
     Route::get('aquarium/realisasi/{plate}', 'AquariumController@realisasi')->name('aquarium.realisasi');
     Route::put('aquarium/realisasi/{plate}', 'AquariumController@realisasiStore')->name('aquarium.realisasiStore');
+    Route::get('aquarium/task', 'AquariumController@task')->name('aquarium.task');
     Route::get('aquarium/working', 'AquariumController@working')->name('aquarium.working');
     Route::resource('aquarium', 'AquariumController', ['except' => ['create', 'store', 'destroy']]);
 

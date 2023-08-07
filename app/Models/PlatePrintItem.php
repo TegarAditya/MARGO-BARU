@@ -27,6 +27,7 @@ class PlatePrintItem extends Model
 
     protected $fillable = [
         'plate_print_id',
+        'surat_jalan_id',
         'semester_id',
         'product_id',
         'product_text',
