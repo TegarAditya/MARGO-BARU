@@ -18,6 +18,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Yajra\DataTables\Facades\DataTables;
 use DB;
 use Alert;
+use Carbon\Carbon;
 use App\Services\TransactionService;
 use App\Services\DeliveryService;
 
@@ -118,7 +119,9 @@ class InvoiceController extends Controller
 
         $no_faktur = Invoice::generateNoInvoice(setting('current_semester'));
 
-        return view('admin.invoices.create', compact('delivery_orders', 'salespeople', 'semesters', 'no_faktur'));
+        $today = Carbon::now()->format('d-m-Y');
+
+        return view('admin.invoices.create', compact('delivery_orders', 'salespeople', 'semesters', 'no_faktur', 'today'));
     }
 
     public function generate(DeliveryOrder $delivery)
@@ -139,7 +142,9 @@ class InvoiceController extends Controller
 
         $no_faktur = Invoice::generateNoInvoice($delivery->semester_id);
 
-        return view('admin.invoices.generate', compact('delivery', 'delivery_item', 'no_faktur'));
+        $today = Carbon::now()->format('d-m-Y');
+
+        return view('admin.invoices.generate', compact('delivery', 'delivery_item', 'no_faktur', 'today'));
     }
 
     public function store(Request $request)

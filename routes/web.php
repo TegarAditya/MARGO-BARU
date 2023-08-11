@@ -249,6 +249,13 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     Route::get('aquarium/working', 'AquariumController@working')->name('aquarium.working');
     Route::resource('aquarium', 'AquariumController', ['except' => ['create', 'store', 'destroy']]);
 
+    // Delivery Plate
+    Route::delete('delivery-plates/destroy', 'DeliveryPlateController@massDestroy')->name('delivery-plates.massDestroy');
+    Route::get('delivery-plates/print-sj/{deliveryPlate}', 'DeliveryPlateController@printSj')->name('delivery-plates.printSj');
+    Route::get('delivery-plates/get-plateitems', 'DeliveryPlateController@getPlateItems')->name('delivery-plates.getPlateItems');
+    Route::get('delivery-plates/get-info-plateitem', 'DeliveryPlateController@getInfoPlateItem')->name('delivery-plates.getInfoPlateItem');
+    Route::resource('delivery-plates', 'DeliveryPlateController');
+
     // Sales Billing
     Route::resource('sales-billings', 'SalesBillingController');
 
@@ -265,9 +272,8 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     // Transaction Total
     Route::resource('transaction-totals', 'TransactionTotalController', ['except' => ['create', 'store', 'edit', 'update', 'destroy']]);
 
-    // Sales Report
+    // Sales Report //Udah tak delete model e, nanti buat laporan aja ini
     Route::delete('sales-reports/destroy', 'SalesReportController@massDestroy')->name('sales-reports.massDestroy');
-    Route::post('sales-reports/generate', 'SalesReportController@generate')->name('sales-reports.generate');
     Route::resource('sales-reports', 'SalesReportController');
 
     // Production Estimation

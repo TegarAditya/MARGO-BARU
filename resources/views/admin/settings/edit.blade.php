@@ -10,6 +10,18 @@
         <form method="POST" action="{{ route("admin.settings.update", [$setting->id]) }}" enctype="multipart/form-data">
             @method('PUT')
             @csrf
+            @if ($setting->key == 'current_semester')
+                <div class="form-group">
+                    <label>{{ trans('cruds.salesOrder.fields.semester') }}</label>
+                    <input type="hidden" name="key" value="{{ $setting->key }}">
+                    <input type="hidden" name="is_json" value="0">
+                    <select class="form-control select2 {{ $errors->has('value') ? 'is-invalid' : '' }}" name="value" id="value">
+                        @foreach($semesters as $id => $entry)
+                            <option value="{{ $id }}" {{ (old('value') ? old('value') : $setting->value ?? '') == $id ? 'selected' : '' }}>{{ $entry }}</option>
+                        @endforeach
+                    </select>
+                </div>
+            @else
             <div class="form-group">
                 <label class="required" for="key">{{ trans('cruds.setting.fields.key') }}</label>
                 <input class="form-control {{ $errors->has('key') ? 'is-invalid' : '' }}" type="text" name="key" id="key" value="{{ old('key', $setting->key) }}" required>
@@ -37,6 +49,7 @@
                 @endif
                 <span class="help-block">{{ trans('cruds.setting.fields.is_json_helper') }}</span>
             </div>
+            @endif
             <div class="form-group">
                 <button class="btn btn-danger" type="submit">
                     {{ trans('global.save') }}

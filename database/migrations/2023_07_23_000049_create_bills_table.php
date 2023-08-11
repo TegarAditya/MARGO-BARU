@@ -17,6 +17,9 @@ class CreateBillsTable extends Migration
             $table->decimal('bayar', 15, 2)->default(0);
             $table->decimal('potongan', 15, 2)->default(0);
             $table->decimal('saldo_akhir', 15, 2);
+            $table->decimal('tagihan', 15, 2)->default(0);
+            $table->decimal('pembayaran', 15, 2)->default(0);
+            $table->decimal('piutang', 15, 2)->default(0);
             $table->timestamps();
             $table->softDeletes();
         });

@@ -18,7 +18,7 @@
 
 <div class="card">
     <div class="card-header">
-        {{ trans('cruds.bill.title_singular') }} {{ trans('global.list') }}
+        <strong>REKAP BILLING {{ App\Models\Semester::find(setting('current_semester'))->name }}</strong>
     </div>
     <div class="card-body">
         <form action="{{ route("admin.bills.jangka") }}" enctype="multipart/form-data" method="POST">

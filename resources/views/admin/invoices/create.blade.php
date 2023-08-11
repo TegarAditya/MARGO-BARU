@@ -29,7 +29,7 @@
                 <div class="col-6">
                     <div class="form-group">
                         <label class="required" for="date">{{ trans('cruds.invoice.fields.date') }}</label>
-                        <input class="form-control date {{ $errors->has('date') ? 'is-invalid' : '' }}" type="text" name="date" id="date" value="{{ old('date') }}" required>
+                        <input class="form-control date {{ $errors->has('date') ? 'is-invalid' : '' }}" type="text" name="date" id="date" value="{{ old('date', $today) }}" required>
                         @if($errors->has('date'))
                             <span class="text-danger">{{ $errors->first('date') }}</span>
                         @endif

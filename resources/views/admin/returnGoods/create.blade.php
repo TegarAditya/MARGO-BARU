@@ -30,7 +30,7 @@
                 <div class="col-6">
                     <div class="form-group">
                         <label class="required" for="date">{{ trans('cruds.returnGood.fields.date') }}</label>
-                        <input class="form-control date {{ $errors->has('date') ? 'is-invalid' : '' }}" type="text" name="date" id="date" value="{{ old('date') }}" required>
+                        <input class="form-control date {{ $errors->has('date') ? 'is-invalid' : '' }}" type="text" name="date" id="date" value="{{ old('date', $today) }}" required>
                         @if($errors->has('date'))
                             <span class="text-danger">{{ $errors->first('date') }}</span>
                         @endif
@@ -42,7 +42,7 @@
                         <label class="required" for="semester_id">{{ trans('cruds.returnGood.fields.semester') }}</label>
                         <select class="form-control select2 {{ $errors->has('semester') ? 'is-invalid' : '' }}" name="semester_id" id="semester_id" required>
                             @foreach($semesters as $id => $entry)
-                                <option value="{{ $id }}" {{ old('semester_id') == $id ? 'selected' : '' }}>{{ $entry }}</option>
+                                <option value="{{ $id }}" {{ old('semester_id', setting('current_semester')) == $id ? 'selected' : '' }}>{{ $entry }}</option>
                             @endforeach
                         </select>
                         @if($errors->has('semester'))

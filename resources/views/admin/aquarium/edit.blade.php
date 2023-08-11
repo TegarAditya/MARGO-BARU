@@ -7,6 +7,13 @@
     </div>
 
     <div class="card-body">
+
+        @if (session()->has('error-message'))
+            <p class="text-danger">
+                {{session()->get('error-message')}}
+            </p>
+        @endif
+
         <form method="POST" action="{{ route("admin.aquarium.update", [$platePrint->id]) }}" enctype="multipart/form-data">
             @method('PUT')
             @csrf

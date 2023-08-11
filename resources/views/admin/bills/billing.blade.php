@@ -7,7 +7,7 @@
 </div>
 <div class="card">
     <div class="card-header">
-        <strong>BILLING PERIODE {{ $start->format('d F Y') }} - {{ $end->format('d F Y') }}</strong>
+        <strong>REKAP PIUTANG PERIODE {{ $start->format('d F Y') }} - {{ $end->format('d F Y') }}</strong>
     </div>
     <div class="card-body">
         <div class="table-responsive">
@@ -27,6 +27,7 @@
                 </thead>
                 <tbody>
                 @php
+                    $total_awal = 0;
                     $total_pengambilan = 0;
                     $total_diskon = 0;
                     $total_retur = 0;
@@ -39,6 +40,7 @@
                         $awal = $saldo_awal->where('id', $item->id)->first();
                         $pertama = $awal->pengambilan - ($awal->diskon + $awal->retur + $awal->bayar + $awal->potongan);
 
+                        $total_awal += $pertama;
                         $total_pengambilan += $item->pengambilan;
                         $total_diskon += $item->diskon;
                         $total_retur += $item->retur;
@@ -63,9 +65,10 @@
                 </tbody>
                 <tfoot>
                     <tr>
-                        <td colspan="3" class="text-center">
+                        <td colspan="2" class="text-center">
                             <strong>Total</strong>
                         </td>
+                        <td class="text-right">{{ money($total_awal) }}</td>
                         <td class="text-right">{{ money($total_pengambilan) }}</td>
                         <td class="text-right">{{ money($total_diskon) }}</td>
                         <td class="text-right">{{ money($total_retur) }}</td>

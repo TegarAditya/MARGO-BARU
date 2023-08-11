@@ -7,6 +7,12 @@
     </div>
 
     <div class="card-body">
+        @if (session()->has('error-message'))
+            <p class="text-danger">
+                {{session()->get('error-message')}}
+            </p>
+        @endif
+
         <form method="POST" action="{{ route("admin.aquarium.realisasiStore", [$plate_item->id]) }}" enctype="multipart/form-data">
             @method('PUT')
             @csrf
@@ -121,8 +127,8 @@
                                     <p class="mb-0 text-sm">Quantity Pesan</p>
                                     <div class="form-group text-field m-0">
                                         <div class="text-field-input px-2 py-0">
-                                            <input class="estimasi_quantity" type="hidden" name="estimasi_quantities[]" value="{{ $plate_item->estimasi }}">
-                                            <input class="form-control text-center estimasi_quantity_text" type="text" name="estimasi_quantity_text[]" value="{{ angka($plate_item->estimasi) }}" tabindex="-1" readonly>
+                                            <input class="estimasi_quantity" type="hidden" name="estimasi_quantity" value="{{ $plate_item->estimasi }}">
+                                            <input class="form-control text-center estimasi_quantity_text" type="text" name="estimasi_quantity_text" value="{{ angka($plate_item->estimasi) }}" tabindex="-1" readonly>
                                             <label class="text-field-border"></label>
                                         </div>
                                     </div>
@@ -131,8 +137,8 @@
                                     <p class="mb-0 text-sm">Realisasi</p>
                                     <div class="form-group text-field m-0">
                                         <div class="text-field-input px-2 py-0">
-                                            <input class="plate_quantity" type="hidden" name="plate_quantities[]" value="{{ $plate_item->realisasi }}">
-                                            <input class="form-control text-center plate_quantity_text" type="text" name="plate_quantity_text[]" value="{{ angka($plate_item->realisasi) }}" data-min="{{ $plate_item->realisasi }}" required>
+                                            <input class="plate_quantity" type="hidden" name="plate_quantity" value="{{ $plate_item->realisasi }}">
+                                            <input class="form-control text-center plate_quantity_text" type="text" name="plate_quantity_text" value="{{ angka($plate_item->realisasi) }}" data-min="{{ $plate_item->realisasi }}" required>
                                             <label class="text-field-border"></label>
                                         </div>
                                     </div>
@@ -142,7 +148,7 @@
                                 <div class="col" style="min-width: 100px">
                                     <div class="form-group text-field m-0">
                                         <p class="mb-0 text-sm">Catatan</p>
-                                        <textarea style="min-height: 50px !important" class="form-control" name="notes[]">{{ $plate_item->note }}</textarea>
+                                        <textarea style="min-height: 50px !important" class="form-control" name="note">{{ $plate_item->note }}</textarea>
                                     </div>
                                 </div>
                             </div>
@@ -151,7 +157,7 @@
                             <div class="col-auto" style="max-width: 200px">
                                 <div class="form-group text-field m-0">
                                     <div class="text-field-input">
-                                        <input class="done" type="hidden" name="dones[]" value="{{ $plate_item->status == 'done' ? 1 : 0 }}">
+                                        <input class="done" type="hidden" name="done" value="{{ $plate_item->status == 'done' ? 1 : 0 }}">
                                         <input class="status bootstrap-switch" type="checkbox" tabindex="-1" value="1" {{ $plate_item->status == 'done' ? 'checked readonly' : '' }} data-on-text="DONE" data-off-text="N/Y">
                                     </div>
                                 </div>
@@ -209,7 +215,7 @@
             plateQuantity.on('change', function(e) {
                 var el = $(e.currentTarget);
                 var valueNum = parseInt(el.val());
-                var min = parseInt(plateQuantityText.data('min'));  
+                var min = parseInt(plateQuantityText.data('min'));
                 if (valueNum < min) {
                     el.val(min);
                     plateQuantityText.val(min).trigger('change');

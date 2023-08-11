@@ -20,6 +20,7 @@ use Yajra\DataTables\Facades\DataTables;
 use DB;
 use Alert;
 use App\Services\TransactionService;
+use Carbon\Carbon;
 
 class PaymentController extends Controller
 {
@@ -104,7 +105,9 @@ class PaymentController extends Controller
 
         $salespeople = Salesperson::get()->pluck('full_name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
-        return view('admin.payments.create', compact('salespeople', 'semesters'));
+        $today = Carbon::now()->format('d-m-Y');
+
+        return view('admin.payments.create', compact('salespeople', 'semesters', 'today'));
     }
 
     public function store(Request $request)
@@ -130,38 +133,50 @@ class PaymentController extends Controller
         $nominal = $validatedData['nominal'];
         $note = $validatedData['note'];
 
-        $bills = collect([]);
-        $bill = Bill::with('semester')->where('salesperson_id', $salesperson)->where('semester_id', $semester)->first();
-        $bills->push($bill);
-        while($bill->saldo_awal > 0) {
-            $semester = prevSemester($semester);
-            $bill = Bill::with('semester')->where('salesperson_id', $salesperson)->where('semester_id', $semester)->first();
-            $bills->push($bill);
-        }
+        $before = Bill::with('semester')->where('salesperson_id', $salesperson)->whereNot('semester_id', $semester)->where('piutang', '>' , 0)->oldest()->get();
 
         DB::beginTransaction();
         try {
-            foreach($bills->sortBy('created_at') as $bill) {
-                if ($bayar > 0) {
-                    $saldo = $bill->saldo_akhir - $diskon;
-                    $paid = ($bayar < $saldo) ? $bayar : $saldo;
-                    $payment = Payment::create([
-                        'no_kwitansi' => Payment::generateNoKwitansi($bill->semester_id),
-                        'date' => $date,
-                        'salesperson_id' => $salesperson,
-                        'semester_id' => $bill->semester_id,
-                        'paid' => $paid,
-                        'discount' => $diskon,
-                        'amount' => $paid - $diskon,
-                        'payment_method' => $payment_method,
-                        'note' => $note
-                    ]);
-                    TransactionService::createTransaction($date, $note, $salesperson, $bill->semester_id, 'bayar', $payment->id, $payment->no_kwitansi, $paid, 'credit');
-                    TransactionService::createTransaction($date, $note, $salesperson, $bill->semester_id, 'potongan', $payment->id, $payment->no_kwitansi, $diskon, 'credit');
+            if ($before->count() > 0) {
+                foreach($before as $bill) {
+                    if ($bayar > 0) {
+                        $paid = ($bayar < $bill->piutang) ? $bayar : $bill->piutang;
+                        $payment = Payment::create([
+                            'no_kwitansi' => Payment::generateNoKwitansi($bill->semester_id),
+                            'date' => $date,
+                            'salesperson_id' => $salesperson,
+                            'semester_id' => $bill->semester_id,
+                            'semester_bayar_id' => setting('current_semester'),
+                            'paid' => $paid,
+                            'discount' => 0,
+                            'amount' => $paid,
+                            'payment_method' => $payment_method,
+                            'note' => $note
+                        ]);
 
-                    $bayar -= $paid;
-                    $diskon -= $diskon;
+                        TransactionService::createTransaction($date, $note, $salesperson, $bill->semester_id, 'bayar', $payment->id, $payment->no_kwitansi, $paid, 'credit');
+                        TransactionService::createTransaction($date, $note, $salesperson, $bill->semester_id, 'potongan', $payment->id, $payment->no_kwitansi, 0, 'credit');
+
+                        $bayar -= $paid;
+                    }
                 }
+            }
+            if ($bayar > 0 || $diskon > 0) {
+                $payment = Payment::create([
+                    'no_kwitansi' => Payment::generateNoKwitansi(setting('current_semester')),
+                    'date' => $date,
+                    'salesperson_id' => $salesperson,
+                    'semester_id' => setting('current_semester'),
+                    'semester_bayar_id' => setting('current_semester'),
+                    'paid' => $bayar,
+                    'discount' => $diskon,
+                    'amount' => $bayar + $diskon,
+                    'payment_method' => $payment_method,
+                    'note' => $note
+                ]);
+
+                TransactionService::createTransaction($date, $note, $salesperson, setting('current_semester'), 'bayar', $payment->id, $payment->no_kwitansi, $bayar, 'credit');
+                TransactionService::createTransaction($date, $note, $salesperson, setting('current_semester'), 'potongan', $payment->id, $payment->no_kwitansi, $diskon, 'credit');
             }
             DB::commit();
 
@@ -279,14 +294,22 @@ class PaymentController extends Controller
         $bills = collect([]);
 
         $bill = Bill::with('semester')->where('salesperson_id', $request->salesperson)->where('semester_id', $semester)->first();
-        $bills->push($bill);
-        while($bill->saldo_awal > 0) {
-            $semester = prevSemester($semester);
-            $bill = Bill::with('semester')->where('salesperson_id', $request->salesperson)->where('semester_id', $semester)->first();
+        if ($bill) {
             $bills->push($bill);
         }
+        do {
+            $semester = prevSemester($semester);
+            $bill = Bill::with('semester')->where('salesperson_id', $request->salesperson)->where('semester_id', $semester)->first();
+            if ($bill && $bill->piutang > 0) {
+                $bills->push($bill);
+            }
+        } while($bill && $bill->piutang > 0);
 
-        return response()->json($bills);
+        if ($bills->count() > 0) {
+            return response()->json(['status' => 'success', 'bills' => $bills]);
+        } else {
+            return response()->json(['status' => 'error']);
+        }
     }
 
     public function kwitansi(Payment $payment)

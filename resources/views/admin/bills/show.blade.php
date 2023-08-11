@@ -7,7 +7,7 @@
 </div>
 <div class="card">
     <div class="card-header">
-        Show Billing Sales
+        <strong>BILLING #{{ $salesperson->full_name }} #{{ $semester->name }}</strong>
     </div>
 
     <div class="card-body">
@@ -16,15 +16,60 @@
 
             <div class="breadcrumb-nav">
                 <ul class="m-0 border-bottom">
+                    @if($bills->count() > 0)
+                        <li><a href="#modelTagihan">Saldo Hutang</a></li>
+                    @endif
                     <li><a href="#modelInvoice">Faktur Penjualan</a></li>
                     <li><a href="#modelRetur">Faktur Retur</a></li>
                     <li><a href="#modelBayar">Pembayaran</a></li>
                     <li><a href="#modelResume">Resume Tagihan</a></li>
-                    @foreach ($bills as $bill)
-                        <li><a href="#modelSemester{{ $bill->semester_id }}">{{ $bill->semester->name }}</a></li>
+                    @foreach ($bills as $item)
+                        <li><a href="#modelSemester{{ $item->semester_id }}">{{ $item->semester->name }}</a></li>
                     @endforeach
                 </ul>
             </div>
+
+            @if($bills->count() > 0)
+                {{-- Saldo Sebelumnya --}}
+                <section class="border-top py-3 mt-5" id="modelTagihan">
+                    <div class="row mb-2">
+                        <div class="col">
+                            <h6>Daftar Saldo Hutang</h6>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-body">
+                            <table class="table table-bordered table-hover m-0">
+                                <thead>
+                                    <tr>
+                                        <th class="text-center" width="1%">No.</th>
+                                        <th class="text-center">Semester</th>
+                                        <th class="text-center" width="35%">Saldo Hutang</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    @foreach ($bills as $bill)
+                                        <tr>
+                                            <td class="text-right px-3">{{ $loop->iteration }}.</td>
+                                            <td class="text-center">{{ $bill->semester->name }}</td>
+                                            <td class="text-center"><strong>{{ money($bill->saldo_akhir) }}</strong></td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+
+                                <tfoot>
+                                    <tr>
+                                        <td colspan="2" class="text-center">Total</td>
+                                        <td class="text-center"><strong>{{ money($bills->sum('saldo_akhir')) }}</strong></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+            @endif
 
             {{-- Invoice --}}
             <section class="border-top py-3" id="modelInvoice">
@@ -216,6 +261,7 @@
                                 <table class="table table-sm table-bordered m-0">
                                     <thead>
                                         <tr>
+                                            <th class="text-center" width="1%">No.</th>
                                             <th class="text-center">Keperluan</th>
                                             <th>Catatan</th>
                                         </tr>
@@ -223,6 +269,7 @@
 
                                     <tbody>
                                         <tr>
+                                            <td class="text-right px-3">{{ $loop->iteration }}.</td>
                                             <td class="text-center">{{ App\Models\Invoice::TYPE_SELECT[$invoice->type] }}</td>
                                             <td class="text-center">{{ $invoice->note }}</td>
                                         </tr>
@@ -254,7 +301,7 @@
                         <p class="mb-0">
                             <span>Total Invoice</span>
                             <br />
-                            <span class="h5 mb-0 invoice-total">{{ money($invoices->sum('total')) }}</span>
+                            <span class="h5 mb-0 invoice-total"><strong>{{ money($invoices->sum('total')) }}</strong></span>
                         </p>
                     </div>
 
@@ -262,7 +309,7 @@
                         <p class="mb-0">
                             <span>Total Discount</span>
                             <br />
-                            <span class="h5 mb-0 invoice-diskon">{{ money($invoices->sum('discount')) }}</span>
+                            <span class="h5 mb-0 invoice-diskon"><strong>{{ money($invoices->sum('discount')) }}</strong></span>
                         </p>
                     </div>
                 </div>
@@ -387,9 +434,30 @@
 
                 <div class="border-top mt-2 pt-2 text-right ml-5">
                     <p class="m-0">Total Faktur Retur</p>
-                    <h5 class="m-0">{{ money($returs->sum('nominal')) }}</h5>
+                    <h5 class="m-0"><strong>{{ money($returs->sum('nominal')) }}</strong></h5>
                 </div>
             </section>
+
+            <div class="row text-right my-4">
+                <div class="col text-left">
+                    <h6 class="m-0">Total Tagihan</h6>
+                </div>
+
+                @php
+                    $faktur = $invoices->sum('total');
+                    $diskon = $invoices->sum('discount');
+                    $retur = $returs->sum('nominal');
+                    $tagihan = $faktur - ($diskon + $retur);
+                @endphp
+
+                <div class="col-auto">
+                    <p class="mb-0">
+                        <span>Total Tagihan</span>
+                        <br />
+                        <span class="h5 mb-0 tagihan-total"><strong>{{ money($tagihan) }}</strong></span>
+                    </p>
+                </div>
+            </div>
 
             {{--Pembayaran --}}
             <section class="border-top py-3 mt-5" id="modelBayar">
@@ -411,6 +479,7 @@
                             <th class="text-center" width="1%">No.</th>
                             <th>No. Kwitansi</th>
                             <th class="text-center px-3" width="100">Tanggal</th>
+                            <th class="text-center px-3">Semester</th>
                             <th class="text-center px-3" width="20%">Bayar</th>
                             <th class="text-center px-3" width="15%">Diskon</th>
                         </tr>
@@ -436,7 +505,8 @@
                                         </div>
                                     </div>
                                 </td>
-                                <td>{{ $pembayaran->date }}</td>
+                                <td class="text-center px-2">{{ $pembayaran->date }}</td>
+                                <td class="text-center">{{ $pembayaran->semester->name }}</td>
                                 <td class="text-right px-3">{{ money($pembayaran->paid) }}</td>
                                 <td class="text-right px-3">
                                     <span>{{ money($pembayaran->discount) }}</span>
@@ -444,14 +514,14 @@
                             </tr>
                         @empty
                             <tr>
-                                <td class="px-3" colspan="5">Belum ada pembayaran</td>
+                                <td class="px-3" colspan="6">Belum ada pembayaran</td>
                             </tr>
                         @endforelse
                     </tbody>
 
                     <tfoot>
                         <tr>
-                            <td class="text-right px-3" colspan="3">
+                            <td class="text-center px-3" colspan="4">
                                 <strong>Total</strong>
                             </td>
                             <td class="text-right px-3">
@@ -475,7 +545,7 @@
                         <p class="mb-0">
                             <span>Total Pembayaran</span>
                             <br />
-                            <span class="h5 mb-0 pembayaran-total">{{ money($payments->sum('paid')) }}</span>
+                            <span class="h5 mb-0 pembayaran-total"><strong>{{ money($payments->sum('paid')) }}</strong></span>
                         </p>
                     </div>
 
@@ -483,7 +553,7 @@
                         <p class="mb-0">
                             <span>Total Potongan</span>
                             <br />
-                            <span class="h5 mb-0 pembayaran-diskon">{{ money($payments->sum('discount')) }}</span>
+                            <span class="h5 mb-0 pembayaran-diskon"><strong>{{ money($payments->sum('discount')) }}</strong></span>
                         </p>
                     </div>
                 </div>
@@ -497,53 +567,75 @@
                     $total_retur = $returs->sum('nominal');
                     $total_bayar = $payments->sum('paid');
                     $total_potongan = $payments->sum('discount');
-                    $tagihan = $total_faktur - ($total_diskon + $total_retur + $total_bayar + $total_potongan);
+                    $saldo_sebelumnya = $bills->sum('saldo_akhir');
+                    $total_utang = $saldo_sebelumnya + $total_faktur - ($total_diskon + $total_retur + $total_bayar + $total_potongan);
                 @endphp
                 <div class="row mb-2">
                     <div class="col">
-                        <h6>Detail Tagihan</h6>
+                        <h6>Resume</h6>
                     </div>
                 </div>
 
-                <table class="table table-bordered table-hover m-0">
-                    <thead>
-                        <tr>
-                            <th class="text-center px-3" width="25%">Total Faktur Penjualan</th>
-                            <th class="text-center px-3" width="15%">Total Diskon</th>
-                            <th class="text-center px-3" width="20%">Total Faktur Retur</th>
-                            <th class="text-center px-3" width="25%">Total Pembayaran</th>
-                            <th class="text-center px-3" width="15%">Total Potongan</th>
-                        </tr>
-                    </thead>
+                <div class="card">
+                    <div class="card-body">
+                        <table class="table table-bordered table-hover m-0">
+                            <thead>
+                                <tr>
+                                    <th class="text-center" width="1%">No.</th>
+                                    <th class="text-center">Total Of</th>
+                                    <th class="text-center" width="35%">Amount</th>
+                                </tr>
+                            </thead>
 
-                    <tbody>
-                            <tr>
-                                <td class="text-right px-3"><strong>{{ money($total_faktur) }}</strong></td>
-                                <td class="text-right px-3"><strong>{{ money($total_diskon) }}</strong></td>
-                                <td class="text-right px-3"><strong>{{ money($total_retur) }}</strong></td>
-                                <td class="text-right px-3"><strong>{{ money($total_bayar) }}</strong></td>
-                                <td class="text-right px-3"><strong>{{ money($total_potongan) }}</strong></td>
-                            </tr>
-                    </tbody>
-
-                    <tfoot>
-                        <tr>
-                            <td class="text-center px-3" colspan="2">
-                                <strong>Sisa Tagihan</strong>
-                            </td>
-                            <td class="text-center px-3" colspan="3">
-                                <strong>{{ money($tagihan) }}</strong>
-                            </td>
-                        </tr>
-                    </tfoot>
-                </table>
+                            <tbody>
+                                @if($saldo_sebelumnya)
+                                <tr>
+                                    <td class="text-right px-3">1.</td>
+                                    <td class="text-center">Saldo Hutang</td>
+                                    <td class="text-right px-3"><strong>{{ money($saldo_sebelumnya)}}</strong></td>
+                                </tr>
+                                @endif
+                                <tr>
+                                    <td class="text-right px-3">2.</td>
+                                    <td class="text-center">Faktur Penjualan</td>
+                                    <td class="text-right px-3"><strong>{{ money($total_faktur)}}</strong></td>
+                                </tr>
+                                <tr>
+                                    <td class="text-right px-3">3.</td>
+                                    <td class="text-center">Diskon</td>
+                                    <td class="text-right px-3"><strong>{{ money($total_diskon)}}</strong></td>
+                                </tr>
+                                <tr>
+                                    <td class="text-right px-3">4.</td>
+                                    <td class="text-center">Faktur Retur</td>
+                                    <td class="text-right px-3"><strong>{{ money($total_retur)}}</strong></td>
+                                </tr>
+                                <tr>
+                                    <td class="text-right px-3">5.</td>
+                                    <td class="text-center">Pembayaran</td>
+                                    <td class="text-right px-3"><strong>{{ money($total_bayar)}}</strong></td>
+                                </tr>
+                                <tr>
+                                    <td class="text-right px-3">6.</td>
+                                    <td class="text-center">Potongan</td>
+                                    <td class="text-right px-3"><strong>{{ money($total_potongan)}}</strong></td>
+                                </tr>
+                                <tr>
+                                    <td class="text-right px-3">7.</td>
+                                    <td class="text-center">Sisa Hutang</td>
+                                    <td class="text-right px-3"><strong>{{ money($total_utang)}}</strong></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
 
                 <div class="border-top mt-2 pt-2 text-right ml-5">
-                    <p class="m-0">Sisa Tagihan</p>
-                    <h5 class="m-0">{{ money($tagihan) }}</h5>
+                    <p class="m-0">Sisa Hutang</p>
+                    <h5 class="m-0"><strong>{{ money($total_utang) }}</strong></h5>
                 </div>
             </section>
-
+            <br>
             @foreach ($bills as $bill)
                 {{--Semester --}}
                 <section class="border-top py-3 mt-5" id="modelSemester{{ $bill->semester_id }}">
@@ -553,11 +645,17 @@
                         $payments = $payments_old->where('semester_id', $bill->semester_id);
                     @endphp
 
+                    <div class="row mb-2">
+                        <div class="col">
+                            <h6>{{ $bill->semester->name }}</h6>
+                        </div>
+                    </div>
+
                     <div class="card">
                         <div class="card-body px-3 py-2">
                             <div class="row">
                                 <div class="col-6 mb-1">
-                                    <span class="badge badge-warning">Faktur Penjualan</span>
+                                    <span class="badge badge-success">Faktur Penjualan</span>
                                 </div>
 
 
@@ -598,7 +696,12 @@
                                     @forelse ($fakturs as $item)
                                         <tr>
                                             <td class="text-right px-3">{{ $loop->iteration }}.</td>
-                                            <td class="text-center px-2">{{ $item->no_spk }}</td>
+                                            <td class="text-center px-2">
+                                                {{ $item->no_faktur }}
+                                                <a href="{{ route('admin.invoices.print-faktur', $item->id) }}" title="Cetak Faktur" target="_blank" class="text-info ml-1">
+                                                    <i class="fa fa-print"></i>
+                                                </a>
+                                            </td>
                                             <td class="text-center px-2">{{ $item->date }}</td>
                                             <td class="text-right px-2">{{ money($item->total) }}</td>
                                             <td class="text-right px-2">{{ money($item->discount) }}</td>
@@ -625,7 +728,7 @@
                         <div class="card-body px-3 py-2">
                             <div class="row">
                                 <div class="col-6 mb-1">
-                                    <span class="badge badge-warning">Faktur Retur</span>
+                                    <span class="badge badge-danger">Faktur Retur</span>
                                 </div>
 
 
@@ -665,7 +768,12 @@
                                     @forelse ($returs as $item)
                                         <tr>
                                             <td class="text-right px-3">{{ $loop->iteration }}.</td>
-                                            <td class="text-center px-2">{{ $item->no_retur }}</td>
+                                            <td class="text-center px-2">
+                                                {{ $item->no_retur }}
+                                                <a href="{{ route('admin.return-goods.print-faktur', $item->id) }}" title="Cetak Faktur" target="_blank" class="text-info ml-1">
+                                                    <i class="fa fa-print"></i>
+                                                </a>
+                                            </td>
                                             <td class="text-center px-2">{{ $item->date }}</td>
                                             <td class="text-right px-2">{{ money($item->nominal) }}</td>
                                         </tr>
@@ -720,10 +828,11 @@
                                 <thead>
                                     <tr>
                                         <th class="text-center" width="1%">No.</th>
-                                        <th>No Kwitansi</th>
-                                        <th class="px-2">Date</th>
-                                        <th class="px-2">Bayar</th>
-                                        <th class="px-2">Potongan</th>
+                                        <th class="text-center">No Kwitansi</th>
+                                        <th class="text-center">Date</th>
+                                        <th class="text-center">Semester</th>
+                                        <th class="text-center">Bayar</th>
+                                        <th class="text-center">Potongan</th>
                                     </tr>
                                 </thead>
 
@@ -731,8 +840,14 @@
                                     @forelse ($payments as $item)
                                         <tr>
                                             <td class="text-right px-3">{{ $loop->iteration }}.</td>
-                                            <td class="text-center px-2">{{ $item->no_kwitansi }}</td>
-                                            <td class="text-center px-2">{{ $item->date }}</td>
+                                            <td class="text-center px-2">
+                                                {{ $item->no_kwitansi }}
+                                                <a href="{{ route('admin.payments.kwitansi', $item->id) }}" title="Cetak Pembayaran" target="_blank" class="text-info ml-1">
+                                                    <i class="fa fa-print"></i>
+                                                </a>
+                                            </td>
+                                            <td class="text-center">{{ $item->date }}</td>
+                                            <td class="text-center">{{ $item->semester->name }}</td>
                                             <td class="text-right px-2">{{ money($item->paid) }}</td>
                                             <td class="text-right px-2">{{ money($item->discount) }}</td>
                                         </tr>
@@ -752,50 +867,6 @@
                                 </tfoot>
                             </table>
                         </div>
-                    </div>
-
-                    <div class="row mb-2">
-                        <div class="col">
-                            <h6>Detail Tagihan</h6>
-                        </div>
-                    </div>
-
-                    <table class="table table-bordered table-hover m-0">
-                        <thead>
-                            <tr>
-                                <th class="text-center px-3" width="25%">Total Faktur Penjualan</th>
-                                <th class="text-center px-3" width="15%">Total Diskon</th>
-                                <th class="text-center px-3" width="20%">Total Faktur Retur</th>
-                                <th class="text-center px-3" width="25%">Total Pembayaran</th>
-                                <th class="text-center px-3" width="15%">Total Potongan</th>
-                            </tr>
-                        </thead>
-
-                        <tbody>
-                                <tr>
-                                    <td class="text-right px-3"><strong>{{ money($bill->jual) }}</strong></td>
-                                    <td class="text-right px-3"><strong>{{ money($bill->diskon) }}</strong></td>
-                                    <td class="text-right px-3"><strong>{{ money($bill->retur) }}</strong></td>
-                                    <td class="text-right px-3"><strong>{{ money($bill->bayar) }}</strong></td>
-                                    <td class="text-right px-3"><strong>{{ money($bill->potongan) }}</strong></td>
-                                </tr>
-                        </tbody>
-
-                        <tfoot>
-                            <tr>
-                                <td class="text-center px-3" colspan="2">
-                                    <strong>Sisa Tagihan</strong>
-                                </td>
-                                <td class="text-center px-3" colspan="3">
-                                    <strong>{{ money($bill->saldo_akhir) }}</strong>
-                                </td>
-                            </tr>
-                        </tfoot>
-                    </table>
-
-                    <div class="border-top mt-2 pt-2 text-right ml-5">
-                        <p class="m-0">Sisa Tagihan</p>
-                        <h5 class="m-0">{{ money($tagihan) }}</h5>
                     </div>
                 </section>
             @endforeach

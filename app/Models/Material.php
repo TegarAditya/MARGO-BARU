@@ -63,4 +63,9 @@ class Material extends Model
     {
         return $this->belongsToMany(Vendor::class);
     }
+
+    public function plate_items()
+    {
+        return $this->hasMany(PlatePrintItem::class, 'plate_id');
+    }
 }

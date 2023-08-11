@@ -27,7 +27,6 @@ class PlatePrintItem extends Model
 
     protected $fillable = [
         'plate_print_id',
-        'surat_jalan_id',
         'semester_id',
         'product_id',
         'product_text',
@@ -41,6 +40,7 @@ class PlatePrintItem extends Model
         'check_kurikulum',
         'check_kolomnama',
         'check_naskah',
+        'surat_jalan_id',
         'created_at',
         'updated_at',
         'deleted_at',

@@ -8,6 +8,9 @@ use Illuminate\Queue\InteractsWithQueue;
 use App\Models\Transaction;
 use App\Models\TransactionTotal;
 use App\Models\Bill;
+use App\Models\Payment;
+use App\Models\Invoice;
+use App\Models\ReturnGood;
 use DB;
 
 class UpdateTransactionTotal
@@ -57,7 +60,6 @@ class UpdateTransactionTotal
             ]);
         }
 
-
         $bill_amount = Transaction::where('salesperson_id', $salesperson)
                     ->where('semester_id', $semester)
                     ->select('type', DB::raw('SUM(amount) as total_amount'))
@@ -66,37 +68,48 @@ class UpdateTransactionTotal
                     ->pluck('total_amount', 'type');
 
         $bill = Bill::where('salesperson_id', $salesperson)->where('semester_id', $semester)->first();
+        $payment = Payment::selectRaw('COALESCE(SUM(paid), 0) as bayar, COALESCE(SUM(discount), 0) as potongan')->where('salesperson_id', $salesperson)->where('semester_bayar_id', $semester)->first();
 
         $faktur = $bill_amount['faktur'] ?? 0;
         $diskon = $bill_amount['diskon'] ?? 0;
         $retur = $bill_amount['retur'] ?? 0;
-        $bayar = $bill_amount['bayar'] ?? 0;
-        $potongan = $bill_amount['potongan'] ?? 0;
+        $bayar = $payment->bayar;
+        $potongan = $payment->potongan;
+
+        $pembayaran = ($bill_amount['bayar'] ?? 0) + ($bill_amount['potongan'] ?? 0);
 
         if ($bill) {
+            $saldo_awal = $bill->previous ? $bill->previous->saldo_akhir : 0;
             $bill->update([
-                'saldo_awal' => $bill->previous ? $bill->previous->saldo_akhir : 0,
+                'saldo_awal' => $saldo_awal,
                 'jual' => $faktur,
                 'diskon' => $diskon,
                 'retur' => $retur,
                 'bayar' => $bayar,
                 'potongan' => $potongan,
-                'saldo_akhir' => $faktur - ($diskon + $retur + $bayar + $potongan),
+                'saldo_akhir' => ($saldo_awal + $faktur) - ($diskon + $retur + $bayar + $potongan),
+                'tagihan' => $faktur - ($diskon + $retur),
+                'pembayaran' => $pembayaran,
+                'piutang' => ($saldo_awal + $faktur) - ($diskon + $retur + $pembayaran)
             ]);
         } else {
             $previous = Bill::where('salesperson_id', $salesperson)->where('semester_id', prevSemester($semester))->first();
 
+            $saldo_awal = $previous ? $previous->saldo_akhir : 0;
             Bill::create([
                 'semester_id' => $semester,
                 'salesperson_id' => $salesperson,
                 'previous_id' => $previous ? $previous->id : null,
-                'saldo_awal' => $previous ? $previous->saldo_akhir : 0,
+                'saldo_awal' => $saldo_awal,
                 'jual' => $faktur,
                 'diskon' => $diskon,
                 'retur' => $retur,
                 'bayar' => $bayar,
                 'potongan' => $potongan,
-                'saldo_akhir' => $faktur - ($diskon + $retur + $bayar + $potongan),
+                'saldo_akhir' => ($saldo_awal + $faktur) - ($diskon + $retur + $bayar + $potongan),
+                'tagihan' => $faktur - ($diskon + $retur),
+                'pembayaran' => $pembayaran,
+                'piutang' => ($saldo_awal + $faktur) - ($diskon + $retur + $pembayaran)
             ]);
         }
     }

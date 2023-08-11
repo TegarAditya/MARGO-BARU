@@ -446,15 +446,14 @@ class AquariumController extends Controller
     {
         // Validate the form data
         $validatedData = $request->validate([
-            'plate_quantities' => 'required|array',
-            'plate_quantities.*' => 'numeric|min:1',
-            'notes' => 'required|array',
-            'dones' => 'required|array',
+            'plate_quantity' => 'numeric|min:1',
+            'note' => 'required',
+            'done' => 'required',
         ]);
 
-        $plate_quantity = $validatedData['plate_quantities'];
-        $note = $validatedData['notes'];
-        $done = $validatedData['dones'];
+        $plate_quantity = $validatedData['plate_quantity'];
+        $note = $validatedData['note'];
+        $done = $validatedData['done'];
 
         $plate_item = PlatePrintItem::with('plate_print', 'plate')->find($id);
 

@@ -590,9 +590,30 @@
                         </ul>
                     </li>
                 @endcan
+                @can('invoice_access')
+                    <li class="nav-item">
+                        <a href="{{ route("admin.invoices.index") }}" class="nav-link {{ request()->is("admin/invoices") || request()->is("admin/invoices/*") ? "active" : "" }} ">
+                            <i class="fa-fw nav-icon fas fa-money-check-alt">
+
+                            </i>
+                            <p>
+                                {{ trans('cruds.invoice.title') }}
+                                @if(checkInvoice() > 0)
+                                    <span class="badge badge-info right">{{ checkInvoice() }}</span>
+                                @endif
+                                {{-- @if(checkInvoice() > 0)
+                                    <i class="fas fa-angle-left right"></i>
+                                    <span class="badge badge-info right">{{ checkInvoice() }}</span>
+                                @else
+                                    <i class="right fa fa-fw fa-angle-left nav-icon"></i>
+                                @endif --}}
+                            </p>
+                        </a>
+                    </li>
+                @endcan
                 @can('tagihan_access')
-                    <li class="nav-item has-treeview {{ request()->is("admin/bills*") ? "menu-open" : "" }} {{ request()->is("admin/sales-billings*") ? "menu-open" : "" }} {{ request()->is("admin/invoices*") ? "menu-open" : "" }} {{ request()->is("admin/invoices*") ? "menu-open" : "" }} {{ request()->is("admin/invoice-items*") ? "menu-open" : "" }} {{ request()->is("admin/rekap-billings*") ? "menu-open" : "" }}">
-                        <a class="nav-link nav-dropdown-toggle {{ request()->is("admin/bills*") ? "active" : "" }} {{ request()->is("admin/sales-billings*") ? "active" : "" }} {{ request()->is("admin/invoices*") ? "active" : "" }} {{ request()->is("admin/invoice-items*") ? "active" : "" }} {{ request()->is("admin/rekap-billings*") ? "active" : "" }}" href="#">
+                    <li class="nav-item has-treeview {{ request()->is("admin/bills*") ? "menu-open" : "" }} {{ request()->is("admin/sales-billings*") ? "menu-open" : "" }} {{ request()->is("admin/rekap-billings*") ? "menu-open" : "" }}">
+                        <a class="nav-link nav-dropdown-toggle {{ request()->is("admin/bills*") ? "active" : "" }} {{ request()->is("admin/sales-billings*") ? "active" : "" }} {{ request()->is("admin/rekap-billings*") ? "active" : "" }}" href="#">
                             <i class="fa-fw nav-icon fas fa-file-invoice">
 
                             </i>
@@ -602,50 +623,14 @@
                             </p>
                         </a>
                         <ul class="nav nav-treeview">
-                            @can('invoice_access')
-                                <li class="nav-item">
-                                    <a href="{{ route("admin.invoices.index") }}" class="nav-link {{ request()->is("admin/invoices") || request()->is("admin/invoices/*") ? "active" : "" }}">
-                                        <i class="fa-fw nav-icon fas fa-money-check-alt">
-
-                                        </i>
-                                        <p>
-                                            {{ trans('cruds.invoice.title') }}
-                                        </p>
-                                    </a>
-                                </li>
-                            @endcan
                             @can('bill_access')
                                 <li class="nav-item">
                                     <a href="{{ route("admin.bills.index") }}" class="nav-link {{ request()->is("admin/bills") || request()->is("admin/bills/*") ? "active" : "" }}">
-                                        <i class="fa-fw nav-icon fas fa-flag">
-
-                                        </i>
-                                        <p>
-                                            Billing
-                                        </p>
-                                    </a>
-                                </li>
-                            @endcan
-                            @can('rekap_billing_access')
-                                <li class="nav-item">
-                                    <a href="{{ route("admin.rekap-billings.index") }}" class="nav-link {{ request()->is("admin/rekap-billings") || request()->is("admin/rekap-billings/*") ? "active" : "" }}">
                                         <i class="fa-fw nav-icon fas fa-dollar-sign">
 
                                         </i>
                                         <p>
                                             Billing Sales
-                                        </p>
-                                    </a>
-                                </li>
-                            @endcan
-                            @can('sales_billing_access')
-                                <li class="nav-item">
-                                    <a href="{{ route("admin.sales-billings.index") }}" class="nav-link {{ request()->is("admin/sales-billings") || request()->is("admin/sales-billings/*") ? "active" : "" }}">
-                                        <i class="fa-fw nav-icon fas fa-hand-holding-usd">
-
-                                        </i>
-                                        <p>
-                                            {{ trans('cruds.salesBilling.title') }}
                                         </p>
                                     </a>
                                 </li>
@@ -807,8 +792,8 @@
                     </li>
                 @endcan
                 @can('aquarium_access')
-                    <li class="nav-item has-treeview {{ request()->is("admin/aquarium*") ? "menu-open" : "" }}">
-                        <a class="nav-link nav-dropdown-toggle {{ request()->is("admin/aquarium*") ? "active" : "" }}" href="#">
+                    <li class="nav-item has-treeview {{ request()->is("admin/aquarium*") || request()->is("admin/delivery-plates*") ? "menu-open" : "" }}">
+                        <a class="nav-link nav-dropdown-toggle {{ request()->is("admin/aquarium*") || request()->is("admin/delivery-plates*") ? "active" : "" }}" href="#">
                             <i class="fa-fw nav-icon fas fa-archway">
 
                             </i>
@@ -846,6 +831,16 @@
                                         </i>
                                         <p>
                                             Realisasi List
+                                        </p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="{{ route("admin.delivery-plates.index") }}" class="nav-link {{ request()->is("admin/delivery-plates") || request()->is("admin/delivery-plates/*") ? "active" : "" }}">
+                                        <i class="fa-fw nav-icon fas fa-truck-loading">
+
+                                        </i>
+                                        <p>
+                                            {{ trans('cruds.deliveryPlate.title') }}
                                         </p>
                                     </a>
                                 </li>

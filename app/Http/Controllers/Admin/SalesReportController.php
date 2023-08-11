@@ -7,8 +7,6 @@ use App\Http\Requests\MassDestroySalesReportRequest;
 use App\Http\Requests\StoreSalesReportRequest;
 use App\Http\Requests\UpdateSalesReportRequest;
 use App\Models\Salesperson;
-use App\Models\SalesReport;
-use App\Models\SalesReportDetail;
 use Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -130,118 +128,5 @@ class SalesReportController extends Controller
         }
 
         return response(null, Response::HTTP_NO_CONTENT);
-    }
-
-    public function generate(Request $request)
-    {
-        $start = Carbon::now()->startOfMonth();
-        $end = Carbon::now()->endOfMonth();
-        $lastmonth = Carbon::now()->subMonth()->format('mY');
-
-        $code = $start->format('mY');
-        $periode = $start->format('d F Y') .' -  '. $end->format('d F Y');
-        $start_date = $start->format('d-m-Y');
-        $end_date = $end->format('d-m-Y');
-
-        $transactions = Salesperson::with('transaction_total')->get();
-
-        DB::beginTransaction();
-        try {
-            foreach($transactions as $transaction) {
-                $before = SalesReport::where('code', $lastmonth)->where('salesperson_id', $transaction->id)->first();
-
-                if ($before) {
-                    $saldo_awal = $before->saldo_akhir;
-                } else {
-                    $saldo_awal = 0;
-                }
-
-                $transaksi = $transaction->transaction_total;
-
-                $pengambilan = $transaksi ? $transaksi->total_invoice : 0;
-                $diskon = $transaksi ? $transaksi->total_diskon : 0;
-                $retur = $transaksi ? $transaksi->total_retur : 0;
-                $bayar = $transaksi ? $transaksi->total_bayar : 0;
-                $potongan = $transaksi ? $transaksi->total_potongan : 0;
-
-                $debet = $pengambilan;
-                $kredit = $diskon + $retur + $bayar + $potongan;
-
-                $saldo_akhir = $debet - $kredit;
-
-                $sales_report = SalesReport::updateOrCreate(
-                    [
-                        'code' => $code,
-                        'salesperson_id' => $transaction->id
-                    ],
-                    [
-                        'periode' => $periode,
-                        'start_date' => $start_date,
-                        'end_date' => $end_date,
-                        'saldo_awal' => $saldo_awal,
-                        'debet' => $debet,
-                        'kredit' => $kredit,
-                        'saldo_akhir' => $saldo_akhir,
-                    ]
-                );
-
-                SalesReportDetail::updateOrCreate([
-                    'sales_report_id' => $sales_report->id,
-                    'type' => 'invoice',
-                ], [
-                    'amount' => $pengambilan,
-                    'debet' => $pengambilan,
-                    'kredit' => 0,
-                ]);
-
-                SalesReportDetail::updateOrCreate([
-                    'sales_report_id' => $sales_report->id,
-                    'type' => 'diskon',
-                ], [
-                    'amount' => $diskon,
-                    'debet' => 0,
-                    'kredit' => $diskon,
-                ]);
-
-                SalesReportDetail::updateOrCreate([
-                    'sales_report_id' => $sales_report->id,
-                    'type' => 'retur',
-                ], [
-                    'amount' => $retur,
-                    'debet' => 0,
-                    'kredit' => $retur,
-                ]);
-
-                SalesReportDetail::updateOrCreate([
-                    'sales_report_id' => $sales_report->id,
-                    'type' => 'bayar',
-                ], [
-                    'amount' => $bayar,
-                    'debet' => 0,
-                    'kredit' => $bayar,
-                ]);
-
-                SalesReportDetail::updateOrCreate([
-                    'sales_report_id' => $sales_report->id,
-                    'type' => 'potongan',
-                ], [
-                    'amount' => $potongan,
-                    'debet' => 0,
-                    'kredit' => $potongan,
-                ]);
-            }
-
-            DB::commit();
-
-            Alert::success('Success', 'Saldo bulan ini berhasil digenerate');
-
-            return redirect()->route('admin.sales-reports.index');
-        } catch (\Exception $e) {
-            DB::rollback();
-
-            dd($e);
-
-            return redirect()->back()->with('error-message', $e->getMessage())->withInput();
-        }
     }
 }

@@ -8,6 +8,7 @@ use App\Http\Requests\StoreSettingRequest;
 use App\Http\Requests\UpdateSettingRequest;
 use App\Models\Setting;
 use App\Models\User;
+use App\Models\Semester;
 use Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -45,6 +46,9 @@ class SettingController extends Controller
                 return $row->key ? $row->key : '';
             });
             $table->editColumn('value', function ($row) {
+                if ($row->key == 'current_semester') {
+                    return Semester::find($row->value)->name;
+                }
                 return $row->value ? $row->value : '';
             });
             $table->editColumn('is_json', function ($row) {
@@ -77,7 +81,9 @@ class SettingController extends Controller
     {
         abort_if(Gate::denies('setting_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        return view('admin.settings.edit', compact('setting'));
+        $semesters = Semester::orderBy('code', 'DESC')->where('status', 1)->pluck('name', 'id');
+
+        return view('admin.settings.edit', compact('setting', 'semesters'));
     }
 
     public function update(UpdateSettingRequest $request, Setting $setting)

@@ -17,6 +17,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Yajra\DataTables\Facades\DataTables;
 use DB;
 use Alert;
+use Carbon\Carbon;
 use App\Services\EstimationService;
 use App\Services\StockService;
 use App\Services\DeliveryService;
@@ -103,7 +104,9 @@ class DeliveryOrderController extends Controller
 
         $no_suratjalan = DeliveryOrder::generateNoSJ(setting('current_semester'));
 
-        return view('admin.deliveryOrders.create', compact('salespeople', 'semesters', 'no_suratjalan'));
+        $today = Carbon::now()->format('d-m-Y');
+
+        return view('admin.deliveryOrders.create', compact('salespeople', 'semesters', 'no_suratjalan', 'today'));
     }
 
     public function store(Request $request)
@@ -283,7 +286,7 @@ class DeliveryOrderController extends Controller
     }
 
     public function getDeliveryOrder(Request $request) {
-        $semester = $request->input('semester');
+        $semester = setting('current_semester');
         $salesperson = $request->input('salesperson');
 
         $query = DeliveryOrder::query();

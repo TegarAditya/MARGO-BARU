@@ -8,6 +8,8 @@
 
 use App\Models\Setting;
 use App\Models\Semester;
+use App\Models\DeliveryOrder;
+use App\Models\SalesOrder;
 
 
 if (! function_exists('formatCurrency')) {
@@ -121,6 +123,24 @@ if (! function_exists('prevSemester')) {
         }
 
         return Semester::where('code', $gasal . $tahun)->first()->id;
+    }
+}
+
+if (! function_exists('checkInvoice')) {
+    function checkInvoice()
+    {
+        $fakturs = DeliveryOrder::where('faktur', 0)->count();
+
+        return $fakturs;
+    }
+}
+
+if (! function_exists('isRetur')) {
+    function isRetur($no_order)
+    {
+        $retur = SalesOrder::where('no_order', $no_order)->sum('retur');
+
+        return $retur > 0 ? true : false;
     }
 }
 

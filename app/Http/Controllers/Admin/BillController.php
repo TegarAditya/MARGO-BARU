@@ -147,44 +147,56 @@ class BillController extends Controller
             $q->where('type', 'bayar')->where('semester_id', $semester)->select(DB::raw('COALESCE(SUM(amount), 0)'));
         }], 'amount')->withSum(['transactions as potongan' => function ($q) use ($semester) {
             $q->where('type', 'potongan')->where('semester_id', $semester)->select(DB::raw('COALESCE(SUM(amount), 0)'));
+        }], 'amount')->withSum(['payments as payment' => function ($q) use ($semester) {
+            $q->where('semester_bayar_id', $semester)->select(DB::raw('COALESCE(SUM(amount), 0)'));
         }], 'amount')->get();
 
         DB::beginTransaction();
         try {
             foreach($sales as $sale) {
-
                 $bill = Bill::where('salesperson_id', $sale->id)->where('semester_id', $semester)->first();
+                $payment = Payment::selectRaw('COALESCE(SUM(paid), 0) as bayar, COALESCE(SUM(discount), 0) as potongan')->where('salesperson_id', $sale->id)->where('semester_bayar_id', $semester)->first();
 
                 $faktur = $sale->pengambilan;
                 $diskon = $sale->diskon;
                 $retur = $sale->retur;
-                $bayar = $sale->bayar;
-                $potongan = $sale->potongan;
+                $bayar = $payment->bayar;
+                $potongan = $payment->potongan;
+
+                $pembayaran = $sale->bayar + $sale->potongan;
 
                 if ($bill) {
+                    $saldo_awal = $bill->previous ? $bill->previous->saldo_akhir : 0;
                     $bill->update([
-                        'saldo_awal' => $bill->previous ? $bill->previous->saldo_akhir : 0,
+                        'saldo_awal' => $saldo_awal,
                         'jual' => $faktur,
                         'diskon' => $diskon,
                         'retur' => $retur,
                         'bayar' => $bayar,
                         'potongan' => $potongan,
-                        'saldo_akhir' => $faktur - ($diskon + $retur + $bayar + $potongan),
+                        'saldo_akhir' => ($saldo_awal + $faktur) - ($diskon + $retur + $bayar + $potongan),
+                        'tagihan' => $faktur - ($diskon + $retur),
+                        'pembayaran' => $pembayaran,
+                        'piutang' => ($saldo_awal + $faktur) - ($diskon + $retur + $pembayaran)
                     ]);
                 } else {
                     $previous = Bill::where('salesperson_id', $sale->id)->where('semester_id', prevSemester($semester))->first();
 
+                    $saldo_awal = $previous ? $previous->saldo_akhir : 0;
                     Bill::create([
                         'semester_id' => $semester,
                         'salesperson_id' => $sale->id,
                         'previous_id' => $previous ? $previous->id : null,
-                        'saldo_awal' => $previous ? $previous->saldo_akhir : 0,
+                        'saldo_awal' => $saldo_awal,
                         'jual' => $faktur,
                         'diskon' => $diskon,
                         'retur' => $retur,
                         'bayar' => $bayar,
                         'potongan' => $potongan,
-                        'saldo_akhir' => $faktur - ($diskon + $retur + $bayar + $potongan),
+                        'saldo_akhir' => ($saldo_awal + $faktur) - ($diskon + $retur + $bayar + $potongan),
+                        'tagihan' => $faktur - ($diskon + $retur),
+                        'pembayaran' => $pembayaran,
+                        'piutang' => ($saldo_awal + $faktur) - ($diskon + $retur + $pembayaran)
                     ]);
                 }
             }
@@ -228,13 +240,13 @@ class BillController extends Controller
         $sales = Salesperson::withSum(['transactions as pengambilan' => function ($q) use ($start, $end) {
             $q->where('type', 'faktur')->whereBetween('transaction_date', [$start, $end])->select(DB::raw('COALESCE(SUM(amount), 0)'));
         }], 'amount')->withSum(['transactions as diskon' => function ($q) use ($start, $end) {
-            $q->where('type', 'diskon')->where('transaction_date', [$start, $end])->select(DB::raw('COALESCE(SUM(amount), 0)'));
+            $q->where('type', 'diskon')->whereBetween('transaction_date', [$start, $end])->select(DB::raw('COALESCE(SUM(amount), 0)'));
         }], 'amount')->withSum(['transactions as retur' => function ($q) use ($start, $end) {
-            $q->where('type', 'retur')->where('transaction_date', [$start, $end])->select(DB::raw('COALESCE(SUM(amount), 0)'));
+            $q->where('type', 'retur')->whereBetween('transaction_date', [$start, $end])->select(DB::raw('COALESCE(SUM(amount), 0)'));
         }], 'amount')->withSum(['transactions as bayar' => function ($q) use ($start, $end) {
-            $q->where('type', 'bayar')->where('transaction_date', [$start, $end])->select(DB::raw('COALESCE(SUM(amount), 0)'));
+            $q->where('type', 'bayar')->whereBetween('transaction_date', [$start, $end])->select(DB::raw('COALESCE(SUM(amount), 0)'));
         }], 'amount')->withSum(['transactions as potongan' => function ($q) use ($start, $end) {
-            $q->where('type', 'potongan')->where('transaction_date', [$start, $end])->select(DB::raw('COALESCE(SUM(amount), 0)'));
+            $q->where('type', 'potongan')->whereBetween('transaction_date', [$start, $end])->select(DB::raw('COALESCE(SUM(amount), 0)'));
         }], 'amount')->get();
 
         return view('admin.bills.billing', compact('start', 'end', 'saldo_awal', 'sales'));
@@ -247,31 +259,31 @@ class BillController extends Controller
 
         $invoices = Invoice::with('invoice_items')->where('salesperson_id', $salesperson)->where('semester_id', $semester)->get();
         $returs = ReturnGood::with('retur_items')->where('salesperson_id', $salesperson)->where('semester_id', $semester)->get();
-        $payments = Payment::where('salesperson_id', $salesperson)->where('semester_id', $semester)->get();
+        $payments = Payment::where('salesperson_id', $salesperson)->where('semester_bayar_id', $semester)->get();
 
         $bills = collect([]);
         $invoices_old = collect([]);
         $returs_old = collect([]);
         $payments_old = collect([]);
 
-        $bill = Bill::where('salesperson_id', $salesperson)->where('semester_id', $semester)->first();
-
         $semester_id = $semester;
-        while($bill->saldo_awal > 0) {
+        do {
             $semester_id = prevSemester($semester_id);
             $bill = Bill::where('salesperson_id', $salesperson)->where('semester_id', $semester_id)->first();
-            $bills->push($bill);
-        }
+            if ($bill) {
+                $bills->push($bill);
+            }
+        } while($bill && $bill->saldo_awal > 0);
 
         if ($bills->count() > 0) {
             foreach($bills as $item) {
                 $faktur = Invoice::with('invoice_items')->where('salesperson_id', $salesperson)->where('semester_id', $item->semester_id)->get();
                 $retur = ReturnGood::with('retur_items')->where('salesperson_id', $salesperson)->where('semester_id', $item->semester_id)->get();
-                $bayar = Payment::where('salesperson_id', $salesperson)->where('semester_id', $item->semester_id)->get();
+                $bayar = Payment::where('salesperson_id', $salesperson)->where('semester_bayar_id', $item->semester_id)->get();
 
-                $invoices_old->merge($faktur->all());
-                $returs_old->merge($retur->all());
-                $payments_old->merge($bayar->all());
+                $invoices_old = $invoices_old->merge($faktur);
+                $returs_old = $returs_old->merge($retur);
+                $payments_old = $payments_old->merge($bayar);
             }
         }
 
@@ -290,7 +302,7 @@ class BillController extends Controller
 
         $invoices = Invoice::with('invoice_items')->where('salesperson_id', $salesperson)->where('semester_id', $semester)->get();
         $returs = ReturnGood::with('retur_items')->where('salesperson_id', $salesperson)->where('semester_id', $semester)->get();
-        $payments = Payment::where('salesperson_id', $salesperson)->where('semester_id', $semester)->get();
+        $payments = Payment::where('salesperson_id', $salesperson)->where('semester_bayar_id', $semester)->get();
         $billing = Bill::where('salesperson_id', $salesperson)->where('semester_id', $semester)->first();
 
         $bills = collect([]);
@@ -298,30 +310,24 @@ class BillController extends Controller
         $returs_old = collect([]);
         $payments_old = collect([]);
 
-        $bill = Bill::where('salesperson_id', $salesperson)->where('semester_id', $semester)->first();
-
         $semester_id = $semester;
-        while($bill->saldo_awal > 0) {
+        do {
             $semester_id = prevSemester($semester_id);
             $bill = Bill::where('salesperson_id', $salesperson)->where('semester_id', $semester_id)->first();
-            $bills->push($bill);
-        }
+            if ($bill) {
+                $bills->push($bill);
+            }
+        } while($bill && $bill->saldo_awal > 0);
 
         if ($bills->count() > 0) {
             foreach($bills as $item) {
                 $faktur = Invoice::with('invoice_items')->where('salesperson_id', $salesperson)->where('semester_id', $item->semester_id)->get();
                 $retur = ReturnGood::with('retur_items')->where('salesperson_id', $salesperson)->where('semester_id', $item->semester_id)->get();
-                $bayar = Payment::where('salesperson_id', $salesperson)->where('semester_id', $item->semester_id)->get();
+                $bayar = Payment::where('salesperson_id', $salesperson)->where('semester_bayar_id', $item->semester_id)->get();
 
-                foreach($faktur as $item) {
-                    $invoices_old->push($item);
-                }
-                foreach($retur as $item) {
-                    $returs_old->push($item);
-                }
-                foreach($bayar as $item) {
-                    $payments_old->push($item);
-                }
+                $invoices_old = $invoices_old->merge($faktur);
+                $returs_old = $returs_old->merge($retur);
+                $payments_old = $payments_old->merge($bayar);
             }
         }
 

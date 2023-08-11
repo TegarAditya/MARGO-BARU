@@ -98,7 +98,9 @@ class ReturnGoodController extends Controller
 
         $no_retur = ReturnGood::generateNoRetur(setting('current_semester'));
 
-        return view('admin.returnGoods.create', compact('salespeople', 'semesters', 'no_retur'));
+        $today = Carbon::now()->format('d-m-Y');
+
+        return view('admin.returnGoods.create', compact('salespeople', 'semesters', 'no_retur', 'today'));
     }
 
     public function store(Request $request)

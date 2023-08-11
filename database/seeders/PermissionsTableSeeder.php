@@ -1050,6 +1050,26 @@ class PermissionsTableSeeder extends Seeder
                 'id'    => 273,
                 'title' => 'aquarium_access',
             ],
+            [
+                'id'    => 274,
+                'title' => 'delivery_plate_create',
+            ],
+            [
+                'id'    => 275,
+                'title' => 'delivery_plate_edit',
+            ],
+            [
+                'id'    => 276,
+                'title' => 'delivery_plate_show',
+            ],
+            [
+                'id'    => 277,
+                'title' => 'delivery_plate_delete',
+            ],
+            [
+                'id'    => 278,
+                'title' => 'delivery_plate_access',
+            ],
         ];
 
         Permission::insert($permissions);

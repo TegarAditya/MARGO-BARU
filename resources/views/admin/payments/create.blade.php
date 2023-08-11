@@ -33,7 +33,7 @@
                 <div class="col-6">
                     <div class="form-group">
                         <label class="required" for="date">{{ trans('cruds.payment.fields.date') }}</label>
-                        <input class="form-control date {{ $errors->has('date') ? 'is-invalid' : '' }}" type="text" name="date" id="date" value="{{ old('date') }}" required>
+                        <input class="form-control date {{ $errors->has('date') ? 'is-invalid' : '' }}" type="text" name="date" id="date" value="{{ old('date', $today) }}" required>
                         @if($errors->has('date'))
                             <span class="text-danger">{{ $errors->first('date') }}</span>
                         @endif
@@ -42,8 +42,8 @@
                 </div>
                 <div class="col-6">
                     <div class="form-group">
-                        <label>{{ trans('cruds.payment.fields.payment_method') }}</label>
-                        <select class="form-control {{ $errors->has('payment_method') ? 'is-invalid' : '' }}" name="payment_method" id="payment_method">
+                        <label class="required">{{ trans('cruds.payment.fields.payment_method') }}</label>
+                        <select class="form-control {{ $errors->has('payment_method') ? 'is-invalid' : '' }}" name="payment_method" id="payment_method" required>
                             <option value disabled {{ old('payment_method', null) === null ? 'selected' : '' }}>{{ trans('global.pleaseSelect') }}</option>
                             @foreach(App\Models\Payment::PAYMENT_METHOD_SELECT as $key => $label)
                                 <option value="{{ $key }}" {{ old('payment_method', '') === (string) $key ? 'selected' : '' }}>{{ $label }}</option>
@@ -104,7 +104,7 @@
                     <div class="row mb-3">
                         <div class="col-auto">
                             <div class="form-check">
-                                <input class="form-check-input" type="radio" name="diskon_type" id="diskon_type-1" value="" data-prefix="">
+                                <input class="form-check-input" type="radio" name="diskon_type" id="diskon_type-1" value="" data-prefix="" checked>
                                 <label class="form-check-label" for="diskon_type-1">
                                     Tidak Ada
                                 </label>
@@ -259,48 +259,60 @@ $(document).ready(function() {
             data: {
                 salesperson: salesperson
             },
-            success: function (bills) {
-                bills.forEach(bill => {
-                    console.log(bill);
+            success: function (response) {
+                $('#tagihan').html('');
+                console.log(response);
+                if (response.status == 'error') {
                     var formHtml = `
                         <div class="detail-tagihan mt-3 mb-4">
-                            <p class="mb-0 font-weight-bold">Detail Tagihan ${bill.semester.name}</p>
-                            <div class="row">
-                                <div class="col-auto" style="min-width: 160px">
-                                    <p class="mb-0">
-                                        <small class="font-weight-bold">Saldo Awal</small>
-                                        <br />
-                                        <span class="tagihan-total">${convertToRupiah(parseInt(bill.saldo_awal))}</span>
-                                    </p>
-                                </div>
-                                <div class="col-auto" style="min-width: 160px">
-                                    <p class="mb-0">
-                                        <small class="font-weight-bold">Total Tagihan</small>
-                                        <br />
-                                        <span class="tagihan-total">${convertToRupiah(parseInt(bill.jual) - (parseInt(bill.diskon) + parseInt(bill.retur)))}</span>
-                                    </p>
-                                </div>
-
-                                <div class="col-auto"  style="min-width: 160px">
-                                    <p class="mb-0">
-                                        <small class="font-weight-bold">Total Pembayaran</small>
-                                        <br />
-                                        <span class="tagihan-saldo">${convertToRupiah(parseInt(bill.bayar) + parseInt(bill.potongan))}</span>
-                                    </p>
-                                </div>
-
-                                <div class="col-auto"  style="min-width: 160px">
-                                    <p class="mb-0">
-                                        <small class="font-weight-bold">Sisa Tagihan</small>
-                                        <br />
-                                        <span class="tagihan-sisa">${convertToRupiah(parseInt(bill.saldo_akhir))}</span>
-                                    </p>
-                                </div>
-                            </div>
+                            <p class="mb-0 font-weight-bold">Tidak Ada Tagihan</p>
                         </div>
                     `;
                     $('#tagihan').prepend(formHtml);
-                });
+                }
+
+                if (response.status == 'success') {
+                    response.bills.forEach(bill => {
+                        var formHtml = `
+                            <div class="detail-tagihan mt-3 mb-4">
+                                <p class="mb-0 font-weight-bold">Detail Tagihan ${bill.semester.name}</p>
+                                <div class="row">
+                                    <div class="col-auto" style="min-width: 160px">
+                                        <p class="mb-0">
+                                            <small class="font-weight-bold">Saldo Awal</small>
+                                            <br />
+                                            <span class="tagihan-total">${convertToRupiah(parseInt(bill.saldo_awal))}</span>
+                                        </p>
+                                    </div>
+                                    <div class="col-auto" style="min-width: 160px">
+                                        <p class="mb-0">
+                                            <small class="font-weight-bold">Total Tagihan</small>
+                                            <br />
+                                            <span class="tagihan-total">${convertToRupiah(parseInt(bill.jual) - (parseInt(bill.diskon) + parseInt(bill.retur)))}</span>
+                                        </p>
+                                    </div>
+
+                                    <div class="col-auto"  style="min-width: 160px">
+                                        <p class="mb-0">
+                                            <small class="font-weight-bold">Total Pembayaran</small>
+                                            <br />
+                                            <span class="tagihan-saldo">${convertToRupiah(parseInt(bill.bayar) + parseInt(bill.potongan))}</span>
+                                        </p>
+                                    </div>
+
+                                    <div class="col-auto"  style="min-width: 160px">
+                                        <p class="mb-0">
+                                            <small class="font-weight-bold">Sisa Tagihan</small>
+                                            <br />
+                                            <span class="tagihan-sisa">${convertToRupiah(parseInt(bill.saldo_akhir))}</span>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        $('#tagihan').prepend(formHtml);
+                    });
+                }
             }
         });
     });

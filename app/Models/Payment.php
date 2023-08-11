@@ -38,6 +38,7 @@ class Payment extends Model
         'date',
         'salesperson_id',
         'semester_id',
+        'semester_bayar_id',
         'paid',
         'discount',
         'amount',
@@ -79,6 +80,11 @@ class Payment extends Model
     public function semester()
     {
         return $this->belongsTo(Semester::class, 'semester_id');
+    }
+
+    public function semester_bayar()
+    {
+        return $this->belongsTo(Semester::class, 'semester_bayar_id');
     }
 
     public static function generateNoKwitansi($semester) {

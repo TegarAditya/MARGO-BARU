@@ -31,7 +31,7 @@
                 <div class="col-6">
                     <div class="form-group">
                         <label class="required" for="date">{{ trans('cruds.invoice.fields.date') }}</label>
-                        <input class="form-control date {{ $errors->has('date') ? 'is-invalid' : '' }}" type="text" name="date" id="date" value="{{ old('date') }}" required>
+                        <input class="form-control date {{ $errors->has('date') ? 'is-invalid' : '' }}" type="text" name="date" id="date" value="{{ old('date', $today) }}" required>
                         @if($errors->has('date'))
                             <span class="text-danger">{{ $errors->first('date') }}</span>
                         @endif
@@ -137,7 +137,7 @@
                                         <div class="text-field-input px-2 py-0 pr-3">
                                             <span class="text-sm mr-1">Rp</span>
                                             <input class="diskon" type="hidden" name="diskons[]" data-max="{{ $product->price }}" value="0">
-                                            <input class="form-control text-right diskon_text" type="text" name="diskon_text[]" value="0" {{ $item->sales_order->payment_type == 'cash' ? 'required' : 'readonly' }}>
+                                            <input class="form-control text-right diskon_text" type="text" name="diskon_text[]" value="0" {{ ($item->sales_order->payment_type == 'cash' && !isRetur($item->sales_order->no_order)) ? 'required' : 'readonly' }}>
                                             <label class="text-field-border"></label>
                                         </div>
                                     </div>

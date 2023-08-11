@@ -17,6 +17,8 @@ class AddRelationshipFieldsToPlatePrintItemsTable extends Migration
             $table->foreign('product_id', 'product_fk_8797634')->references('id')->on('book_variants');
             $table->unsignedBigInteger('plate_id')->nullable();
             $table->foreign('plate_id', 'plate_fk_8797635')->references('id')->on('materials');
+            $table->unsignedBigInteger('surat_jalan_id')->nullable();
+            $table->foreign('surat_jalan_id', 'surat_jalan_fk_8842059')->references('id')->on('delivery_plates');
         });
     }
 }
