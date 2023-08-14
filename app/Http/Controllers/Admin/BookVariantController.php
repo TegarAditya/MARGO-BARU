@@ -595,7 +595,7 @@ class BookVariantController extends Controller
         return response()->json($product);
     }
 
-    public function getCetak(Request $request)
+    public function getCetakDefault(Request $request)
     {
         $query = $request->input('q');
         $type = $request->input('type');
@@ -606,12 +606,69 @@ class BookVariantController extends Controller
             return response()->json([]);
         }
 
-        $query = BookVariant::whereHas('estimasi_produksi', function ($q) {
-                    $q->where('estimasi', '>', 0);
-                })->where(function($q) use ($query) {
+        $query = BookVariant::where(function($q) use ($query) {
                     $q->where('code', 'LIKE', "%{$query}%")
                     ->orWhere('name', 'LIKE', "%{$query}%");
                 });
+
+        if ($type == 'isi') {
+            $query->whereIn('type', ['I', 'S', 'U']);
+        } else if ($type == 'cover') {
+            $query->whereIn('type', ['C', 'V']);
+        } else if ($type == 'finishing') {
+            $query->whereIn('type', ['L', 'P', 'K']);
+        }
+
+        if (!empty($jenjang)) {
+            $query->where('jenjang_id', $jenjang);
+        }
+
+        if (!empty($cover_isi)) {
+            if ($type == 'isi') {
+                $query->where('isi_id', $cover_isi);
+            } else if ($type == 'cover') {
+                $query->where('cover_id', $cover_isi);
+            }
+        }
+
+        $products = $query->orderBy('code', 'ASC')->get();
+
+        $formattedProducts = [];
+
+        foreach ($products as $product) {
+            $formattedProducts[] = [
+                'id' => $product->id,
+                'text' => $product->code,
+                'stock' => $product->stock,
+                'name' => $product->name,
+            ];
+        }
+
+        return response()->json($formattedProducts);
+    }
+
+    public function getCetak(Request $request)
+    {
+        $query = $request->input('q');
+        $type = $request->input('type');
+        $jenjang = $request->input('jenjang');
+        $cover_isi = $request->input('cover_isi');
+        $estimasi = $request->input('estimasi') ?? 1;
+
+        if(empty($type)) {
+            return response()->json([]);
+        }
+
+        $query = BookVariant::where(function($q) use ($query) {
+            $q->where('code', 'LIKE', "%{$query}%")
+            ->orWhere('name', 'LIKE', "%{$query}%");
+        });
+
+        if ($estimasi) {
+            $query->whereHas('estimasi_produksi', function ($q) {
+                $q->where('estimasi', '>', 0);
+            });
+        }
 
         if ($type == 'isi') {
             $query->whereIn('type', ['I', 'S', 'U']);

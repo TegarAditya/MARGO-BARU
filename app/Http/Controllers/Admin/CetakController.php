@@ -28,6 +28,7 @@ use Alert;
 use Carbon\Carbon;
 use App\Services\EstimationService;
 use App\Services\StockService;
+use App\Services\TransactionService;
 
 class CetakController extends Controller
 {
@@ -126,7 +127,9 @@ class CetakController extends Controller
 
         $no_spc = Cetak::generateNoSPCTemp(setting('current_semester'));
 
-        return view('admin.cetaks.create', compact('semesters', 'vendors', 'jenjangs', 'no_spc'));
+        $today = Carbon::now()->format('d-m-Y');
+
+        return view('admin.cetaks.create', compact('semesters', 'vendors', 'jenjangs', 'no_spc', 'today'));
     }
 
     public function store(Request $request)
@@ -229,6 +232,8 @@ class CetakController extends Controller
                 EstimationService::createMovement('out', 'cetak', $cetak->id, $product->id, -1 * $quantity, $product->type);
                 EstimationService::createProduction($product->id, -1 * $quantity, $product->type);
             }
+
+            TransactionService::createProductionTransaction($date, 'Ongkos Cetak Produsi SPc '. $cetak->no_spc, $vendor, $semester, 'cetak', $cetak->id, $cetak->no_spc, $total_cost, 'credit');
 
             $cetak->total_cost = $total_cost;
             $cetak->save();
@@ -380,6 +385,8 @@ class CetakController extends Controller
                 'total_cost' => $total_cost,
                 'note' => $note
             ]);
+
+            TransactionService::editProductionTransaction($date, 'Ongkos Cetak Produsi SPc '. $cetak->no_spc, $vendor, $semester, 'cetak', $cetak->id, $cetak->no_spc, $total_cost, 'credit');
 
             DB::commit();
 

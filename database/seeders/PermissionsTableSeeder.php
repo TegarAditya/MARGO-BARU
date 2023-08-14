@@ -1070,6 +1070,74 @@ class PermissionsTableSeeder extends Seeder
                 'id'    => 278,
                 'title' => 'delivery_plate_access',
             ],
+            [
+                'id'    => 279,
+                'title' => 'production_transaction_create',
+            ],
+            [
+                'id'    => 280,
+                'title' => 'production_transaction_edit',
+            ],
+            [
+                'id'    => 281,
+                'title' => 'production_transaction_show',
+            ],
+            [
+                'id'    => 282,
+                'title' => 'production_transaction_delete',
+            ],
+            [
+                'id'    => 283,
+                'title' => 'production_transaction_access',
+            ],
+            [
+                'id'    => 284,
+                'title' => 'production_transaction_total_show',
+            ],
+            [
+                'id'    => 285,
+                'title' => 'production_transaction_total_access',
+            ],
+            [
+                'id'    => 286,
+                'title' => 'production_payment_create',
+            ],
+            [
+                'id'    => 287,
+                'title' => 'production_payment_edit',
+            ],
+            [
+                'id'    => 288,
+                'title' => 'production_payment_show',
+            ],
+            [
+                'id'    => 289,
+                'title' => 'production_payment_delete',
+            ],
+            [
+                'id'    => 290,
+                'title' => 'production_payment_access',
+            ],
+            [
+                'id'    => 291,
+                'title' => 'production_fee_create',
+            ],
+            [
+                'id'    => 292,
+                'title' => 'production_fee_edit',
+            ],
+            [
+                'id'    => 293,
+                'title' => 'production_fee_show',
+            ],
+            [
+                'id'    => 294,
+                'title' => 'production_fee_delete',
+            ],
+            [
+                'id'    => 295,
+                'title' => 'production_fee_access',
+            ],
         ];
 
         Permission::insert($permissions);

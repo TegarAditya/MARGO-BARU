@@ -29,7 +29,7 @@
                 <div class="col-6">
                     <div class="form-group">
                         <label class="required" for="date">{{ trans('cruds.cetak.fields.date') }}</label>
-                        <input class="form-control date {{ $errors->has('date') ? 'is-invalid' : '' }}" type="text" name="date" id="date" value="{{ old('date') }}" required>
+                        <input class="form-control date {{ $errors->has('date') ? 'is-invalid' : '' }}" type="text" name="date" id="date" value="{{ old('date', $today) }}" required>
                         @if($errors->has('date'))
                             <span class="text-danger">{{ $errors->first('date') }}</span>
                         @endif
@@ -99,12 +99,23 @@
             </div>
             <hr style="margin: .5em -15px;border-color:#ccc" />
             <div class="row mb-4">
-                <div class="col-12">
+                <div class="col-10">
                     <div class="form-group">
                         <label for="product-search">Book Search</label>
                         <select id="product-search" class="form-control select2" style="width: 100%;">
                             <option></option>
                         </select>
+                    </div>
+                </div>
+                <div class="col-2 align-items-end align-self-center">
+                    <div class="col-auto mt-2" style="max-width: 200px">
+                        <label for="product-search" class="mb-0 text-sm">Pakai Estimasi</label>
+                        <div class="form-group text-field m-0">
+                            <div class="text-field-input">
+                                <input id="pakeestimasi" type="hidden" value="1">
+                                <input id="status" class="bootstrap-switch" type="checkbox" tabindex="-1" value="1" checked data-on-text="YES" data-off-text="NO">
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -126,6 +137,14 @@
 @section('scripts')
 <script>
     $(document).ready(function() {
+        $('#status').on('switchChange.bootstrapSwitch', function (event, state) {
+            if (state) {
+                $('#pakeestimasi').val(1);
+            } else {
+                $('#pakeestimasi').val(0);
+            }
+        });
+
         $('#product-search').select2({
             templateResult: formatProduct,
             templateSelection: formatProductSelection,
@@ -138,7 +157,8 @@
                             q: params.term,
                             type: $('#type').val(),
                             jenjang: $('#jenjang_id').val(),
-                            cover_isi: $('#isi_cover_id').val()
+                            cover_isi: $('#isi_cover_id').val(),
+                            estimasi: $('#pakeestimasi').val()
                         };
                     },
                     processResults: function(data) {
@@ -221,7 +241,7 @@
                                         <strong>STOCK : ${product.stock}</strong>
                                     </p>
                                     <p class="mb-0 text-sm">
-                                        <strong>ESTIMASI : ${product.estimasi_produksi.estimasi}</strong>
+                                        <strong>ESTIMASI : ${product.estimasi_produksi ? product.estimasi_produksi.estimasi : 0}</strong>
                                     </p>
                                 </div>
                                 <div class="col offset-1 row align-items-end align-self-center">
@@ -248,7 +268,7 @@
                                         <p class="mb-0 text-sm">Cetak</p>
                                         <div class="form-group text-field m-0">
                                             <div class="text-field-input px-2 py-0">
-                                                <input class="quantity" type="hidden" name="quantities[]" data-max="${product.estimasi_produksi.estimasi}" value="1">
+                                                <input class="quantity" type="hidden" name="quantities[]" data-max="${product.estimasi_produksi ? product.estimasi_produksi.estimasi : 0}" value="1">
                                                 <input class="form-control text-center quantity_text" type="text" name="quantity_text[]" value="1" required>
                                                 <label class="text-field-border"></label>
                                             </div>

@@ -269,6 +269,10 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     Route::delete('transactions/destroy', 'TransactionController@massDestroy')->name('transactions.massDestroy');
     Route::resource('transactions', 'TransactionController');
 
+    // Production Transaction
+    Route::delete('production-transactions/destroy', 'ProductionTransactionController@massDestroy')->name('production-transactions.massDestroy');
+    Route::resource('production-transactions', 'ProductionTransactionController');
+
     // Transaction Total
     Route::resource('transaction-totals', 'TransactionTotalController', ['except' => ['create', 'store', 'edit', 'update', 'destroy']]);
 
@@ -279,6 +283,15 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     // Production Estimation
     Route::delete('production-estimations/destroy', 'ProductionEstimationController@massDestroy')->name('production-estimations.massDestroy');
     Route::resource('production-estimations', 'ProductionEstimationController');
+
+    // Production Payment
+    Route::delete('production-payments/destroy', 'ProductionPaymentController@massDestroy')->name('production-payments.massDestroy');
+    Route::get('production-payments/get-tagihan', 'ProductionPaymentController@getTagihan')->name('production-payments.getTagihan');
+    Route::get('production-payments/kwitansi/{productionPayment}', 'ProductionPaymentController@kwitansi')->name('production-payments.kwitansi');
+    Route::resource('production-payments', 'ProductionPaymentController');
+
+    // Production Fee
+    Route::resource('production-fees', 'ProductionFeeController');
 
     // Vendor
     Route::delete('vendors/destroy', 'VendorController@massDestroy')->name('vendors.massDestroy');

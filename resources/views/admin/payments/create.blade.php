@@ -1,6 +1,10 @@
 @extends('layouts.admin')
 @section('content')
-
+<div class="row mb-4">
+    <div class="col-12">
+        <h1 class="m-0">Formulir Pembayaran Sales</h1>
+    </div>
+</div>
 <div class="card">
     <div class="card-header">
         {{ trans('global.create') }} {{ trans('cruds.payment.title_singular') }}
@@ -23,7 +27,7 @@
                 <div class="col-6">
                     <div class="form-group">
                         <label class="required" for="no_kwitansi">{{ trans('cruds.payment.fields.no_kwitansi') }}</label>
-                        <input class="form-control {{ $errors->has('no_kwitansi') ? 'is-invalid' : '' }}" type="text" name="no_kwitansi" id="no_kwitansi" value="{{ old('no_kwitansi', '') }}" placeholder="(Otomatis)" readonly>
+                        <input class="form-control {{ $errors->has('no_kwitansi') ? 'is-invalid' : '' }}" type="text" name="no_kwitansi" id="no_kwitansi" value="{{ old('no_kwitansi', $no_kwitansi) }}" placeholder="(Otomatis)" readonly>
                         @if($errors->has('no_kwitansi'))
                             <span class="text-danger">{{ $errors->first('no_kwitansi') }}</span>
                         @endif
@@ -186,11 +190,6 @@ $(document).ready(function() {
     var diskon = form.find('[name="diskon"]');
     var bayar = form.find('[name="bayar"]');
     var bayarText = form.find('[name="bayar_text"]');
-
-    var tagihanDetail = form.find('.detail-tagihan');
-    var tagihanTotal = tagihanDetail.find('.tagihan-total');
-    var tagihanSaldo = tagihanDetail.find('.tagihan-saldo');
-    var tagihanSisa = tagihanDetail.find('.tagihan-sisa');
 
     bayarText.on('change keyup blur paste', function(e) {
         var value = numeral(e.target.value);

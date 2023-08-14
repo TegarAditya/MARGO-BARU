@@ -639,16 +639,16 @@
                     </li>
                 @endcan
                 @can('menu_pembayaran_access')
-                    <li class="nav-item has-treeview {{ request()->is("admin/payments*") ? "menu-open" : "" }}">
-                        <a class="nav-link nav-dropdown-toggle {{ request()->is("admin/payments*") ? "active" : "" }}" href="#">
-                            <i class="fa-fw nav-icon fas fa-hand-holding-usd">
+                <li class="nav-item has-treeview {{ request()->is("admin/payments*") ? "menu-open" : "" }} {{ request()->is("admin/production-payments*") ? "menu-open" : "" }}">
+                    <a class="nav-link nav-dropdown-toggle {{ request()->is("admin/payments*") ? "active" : "" }} {{ request()->is("admin/production-payments*") ? "active" : "" }}" href="#">
+                        <i class="fa-fw nav-icon fas fa-hand-holding-usd">
 
-                            </i>
-                            <p>
-                                {{ trans('cruds.menuPembayaran.title') }}
-                                <i class="right fa fa-fw fa-angle-left nav-icon"></i>
-                            </p>
-                        </a>
+                        </i>
+                        <p>
+                            {{ trans('cruds.menuPembayaran.title') }}
+                            <i class="right fa fa-fw fa-angle-left nav-icon"></i>
+                        </p>
+                    </a>
                         <ul class="nav nav-treeview">
                             @can('payment_access')
                                 <li class="nav-item">
@@ -662,12 +662,24 @@
                                     </a>
                                 </li>
                             @endcan
+                            @can('production_payment_access')
+                                <li class="nav-item">
+                                    <a href="{{ route("admin.production-payments.index") }}" class="nav-link {{ request()->is("admin/production-payments") || request()->is("admin/production-payments/*") ? "active" : "" }}">
+                                        <i class="fa-fw nav-icon far fa-money-bill-alt">
+
+                                        </i>
+                                        <p>
+                                            {{ trans('cruds.productionPayment.title') }}
+                                        </p>
+                                    </a>
+                                </li>
+                            @endcan
                         </ul>
                     </li>
                 @endcan
                 @can('transaksi_access')
-                    <li class="nav-item has-treeview {{ request()->is("admin/transaction-totals*") ? "menu-open" : "" }} {{ request()->is("admin/transactions*") ? "menu-open" : "" }} {{ request()->is("admin/sales-reports*") ? "menu-open" : "" }}">
-                        <a class="nav-link nav-dropdown-toggle {{ request()->is("admin/transaction-totals*") ? "active" : "" }} {{ request()->is("admin/transactions*") ? "active" : "" }} {{ request()->is("admin/sales-reports*") ? "active" : "" }} " href="#">
+                    <li class="nav-item has-treeview {{ request()->is("admin/transaction-totals*") ? "menu-open" : "" }} {{ request()->is("admin/transactions*") ? "menu-open" : "" }} {{ request()->is("admin/sales-reports*") ? "menu-open" : "" }} {{ request()->is("admin/production-transactions/*") ? "menu-open" : "" }}">
+                        <a class="nav-link nav-dropdown-toggle {{ request()->is("admin/transaction-totals*") ? "active" : "" }} {{ request()->is("admin/transactions*") ? "active" : "" }} {{ request()->is("admin/sales-reports*") ? "active" : "" }} {{ request()->is("admin/production-transactions *") ? "active" : "" }} " href="#">
                             <i class="fa-fw nav-icon fas fa-file-signature">
 
                             </i>
@@ -689,6 +701,18 @@
                                     </a>
                                 </li>
                             @endcan
+                            @can('production_transaction_access')
+                                <li class="nav-item">
+                                    <a href="{{ route("admin.production-transactions.index") }}" class="nav-link {{ request()->is("admin/production-transactions") || request()->is("admin/production-transactions/*") ? "active" : "" }}">
+                                        <i class="fa-fw nav-icon fab fa-product-hunt">
+
+                                        </i>
+                                        <p>
+                                            {{ trans('cruds.productionTransaction.title') }}
+                                        </p>
+                                    </a>
+                                </li>
+                            @endcan
                             {{-- @can('transaction_total_access')
                                 <li class="nav-item">
                                     <a href="{{ route("admin.transaction-totals.index") }}" class="nav-link {{ request()->is("admin/transaction-totals") || request()->is("admin/transaction-totals/*") ? "active" : "" }}">
@@ -701,7 +725,7 @@
                                     </a>
                                 </li>
                             @endcan --}}
-                            @can('sales_report_access')
+                            {{-- @can('sales_report_access')
                                 <li class="nav-item">
                                     <a href="{{ route("admin.sales-reports.index") }}" class="nav-link {{ request()->is("admin/sales-reports") || request()->is("admin/sales-reports/*") ? "active" : "" }}">
                                         <i class="fa-fw nav-icon fas fa-flag">
@@ -712,7 +736,7 @@
                                         </p>
                                     </a>
                                 </li>
-                            @endcan
+                            @endcan --}}
                         </ul>
                     </li>
                 @endcan

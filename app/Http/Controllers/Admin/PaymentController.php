@@ -105,9 +105,11 @@ class PaymentController extends Controller
 
         $salespeople = Salesperson::get()->pluck('full_name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
+        $no_kwitansi = Payment::generateNoKwitansi(setting('current_semester'));
+
         $today = Carbon::now()->format('d-m-Y');
 
-        return view('admin.payments.create', compact('salespeople', 'semesters', 'today'));
+        return view('admin.payments.create', compact('salespeople', 'semesters','no_kwitansi', 'today'));
     }
 
     public function store(Request $request)
@@ -154,8 +156,8 @@ class PaymentController extends Controller
                             'note' => $note
                         ]);
 
-                        TransactionService::createTransaction($date, $note, $salesperson, $bill->semester_id, 'bayar', $payment->id, $payment->no_kwitansi, $paid, 'credit');
-                        TransactionService::createTransaction($date, $note, $salesperson, $bill->semester_id, 'potongan', $payment->id, $payment->no_kwitansi, 0, 'credit');
+                        TransactionService::createTransaction($date, 'Pembayaran dengan No Kwitansi ' .$payment->no_kwitansi.' dan Catatan :'. $note, $salesperson, $bill->semester_id, 'bayar', $payment->id, $payment->no_kwitansi, $paid, 'credit');
+                        TransactionService::createTransaction($date, 'Diskon Dari Pembayaran dengan No Kwitansi ' .$payment->no_kwitansi.' dan Catatan :'. $note, $salesperson, $bill->semester_id, 'potongan', $payment->id, $payment->no_kwitansi, 0, 'credit');
 
                         $bayar -= $paid;
                     }
@@ -175,8 +177,8 @@ class PaymentController extends Controller
                     'note' => $note
                 ]);
 
-                TransactionService::createTransaction($date, $note, $salesperson, setting('current_semester'), 'bayar', $payment->id, $payment->no_kwitansi, $bayar, 'credit');
-                TransactionService::createTransaction($date, $note, $salesperson, setting('current_semester'), 'potongan', $payment->id, $payment->no_kwitansi, $diskon, 'credit');
+                TransactionService::createTransaction($date, 'Pembayaran dengan No Kwitansi ' .$payment->no_kwitansi.' dan Catatan :'. $note, $salesperson, setting('current_semester'), 'bayar', $payment->id, $payment->no_kwitansi, $bayar, 'credit');
+                TransactionService::createTransaction($date, 'Diskon Dari Pembayaran dengan No Kwitansi ' .$payment->no_kwitansi.' dan Catatan :'. $note, $salesperson, setting('current_semester'), 'potongan', $payment->id, $payment->no_kwitansi, $diskon, 'credit');
             }
             DB::commit();
 
@@ -241,8 +243,8 @@ class PaymentController extends Controller
                 'note' => $note
             ]);
 
-            TransactionService::editTransaction($date, $note, $salesperson, $semester, 'bayar', $payment->id, $reference_no, $bayar, 'credit');
-            TransactionService::editTransaction($date, $note, $salesperson, $semester, 'diskon', $payment->id, $reference_no, $diskon, 'credit');
+            TransactionService::editTransaction($date, 'Pembayaran dengan No Kwitansi ' .$reference_no.' dan Catatan :'. $note, $salesperson, $semester, 'bayar', $payment->id, $reference_no, $bayar, 'credit');
+            TransactionService::editTransaction($date, 'Diskon dari Pembayaran dengan No Kwitansi ' .$reference_no.' dan Catatan :'. $note, $salesperson, $semester, 'diskon', $payment->id, $reference_no, $diskon, 'credit');
 
             DB::commit();
 

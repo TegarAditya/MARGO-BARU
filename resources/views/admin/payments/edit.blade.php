@@ -1,6 +1,10 @@
 @extends('layouts.admin')
 @section('content')
-
+<div class="row mb-4">
+    <div class="col-12">
+        <h1 class="m-0">Formulir Pembayaran Sales</h1>
+    </div>
+</div>
 <div class="card">
     <div class="card-header">
         {{ trans('global.edit') }} {{ trans('cruds.payment.title_singular') }}
@@ -102,7 +106,7 @@
                     <div class="row mb-3">
                         <div class="col-auto">
                             <div class="form-check">
-                                <input class="form-check-input" type="radio" name="diskon_type" id="diskon_type-1" value="" data-prefix="" required>
+                                <input class="form-check-input" type="radio" name="diskon_type" id="diskon_type-1" value="" data-prefix="" {{ $payment->discount ? '' : 'checked' }} required>
                                 <label class="form-check-label" for="diskon_type-1">
                                     Tidak Ada
                                 </label>

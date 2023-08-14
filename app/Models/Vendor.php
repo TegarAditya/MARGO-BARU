@@ -52,4 +52,14 @@ class Vendor extends Model
 
         return $name;
     }
+
+    public function transaction()
+    {
+        return $this->hasMany(ProductionTransaction::class, 'vendor_id');
+    }
+
+    public function fee()
+    {
+        return $this->hasOne(ProductionTransactionTotal::class, 'vendor_id');
+    }
 }

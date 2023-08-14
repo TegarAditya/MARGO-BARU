@@ -8,6 +8,8 @@ use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvi
 use Illuminate\Support\Facades\Event;
 use App\Events\TransactionUpdated;
 use App\Listeners\UpdateTransactionTotal;
+use App\Events\ProductionTransactionUpdated;
+use App\Listeners\UpdateProductionTransactionTotal;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -22,6 +24,9 @@ class EventServiceProvider extends ServiceProvider
         ],
         TransactionUpdated::class => [
             UpdateTransactionTotal::class,
+        ],
+        ProductionTransactionUpdated::class => [
+            UpdateProductionTransactionTotal::class,
         ],
     ];
 
