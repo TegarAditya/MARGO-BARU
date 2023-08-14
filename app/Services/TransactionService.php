@@ -95,7 +95,7 @@ class TransactionService
         $reversal = ProductionTransaction::where('type', $type)->where('reference_id', $reference)->where('semester_id', $semester)
                     ->where('vendor_id', $vendor)->orderBy('id', 'DESC')->first();
 
-        Transaction::create([
+        ProductionTransaction::create([
             'date' => Carbon::now()->format('d-m-Y'),
             'description' => $description,
             'vendor_id' => $vendor,
@@ -110,7 +110,7 @@ class TransactionService
             'reversal_of_id' => $reversal->id
         ]);
 
-        $transaction = Transaction::create([
+        $transaction = ProductionTransaction::create([
             'date' => Carbon::now()->format('d-m-Y'),
             'description' => $description,
             'vendor_id' => $vendor,

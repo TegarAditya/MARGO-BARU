@@ -1,6 +1,5 @@
 <?php
 
 return [
-    'site_title' => 'APLIKASI MARGO BARU',
-
+    'site_title' => 'PT Margo Mitro Joyo',
 ];

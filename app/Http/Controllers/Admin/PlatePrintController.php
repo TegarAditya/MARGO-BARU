@@ -20,6 +20,7 @@ use Yajra\DataTables\Facades\DataTables;
 use App\Services\StockService;
 use DB;
 use Alert;
+use Carbon\Carbon;
 
 class PlatePrintController extends Controller
 {
@@ -107,9 +108,11 @@ class PlatePrintController extends Controller
 
         $no_spk = PlatePrint::generateNoSPK(setting('current_semester'));
 
+        $today = Carbon::now()->format('d-m-Y');
+
         $jenjangs = Jenjang::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
-        return view('admin.platePrints.sell', compact('vendors','jenjangs', 'no_spk'));
+        return view('admin.platePrints.sell', compact('vendors','jenjangs', 'no_spk', 'today'));
     }
 
     public function store(Request $request)

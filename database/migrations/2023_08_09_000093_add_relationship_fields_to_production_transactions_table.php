@@ -15,7 +15,7 @@ class AddRelationshipFieldsToProductionTransactionsTable extends Migration
             $table->foreign('semester_id', 'semester_fk_8854850')->references('id')->on('semesters');
             $table->unsignedBigInteger('reference_id')->nullable();
             $table->unsignedBigInteger('reversal_of_id')->nullable();
-            $table->foreign('reversal_of_id', 'reversal_of_fk_8854858')->references('id')->on('transactions');
+            $table->foreign('reversal_of_id', 'reversal_of_fk_8854858')->references('id')->on('production_transactions');
             $table->unsignedBigInteger('created_by_id')->nullable();
             $table->foreign('created_by_id', 'created_by_fk_8854859')->references('id')->on('users');
             $table->unsignedBigInteger('updated_by_id')->nullable();

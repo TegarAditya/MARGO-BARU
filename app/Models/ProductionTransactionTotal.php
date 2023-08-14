@@ -24,6 +24,7 @@ class ProductionTransactionTotal extends Model
         'vendor_id',
         'total_fee',
         'total_payment',
+        'outstanding_fee',
         'created_at',
         'updated_at',
         'deleted_at',

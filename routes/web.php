@@ -291,7 +291,8 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     Route::resource('production-payments', 'ProductionPaymentController');
 
     // Production Fee
-    Route::resource('production-fees', 'ProductionFeeController');
+    Route::post('fees/jangka', 'ProductionFeeController@jangka')->name('fees.jangka');
+    Route::resource('fees', 'ProductionFeeController', ['only' => ['index']]);
 
     // Vendor
     Route::delete('vendors/destroy', 'VendorController@massDestroy')->name('vendors.massDestroy');

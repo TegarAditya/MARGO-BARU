@@ -27,7 +27,7 @@ class ProductionPaymentController extends Controller
 
         if ($request->ajax()) {
             $query = ProductionPayment::with(['vendor', 'semester'])->select(sprintf('%s.*', (new ProductionPayment)->table));
-            
+
             if (!empty($request->semester)) {
                 $query->where('semester_id', $request->semester);
             }
@@ -35,7 +35,7 @@ class ProductionPaymentController extends Controller
             if (!empty($request->payment_method)) {
                 $query->where('payment_method', $request->payment_method);
             }
-            
+
             $table = Datatables::of($query);
 
             $table->addColumn('placeholder', '&nbsp;');
@@ -87,7 +87,8 @@ class ProductionPaymentController extends Controller
     {
         abort_if(Gate::denies('production_payment_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $vendors = Vendor::whereHas('fee')->get()->pluck('full_name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        // $vendors = Vendor::whereHas('fee')->get()->pluck('full_name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $vendors = Vendor::all()->pluck('full_name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
         $no_payment = ProductionPayment::generateNoPayment(setting('current_semester'));
 
@@ -127,7 +128,7 @@ class ProductionPaymentController extends Controller
             ]);
 
             TransactionService::createProductionTransaction($date, 'Pembayaran dengan No Payment ' .$payment->no_payment.' dan Catatan :'. $note, $vendor, $semester, 'bayar', $payment->id, $payment->no_payment, $nominal, 'debet');
-            
+
             DB::commit();
 
             Alert::success('Success', 'Pembayaran berhasil di simpan');
@@ -157,6 +158,8 @@ class ProductionPaymentController extends Controller
 
     public function update(Request $request, ProductionPayment $productionPayment)
     {
+        TransactionService::editProductionTransaction($request->date, 'Pembayaran dengan No Payment ' .$productionPayment->no_payment.' dan Catatan :'. $request->note, $request->vendor_id, $productionPayment->semester_id, 'bayar', $productionPayment->id, $productionPayment->no_payment, $request->nominal, 'debet');
+
         $productionPayment->update($request->all());
 
         Alert::success('Success', 'Pembayaran berhasil di simpan');

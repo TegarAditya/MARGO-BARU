@@ -104,8 +104,10 @@ class FinishingController extends Controller
         $jenjangs = Jenjang::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
         $no_spk = Finishing::generateNoSPKTemp(setting('current_semester'));
+        
+        $today = Carbon::now()->format('d-m-Y');
 
-        return view('admin.finishings.create', compact('vendors', 'jenjangs', 'no_spk'));
+        return view('admin.finishings.create', compact('vendors', 'jenjangs', 'no_spk', 'today'));
     }
 
     public function store(Request $request)

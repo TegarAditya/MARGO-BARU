@@ -1,6 +1,8 @@
 <aside class="main-sidebar sidebar-dark-primary elevation-4" style="min-height: 917px;">
     <!-- Brand Logo -->
     <a href="#" class="brand-link">
+        <img src="{{ asset('images/app-logo.png') }}" alt="Margo Mitro Joyo" class="brand-image img-circle elevation-3"
+           style="opacity: .8">
         <span class="brand-text font-weight-light">{{ trans('panel.site_title') }}</span>
     </a>
 
@@ -612,8 +614,8 @@
                     </li>
                 @endcan
                 @can('tagihan_access')
-                    <li class="nav-item has-treeview {{ request()->is("admin/bills*") ? "menu-open" : "" }} {{ request()->is("admin/sales-billings*") ? "menu-open" : "" }} {{ request()->is("admin/rekap-billings*") ? "menu-open" : "" }}">
-                        <a class="nav-link nav-dropdown-toggle {{ request()->is("admin/bills*") ? "active" : "" }} {{ request()->is("admin/sales-billings*") ? "active" : "" }} {{ request()->is("admin/rekap-billings*") ? "active" : "" }}" href="#">
+                    <li class="nav-item has-treeview {{ request()->is("admin/fees*") ? "menu-open" : "" }} {{ request()->is("admin/bills*") ? "menu-open" : "" }} {{ request()->is("admin/sales-billings*") ? "menu-open" : "" }} {{ request()->is("admin/rekap-billings*") ? "menu-open" : "" }}">
+                        <a class="nav-link nav-dropdown-toggle {{ request()->is("admin/fees*") ? "active" : "" }} {{ request()->is("admin/bills*") ? "active" : "" }} {{ request()->is("admin/sales-billings*") ? "active" : "" }} {{ request()->is("admin/rekap-billings*") ? "active" : "" }}" href="#">
                             <i class="fa-fw nav-icon fas fa-file-invoice">
 
                             </i>
@@ -631,6 +633,18 @@
                                         </i>
                                         <p>
                                             Billing Sales
+                                        </p>
+                                    </a>
+                                </li>
+                            @endcan
+                            @can('production_fee_access')
+                                <li class="nav-item">
+                                    <a href="{{ route("admin.fees.index") }}" class="nav-link {{ request()->is("admin/fees") || request()->is("admin/fees/*") ? "active" : "" }}">
+                                        <i class="fa-fw nav-icon far fa-money-bill-alt">
+
+                                        </i>
+                                        <p>
+                                            Billing Vendor
                                         </p>
                                     </a>
                                 </li>
