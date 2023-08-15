@@ -85,4 +85,16 @@ class Salesperson extends Model
     {
         return $this->hasOne(TransactionTotal::class);
     }
+
+    public function area()
+    {
+        return $this->hasOneThrough(
+            GroupArea::class,
+            MarketingArea::class,
+            'id', // refers to id column on invoices table
+            'id', // refers to id column on customers table
+            'marketing_area_id', // refers to invoice_id column on credit_notes table
+            'group_area_id' // refers to customer_id column on invoices table
+        );
+    }
 }

@@ -6,17 +6,46 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\MassDestroyEstimasiSaldoRequest;
 use App\Http\Requests\StoreEstimasiSaldoRequest;
 use App\Http\Requests\UpdateEstimasiSaldoRequest;
+use App\Models\Semester;
+use App\Models\SalesOrder;
+use App\Models\Salesperson;
+use App\Models\GroupArea;
 use Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
+use DB;
+use Alert;
+use Carbon\Carbon;
+use Yajra\DataTables\Facades\DataTables;
 
 class EstimasiSaldoController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         abort_if(Gate::denies('estimasi_saldo_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        return view('admin.estimasiSaldos.index');
+        $semester = setting('current_semester');
+        $group_area = null;
+
+        $query = Salesperson::withSum(['estimasi as pesanan' => function ($q) use ($semester) {
+            $q->where('semester_id', $semester)->select(DB::raw('COALESCE(SUM(quantity), 0)'));
+        }], 'quantity')->withSum(['estimasi as dikirim' => function ($q) use ($semester) {
+            $q->where('semester_id', $semester)->select(DB::raw('COALESCE(SUM(moved), 0)'));
+        }], 'moved');
+
+        if (!empty($request->area)) {
+            $query->whereHas('area', function ($q) use ($request) {
+                $q->where('group_area_id', $request->area);
+            });
+
+            $group_area = GroupArea::find($request->area);
+        }
+
+        $saldo = $query->get();
+
+        $group_areas = GroupArea::pluck('code', 'id')->prepend('All', '');
+
+        return view('admin.estimasiSaldos.index', compact('saldo', 'group_area', 'group_areas'));
     }
 
     public function create()
