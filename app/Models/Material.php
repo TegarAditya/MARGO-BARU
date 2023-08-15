@@ -68,4 +68,9 @@ class Material extends Model
     {
         return $this->hasMany(PlatePrintItem::class, 'plate_id');
     }
+
+    public function movement()
+    {
+        return $this->hasMany(StockMovement::class, 'material_id');
+    }
 }

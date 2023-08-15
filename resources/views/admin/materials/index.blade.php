@@ -59,8 +59,43 @@
                 </div>
             </div>
 
-            <div class="form-group mt-3">
+            <div class="form-group">
                 <button class="btn btn-primary" type="submit">
+                    Filter
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <div class="card-body">
+        <form action="{{ route("admin.materials.jangka") }}" enctype="multipart/form-data" method="POST">
+            @csrf
+            <div class="row">
+                <div class="col-6">
+                    <x-admin.form-group
+                        type="text"
+                        id="date"
+                        name="date"
+                        containerClass=" m-0"
+                        boxClass=" px-2 py-1"
+                        class="form-control-sm"
+                        value="{{ request('date', old('date'))}}"
+                        placeholder="Pilih Tanggal"
+                    >
+                        <x-slot name="label">
+                            <label class="small mb-0" for="date">Tanggal</label>
+                        </x-slot>
+
+                        <x-slot name="right">
+                            <button type="button" class="btn btn-sm border-0 btn-default px-2 date-clear" data-action="+" style="display:{{ !request('date', old('date')) ? 'none' : 'block' }}">
+                                <i class="fa fa-times"></i>
+                            </button>
+                        </x-slot>
+                    </x-admin.form-group>
+                </div>
+            </div>
+            <div class="form-group mt-3 mb-5">
+                <button class="btn btn-danger" type="submit">
                     Filter
                 </button>
             </div>
@@ -103,6 +138,7 @@
 @endsection
 @section('scripts')
 @parent
+<script src="https://cdn.jsdelivr.net/npm/@easepick/bundle@1.2.0/dist/index.umd.min.js"></script>
 <script>
 $(function () {
   let dtOverrideGlobals = {
@@ -124,7 +160,7 @@ $(function () {
         { data: 'unit_name', name: 'unit.name', class: 'text-center' },
         { data: 'stock', name: 'stock', class: 'text-center' },
         { data: 'vendor', name: 'vendor', class: 'text-center' },
-        { data: 'actions', name: '{{ trans('global.actions') }}' }
+        { data: 'actions', name: '{{ trans('global.actions') }}', class: 'text-center' }
     ],
     orderCellsTop: true,
     pageLength: 25,
@@ -139,6 +175,33 @@ $(function () {
         event.preventDefault();
         table.ajax.reload();
     });
+
+    var picker = new easepick.create({
+        element: $('#date').get(0),
+        css: [
+            'https://cdn.jsdelivr.net/npm/@easepick/bundle@1.2.0/dist/index.css',
+        ],
+        plugins: ['RangePlugin', 'LockPlugin'],
+        RangePlugin: {
+            tooltip: true,
+        },
+        LockPlugin: {
+            maxDate: new Date(),
+        },
+    });
+
+    picker.on('select', function(e) {
+        $('#date').trigger('change');
+        $('.date-clear').show();
+    });
+
+    $('.date-clear').on('click', function(e) {
+        e.preventDefault();
+
+        picker.clear();
+        $(e.currentTarget).hide();
+    });
+
 });
 
 </script>

@@ -67,14 +67,14 @@
                 @endif
                 <span class="help-block">{{ trans('cruds.material.fields.cost_helper') }}</span>
             </div>
-            <div class="form-group">
+            {{-- <div class="form-group">
                 <label class="required" for="stock">{{ trans('cruds.material.fields.stock') }}</label>
                 <input class="form-control {{ $errors->has('stock') ? 'is-invalid' : '' }}" type="number" name="stock" id="stock" value="{{ old('stock', $material->stock) }}" step="0.01" required>
                 @if($errors->has('stock'))
                     <span class="text-danger">{{ $errors->first('stock') }}</span>
                 @endif
                 <span class="help-block">{{ trans('cruds.material.fields.stock_helper') }}</span>
-            </div>
+            </div> --}}
             <div class="form-group">
                 <label for="vendors">{{ trans('cruds.material.fields.vendor') }}</label>
                 <div style="padding-bottom: 4px">

@@ -19,6 +19,9 @@ use Alert;
 use Excel;
 use App\Imports\MaterialImport;
 use App\Exports\MaterialTemplate;
+use Illuminate\Support\Facades\Date;
+use Carbon\Carbon;
+use DB;
 
 class MaterialsController extends Controller
 {
@@ -91,6 +94,31 @@ class MaterialsController extends Controller
         $vendors = Vendor::where('type', 'cetak')->get()->pluck('full_name', 'id')->prepend('All', '');
 
         return view('admin.materials.index', compact('vendors'));
+    }
+
+    public function jangka(Request $request)
+    {
+        if ($request->has('date') && $request->date && $dates = explode(' - ', $request->date)) {
+            $start = Date::parse($dates[0])->startOfDay();
+            $end = !isset($dates[1]) ? $start->clone()->endOfMonth() : Date::parse($dates[1])->endOfDay();
+        } else {
+            $start = Carbon::now()->startOfMonth();
+            $end = Carbon::now();
+        }
+
+        $saldo_awal = Material::withSum(['movement as in' => function ($q) use ($start) {
+            $q->where('movement_type', 'in')->where('movement_date', '<', $start)->select(DB::raw('COALESCE(SUM(quantity), 0)'));
+        }], 'quantity')->withSum(['movement as out' => function ($q) use ($start) {
+            $q->where('movement_type', 'out')->where('movement_date', '<', $start)->select(DB::raw('COALESCE(SUM(quantity), 0)'));
+        }], 'quantity')->whereIn('category', ['paper', 'plate', 'chemical'])->get();
+
+        $materials = Material::withSum(['movement as in' => function ($q) use ($start, $end) {
+            $q->where('movement_type', 'in')->whereBetween('movement_date', [$start, $end])->select(DB::raw('COALESCE(SUM(quantity), 0)'));
+        }], 'quantity')->withSum(['movement as out' => function ($q) use ($start, $end) {
+            $q->where('movement_type', 'out')->whereBetween('movement_date', [$start, $end])->select(DB::raw('COALESCE(SUM(quantity), 0)'));
+        }], 'quantity')->whereIn('category', ['paper', 'plate', 'chemical'])->get();
+
+        return view('admin.materials.saldo', compact('start', 'end', 'saldo_awal', 'materials'));
     }
 
     public function create()

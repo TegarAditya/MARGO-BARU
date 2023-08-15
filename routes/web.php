@@ -171,6 +171,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     Route::get('materials/get-plates', 'MaterialsController@getPlates')->name('materials.getPlates');
     Route::get('materials/get-plate-raws', 'MaterialsController@getPlateRaws')->name('materials.getPlateRaws');
     Route::get('materials/get-checmicals', 'MaterialsController@getChemicals')->name('materials.getChemicals');
+    Route::post('materials/jangka', 'MaterialsController@jangka')->name('materials.jangka');
     Route::resource('materials', 'MaterialsController');
 
     // Stock Adjustment Detail
