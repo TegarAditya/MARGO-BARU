@@ -1138,6 +1138,26 @@ class PermissionsTableSeeder extends Seeder
                 'id'    => 295,
                 'title' => 'production_fee_access',
             ],
+            [
+                'id'    => 296,
+                'title' => 'estimation_create',
+            ],
+            [
+                'id'    => 297,
+                'title' => 'estimation_edit',
+            ],
+            [
+                'id'    => 298,
+                'title' => 'estimation_show',
+            ],
+            [
+                'id'    => 299,
+                'title' => 'estimation_delete',
+            ],
+            [
+                'id'    => 300,
+                'title' => 'estimation_access',
+            ],
         ];
 
         Permission::insert($permissions);

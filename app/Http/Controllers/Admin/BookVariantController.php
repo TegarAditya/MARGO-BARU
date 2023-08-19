@@ -374,15 +374,11 @@ class BookVariantController extends Controller
     public function getEstimasi(Request $request)
     {
         $query = $request->input('q');
-        $semester = setting('current_semester');
-        $salesperson = $request->input('salesperson');
-        $type = $request->input('type');
+        $estimasi = $request->input('estimasi');
         $jenjang = $request->input('jenjang');
 
-        $query = BookVariant::whereHas('estimasi', function ($q) use ($semester, $salesperson, $type) {
-                    $q->where('salesperson_id', $salesperson)
-                    ->where('payment_type', $type)
-                    ->where('semester_id', $semester);
+        $query = BookVariant::whereHas('estimasi_items', function ($q) use ($estimasi) {
+                    $q->where('estimation_id', $estimasi);
                 })->where(function($q) use ($query) {
                     $q->where('code', 'LIKE', "%{$query}%")
                     ->orWhere('name', 'LIKE', "%{$query}%");
@@ -411,16 +407,13 @@ class BookVariantController extends Controller
     public function getInfoEstimasi(Request $request)
     {
         $id = $request->input('id');
-        $semester = setting('current_semester');
-        $salesperson = $request->input('salesperson');
-        $type = $request->input('type');
+        $estimasi = $request->input('estimasi');
 
-        $product = BookVariant::join('sales_orders', 'sales_orders.product_id', '=', 'book_variants.id')
+        $product = BookVariant::join('estimation_items', 'estimation_items.product_id', '=', 'book_variants.id')
+                ->join('sales_orders', 'sales_orders.product_id', '=', 'estimation_items.product_id')
                 ->where('book_variants.id', $id)
-                ->where('sales_orders.semester_id', $semester)
-                ->where('sales_orders.salesperson_id', $salesperson)
-                ->where('sales_orders.payment_type', $type)
-                ->first(['book_variants.*', 'sales_orders.quantity as estimasi', 'sales_orders.moved as terkirim', 'sales_orders.id as order_id', 'sales_orders.payment_type as payment_type']);
+                ->where('estimation_items.estimation_id', $estimasi)
+                ->first(['book_variants.*','estimation_items.id as estimasi_id', 'estimation_items.quantity as estimasi', 'estimation_items.payment_type as payment_type', 'sales_orders.moved as terkirim']);
         $product->load('book', 'jenjang', 'cover', 'kurikulum', 'isi');
 
         return response()->json($product);

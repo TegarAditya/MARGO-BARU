@@ -31,6 +31,10 @@ class UnitTableSeeder extends Seeder
                 'code'  => 'kg',
                 'name'  => 'Kilogram',
             ],
+            [
+                'code'  => 'ml',
+                'name'  => 'Mililiter',
+            ],
         ];
 
         Unit::insert($units);

@@ -195,6 +195,11 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     Route::get('sales-orders/template-import', 'SalesOrderController@template_import')->name('sales-orders.templateImport');
     Route::resource('sales-orders', 'SalesOrderController', ['except' => ['edit', 'show']]);
 
+    // Estimation
+    Route::delete('estimations/destroy', 'EstimationController@massDestroy')->name('estimations.massDestroy');
+    Route::post('estimations/import', 'EstimationController@import')->name('estimations.import');
+    Route::resource('estimations', 'EstimationController');
+
     // Delivery Order
     Route::delete('delivery-orders/destroy', 'DeliveryOrderController@massDestroy')->name('delivery-orders.massDestroy');
     Route::get('delivery-orders/print-sj/{deliveryOrder}', 'DeliveryOrderController@printSj')->name('delivery-orders.printSj');

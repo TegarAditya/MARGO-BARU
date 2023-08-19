@@ -125,6 +125,13 @@ class BookVariant extends Model implements HasMedia
         return $name;
     }
 
+    public function getJenKumAttribute()
+    {
+        $name = $this->jenjang->name. ' - '. $this->kurikulum->name;
+
+        return $name;
+    }
+
     public function book()
     {
         return $this->belongsTo(Book::class, 'book_id');
@@ -183,6 +190,11 @@ class BookVariant extends Model implements HasMedia
     public function estimasi()
     {
         return $this->hasMany(SalesOrder::class, 'product_id');
+    }
+
+    public function estimasi_items()
+    {
+        return $this->hasMany(EstimationItem::class, 'product_id');
     }
 
     public function dikirim()

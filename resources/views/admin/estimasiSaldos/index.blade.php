@@ -41,7 +41,8 @@
                         <th>Sales</th>
                         <th>Estimasi</th>
                         <th>Dikirim</th>
-                        <th>Sisa</th>
+                        {{-- <th>Sisa</th> --}}
+                        <th></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -54,14 +55,23 @@
                     @php
                         $total_pesanan += $item->pesanan;
                         $total_dikirim += $item->dikirim;
-                        $total_sisa += $item->sisa;
+                        $sisa = max(0, $item->pesanan - $item->dikirim);
+                        $total_sisa += $sisa;
                     @endphp
                     <tr>
                         <td></td>
                         <td>{{ $item->full_name }}</td>
                         <td class="text-center">{{ angka($item->pesanan) }} Eksemplar</td>
                         <td class="text-center">{{ angka($item->dikirim) }} Eksemplar</td>
-                        <td class="text-center">{{ angka($item->sisa) }} Eksemplar</td>
+                        {{-- <td class="text-center">{{ angka($sisa) }} Eksemplar</td> --}}
+                        <td class="text-center">
+                            <a class="px-1" href="{{ route('admin.sales-orders.show', ['salesperson' => $item->id, 'semester' => setting('current_semester')]) }}" title="Checklist Estimasi">
+                                <i class="fas fa-receipt text-danger fa-lg"></i>
+                            </a>
+                            <a class="px-1" href="{{ route('admin.sales-orders.estimasi', ['salesperson' => $item->id, 'semester' => setting('current_semester')]) }}" target="_blank" title="Print Estimasi" >
+                                <i class="fas fa-print text-secondary fa-lg"></i>
+                            </a>
+                        </td>
                     </tr>
                 @endforeach
                 </tbody>
@@ -72,7 +82,8 @@
                         </td>
                         <td class="text-center">{{ angka($total_pesanan) }} Eksemplar</td>
                         <td class="text-center">{{ angka($total_dikirim) }} Eksemplar</td>
-                        <td class="text-center">{{ angka($total_sisa) }} Eksemplar</td>
+                        {{-- <td class="text-center">{{ angka($total_sisa) }} Eksemplar</td> --}}
+                        <td></td>
                     </tr>
                 </tfoot>
             </table>

@@ -7,6 +7,7 @@ use App\Http\Requests\MassDestroySalesOrderRequest;
 use App\Http\Requests\StoreSalesOrderRequest;
 use App\Http\Requests\UpdateSalesOrderRequest;
 use App\Models\BookVariant;
+use App\Models\Estimation;
 use App\Models\Jenjang;
 use App\Models\Kurikulum;
 use App\Models\SalesOrder;
@@ -32,7 +33,7 @@ class SalesOrderController extends Controller
 
         if ($request->ajax()) {
             // $query = SalesOrder::with(['semester', 'salesperson', 'product', 'jenjang', 'kurikulum'])->select(sprintf('%s.*', (new SalesOrder)->table));
-            $query = SalesOrder::select('no_order', 'semester_id', 'salesperson_id', 'payment_type')->distinct()->with(['semester', 'salesperson'])
+            $query = SalesOrder::select('semester_id', 'salesperson_id')->distinct()->with(['semester', 'salesperson'])
                 ->orderBy('semester_id', 'DESC')->OrderBy('salesperson_id', 'ASC');
 
             if (!empty($request->salesperson)) {
@@ -40,9 +41,6 @@ class SalesOrderController extends Controller
             }
             if (!empty($request->semester)) {
                 $query->where('semester_id', $request->semester);
-            }
-            if (!empty($request->payment_type)) {
-                $query->where('payment_type', $request->payment_type);
             }
 
             $table = Datatables::of($query);
@@ -58,9 +56,6 @@ class SalesOrderController extends Controller
                     <a class="px-1" href="'.route('admin.sales-orders.estimasi', ['salesperson' => $row->salesperson_id, 'semester' => $row->semester_id]).'" target="_blank" title="Show" >
                         <i class="fas fa-print text-secondary fa-lg"></i>
                     </a>
-                    <a class="px-1" href="'.route('admin.sales-orders.edit', ['salesperson' => $row->salesperson_id, 'semester' => $row->semester_id, 'payment_type' => $row->payment_type]).'" title="Edit">
-                        <i class="fas fa-edit fa-lg"></i>
-                    </a>
                 ';
             });
 
@@ -70,10 +65,6 @@ class SalesOrderController extends Controller
 
             $table->addColumn('salesperson_name', function ($row) {
                 return $row->salesperson ? $row->salesperson->short_name : '';
-            });
-
-            $table->editColumn('payment_type', function ($row) {
-                return $row->payment_type ? SalesOrder::PAYMENT_TYPE_SELECT[$row->payment_type] : '';
             });
 
             $table->rawColumns(['actions', 'placeholder', 'semester', 'salesperson']);
@@ -197,7 +188,6 @@ class SalesOrderController extends Controller
             'products' => 'required|array',
             'products.*' => 'exists:book_variants,id',
             'payment_types' => 'required|array',
-            'quantities.*' => 'numeric|min:1',
             'quantities' => 'required|array',
             'quantities.*' => 'numeric|min:1',
         ]);
@@ -257,18 +247,17 @@ class SalesOrderController extends Controller
 
         $semester = $request->semester;
         $salesperson = $request->salesperson;
-        // $payment_type = $request->payment_type;
 
-        $orders = SalesOrder::where('salesperson_id', $salesperson)
-            ->where('semester_id', $semester)
-            // ->where('payment_type', $payment_type)
-            ->get();
+        $orders = BookVariant::whereHas('estimasi', function ($q) use ($salesperson, $semester) {
+                    $q->where('salesperson_id', $salesperson)
+                    ->where('semester_id', $semester);
+                })->with('estimasi')->orderBy('code', 'ASC')->get();
+        
+        $salesOrder = SalesOrder::where('salesperson_id', $salesperson)->where('semester_id', $semester)->first();
 
-        $salesOrder = $orders->first();
-
-        $salesOrder->load('semester', 'salesperson', 'product', 'jenjang', 'kurikulum');
-
-        return view('admin.salesOrders.show', compact('salesOrder', 'orders'));
+        $grouped = $orders->sortBy('product.kelas_id')->sortBy('product.mapel_id')->groupBy('jen_kum');
+            
+        return view('admin.salesOrders.show', compact('salesOrder', 'orders', 'grouped'));
     }
 
     public function destroy(SalesOrder $salesOrder)

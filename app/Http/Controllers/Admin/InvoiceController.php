@@ -142,7 +142,7 @@ class InvoiceController extends Controller
 
         $no_faktur = Invoice::generateNoInvoice($delivery->semester_id);
 
-        $today = Carbon::now()->format('d-m-Y');
+        $today = Carbon::parse($delivery->date)->format('d-m-Y');
 
         return view('admin.invoices.generate', compact('delivery', 'delivery_item', 'no_faktur', 'today'));
     }

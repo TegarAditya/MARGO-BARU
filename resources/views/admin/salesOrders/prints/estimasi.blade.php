@@ -52,7 +52,7 @@
             <tbody>
                 @foreach ($value as $order)
                     @php
-                    $sisa = $order->quantity - $order->moved;
+                    $sisa = max(0, $order->quantity - $order->moved);
                     $total_sisa += $sisa;
 
                     $product = $order->product;
@@ -63,7 +63,7 @@
                         <td>{{ $product->mapel->name }}</td>
                         <td class="text-center">{{ $product->kelas->code }}</td>
                         <td class="text-center">{{ $product->halaman->code }}</td>
-                        <td class="text-center">{{ angka(max($sisa, 0))}}</td>
+                        <td class="text-center">{{ angka($sisa)}}</td>
                     </tr>
                 @endforeach
             </tbody>

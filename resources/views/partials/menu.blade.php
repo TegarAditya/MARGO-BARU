@@ -397,7 +397,7 @@
                                     </a>
                                 </li>
                             @endcan
-                            @can('book_component_access')
+                            {{-- @can('book_component_access')
                                 <li class="nav-item">
                                     <a href="{{ route("admin.book-components.index") }}" class="nav-link {{ request()->is("admin/book-components") || request()->is("admin/book-components/*") ? "active" : "" }}">
                                         <i class="fa-fw nav-icon fas fa-book">
@@ -408,7 +408,7 @@
                                         </p>
                                     </a>
                                 </li>
-                            @endcan
+                            @endcan --}}
                         </ul>
                     </li>
                 @endcan
@@ -491,8 +491,8 @@
                     </li>
                 @endcan
                 @can('estimasi_access')
-                    <li class="nav-item has-treeview {{ request()->is("admin/sales-orders*") ? "menu-open" : "" }} {{ request()->is("admin/estimasi-saldos*") ? "menu-open" : "" }} {{ request()->is("admin/production-estimations*") ? "menu-open" : "" }} {{ request()->is("admin/estimation-movements*") ? "menu-open" : "" }}">
-                        <a class="nav-link nav-dropdown-toggle {{ request()->is("admin/sales-orders*") ? "active" : "" }} {{ request()->is("admin/estimasi-saldos*") ? "active" : "" }} {{ request()->is("admin/production-estimations*") ? "active" : "" }} {{ request()->is("admin/estimation-movements*") ? "active" : "" }}" href="#">
+                    <li class="nav-item has-treeview {{ request()->is("admin/estimations*") ? "menu-open" : "" }} {{ request()->is("admin/sales-orders*") ? "menu-open" : "" }} {{ request()->is("admin/estimasi-saldos*") ? "menu-open" : "" }} {{ request()->is("admin/production-estimations*") ? "menu-open" : "" }} {{ request()->is("admin/estimation-movements*") ? "menu-open" : "" }}">
+                        <a class="nav-link nav-dropdown-toggle {{ request()->is("admin/estimations*") ? "active" : "" }} {{ request()->is("admin/sales-orders*") ? "active" : "" }} {{ request()->is("admin/estimasi-saldos*") ? "active" : "" }} {{ request()->is("admin/production-estimations*") ? "active" : "" }} {{ request()->is("admin/estimation-movements*") ? "active" : "" }}" href="#">
                             <i class="fa-fw nav-icon fas fa-weight">
 
                             </i>
@@ -502,6 +502,18 @@
                             </p>
                         </a>
                         <ul class="nav nav-treeview">
+                            @can('estimation_access')
+                                <li class="nav-item">
+                                    <a href="{{ route("admin.estimations.index") }}" class="nav-link {{ request()->is("admin/estimations") || request()->is("admin/estimations/*") ? "active" : "" }}">
+                                        <i class="fa-fw nav-icon fab fa-jedi-order">
+
+                                        </i>
+                                        <p>
+                                            {{ trans('cruds.estimation.title') }}
+                                        </p>
+                                    </a>
+                                </li>
+                            @endcan
                             @can('sales_order_access')
                                 <li class="nav-item">
                                     <a href="{{ route("admin.sales-orders.index") }}" class="nav-link {{ request()->is("admin/sales-orders") || request()->is("admin/sales-orders/*") ? "active" : "" }}">
