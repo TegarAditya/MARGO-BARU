@@ -10,6 +10,24 @@ use App\Models\Material;
 
 class StockService
 {
+    public static function createStockAwal($product, $quantity)
+    {
+        $awal = StockMovement::where('product_id', $product)->where('transaction_type', 'awal')->first();
+
+        if (!$awal) {
+            $estimation = StockMovement::create([
+                'warehouse' => 1,
+                'movement_date' => Carbon::now()->format('d-m-Y'),
+                'movement_type' => 'in',
+                'transaction_type' => 'awal',
+                'reference_id' => $product,
+                'reference_date' => Carbon::now()->format('d-m-Y'),
+                'product_id' => $product,
+                'quantity' => $quantity,
+            ]);
+        }
+    }
+
     public static function createMovement($type_movement, $transaction_type, $reference, $date,  $product, $quantity)
     {
         $estimation = StockMovement::create([
@@ -125,10 +143,10 @@ class StockService
             'quantity' => $realisasi,
         ]);
 
-        
+
         $gum = Material::where('code', 'GUM')->first();
         $gum_qty = 2.5 * $realisasi;
-        
+
         StockMovement::create([
             'warehouse' => 2,
             'movement_date' => Carbon::now()->format('d-m-Y'),
@@ -139,12 +157,12 @@ class StockService
             'material_id' => $gum->id,
             'quantity' => $gum_qty,
         ]);
-        
+
         $gum->update([
             'stock' => DB::raw("stock - $gum_qty")
         ]);
 
-        
+
         $developer = Material::where('code', 'DEVELOPER')->first();
         $developer_qty = 15 * $realisasi;
 

@@ -19,6 +19,7 @@ use App\Models\Semester;
 use App\Models\Halaman;
 use DB;
 use Alert;
+use App\Services\StockService;
 
 class BookImport implements ToCollection, WithHeadingRow
 {
@@ -79,12 +80,14 @@ class BookImport implements ToCollection, WithHeadingRow
                         'halaman_id' => $halaman->id,
                         'semester_id' => $semester->id,
                         'warehouse_id' => 1,
-                        'stock' => 0,
+                        'stock' => DB::raw("stock"),
                         'unit_id' => 1,
                         'price' => $row['harga'],
                         'cost' => $row['hpp'],
                         'status' => 1,
                     ]);
+
+                    StockService::createStockAwal($lks->id, $lks->stock);
 
                     foreach(BookVariant::LKS_TYPE as $key => $label) {
                         $component = BookVariant::updateOrCreate([

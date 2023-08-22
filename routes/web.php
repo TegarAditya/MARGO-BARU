@@ -180,6 +180,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
 
     // Stock Saldo
     Route::delete('stock-saldos/destroy', 'StockSaldoController@massDestroy')->name('stock-saldos.massDestroy');
+    Route::post('stock-saldos/jangka', 'StockSaldoController@jangka')->name('stock-saldos.jangka');
     Route::resource('stock-saldos', 'StockSaldoController');
 
     // Estimasi Saldo

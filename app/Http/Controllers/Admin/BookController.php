@@ -27,6 +27,7 @@ use Yajra\DataTables\Facades\DataTables;
 use Alert;
 use Excel;
 use App\Imports\BookImport;
+use App\Services\StockService;
 
 class BookController extends Controller
 {
@@ -163,6 +164,8 @@ class BookController extends Controller
                         'cost' => $cost,
                         'status' => 1,
                     ]);
+
+                    StockService::createStockAwal($lks->id, $stock);
 
                     foreach(BookComponent::LKS_TYPE as $key => $label) {
                         $component = BookVariant::updateOrCreate([
@@ -366,12 +369,23 @@ class BookController extends Controller
     {
         abort_if(Gate::denies('book_delete'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
+        $relationMethods = ['estimasi', 'estimasi_produksi', 'movement'];
+
         $variants = BookVariant::where('book_id', $book->id)->get();
         foreach($variants as $variant) {
+            foreach ($relationMethods as $relationMethod) {
+                if ($variant->$relationMethod()->count() > 0) {
+                    Alert::warning('Error', 'Salah Satu Book Variant telah digunakan, tidak bisa dihapus !');
+                    return back();
+                }
+            }
+
             $variant->delete();
         }
 
         $book->delete();
+
+        Alert::success('Success', 'Book Variant berhasil dihapus !');
 
         return back();
     }

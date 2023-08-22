@@ -257,7 +257,18 @@ class BookVariantController extends Controller
     {
         abort_if(Gate::denies('book_variant_delete'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
+        $relationMethods = ['estimasi', 'estimasi_produksi', 'movement'];
+
+        foreach ($relationMethods as $relationMethod) {
+            if ($bookVariant->$relationMethod()->count() > 0) {
+                Alert::warning('Error', 'Book Variant telah digunakan, tidak bisa dihapus !');
+                return back();
+            }
+        }
+
         $bookVariant->delete();
+
+        Alert::success('Success', 'Book Variant berhasil dihapus !');
 
         return back();
     }

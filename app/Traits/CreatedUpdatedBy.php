@@ -2,7 +2,6 @@
 
 namespace App\Traits;
 
-use App\Models\AuditLog;
 use Illuminate\Database\Eloquent\Model;
 
 trait CreatedUpdatedBy

@@ -25,6 +25,7 @@ class StockMovement extends Model
     ];
 
     public const TRANSACTION_TYPE_SELECT = [
+        'awal'   => 'Stock Awal',
         'adjustment' => 'Adjustment',
         'delivery'   => 'Delivery',
         'retur'      => 'Retur',

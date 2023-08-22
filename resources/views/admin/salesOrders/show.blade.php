@@ -41,7 +41,7 @@
                         <div class="col">
                             <h6>Estimasi Jenjang {{ $key }}</h6>
 
-                            <p class="mb-0">Total Produk: {{ $orders->count() }}</p>
+                            <p class="mb-0">Total Produk: {{ $value->count() }}</p>
                         </div>
                     </div>
 
@@ -117,10 +117,10 @@
                             </table>
                         </div>
                     </div>
-                </section>   
+                </section>
             @endforeach
 
-            
+
         </div>
         <div class="row mt-3">
 

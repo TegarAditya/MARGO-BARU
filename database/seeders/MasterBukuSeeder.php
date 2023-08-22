@@ -31,7 +31,7 @@ class MasterBukuSeeder extends Seeder
         ('SDD', 'SD'),
         ('SMP', 'SMP'),
         ('SMA', 'SMA'),
-        ('MI', 'MII'),
+        ('MII', 'MI'),
         ('MTS', 'MTS'),
         ('MAA', 'MA'),
         ('SMK', 'SMK'),

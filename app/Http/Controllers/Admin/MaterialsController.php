@@ -137,6 +137,8 @@ class MaterialsController extends Controller
         $material = Material::create($request->all());
         $material->vendors()->sync($request->input('vendors', []));
 
+        Alert::success('Success', 'Material telah disimpan !');
+
         return redirect()->route('admin.materials.index');
     }
 
@@ -158,6 +160,8 @@ class MaterialsController extends Controller
         $material->update($request->all());
         $material->vendors()->sync($request->input('vendors', []));
 
+        Alert::success('Success', 'Material telah disimpan !');
+
         return redirect()->route('admin.materials.index');
     }
 
@@ -174,7 +178,18 @@ class MaterialsController extends Controller
     {
         abort_if(Gate::denies('material_delete'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
+        $relationMethods = ['plate_items', 'movement'];
+
+        foreach ($relationMethods as $relationMethod) {
+            if ($material->$relationMethod()->count() > 0) {
+                Alert::warning('Error', 'Material telah digunakan, tidak bisa dihapus !');
+                return back();
+            }
+        }
+
         $material->delete();
+
+        Alert::success('Success', 'Material telah dihapus !');
 
         return back();
     }
