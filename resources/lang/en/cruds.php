@@ -495,6 +495,8 @@ return [
             'deleted_at_helper' => ' ',
             'reason'            => 'Reason',
             'reason_helper'     => ' ',
+            'type'              => 'Type',
+            'type_helper'       => ' ',
         ],
     ],
     'material' => [

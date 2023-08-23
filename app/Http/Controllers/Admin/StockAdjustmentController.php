@@ -15,6 +15,7 @@ use Yajra\DataTables\Facades\DataTables;
 use DB;
 use Alert;
 use App\Services\StockService;
+use Carbon\Carbon;
 
 class StockAdjustmentController extends Controller
 {
@@ -43,6 +44,9 @@ class StockAdjustmentController extends Controller
             $table->editColumn('operation', function ($row) {
                 return $row->operation ? StockAdjustment::OPERATION_SELECT[$row->operation] : '';
             });
+            $table->editColumn('type', function ($row) {
+                return $row->type ? StockAdjustment::TYPE_SELECT[$row->type] : '';
+            });
             $table->editColumn('reason', function ($row) {
                 return $row->reason ? $row->reason : '';
             });
@@ -55,11 +59,17 @@ class StockAdjustmentController extends Controller
         return view('admin.stockAdjustments.index');
     }
 
-    public function create()
+    public function create(Request $request)
     {
         abort_if(Gate::denies('stock_adjustment_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        return view('admin.stockAdjustments.create');
+        $today = Carbon::now()->format('d-m-Y');
+
+        if ($request->type == 'material') {
+            return view('admin.stockAdjustments.createMaterial', compact('today'));
+        }
+
+        return view('admin.stockAdjustments.create', compact('today'));
     }
 
     public function store(Request $request)
@@ -68,6 +78,7 @@ class StockAdjustmentController extends Controller
         $validatedData = $request->validate([
             'date' =>'required',
             'operation' => 'required',
+            'type' => 'required',
             'reason' => 'required',
             'note' => 'nullable',
             'products' => 'required|array',
@@ -78,6 +89,7 @@ class StockAdjustmentController extends Controller
 
         $date = $validatedData['date'];
         $operation = $validatedData['operation'];
+        $type = $validatedData['type'];
         $reason = $validatedData['reason'];
         $note = $validatedData['note'];
         $products = $validatedData['products'];
@@ -87,26 +99,38 @@ class StockAdjustmentController extends Controller
         try {
             $adjustment = StockAdjustment::create([
                 'date' => $date,
+                'type' => $type,
                 'operation' => $operation,
                 'reason' => $reason,
                 'note' => $note,
             ]);
 
-            $multiplier = ($operation == 'add') ? 1 : -1;
-            $type = ($operation == 'add') ? 'in' : 'out';
+            $multiplier = ($operation == 'increase') ? 1 : -1;
+            $movement = ($operation == 'increase') ? 'in' : 'out';
 
             for ($i = 0; $i < count($products); $i++) {
                 $product = $products[$i];
                 $quantity = $quantities[$i];
 
-                $adjustment_item = StockAdjustmentDetail::create([
-                    'product_id' => $product,
-                    'stock_adjustment_id' => $adjustment->id,
-                    'quantity' => $quantity
-                ]);
+                if ($type == 'book') {
+                    $adjustment_item = StockAdjustmentDetail::create([
+                        'product_id' => $product,
+                        'stock_adjustment_id' => $adjustment->id,
+                        'quantity' => $quantity
+                    ]);
 
-                StockService::createMovement($type, 'adjustment', $adjustment->id, $date, $product, $multiplier * $quantity);
-                StockService::updateStock($product, $multiplier * $quantity);
+                    StockService::createMovement($movement, 'adjustment', $adjustment->id, $date, $product, $multiplier * $quantity);
+                    StockService::updateStock($product, $multiplier * $quantity);
+                } else if($type == 'material') {
+                    $adjustment_item = StockAdjustmentDetail::create([
+                        'material_id' => $product,
+                        'stock_adjustment_id' => $adjustment->id,
+                        'quantity' => $quantity
+                    ]);
+
+                    StockService::createMovementMaterial($movement, 'adjustment', $adjustment->id, $date, $product, $multiplier * $quantity);
+                    StockService::updateStockMaterial($product, $multiplier * $quantity);
+                }
             }
 
             DB::commit();
@@ -125,6 +149,10 @@ class StockAdjustmentController extends Controller
     {
         abort_if(Gate::denies('stock_adjustment_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
+        if ($stockAdjustment->type == 'material') {
+            return view('admin.stockAdjustments.editMaterial', compact('stockAdjustment'));
+        }
+
         return view('admin.stockAdjustments.edit', compact('stockAdjustment'));
     }
 
@@ -133,6 +161,7 @@ class StockAdjustmentController extends Controller
         // Validate the form data
         $validatedData = $request->validate([
             'date' =>'required',
+            'type' => 'required',
             'reason' => 'required',
             'note' => 'nullable',
             'adjustment_details' => 'required|array',
@@ -144,6 +173,7 @@ class StockAdjustmentController extends Controller
         ]);
 
         $date = $validatedData['date'];
+        $type = $validatedData['type'];
         $reason = $validatedData['reason'];
         $note = $validatedData['note'];
         $adjustment_details = $validatedData['adjustment_details'];
@@ -160,8 +190,8 @@ class StockAdjustmentController extends Controller
                 'note' => $note,
             ]);
 
-            $multiplier = ($operation == 'add') ? 1 : -1;
-            $type = ($operation == 'add') ? 'in' : 'out';
+            $multiplier = ($operation == 'increase') ? 1 : -1;
+            $movement = ($operation == 'increase') ? 'in' : 'out';
 
             for ($i = 0; $i < count($products); $i++) {
                 $adjustment_detail = $adjustment_details[$i];
@@ -175,8 +205,13 @@ class StockAdjustmentController extends Controller
 
                 $adjustment_item->save();
 
-                StockService::editMovement($type, 'adjustment', $stockAdjustment->id, $date, $product, $multiplier * $quantity);
-                StockService::updateStock($product, ($multiplier * $quantity) - ($multiplier * $old_quantity));
+                if ($type == 'book') {
+                    StockService::editMovement($movement, 'adjustment', $stockAdjustment->id, $date, $product, $multiplier * $quantity);
+                    StockService::updateStock($product, ($multiplier * $quantity) - ($multiplier * $old_quantity));
+                } else if($type == 'material') {
+                    StockService::editMovementMaterial($movement, 'adjustment', $stockAdjustment->id, $date, $product, $multiplier * $quantity);
+                    StockService::updateStockMaterial($product, ($multiplier * $quantity) - ($multiplier * $old_quantity));
+                }
             }
 
             DB::commit();

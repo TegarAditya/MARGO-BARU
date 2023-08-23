@@ -12,6 +12,7 @@ class CreateStockAdjustmentsTable extends Migration
             $table->bigIncrements('id');
             $table->date('date');
             $table->string('operation');
+            $table->string('type')->nullable();
             $table->string('reason');
             $table->longText('note')->nullable();
             $table->timestamps();

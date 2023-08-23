@@ -17,8 +17,8 @@ class StockAdjustment extends Model
     public $table = 'stock_adjustments';
 
     public const OPERATION_SELECT = [
-        'add'    => 'Tambah',
-        'delete' => 'Hapus',
+        'increase' => 'Tambah',
+        'decrease' => 'Kurang',
     ];
 
     protected $dates = [
@@ -28,9 +28,15 @@ class StockAdjustment extends Model
         'deleted_at',
     ];
 
+    public const TYPE_SELECT = [
+        'book'      => 'Book',
+        'material'  => 'Material',
+    ];
+
     protected $fillable = [
         'date',
         'operation',
+        'type',
         'reason',
         'note',
         'created_by_id',
@@ -53,5 +59,15 @@ class StockAdjustment extends Model
     public function setDateAttribute($value)
     {
         $this->attributes['date'] = $value ? Carbon::createFromFormat(config('panel.date_format'), $value)->format('Y-m-d') : null;
+    }
+
+    public function created_by()
+    {
+        return $this->belongsTo(User::class, 'created_by_id');
+    }
+
+    public function updated_by()
+    {
+        return $this->belongsTo(User::class, 'updated_by_id');
     }
 }

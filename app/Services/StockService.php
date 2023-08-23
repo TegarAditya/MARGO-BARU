@@ -28,6 +28,24 @@ class StockService
         }
     }
 
+    public static function createStockAwalMaterial($material, $quantity)
+    {
+        $awal = StockMovement::where('material_id', $material)->where('transaction_type', 'awal')->first();
+
+        if (!$awal) {
+            $estimation = StockMovement::create([
+                'warehouse' => 1,
+                'movement_date' => Carbon::now()->format('d-m-Y'),
+                'movement_type' => 'in',
+                'transaction_type' => 'awal',
+                'reference_id' => $material,
+                'reference_date' => Carbon::now()->format('d-m-Y'),
+                'material_id' => $material,
+                'quantity' => $quantity,
+            ]);
+        }
+    }
+
     public static function createMovement($type_movement, $transaction_type, $reference, $date,  $product, $quantity)
     {
         $estimation = StockMovement::create([

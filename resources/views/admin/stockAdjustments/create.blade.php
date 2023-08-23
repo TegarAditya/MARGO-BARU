@@ -15,11 +15,12 @@
 
         <form method="POST" action="{{ route("admin.stock-adjustments.store") }}" enctype="multipart/form-data">
             @csrf
+            <input type="hidden" name="type" value="book">
             <div class="row">
                 <div class="col-6">
                     <div class="form-group">
                         <label class="required" for="date">{{ trans('cruds.stockAdjustment.fields.date') }}</label>
-                        <input class="form-control date {{ $errors->has('date') ? 'is-invalid' : '' }}" type="text" name="date" id="date" value="{{ old('date') }}" required>
+                        <input class="form-control date {{ $errors->has('date') ? 'is-invalid' : '' }}" type="text" name="date" id="date" value="{{ old('date', $today) }}" required>
                         @if($errors->has('date'))
                             <span class="text-danger">{{ $errors->first('date') }}</span>
                         @endif

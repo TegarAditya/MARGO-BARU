@@ -73,4 +73,9 @@ class Material extends Model
     {
         return $this->hasMany(StockMovement::class, 'material_id');
     }
+
+    public function adjustment()
+    {
+        return $this->hasMany(StockAdjustmentDetail::class, 'material_id');
+    }
 }

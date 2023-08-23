@@ -310,4 +310,78 @@ class MaterialsController extends Controller
 
         return response()->json($formattedMaterials);
     }
+
+    public function getMaterials(Request $request) {
+        $query = $request->input('q');
+
+        $materials = Material::whereIn('category', ['plate', 'chemical'])->where(function($q) use ($query) {
+            $q->where('code', 'LIKE', "%{$query}%")
+            ->orWhere('name', 'LIKE', "%{$query}%");
+        })->orderBy('code', 'ASC')->get();
+
+        $formattedMaterials = [];
+
+        foreach ($materials as $material) {
+            $formattedMaterials[] = [
+                'id' => $material->id,
+                'text' => $material->code .' - '.$material->name,
+                'stock' => $material->stock,
+                'code' => $material->code,
+                'name' => $material->name,
+            ];
+        }
+
+        return response()->json($formattedMaterials);
+    }
+
+    public function getMaterial(Request $request)
+    {
+        $id = $request->input('id');
+
+        $product = Material::find($id);
+        $product->load('unit');
+
+        return response()->json($product);
+    }
+
+    public function getAdjustment(Request $request)
+    {
+        $query = $request->input('q');
+        $adjustment = $request->input('adjustment');
+
+        $products = Material::whereHas('adjustment', function ($q) use ($adjustment) {
+                    $q->where('stock_adjustment_id', $adjustment);
+                })->where(function($q) use ($query) {
+                    $q->where('code', 'LIKE', "%{$query}%")
+                    ->orWhere('name', 'LIKE', "%{$query}%");
+                })->orderBy('code', 'ASC')->get();
+
+        $formattedProducts = [];
+
+        foreach ($products as $product) {
+            $formattedProducts[] = [
+                'id' => $product->id,
+                'text' => $product->code. ' - '. $product->name,
+                'stock' => $product->stock,
+                'name' => $product->name,
+            ];
+        }
+
+        return response()->json($formattedProducts);
+    }
+
+    public function getInfoAdjustment(Request $request)
+    {
+        $id = $request->input('id');
+        $adjustment = $request->input('adjustment');
+
+        $product = Material::join('stock_adjustment_details', 'stock_adjustment_details.product_id', '=', 'materials.id')
+                ->where('materials.id', $id)
+                ->where('stock_adjustment_details.stock_adjustment_id', $adjustment)
+                ->first(['materials.*', 'stock_adjustment_details.quantity as quantity', 'stock_adjustment_details.id as adjustment_detail_id']);
+        $product->load('unit');
+
+        return response()->json($product);
+    }
+
 }

@@ -4,7 +4,10 @@
     <div style="margin-bottom: 10px;" class="row">
         <div class="col-lg-12">
             <a class="btn btn-success" href="{{ route('admin.stock-adjustments.create') }}">
-                {{ trans('global.add') }} {{ trans('cruds.stockAdjustment.title_singular') }}
+                {{ trans('global.add') }} {{ trans('cruds.stockAdjustment.title_singular') }} Buku
+            </a>
+            <a class="btn btn-warning" href="{{ route('admin.stock-adjustments.create', ['type' => 'material']) }}">
+                {{ trans('global.add') }} {{ trans('cruds.stockAdjustment.title_singular') }} Material
             </a>
         </div>
     </div>
@@ -28,6 +31,9 @@
                         {{ trans('cruds.stockAdjustment.fields.date') }}
                     </th>
                     <th>
+                        {{ trans('cruds.stockAdjustment.fields.type') }}
+                    </th>
+                    <th>
                         {{ trans('cruds.stockAdjustment.fields.reason') }}
                     </th>
                     <th>
@@ -45,37 +51,8 @@
 @section('scripts')
 @parent
 <script>
-    $(function () {
+$(function () {
   let dtButtons = $.extend(true, [], $.fn.dataTable.defaults.buttons)
-@can('stock_adjustment_delete')
-  let deleteButtonTrans = '{{ trans('global.datatables.delete') }}';
-  let deleteButton = {
-    text: deleteButtonTrans,
-    url: "{{ route('admin.stock-adjustments.massDestroy') }}",
-    className: 'btn-danger',
-    action: function (e, dt, node, config) {
-      var ids = $.map(dt.rows({ selected: true }).data(), function (entry) {
-          return entry.id
-      });
-
-      if (ids.length === 0) {
-        alert('{{ trans('global.datatables.zero_selected') }}')
-
-        return
-      }
-
-      if (confirm('{{ trans('global.areYouSure') }}')) {
-        $.ajax({
-          headers: {'x-csrf-token': _token},
-          method: 'POST',
-          url: config.url,
-          data: { ids: ids, _method: 'DELETE' }})
-          .done(function () { location.reload() })
-      }
-    }
-  }
-  dtButtons.push(deleteButton)
-@endcan
 
   let dtOverrideGlobals = {
     buttons: dtButtons,
@@ -88,6 +65,7 @@
         { data: 'placeholder', name: 'placeholder' },
         { data: 'operation', name: 'operation', class: 'text-center' },
         { data: 'date', name: 'date', class: 'text-center' },
+        { data: 'type', name: 'type', class: 'text-center' },
         { data: 'reason', name: 'reason' },
         { data: 'actions', name: '{{ trans('global.actions') }}', class: 'text-center' }
     ],
@@ -103,31 +81,4 @@
 
 });
 </script>
-{{-- <script type="text/javascript">
-$(function() {
-
-    var start = moment().subtract(29, 'days');
-    var end = moment();
-
-    function cb(start, end) {
-        $('#reportrange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
-    }
-
-    $('#reportrange').daterangepicker({
-        startDate: start,
-        endDate: end,
-        ranges: {
-            'Today': [moment(), moment()],
-            'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
-            'Last 7 Days': [moment().subtract(6, 'days'), moment()],
-            'Last 30 Days': [moment().subtract(29, 'days'), moment()],
-            'This Month': [moment().startOf('month'), moment().endOf('month')],
-            'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
-        }
-    }, cb);
-
-    cb(start, end);
-
-});
-</script> --}}
 @endsection

@@ -113,7 +113,7 @@
             templateResult: formatProduct,
             templateSelection: formatProductSelection,
             ajax: {
-                    url: "{{ route('admin.book-variants.getAdjustment') }}",
+                    url: "{{ route('admin.materials.getAdjustment') }}",
                     dataType: 'json',
                     delay: 250,
                     data: function(params) {
@@ -161,7 +161,7 @@
             }
 
             $.ajax({
-                url: "{{ route('admin.book-variants.getInfoAdjustment') }}",
+                url: "{{ route('admin.materials.getInfoAdjustment') }}",
                 type: 'GET',
                 dataType: 'json',
                 data: {
@@ -172,16 +172,16 @@
                     var formHtml = `
                         <div class="item-product" id="product-${product.id}">
                             <div class="row">
-                                <div class="col-8 align-self-center">
-                                    <h6 class="text-sm product-name mb-1">(${product.book_type}) ${product.short_name}</h6>
+                                <div class="col-6 align-self-center">
+                                    <h6 class="text-sm product-name mb-1">${product.code} - ${product.name}</h6>
                                     <p class="mb-0 text-sm">
-                                        Code : <strong>${product.code}</strong>
-                                    </p>
-                                    <p class="mb-0 text-sm">
-                                        Jenjang - Kurikulum : <strong>${product.jenjang.name} - ${product.kurikulum.name}</strong>
+                                        Name : <strong>${product.name}</strong>
                                     </p>
                                     <p class="mb-0 text-sm">
                                         <strong>STOCK : ${product.stock}</strong>
+                                    </p>
+                                    <p class="mb-0 text-sm">
+                                        <strong>Unit : ${product.unit.name}</strong>
                                     </p>
                                 </div>
                                 <div class="col offset-1 row align-items-end align-self-center">

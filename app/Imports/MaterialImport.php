@@ -8,6 +8,7 @@ use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithMultipleSheets;
 use App\Models\Material;
 use App\Models\Unit;
+use App\Services\StockService;
 
 class MaterialImport implements ToCollection, WithHeadingRow, WithMultipleSheets
 {
@@ -29,7 +30,7 @@ class MaterialImport implements ToCollection, WithHeadingRow, WithMultipleSheets
         foreach ($rows as $row) {
             $unit = Unit::where('code', $row['unit'])->first()->id;
 
-            Material::create([
+            $material = Material::create([
                 'code' => $row['code'],
                 'name' => $row['name'],
                 'category' => $row['category'],
@@ -38,6 +39,8 @@ class MaterialImport implements ToCollection, WithHeadingRow, WithMultipleSheets
                 'stock' => $row['stock'],
                 'warehouse_id' => 1,
             ]);
+
+            StockService::createStockAwalMaterial($material->id, $material->stock);
         }
     }
 }

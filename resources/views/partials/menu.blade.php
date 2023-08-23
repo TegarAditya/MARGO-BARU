@@ -491,8 +491,8 @@
                     </li>
                 @endcan
                 @can('estimasi_access')
-                    <li class="nav-item has-treeview {{ request()->is("admin/estimations*") ? "menu-open" : "" }} {{ request()->is("admin/sales-orders*") ? "menu-open" : "" }} {{ request()->is("admin/estimasi-saldos*") ? "menu-open" : "" }} {{ request()->is("admin/production-estimations*") ? "menu-open" : "" }} {{ request()->is("admin/estimation-movements*") ? "menu-open" : "" }}">
-                        <a class="nav-link nav-dropdown-toggle {{ request()->is("admin/estimations*") ? "active" : "" }} {{ request()->is("admin/sales-orders*") ? "active" : "" }} {{ request()->is("admin/estimasi-saldos*") ? "active" : "" }} {{ request()->is("admin/production-estimations*") ? "active" : "" }} {{ request()->is("admin/estimation-movements*") ? "active" : "" }}" href="#">
+                    <li class="nav-item has-treeview {{ request()->is("admin/estimations*") ? "menu-open" : "" }} {{ request()->is("admin/sales-orders*") ? "menu-open" : "" }} {{ request()->is("admin/estimasi-saldos*") ? "menu-open" : "" }} {{ request()->is("admin/estimation-movements*") ? "menu-open" : "" }}">
+                        <a class="nav-link nav-dropdown-toggle {{ request()->is("admin/estimations*") ? "active" : "" }} {{ request()->is("admin/sales-orders*") ? "active" : "" }} {{ request()->is("admin/estimasi-saldos*") ? "active" : "" }} {{ request()->is("admin/estimation-movements*") ? "active" : "" }}" href="#">
                             <i class="fa-fw nav-icon fas fa-weight">
 
                             </i>
@@ -538,19 +538,8 @@
                                     </a>
                                 </li>
                             @endcan
-                            @can('production_estimation_access')
-                                <li class="nav-item">
-                                    <a href="{{ route("admin.production-estimations.index") }}" class="nav-link {{ request()->is("admin/production-estimations") || request()->is("admin/production-estimations/*") ? "active" : "" }}">
-                                        <i class="fa-fw nav-icon fab fa-accessible-icon">
 
-                                        </i>
-                                        <p>
-                                            {{ trans('cruds.productionEstimation.title') }}
-                                        </p>
-                                    </a>
-                                </li>
-                            @endcan
-                            @can('estimation_movement_access')
+                            {{-- @can('estimation_movement_access')
                                 <li class="nav-item">
                                     <a href="{{ route("admin.estimation-movements.index") }}" class="nav-link {{ request()->is("admin/estimation-movements") || request()->is("admin/estimation-movements/*") ? "active" : "" }}">
                                         <i class="fa-fw nav-icon fas fa-arrows-alt">
@@ -561,7 +550,7 @@
                                         </p>
                                     </a>
                                 </li>
-                            @endcan
+                            @endcan --}}
                         </ul>
                     </li>
                 @endcan
@@ -767,8 +756,8 @@
                     </li>
                 @endcan
                 @can('produksi_access')
-                    <li class="nav-item has-treeview {{ request()->is("admin/plate-prints*") ? "menu-open" : "" }} {{ request()->is("admin/cetaks*") ? "menu-open" : "" }} {{ request()->is("admin/cetak-items*") ? "menu-open" : "" }} {{ request()->is("admin/finishings*") ? "menu-open" : "" }} {{ request()->is("admin/finishing-items*") ? "menu-open" : "" }}">
-                        <a class="nav-link nav-dropdown-toggle {{ request()->is("admin/plate-prints*") ? "active" : "" }} {{ request()->is("admin/cetaks*") ? "active" : "" }} {{ request()->is("admin/cetak-items*") ? "active" : "" }} {{ request()->is("admin/finishings*") ? "active" : "" }} {{ request()->is("admin/finishing-items*") ? "active" : "" }}" href="#">
+                    <li class="nav-item has-treeview {{ request()->is("admin/production-estimations*") ? "menu-open" : "" }} {{ request()->is("admin/plate-prints*") ? "menu-open" : "" }} {{ request()->is("admin/cetaks*") ? "menu-open" : "" }} {{ request()->is("admin/cetak-items*") ? "menu-open" : "" }} {{ request()->is("admin/finishings*") ? "menu-open" : "" }} {{ request()->is("admin/finishing-items*") ? "menu-open" : "" }}">
+                        <a class="nav-link nav-dropdown-toggle {{ request()->is("admin/production-estimations*") ? "active" : "" }} {{ request()->is("admin/plate-prints*") ? "active" : "" }} {{ request()->is("admin/cetaks*") ? "active" : "" }} {{ request()->is("admin/cetak-items*") ? "active" : "" }} {{ request()->is("admin/finishings*") ? "active" : "" }} {{ request()->is("admin/finishing-items*") ? "active" : "" }}" href="#">
                             <i class="fa-fw nav-icon fas fa-print">
 
                             </i>
@@ -778,6 +767,18 @@
                             </p>
                         </a>
                         <ul class="nav nav-treeview">
+                            @can('production_estimation_access')
+                                <li class="nav-item">
+                                    <a href="{{ route("admin.production-estimations.index") }}" class="nav-link {{ request()->is("admin/production-estimations") || request()->is("admin/production-estimations/*") ? "active" : "" }}">
+                                        <i class="fa-fw nav-icon fab fa-accessible-icon">
+
+                                        </i>
+                                        <p>
+                                            Estimasi
+                                        </p>
+                                    </a>
+                                </li>
+                            @endcan
                             @can('plate_print_access')
                                 <li class="nav-item">
                                     <a href="{{ route("admin.plate-prints.index") }}" class="nav-link {{ request()->is("admin/plate-prints") || request()->is("admin/plate-prints/*") ? "active" : "" }}">

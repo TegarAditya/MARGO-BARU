@@ -170,7 +170,11 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     Route::get('materials/template-import', 'MaterialsController@template_import')->name('materials.templateImport');
     Route::get('materials/get-plates', 'MaterialsController@getPlates')->name('materials.getPlates');
     Route::get('materials/get-plate-raws', 'MaterialsController@getPlateRaws')->name('materials.getPlateRaws');
-    Route::get('materials/get-checmicals', 'MaterialsController@getChemicals')->name('materials.getChemicals');
+    Route::get('materials/get-chemicals', 'MaterialsController@getChemicals')->name('materials.getChemicals');
+    Route::get('materials/get-materials', 'MaterialsController@getMaterials')->name('materials.getMaterials');
+    Route::get('materials/get-material', 'MaterialsController@getMaterial')->name('materials.getMaterial');
+    Route::get('materials/get-adjustment', 'MaterialsController@getAdjustment')->name('materials.getAdjustment');
+    Route::get('materials/get-info-adjustment', 'MaterialsController@getInfoAdjustment')->name('materials.getInfoAdjustment');
     Route::post('materials/jangka', 'MaterialsController@jangka')->name('materials.jangka');
     Route::resource('materials', 'MaterialsController');
 

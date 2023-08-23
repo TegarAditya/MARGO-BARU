@@ -15,10 +15,6 @@ class AddRelationshipFieldsToStockAdjustmentDetailsTable extends Migration
             $table->foreign('material_id', 'material_fk_8109421')->references('id')->on('materials');
             $table->unsignedBigInteger('stock_adjustment_id')->nullable();
             $table->foreign('stock_adjustment_id', 'stock_adjustment_fk_8109422')->references('id')->on('stock_adjustments');
-            $table->unsignedBigInteger('created_by_id')->nullable();
-            $table->foreign('created_by_id')->references('id')->on('users');
-            $table->unsignedBigInteger('updated_by_id')->nullable();
-            $table->foreign('updated_by_id')->references('id')->on('users');
         });
     }
 }
