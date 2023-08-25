@@ -46,7 +46,7 @@ class EstimationController extends Controller
 
 
             $table->editColumn('actions', function ($row) {
-                return '
+                $btn = '
                     <a class="px-1" href="'.route('admin.estimations.show', $row->id).'" title="Show">
                         <i class="fas fa-eye text-success fa-lg"></i>
                     </a>
@@ -56,10 +56,15 @@ class EstimationController extends Controller
                     <a class="px-1" href="'.route('admin.sales-orders.show', ['salesperson' => $row->salesperson_id, 'semester' => $row->semester_id]).'" title="Checklist Estimasi">
                         <i class="fas fa-receipt text-danger fa-lg"></i>
                     </a>
-                    <a class="px-1" href="'.route('admin.sales-orders.estimasi', ['salesperson' => $row->salesperson_id, 'semester' => $row->semester_id]).'" target="_blank" title="Print Estimasi" >
-                        <i class="fas fa-print text-secondary fa-lg"></i>
-                    </a>
                 ';
+
+                if ($row->salesperson) {
+                    $btn .= '<a class="px-1" href="'.route('admin.sales-orders.estimasi', ['salesperson' => $row->salesperson_id, 'semester' => $row->semester_id]).'" target="_blank" title="Print Estimasi" >
+                        <i class="fas fa-print text-secondary fa-lg"></i>
+                    </a>';
+                }
+
+                return $btn;
             });
 
             $table->editColumn('no_estimasi', function ($row) {
@@ -71,7 +76,7 @@ class EstimationController extends Controller
             });
 
             $table->addColumn('salesperson_name', function ($row) {
-                return $row->salesperson ? $row->salesperson->name : '';
+                return $row->salesperson ? $row->salesperson->name : 'Internal';
             });
 
             $table->editColumn('payment_type', function ($row) {
@@ -99,19 +104,20 @@ class EstimationController extends Controller
         return view('admin.estimations.index', compact('semesters', 'salespeople', 'today'));
     }
 
-    public function create()
+    public function create(Request $request)
     {
         abort_if(Gate::denies('estimation_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $semesters = Semester::orderBy('code', 'DESC')->where('status', 1)->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
-
-        $salespeople = Salesperson::get()->pluck('full_name', 'id')->prepend(trans('global.pleaseSelect'), '');
-
         $jenjangs = Jenjang::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
-
         $no_estimasi = Estimation::generateNoEstimasi(setting('current_semester'));
-
         $today = Carbon::now()->format('d-m-Y');
+
+        if ($request->salesperson == 'internal') {
+            return view('admin.estimations.createInternal', compact('jenjangs', 'no_estimasi', 'today'));
+        }
+
+        $semesters = Semester::orderBy('code', 'DESC')->where('status', 1)->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $salespeople = Salesperson::get()->pluck('full_name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
         return view('admin.estimations.create', compact('salespeople', 'semesters', 'jenjangs', 'no_estimasi', 'today'));
     }
@@ -121,7 +127,7 @@ class EstimationController extends Controller
         // Validate the form data
         $validatedData = $request->validate([
             'date' => 'required',
-            'salesperson_id' => 'required',
+            'salesperson_id' => 'nullable',
             'jenjang_id' => 'nullable',
             'products' => 'required|array',
             'products.*' => 'exists:book_variants,id',
@@ -132,7 +138,7 @@ class EstimationController extends Controller
 
         $date = $validatedData['date'];
         $semester = setting('current_semester');
-        $salesperson = $validatedData['salesperson_id'];
+        $salesperson = $validatedData['salesperson_id'] ?? null;
         $payment_types = $validatedData['payment_types'];
         $products = $validatedData['products'];
         $quantities = $validatedData['quantities'];
@@ -201,10 +207,6 @@ class EstimationController extends Controller
     {
         abort_if(Gate::denies('estimation_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $semesters = Semester::orderBy('code', 'DESC')->where('status', 1)->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
-
-        $salespeople = Salesperson::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
-
         $jenjangs = Jenjang::pluck('name', 'id')->prepend('All', '');
 
         $estimation->load('semester', 'salesperson');
@@ -213,7 +215,13 @@ class EstimationController extends Controller
 
         $estimasi_list = EstimationItem::where('estimation_id', $estimation->id)->get();
 
-        return view('admin.estimations.edit', compact('estimation', 'estimasi_list', 'salespeople', 'semesters', 'jenjangs', 'no_estimasi'));
+        if ($estimation->salesperson_id == 0) {
+            return view('admin.estimations.editInternal', compact('estimation', 'estimasi_list', 'jenjangs', 'no_estimasi'));
+        }
+
+        $salespeople = Salesperson::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+
+        return view('admin.estimations.edit', compact('estimation', 'estimasi_list', 'salespeople', 'jenjangs', 'no_estimasi'));
     }
 
     public function update(Request $request, Estimation $estimation)

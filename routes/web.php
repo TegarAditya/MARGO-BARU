@@ -209,6 +209,8 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     Route::delete('delivery-orders/destroy', 'DeliveryOrderController@massDestroy')->name('delivery-orders.massDestroy');
     Route::get('delivery-orders/print-sj/{deliveryOrder}', 'DeliveryOrderController@printSj')->name('delivery-orders.printSj');
     Route::get('delivery-orders/get-delivery-order', 'DeliveryOrderController@getDeliveryOrder')->name('delivery-orders.getDeliveryOrder');
+    Route::get('delivery-orders/get-estimasi', 'DeliveryOrderController@getEstimasi')->name('delivery-orders.getEstimasi');
+    Route::get('delivery-orders/get-info-estimasi', 'DeliveryOrderController@getInfoEstimasi')->name('delivery-orders.getInfoEstimasi');
     Route::resource('delivery-orders', 'DeliveryOrderController');
 
     // Delivery Order Item

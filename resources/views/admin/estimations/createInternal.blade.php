@@ -3,81 +3,54 @@
 
 <div class="card">
     <div class="card-header">
-        <h1>Formulir Pengiriman</h1>
+        {{ trans('global.create') }} {{ trans('cruds.estimation.title_singular') }} Internal
     </div>
 
     <div class="card-body">
-
         @if (session()->has('error-message'))
             <p class="text-danger">
                 {{session()->get('error-message')}}
             </p>
         @endif
 
-        <form method="POST" action="{{ route("admin.delivery-orders.store") }}" enctype="multipart/form-data">
+        <form method="POST" action="{{ route("admin.estimations.store") }}" enctype="multipart/form-data">
             @csrf
+            <input type="hidden" id="semester_id" value="{{ setting('current_semester') }}">
             <div class="row">
                 <div class="col-6">
                     <div class="form-group">
-                        <label class="required" for="no_suratjalan">{{ trans('cruds.deliveryOrder.fields.no_suratjalan') }}</label>
-                        <input class="form-control {{ $errors->has('no_suratjalan') ? 'is-invalid' : '' }}" type="text" name="no_suratjalan" id="no_suratjalan" value="{{ old('no_suratjalan', $no_suratjalan) }}" readonly>
-                        @if($errors->has('no_suratjalan'))
-                            <span class="text-danger">{{ $errors->first('no_suratjalan') }}</span>
+                        <label class="required" for="no_estimasi">{{ trans('cruds.estimation.fields.no_estimasi') }}</label>
+                        <input class="form-control {{ $errors->has('no_estimasi') ? 'is-invalid' : '' }}" type="text" name="no_estimasi" id="no_estimasi" value="{{ old('no_estimasi', $no_estimasi) }}" readonly>
+                        @if($errors->has('no_estimasi'))
+                            <span class="text-danger">{{ $errors->first('no_estimasi') }}</span>
                         @endif
-                        <span class="help-block">{{ trans('cruds.deliveryOrder.fields.no_suratjalan_helper') }}</span>
+                        <span class="help-block">{{ trans('cruds.estimation.fields.no_estimasi_helper') }}</span>
                     </div>
                 </div>
                 <div class="col-6">
                     <div class="form-group">
-                        <label class="required" for="date">{{ trans('cruds.deliveryOrder.fields.date') }}</label>
+                        <label class="required" for="date">{{ trans('cruds.estimation.fields.date') }}</label>
                         <input class="form-control date {{ $errors->has('date') ? 'is-invalid' : '' }}" type="text" name="date" id="date" value="{{ old('date', $today) }}" required>
                         @if($errors->has('date'))
                             <span class="text-danger">{{ $errors->first('date') }}</span>
                         @endif
-                        <span class="help-block">{{ trans('cruds.deliveryOrder.fields.date_helper') }}</span>
+                        <span class="help-block">{{ trans('cruds.estimation.fields.date_helper') }}</span>
                     </div>
                 </div>
-                {{-- <div class="col-6">
-                    <div class="form-group">
-                        <label class="required" for="semester_id">{{ trans('cruds.deliveryOrder.fields.semester') }}</label>
-                        <select class="form-control select2 {{ $errors->has('semester') ? 'is-invalid' : '' }}" name="semester_id" id="semester_id" required>
-                            @foreach($semesters as $id => $entry)
-                                <option value="{{ $id }}" {{ old('semester_id') == $id ? 'selected' : '' }}>{{ $entry }}</option>
-                            @endforeach
-                        </select>
-                        @if($errors->has('semester'))
-                            <span class="text-danger">{{ $errors->first('semester') }}</span>
-                        @endif
-                        <span class="help-block">{{ trans('cruds.deliveryOrder.fields.semester_helper') }}</span>
-                    </div>
-                </div> --}}
+            </div>
+            <div class="row">
                 <div class="col-6">
                     <div class="form-group">
-                        <label class="required" for="salesperson_id">{{ trans('cruds.deliveryOrder.fields.salesperson') }}</label>
-                        <select class="form-control select2 {{ $errors->has('salesperson') ? 'is-invalid' : '' }}" name="salesperson_id" id="salesperson_id" required>
-                            @foreach($salespeople as $id => $entry)
-                                <option value="{{ $id }}" {{ old('salesperson_id') == $id ? 'selected' : '' }}>{{ $entry }}</option>
+                        <label for="jenjang_id">{{ trans('cruds.salesOrder.fields.jenjang') }}</label>
+                        <select class="form-control select2 {{ $errors->has('jenjang') ? 'is-invalid' : '' }}" name="jenjang_id" id="jenjang_id">
+                            @foreach($jenjangs as $id => $entry)
+                                <option value="{{ $id }}" {{ old('jenjang_id') == $id ? 'selected' : '' }}>{{ $entry }}</option>
                             @endforeach
                         </select>
-                        @if($errors->has('salesperson'))
-                            <span class="text-danger">{{ $errors->first('salesperson') }}</span>
+                        @if($errors->has('jenjang'))
+                            <span class="text-danger">{{ $errors->first('jenjang') }}</span>
                         @endif
-                        <span class="help-block">{{ trans('cruds.deliveryOrder.fields.salesperson_helper') }}</span>
-                    </div>
-                </div>
-                <div class="col-6">
-                    <div class="form-group">
-                        <label class="required">{{ trans('cruds.deliveryOrder.fields.payment_type') }}</label>
-                        <select class="form-control {{ $errors->has('payment_type') ? 'is-invalid' : '' }}" name="payment_type" id="payment_type" required>
-                            <option value disabled {{ old('payment_type', null) === null ? 'selected' : '' }}>{{ trans('global.pleaseSelect') }}</option>
-                            @foreach(App\Models\DeliveryOrder::PAYMENT_TYPE_SELECT as $key => $label)
-                                <option value="{{ $key }}" {{ old('payment_type', '') === (string) $key ? 'selected' : '' }}>{{ $label }}</option>
-                            @endforeach
-                        </select>
-                        @if($errors->has('payment_type'))
-                            <span class="text-danger">{{ $errors->first('payment_type') }}</span>
-                        @endif
-                        <span class="help-block">{{ trans('cruds.deliveryOrder.fields.payment_type_helper') }}</span>
+                        <span class="help-block">{{ trans('cruds.salesOrder.fields.jenjang_helper') }}</span>
                     </div>
                 </div>
             </div>
@@ -107,7 +80,6 @@
 </div>
 
 @endsection
-
 @section('scripts')
 <script>
     $(document).ready(function() {
@@ -115,15 +87,13 @@
             templateResult: formatProduct,
             templateSelection: formatProductSelection,
             ajax: {
-                    url: "{{ route('admin.delivery-orders.getEstimasi') }}",
+                    url: "{{ route('admin.book-variants.getBooks') }}",
                     dataType: 'json',
                     delay: 250,
                     data: function(params) {
                         return {
                             q: params.term,
-                            // semester: $('#semester_id').val(),
-                            salesperson: $('#salesperson_id').val(),
-                            type: $('#payment_type').val(),
+                            semester: $('#semester_id').val(),
                             jenjang: $('#jenjang_id').val()
                         };
                     },
@@ -166,20 +136,14 @@
             }
 
             $.ajax({
-                url: "{{ route('admin.delivery-orders.getInfoEstimasi') }}",
+                url: "{{ route('admin.book-variants.getBook') }}" +  '?id=' + productId,
                 type: 'GET',
                 dataType: 'json',
-                data: {
-                    id: productId,
-                    semester: $('#semester_id').val(),
-                    salesperson: $('#salesperson_id').val(),
-                    type: $('#payment_type').val()
-                },
                 success: function(product) {
                     var formHtml = `
                         <div class="item-product" id="product-${product.id}">
                             <div class="row">
-                                <div class="col-8 align-self-center">
+                                <div class="col-7 align-self-center">
                                     <h6 class="text-sm product-name mb-1">(${product.book_type}) ${product.short_name}</h6>
                                     <p class="mb-0 text-sm">
                                         Code : <strong>${product.code}</strong>
@@ -188,23 +152,17 @@
                                         Jenjang - Kurikulum : <strong>${product.jenjang.name} - ${product.kurikulum.name}</strong>
                                     </p>
                                     <p class="mb-0 text-sm">
-                                        <strong>ESTIMASI : ${product.estimasi}</strong>
-                                    </p>
-                                    <p class="mb-0 text-sm">
-                                        <strong>TERKIRIM : ${product.terkirim}</strong>
-                                    </p>
-                                    <p class="mb-0 text-sm">
-                                        <strong>STOCK : ${product.stock}</strong>
+                                        Cover - Isi : <strong>${product.cover.name} - ${product.isi.name}</strong>
                                     </p>
                                 </div>
                                 <div class="col offset-1 row align-items-end align-self-center">
-                                    <div class="col" style="max-width: 160px">
-                                        <p class="mb-0 text-sm">Dikirim</p>
+                                    <div class="col" style="max-width: 260px">
+                                        <p class="mb-0 text-sm">Estimasi</p>
                                         <div class="form-group text-field m-0">
                                             <div class="text-field-input px-2 py-0">
                                                 <input type="hidden" name="products[]" value="${product.id}">
-                                                <input type="hidden" name="orders[]" value="${product.order_id}">
-                                                <input class="quantity" type="hidden" name="quantities[]" data-max="${Math.min(product.estimasi - product.terkirim, product.stock)}" value="1">
+                                                <input class="quantity" type="hidden" name="quantities[]">
+                                                <input type="hidden" name="payment_types[]" value="cash">
                                                 <input class="form-control text-center quantity_text" type="text" name="quantity_text[]" value="1" required>
                                                 <label class="text-field-border"></label>
                                             </div>
@@ -222,6 +180,7 @@
                     `;
                     $('#product-form').prepend(formHtml);
                     $('#product-search').val(null).trigger('change');
+                    $('.payment_types').select2();
 
                     var productForm = $('#product-form');
                     var productItem = productForm.find('.item-product');
@@ -230,9 +189,8 @@
                         var product = $(item);
                         var quantity = product.find('.quantity');
                         var quantityText = product.find('.quantity_text');
-                        var max = quantity.data('max');
 
-                        quantityText.on('input change', function(e) {
+                        quantityText.on('input', function(e) {
                             var value = numeral(e.target.value);
 
                             quantityText.val(value.format('0,0'));
@@ -246,22 +204,6 @@
                                 el.val(1);
                                 quantityText.val(1).trigger('change');
                             }
-
-                            if (valueNum > max) {
-                                Swal.fire({
-                                    title: 'Quantity Exceeded',
-                                    text: 'The input quantity exceeds the maximum allowed.',
-                                    icon: 'warning',
-                                    showCancelButton: true,
-                                    confirmButtonText: 'I Know',
-                                    cancelButtonText: 'Cancel'
-                                }).then((result) => {
-                                    if (result.isConfirmed) {
-                                        max = valueNum + 100;
-                                        quantity.data('max', valueNum + 100);
-                                    }
-                                });
-                            }
                         }).trigger('change');
                     });
                 },
@@ -270,11 +212,11 @@
                 }
             });
         });
-    });
 
-    $('#product-form').on('click', '.product-delete', function() {
-        var productId = $(this).data('product-id');
-        $('#product-' + productId).remove();
+        $('#product-form').on('click', '.product-delete', function() {
+            var productId = $(this).data('product-id');
+            $('#product-' + productId).remove();
+        });
     });
 </script>
 @endsection

@@ -11,6 +11,9 @@
             <a class="btn btn-success" href="{{ route('admin.estimations.create') }}">
                 {{ trans('global.add') }} {{ trans('cruds.estimation.title_singular') }}
             </a>
+            <a class="btn btn-warning" href="{{ route('admin.estimations.create', ['salesperson' => 'internal']) }}">
+                {{ trans('global.add') }} {{ trans('cruds.estimation.title_singular') }} Internal
+            </a>
             <button class="btn btn-primary" data-toggle="modal" data-target="#importModal">
                 Import
             </button>

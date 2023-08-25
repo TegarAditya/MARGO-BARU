@@ -85,7 +85,7 @@ class SalesOrder extends Model
         $semester = Semester::find($semester);
         $salesperson = Salesperson::find($salesperson);
 
-        $code = 'ORD/'.strtoupper($salesperson->code).'/'.strtoupper($payment_type).'/'.$semester->code;
+        $code = 'ORD/'.strtoupper($salesperson->code ?? 'INTERNAL').'/'.strtoupper($payment_type).'/'.$semester->code;
 
         return $code;
     }

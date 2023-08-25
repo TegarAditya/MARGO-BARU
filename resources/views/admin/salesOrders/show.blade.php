@@ -20,7 +20,7 @@
                                 Semester
                             </th>
                             <td>
-                                {{ $salesOrder->semester->name ?? '' }}
+                                {{ $semester->name ?? '' }}
                             </td>
                         </tr>
                         <tr>
@@ -28,7 +28,7 @@
                                 Sales
                             </th>
                             <td>
-                                {{ $salesOrder->salesperson->name ?? '' }}
+                                {{ $salesperson->name ?? 'Internal' }}
                             </td>
                         </tr>
                     </tbody>
@@ -70,11 +70,11 @@
                                     @endphp
                                     @foreach ($value as $order)
                                         @php
-                                        $estimation_items = \App\Models\EstimationItem::with('estimation')->where('salesperson_id', $salesOrder->salesperson_id)->where('semester_id', $salesOrder->semester_id)->where('product_id', $order->id)->get();
+                                        $estimation_items = \App\Models\EstimationItem::with('estimation')->where('salesperson_id', $salesperson->id ?? null)->where('semester_id', $semester->id)->where('product_id', $order->id)->get();
 
-                                        $estimasi = $order->estimasi->first()->quantity;
-                                        $terkirim = $order->estimasi->first()->moved;
-                                        $retur = $order->estimasi->first()->retur;
+                                        $estimasi = $salesOrder->where('product_id', $order->id)->first()->quantity;
+                                        $terkirim = $salesOrder->where('product_id', $order->id)->first()->moved;
+                                        $retur = $salesOrder->where('product_id', $order->id)->first()->retur;
                                         $sisa = max(0, $estimasi - $terkirim);
 
                                         $test = $terkirim;

@@ -35,9 +35,9 @@
                             <th>
                                 Sales
                             </th>
-                            <td>
-                                {{ $estimation->salesperson->name ?? '' }}
-                            </td>
+                                <td>
+                                    {{ $estimation->salesperson->name ?? 'Internal' }}
+                                </td>
                         </tr>
                         <tr>
                             <th width="150">

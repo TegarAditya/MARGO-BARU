@@ -49,6 +49,14 @@ class SalesOrderController extends Controller
             $table->addColumn('actions', '&nbsp;');
 
             $table->editColumn('actions', function ($row) {
+                if (!$row->salesperson) {
+                    return '
+                        <a class="px-1" href="'.route('admin.sales-orders.show', ['salesperson' => $row->salesperson_id, 'semester' => $row->semester_id]).'" title="Show">
+                            <i class="fas fa-eye text-success fa-lg"></i>
+                        </a>
+                    ';
+                }
+
                 return '
                     <a class="px-1" href="'.route('admin.sales-orders.show', ['salesperson' => $row->salesperson_id, 'semester' => $row->semester_id]).'" title="Show">
                         <i class="fas fa-eye text-success fa-lg"></i>
@@ -64,7 +72,7 @@ class SalesOrderController extends Controller
             });
 
             $table->addColumn('salesperson_name', function ($row) {
-                return $row->salesperson ? $row->salesperson->short_name : '';
+                return $row->salesperson ? $row->salesperson->short_name : 'Internal';
             });
 
             $table->rawColumns(['actions', 'placeholder', 'semester', 'salesperson']);
@@ -246,18 +254,21 @@ class SalesOrderController extends Controller
         abort_if(Gate::denies('sales_order_show'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         $semester = $request->semester;
-        $salesperson = $request->salesperson;
+        $salesperson = $request->salesperson ?? null;
 
         $orders = BookVariant::whereHas('estimasi', function ($q) use ($salesperson, $semester) {
                     $q->where('salesperson_id', $salesperson)
                     ->where('semester_id', $semester);
                 })->with('estimasi')->orderBy('code', 'ASC')->get();
-        
-        $salesOrder = SalesOrder::where('salesperson_id', $salesperson)->where('semester_id', $semester)->first();
+
+        $salesOrder = SalesOrder::where('salesperson_id', $salesperson)->where('semester_id', $semester)->get();
 
         $grouped = $orders->sortBy('product.kelas_id')->sortBy('product.mapel_id')->groupBy('jen_kum');
-            
-        return view('admin.salesOrders.show', compact('salesOrder', 'orders', 'grouped'));
+
+        $semester = Semester::find($semester);
+        $salesperson = Salesperson::find($salesperson);
+
+        return view('admin.salesOrders.show', compact('salesOrder', 'orders', 'grouped', 'semester', 'salesperson'));
     }
 
     public function destroy(SalesOrder $salesOrder)

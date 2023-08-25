@@ -312,4 +312,59 @@ class DeliveryOrderController extends Controller
 
         return response()->json($formatted);
     }
+
+    public function getEstimasi(Request $request)
+    {
+        $query = $request->input('q');
+        $semester = setting('current_semester');
+        $salesperson = $request->input('salesperson');
+        $type = $request->input('type');
+        $jenjang = $request->input('jenjang');
+
+        $query = BookVariant::whereHas('estimasi', function ($q) use ($semester, $salesperson, $type) {
+                    $q->where('salesperson_id', $salesperson)
+                    ->where('payment_type', $type)
+                    ->where('semester_id', $semester);
+                })->where(function($q) use ($query) {
+                    $q->where('code', 'LIKE', "%{$query}%")
+                    ->orWhere('name', 'LIKE', "%{$query}%");
+                })->orderBy('code', 'ASC');
+
+        if (!empty($jenjang)) {
+            $query->where('jenjang_id', $jenjang);
+        }
+
+        $products = $query->get();
+
+        $formattedProducts = [];
+
+        foreach ($products as $product) {
+            $formattedProducts[] = [
+                'id' => $product->id,
+                'text' => $product->code,
+                'stock' => $product->stock,
+                'name' => $product->name,
+            ];
+        }
+
+        return response()->json($formattedProducts);
+    }
+
+    public function getInfoEstimasi(Request $request)
+    {
+        $id = $request->input('id');
+        $semester = setting('current_semester');
+        $salesperson = $request->input('salesperson');
+        $type = $request->input('type');
+
+        $product = BookVariant::join('sales_orders', 'sales_orders.product_id', '=', 'book_variants.id')
+                ->where('book_variants.id', $id)
+                ->where('sales_orders.semester_id', $semester)
+                ->where('sales_orders.salesperson_id', $salesperson)
+                ->where('sales_orders.payment_type', $type)
+                ->first(['book_variants.*', 'sales_orders.quantity as estimasi', 'sales_orders.moved as terkirim', 'sales_orders.id as order_id', 'sales_orders.payment_type as payment_type']);
+        $product->load('book', 'jenjang', 'cover', 'kurikulum', 'isi');
+
+        return response()->json($product);
+    }
 }
