@@ -818,8 +818,8 @@ return [
         'title_singular' => 'Pembayaran',
     ],
     'payment' => [
-        'title'          => 'Payment',
-        'title_singular' => 'Payment',
+        'title'          => 'Pembayaran',
+        'title_singular' => 'Pembayaran',
         'fields'         => [
             'id'                    => 'ID',
             'id_helper'             => ' ',
