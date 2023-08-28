@@ -38,23 +38,24 @@ class StockMovementController extends Controller
 
             $table->addColumn('reference', function ($row) {
                 if ($row->transaction_type == 'adjustment') {
-                    return 'Adjustment <a class="px-1" title="Reference" href="'.route('admin.stock-adjustments.show', $row->reference_id).'"><i class="fas fa-eye text-success  fa-lg"></i></a>';
+                    return 'Adjustment <a class="px-1" title="Reference" href="'.route('admin.stock-adjustments.show', $row->reference_id).'"><i class="fas fa-eye text-success fa-lg"></i></a>';
                 } else if ($row->transaction_type == 'delivery') {
-                    return 'Delivery <a class="px-1" title="Reference" href="'.route('admin.delivery-orders.show', $row->reference_id).'"><i class="fas fa-eye text-success  fa-lg"></i></a>';
+                    return 'Delivery <a class="px-1" title="Reference" href="'.route('admin.delivery-orders.show', $row->reference_id).'"><i class="fas fa-eye text-success fa-lg"></i></a>';
                 } else if ($row->transaction_type == 'retur') {
-                    return 'Retur <a class="px-1" title="Reference" href="'.route('admin.return-goods.show', $row->reference_id).'"><i class="fas fa-eye text-success  fa-lg"></i></a>';
+                    return 'Retur <a class="px-1" title="Reference" href="'.route('admin.return-goods.show', $row->reference_id).'"><i class="fas fa-eye text-success fa-lg"></i></a>';
                 } else if ($row->transaction_type == 'cetak') {
-                    return 'Cetak <a class="px-1" title="Reference" href="'.route('admin.cetaks.show', $row->reference_id).'"><i class="fas fa-eye text-success  fa-lg"></i></a>';
+                    return 'Cetak <a class="px-1" title="Reference" href="'.route('admin.cetaks.show', $row->reference_id).'"><i class="fas fa-eye text-success fa-lg"></i></a>';
                 } else if ($row->transaction_type == 'produksi') {
-                    return 'Produksi <a class="px-1" title="Reference" href="'.route('admin.finishings.show', $row->reference_id).'"><i class="fas fa-eye text-success  fa-lg"></i></a>';
+                    return 'Produksi <a class="px-1" title="Reference" href="'.route('admin.finishings.show', $row->reference_id).'"><i class="fas fa-eye text-success fa-lg"></i></a>';
                 } else if ($row->transaction_type == 'plating') {
-                    return 'Produksi <a class="px-1" title="Reference" href="'.route('admin.plate-prints.show', $row->reference_id).'"><i class="fas fa-eye text-success  fa-lg"></i></a>';
+                    return 'Produksi <a class="px-1" title="Reference" href="'.route('admin.plate-prints.show', $row->reference_id).'"><i class="fas fa-eye text-success fa-lg"></i></a>';
+                } else if ($row->transaction_type == 'awal') {
+                    return 'Stock Awal';
                 }
-
             });
 
             $table->editColumn('quantity', function ($row) {
-                return $row->quantity ? angka(abs($row->quantity)) : '';
+                return angka($row->quantity);
             });
 
             $table->editColumn('transaction_type', function ($row) {

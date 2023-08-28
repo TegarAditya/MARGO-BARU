@@ -28,13 +28,38 @@ class EstimationService
         $production = ProductionEstimation::where('product_id', $product)->where('type', $type)->first();
 
         if ($production) {
-            $production->estimasi += $quantity;
+            if ($production->internal > 0) {
+                $internal = ($quantity > $production->internal) ?  $production->internal : $quantity;
+                $production->internal -= $internal;
+                $quantity -= $internal;
+            }
+            if ($quantity > 0) {
+                $production->estimasi += $quantity;
+            }
             $production->save();
         } else {
             $new = ProductionEstimation::create([
                 'product_id' => $product,
                 'type' => $type,
                 'estimasi' => $quantity,
+            ]);
+        }
+    }
+
+    public static function createInternal($product, $quantity, $type)
+    {
+        $production = ProductionEstimation::where('product_id', $product)->where('type', $type)->first();
+
+        if ($production) {
+            $production->estimasi += $quantity;
+            $production->internal += $quantity;
+            $production->save();
+        } else {
+            $new = ProductionEstimation::create([
+                'product_id' => $product,
+                'type' => $type,
+                'estimasi' => $quantity,
+                'internal' => $quantity,
             ]);
         }
     }
@@ -62,6 +87,17 @@ class EstimationService
 
         if ($production) {
             $production->estimasi += $quantity;
+            $production->save();
+        }
+    }
+
+    public static function editInternal($product, $quantity, $type)
+    {
+        $production = ProductionEstimation::where('product_id', $product)->where('type', $type)->first();
+
+        if ($production) {
+            $production->estimasi += $quantity;
+            $production->internal += $quantity;
             $production->save();
         }
     }

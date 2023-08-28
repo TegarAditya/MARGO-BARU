@@ -49,6 +49,7 @@ class EstimationMovement extends Model
         'reference_id',
         'product_id',
         'quantity',
+        'internal',
         'type',
         'reversal_of_id',
         'created_by_id',

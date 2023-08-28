@@ -14,7 +14,8 @@ class CreateEstimationMovementsTable extends Migration
             $table->string('movement_type');
             $table->string('reference_type')->nullable();
             $table->string('type');
-            $table->integer('quantity');
+            $table->integer('quantity')->default(0);
+            $table->integer('internal')->default(0);
             $table->timestamps();
             $table->softDeletes();
         });

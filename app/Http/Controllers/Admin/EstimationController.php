@@ -181,12 +181,22 @@ class EstimationController extends Controller
                 ]);
 
                 if ($product->semester_id == $semester) {
-                    EstimationService::createMovement('in', 'sales_order', $estimasi->id, $product->id, $quantity, $product->type);
-                    EstimationService::createProduction($product->id, $quantity, $product->type);
+                    if ($salesperson) {
+                        EstimationService::createMovement('in', 'sales_order', $estimasi->id, $product->id, $quantity, $product->type);
+                        EstimationService::createProduction($product->id, $quantity, $product->type);
 
-                    foreach($product->components as $item) {
-                        EstimationService::createMovement('in', 'sales_order', $estimasi->id, $item->id, $quantity, $item->type);
-                        EstimationService::createProduction($item->id, $quantity, $item->type);
+                        foreach($product->components as $item) {
+                            EstimationService::createMovement('in', 'sales_order', $estimasi->id, $item->id, $quantity, $item->type);
+                            EstimationService::createProduction($item->id, $quantity, $item->type);
+                        }
+                    } else {
+                        EstimationService::createMovement('in', 'sales_order', $estimasi->id, $product->id, $quantity, $product->type);
+                        EstimationService::createInternal($product->id, $quantity, $product->type);
+
+                        foreach($product->components as $item) {
+                            EstimationService::createMovement('in', 'sales_order', $estimasi->id, $item->id, $quantity, $item->type);
+                            EstimationService::createInternal($item->id, $quantity, $item->type);
+                        }
                     }
                 }
             }
@@ -234,7 +244,7 @@ class EstimationController extends Controller
             'products.*' => 'exists:book_variants,id',
             'payment_types' => 'required|array',
             'quantities' => 'required|array',
-            'quantities.*' => 'numeric|min:1',
+            'quantities.*' => 'numeric|min:0',
             'estimasi_items' => 'required|array',
             'estimasi_items.*' => 'exists:estimation_items,id',
         ]);
@@ -276,19 +286,35 @@ class EstimationController extends Controller
                 $order->quantity = ($old_order - $old_quantity) + $quantity;
                 $order->save();
 
-                EstimationService::editMovement('in', 'sales_order', $estimation->id, $product->id, $quantity, $product->type);
-                EstimationService::editProduction($product->id, ($quantity - $old_quantity), $product->type);
+                $estimasi_item->update([
+                    'quantity' => $quantity
+                ]);
 
-                foreach($product->components as $item) {
-                    EstimationService::editMovement('in', 'sales_order', $estimation->id, $item->id, $quantity, $item->type);
-                    EstimationService::editProduction($item->id, ($quantity - $old_quantity), $item->type);
+                if ($product->semester_id == $semester) {
+                    if ($salesperson) {
+                        EstimationService::editMovement('in', 'sales_order', $estimation->id, $product->id, $quantity, $product->type);
+                        EstimationService::editProduction($product->id, ($quantity - $old_quantity), $product->type);
+
+                        foreach($product->components as $item) {
+                            EstimationService::editMovement('in', 'sales_order', $estimation->id, $item->id, $quantity, $item->type);
+                            EstimationService::editProduction($item->id, ($quantity - $old_quantity), $item->type);
+                        }
+                    } else {
+                        EstimationService::editMovement('in', 'sales_order', $estimation->id, $product->id, $quantity, $product->type);
+                        EstimationService::editInternal($product->id, ($quantity - $old_quantity), $product->type);
+
+                        foreach($product->components as $item) {
+                            EstimationService::editMovement('in', 'sales_order', $estimation->id, $item->id, $quantity, $item->type);
+                            EstimationService::editInternal($item->id, ($quantity - $old_quantity), $item->type);
+                        }
+                    }
                 }
             }
 
             DB::commit();
             Alert::success('Success', 'Sales Order berhasil di simpan');
 
-            return redirect()->route('admin.sales-orders.index');
+            return redirect()->route('admin.estimations.index');
         } catch (\Exception $e) {
             DB::rollback();
             dd($e->getMessage());

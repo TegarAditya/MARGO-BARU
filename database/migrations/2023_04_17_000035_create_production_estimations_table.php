@@ -11,7 +11,8 @@ class CreateProductionEstimationsTable extends Migration
         Schema::create('production_estimations', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('type');
-            $table->integer('estimasi')->nullable();
+            $table->integer('estimasi')->nullable()->default(0);
+            $table->integer('internal')->nullable()->default(0);
             $table->timestamps();
             $table->softDeletes();
         });
