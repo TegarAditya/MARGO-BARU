@@ -28,12 +28,11 @@ class EstimationMovement extends Model
     ];
 
     public const TYPE_SELECT = [
-        'L' => 'LKS',
-        'C' => 'Cover LKS',
-        'I' => 'Isi LKS',
-        'P' => 'Pegangan Guru',
-        'V' => 'Cover PG',
-        'S' => 'Isi PG',
+        'estimasi' => 'Estimasi',
+        'sales' => 'Estimasi Sales',
+        'internal' => 'Estimasi Internal',
+        'produksi' => 'SPK Produksi',
+        'realisasi' => 'Realisasi Produksi',
     ];
 
     public const REFERENCE_TYPE_SELECT = [

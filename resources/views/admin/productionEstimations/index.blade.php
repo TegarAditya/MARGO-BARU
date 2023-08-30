@@ -160,6 +160,18 @@
                     <th class="text-center">
                         {{ trans('cruds.productionEstimation.fields.estimasi') }}
                     </th>
+                    {{-- <th class="text-center">
+                        Estimasi Sales
+                    </th>
+                    <th class="text-center">
+                        Estimasi Internal
+                    </th> --}}
+                    <th class="text-center">
+                        Produksi
+                    </th>
+                    {{-- <th class="text-center">
+                        Realisasi Produksi
+                    </th> --}}
                 </tr>
             </thead>
         </table>
@@ -197,6 +209,10 @@ $(function () {
         { data: 'product_code', name: 'product.code', class: 'text-center' },
         { data: 'product_name', name: 'product.name' },
         { data: 'estimasi', name: 'estimasi', class: 'text-center' },
+        // { data: 'sales', name: 'sales', class: 'text-center' },
+        // { data: 'internal', name: 'internal', class: 'text-center' },
+        { data: 'produksi', name: 'produksi', class: 'text-center' },
+        // { data: 'realisasi', name: 'realisasi', class: 'text-center' },
     ],
     orderCellsTop: true,
     order: [[ 1, 'desc' ]],

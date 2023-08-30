@@ -229,8 +229,8 @@ class CetakController extends Controller
                     'status' => 'created'
                 ]);
 
-                EstimationService::createMovement('out', 'cetak', $cetak->id, $product->id, -1 * $quantity, $product->type);
-                EstimationService::createProduction($product->id, -1 * $quantity, $product->type);
+                EstimationService::createMovement('out', 'cetak', $cetak->id, $product->id, $quantity, 'produksi');
+                EstimationService::createCetak($product->id, $quantity, $product->type);
             }
 
             TransactionService::createProductionTransaction($date, 'Ongkos Cetak Produsi SPc '. $cetak->no_spc, $vendor, $semester, 'cetak', $cetak->id, $cetak->no_spc, $total_cost, 'credit');
@@ -347,8 +347,8 @@ class CetakController extends Controller
                         'realisasi' => $plate_quantity
                     ]);
 
-                    EstimationService::editMovement('out', 'cetak', $cetak->id, $product->id, -1 * $quantity, $product->type);
-                    EstimationService::editProduction($product->id, ($quantity - $old_quantity), $product->type);
+                    EstimationService::editMovement('out', 'cetak', $cetak->id, $product->id, $quantity, 'produksi');
+                    EstimationService::editCetak($product->id, ($quantity - $old_quantity), $product->type);
                 } else {
                     $detail = CetakItem::create([
                         'cetak_id' => $cetak->id,
@@ -374,8 +374,8 @@ class CetakController extends Controller
                         'status' => 'created'
                     ]);
 
-                    EstimationService::createMovement('out', 'cetak', $cetak->id, $product->id, -1 * $quantity, $product->type);
-                    EstimationService::createProduction($product->id, -1 * $quantity, $product->type);
+                    EstimationService::createMovement('out', 'cetak', $cetak->id, $product->id, $quantity, 'produksi');
+                    EstimationService::createCetak($product->id, $quantity, $product->type);
                 }
             }
 
@@ -487,6 +487,9 @@ class CetakController extends Controller
                     'quantity' => $quantity,
                     'done' => $status
                 ]);
+
+                EstimationService::createMovement('out', 'cetak', $cetak->id, $product->id, $quantity, 'realisasi');
+                EstimationService::createUpdateRealisasi($product->id, $quantity);
 
                 StockService::createMovement('in', 'cetak', $cetak->id, $date, $product->id, $quantity);
                 StockService::updateStock($product->id, $quantity);

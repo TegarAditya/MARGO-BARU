@@ -119,7 +119,8 @@ class ReturnGoodController extends Controller
         ]);
 
         $date = $validatedData['date'];
-        $semester = $validatedData['semester_id'];
+        $semester_retur = $validatedData['semester_id'];
+        $semester = setting('current_semester');
         $salesperson = $validatedData['salesperson_id'];
         $products = $validatedData['products'];
         $orders = $validatedData['orders'];
@@ -131,6 +132,7 @@ class ReturnGoodController extends Controller
                 'no_retur' => ReturnGood::generateNoRetur(setting('current_semester')),
                 'date' => $date,
                 'semester_id' => $semester,
+                'semester_retur_id' => $semester_retur,
                 'salesperson_id' => $salesperson,
             ]);
 

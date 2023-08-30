@@ -22,6 +22,7 @@ use Carbon\Carbon;
 use DB;
 use Alert;
 use App\Services\EstimationService;
+use App\Imports\EstimationImport;
 
 class EstimationController extends Controller
 {
@@ -182,19 +183,19 @@ class EstimationController extends Controller
 
                 if ($product->semester_id == $semester) {
                     if ($salesperson) {
-                        EstimationService::createMovement('in', 'sales_order', $estimasi->id, $product->id, $quantity, $product->type);
+                        EstimationService::createMovement('in', 'sales_order', $estimasi->id, $product->id, $quantity, 'sales');
                         EstimationService::createProduction($product->id, $quantity, $product->type);
 
                         foreach($product->components as $item) {
-                            EstimationService::createMovement('in', 'sales_order', $estimasi->id, $item->id, $quantity, $item->type);
+                            EstimationService::createMovement('in', 'sales_order', $estimasi->id, $item->id, $quantity, 'sales');
                             EstimationService::createProduction($item->id, $quantity, $item->type);
                         }
                     } else {
-                        EstimationService::createMovement('in', 'sales_order', $estimasi->id, $product->id, $quantity, $product->type);
+                        EstimationService::createMovement('in', 'sales_order', $estimasi->id, $product->id, $quantity, 'internal');
                         EstimationService::createInternal($product->id, $quantity, $product->type);
 
                         foreach($product->components as $item) {
-                            EstimationService::createMovement('in', 'sales_order', $estimasi->id, $item->id, $quantity, $item->type);
+                            EstimationService::createMovement('in', 'sales_order', $estimasi->id, $item->id, $quantity, 'internal');
                             EstimationService::createInternal($item->id, $quantity, $item->type);
                         }
                     }
@@ -292,19 +293,19 @@ class EstimationController extends Controller
 
                 if ($product->semester_id == $semester) {
                     if ($salesperson) {
-                        EstimationService::editMovement('in', 'sales_order', $estimation->id, $product->id, $quantity, $product->type);
+                        EstimationService::editMovement('in', 'sales_order', $estimation->id, $product->id, $quantity, 'sales');
                         EstimationService::editProduction($product->id, ($quantity - $old_quantity), $product->type);
 
                         foreach($product->components as $item) {
-                            EstimationService::editMovement('in', 'sales_order', $estimation->id, $item->id, $quantity, $item->type);
+                            EstimationService::editMovement('in', 'sales_order', $estimation->id, $item->id, $quantity, 'sales');
                             EstimationService::editProduction($item->id, ($quantity - $old_quantity), $item->type);
                         }
                     } else {
-                        EstimationService::editMovement('in', 'sales_order', $estimation->id, $product->id, $quantity, $product->type);
+                        EstimationService::editMovement('in', 'sales_order', $estimation->id, $product->id, $quantity, 'internal');
                         EstimationService::editInternal($product->id, ($quantity - $old_quantity), $product->type);
 
                         foreach($product->components as $item) {
-                            EstimationService::editMovement('in', 'sales_order', $estimation->id, $item->id, $quantity, $item->type);
+                            EstimationService::editMovement('in', 'sales_order', $estimation->id, $item->id, $quantity, 'internal');
                             EstimationService::editInternal($item->id, ($quantity - $old_quantity), $item->type);
                         }
                     }
@@ -355,14 +356,23 @@ class EstimationController extends Controller
 
     public function import(Request $request)
     {
-        dd($request->all());
-        $file = $request->file('import_file');
         $request->validate([
             'import_file' => 'mimes:csv,txt,xls,xlsx',
+            'date' => 'required',
+            'salesperson_id' => 'required',
+        ]);
+        $file = $request->file('import_file');
+        $semester = setting('current_semester');
+
+        $estimasi = Estimation::create([
+            'no_estimasi' => Estimation::generateNoEstimasi($semester),
+            'date' => $request->date,
+            'semester_id' => $semester,
+            'salesperson_id' => $request->salesperson_id,
         ]);
 
         try {
-            Excel::import(new SalesOrderImport(9), $file);
+            Excel::import(new EstimationImport($estimasi), $file);
         } catch (\Exception $e) {
             Alert::error('Error', $e->getMessage());
             return redirect()->back();

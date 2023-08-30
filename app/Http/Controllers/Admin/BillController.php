@@ -20,6 +20,8 @@ use DB;
 use Alert;
 use Illuminate\Support\Facades\Date;
 use Carbon\Carbon;
+use App\Exports\RekapBillingExport;
+use App\Exports\BillingExport;
 
 class BillController extends Controller
 {
@@ -249,7 +251,11 @@ class BillController extends Controller
             $q->where('type', 'potongan')->whereBetween('transaction_date', [$start, $end])->select(DB::raw('COALESCE(SUM(amount), 0)'));
         }], 'amount')->get();
 
-        return view('admin.bills.billing', compact('start', 'end', 'saldo_awal', 'sales'));
+        if ($request->has('export')) {
+            return (new BillingExport($saldo_awal, $sales))->download('REKAP PIUTANG PERIODE' . $start->format('d-F-Y') .' sd '. $end->format('d-F-Y') .'.xlsx');
+        } else {
+            return view('admin.bills.billing', compact('start', 'end', 'saldo_awal', 'sales'));
+        }
     }
 
     public function billing(Request $request)
@@ -337,5 +343,12 @@ class BillController extends Controller
         $semester = Semester::find($semester);
 
         return view('admin.bills.saldo', compact('salesperson', 'semester', 'invoices', 'returs', 'payments', 'billing', 'bills', 'invoices_old', 'returs_old', 'payments_old', 'list_semester'));
+    }
+
+    public function eksportRekapBilling(Request $request)
+    {
+        $today = Carbon::now()->format('d-m-Y');
+        $semester = Semester::find(setting('current_semester'))->name;
+        return (new RekapBillingExport())->download('REKAP BILLING '. preg_replace('/[^A-Za-z0-9_\-]/', '-', $semester) . ' TANGGAL ' . $today . '.xlsx');
     }
 }

@@ -30,6 +30,7 @@ class ReturnGood extends Model
         'no_retur',
         'date',
         'salesperson_id',
+        'semester_retur_id',
         'semester_id',
         'nominal',
         'created_by_id',

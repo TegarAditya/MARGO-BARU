@@ -12,7 +12,10 @@ class CreateProductionEstimationsTable extends Migration
             $table->bigIncrements('id');
             $table->string('type');
             $table->integer('estimasi')->nullable()->default(0);
+            $table->integer('sales')->nullable()->default(0);
             $table->integer('internal')->nullable()->default(0);
+            $table->integer('produksi')->nullable()->default(0);
+            $table->integer('realisasi')->nullable()->default(0);
             $table->timestamps();
             $table->softDeletes();
         });

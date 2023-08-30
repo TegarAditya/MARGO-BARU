@@ -91,16 +91,19 @@ class ProductionEstimationController extends Controller
                 return $row->quantity ? $row->quantity : '';
             });
             $table->editColumn('estimasi', function ($row) {
-                return $row->estimasi ? angka($row->estimasi) : '';
+                return angka($row->estimasi);
             });
-            $table->editColumn('isi', function ($row) {
-                return $row->isi ? $row->isi : '';
+            $table->editColumn('sales', function ($row) {
+                return angka($row->sales);
             });
-            $table->editColumn('cover', function ($row) {
-                return $row->cover ? $row->cover : '';
+            $table->editColumn('internal', function ($row) {
+                return angka($row->internal);
             });
-            $table->editColumn('finishing', function ($row) {
-                return $row->finishing ? $row->finishing : '';
+            $table->editColumn('produksi', function ($row) {
+                return angka($row->produksi);
+            });
+            $table->editColumn('realisasi', function ($row) {
+                return angka($row->realisasi);
             });
 
             $table->rawColumns(['actions', 'placeholder', 'product']);

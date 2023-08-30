@@ -7,11 +7,14 @@
 </div>
 @can('bill_create')
 <div style="margin-bottom: 10px;" class="row">
-    <div class="col-lg-12">
+    <div class="col-2">
         <form action="{{ route('admin.bills.generate') }}" method="POST">
             @csrf
-            <button type="submit" class="btn btn-danger"><i class="fas fa-sync fa-spin fa-lg"></i> Generate Saldo</button>
+            <button type="submit" class="btn btn-danger btn-block"><i class="fas fa-sync fa-spin fa-lg"></i> Generate Saldo</button>
         </form>
+    </div>
+    <div class="col-2">
+        <a href="{{ route('admin.bills.eksportRekapBilling') }}" class="btn btn-warning btn-block"><i class="fas fa-file-export"></i> Export Rekap Billing</a>
     </div>
 </div>
 @endcan
@@ -25,7 +28,7 @@
             @csrf
             <div class="row mb-5">
                 <div class="col row">
-                    <div class="col-6">
+                    <div class="col-8">
                         <x-admin.form-group
                             type="text"
                             id="date"
@@ -50,7 +53,8 @@
                 </div>
 
                 <div class="col-auto align-self-end">
-                    <button type="submit" class="btn btn-primary">Filter</button>
+                    <button type="submit" class="btn btn-primary mr-2">Filter</button>
+                    <button type="submit" value="export" name="export" class="btn btn-warning">Export</button>
                 </div>
             </div>
         </form>

@@ -147,8 +147,8 @@ if (! function_exists('isRetur')) {
 if (! function_exists('noRevisi')) {
     function noRevisi($no)
     {
-        if (!str_contains($no, 'REF')) {
-            return $no .= '/REF01'; 
+        if (!str_contains($no, 'REV')) {
+            return $no .= '/REV01';
         } else {
             $prefix = substr($no, 0, -2);
             $angka = substr($no, -2);

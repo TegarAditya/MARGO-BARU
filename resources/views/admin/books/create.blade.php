@@ -124,7 +124,7 @@
                             <span class="text-danger">{{ $errors->first('cover') }}</span>
                         @endif
                         <span class="help-block">{{ trans('cruds.book.fields.cover_helper') }}</span>
-                    </div>  
+                    </div>
                 </div>
                 <div class="col-6">
                     <div class="form-group">
@@ -150,11 +150,11 @@
                             <span class="text-danger">{{ $errors->first('description') }}</span>
                         @endif
                         <span class="help-block">{{ trans('cruds.book.fields.description_helper') }}</span>
-                    </div>    
+                    </div>
                 </div>
                 <div class="col-6">
                     <div class="form-group">
-                        <label class="required" for="stock">{{ trans('cruds.bookVariant.fields.stock') }}</label>
+                        <label class="required" for="stock">{{ trans('cruds.bookVariant.fields.stock') }} LKS</label>
                         <input class="form-control {{ $errors->has('stock') ? 'is-invalid' : '' }}" type="number" name="stock" id="stock" value="{{ old('stock', '0') }}" step="1" required>
                         @if($errors->has('stock'))
                             <span class="text-danger">{{ $errors->first('stock') }}</span>
@@ -164,7 +164,7 @@
                 </div>
                 <div class="col-6">
                     <div class="form-group">
-                        <label for="price">{{ trans('cruds.bookVariant.fields.price') }}</label>
+                        <label for="price">{{ trans('cruds.bookVariant.fields.price') }} LKS</label>
                         <input class="form-control {{ $errors->has('price') ? 'is-invalid' : '' }}" type="number" name="price" id="price" value="{{ old('price', '') }}" step="0.01">
                         @if($errors->has('price'))
                             <span class="text-danger">{{ $errors->first('price') }}</span>
@@ -172,18 +172,18 @@
                         <span class="help-block">{{ trans('cruds.bookVariant.fields.price_helper') }}</span>
                     </div>
                 </div>
-                <div class="col-6">
+                {{-- <div class="col-6">
                     <div class="form-group">
-                        <label for="cost">{{ trans('cruds.bookVariant.fields.cost') }}</label>
+                        <label for="cost">{{ trans('cruds.bookVariant.fields.cost') }} LKS</label>
                         <input class="form-control {{ $errors->has('cost') ? 'is-invalid' : '' }}" type="number" name="cost" id="cost" value="{{ old('cost', '') }}" step="0.01">
                         @if($errors->has('cost'))
                             <span class="text-danger">{{ $errors->first('cost') }}</span>
                         @endif
                         <span class="help-block">{{ trans('cruds.bookVariant.fields.cost_helper') }}</span>
-                    </div>        
-                </div>
+                    </div>
+                </div> --}}
             </div>
-        
+
             <div class="row mt-4">
                 <div class="col"></div>
 

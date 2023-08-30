@@ -121,7 +121,8 @@ class BookController extends Controller
         $halaman_id = $request->halaman_id;
         $stock = $request->stock;
         $price =  $request->price;
-        $cost = $request->cost;
+        // $cost = $request->cost;
+        $cost = 0;
 
         DB::beginTransaction();
         try {

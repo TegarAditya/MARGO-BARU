@@ -64,8 +64,6 @@ class BookImport implements ToCollection, WithHeadingRow
                 ]);
 
                 if ($lks_status) {
-                    $stock = BookVariant::where('code', 'L' . '-' . $code)->first();
-
                     $lks = BookVariant::updateOrCreate([
                         'book_id' => $buku->id,
                         'code' => 'L' . '-' .$code,
@@ -82,14 +80,14 @@ class BookImport implements ToCollection, WithHeadingRow
                         'halaman_id' => $halaman->id,
                         'semester_id' => $semester->id,
                         'warehouse_id' => 1,
-                        'stock' => $stock ? $stock->stock : 0,
+                        'stock' => DB::raw('stock + '.$row['stok']),
                         'unit_id' => 1,
                         'price' => $row['harga'],
                         'cost' => $row['hpp'],
                         'status' => 1,
                     ]);
 
-                    StockService::createStockAwal($lks->id, $stock ? $stock->stock : 0);
+                    StockService::createStockAwal($lks->id, $row['stok']);
 
                     foreach(BookVariant::LKS_TYPE as $key => $label) {
                         $component = BookVariant::updateOrCreate([

@@ -142,11 +142,11 @@ class SalesOrderController extends Controller
                 ]);
 
                 if ($product->semester_id == $semester) {
-                    EstimationService::createMovement('in', 'sales_order', $order->id, $product->id, $quantity, $product->type);
+                    EstimationService::createMovement('in', 'sales_order', $order->id, $product->id, $quantity, 'sales');
                     EstimationService::createProduction($product->id, $quantity, $product->type);
 
                     foreach($product->components as $item) {
-                        EstimationService::createMovement('in', 'sales_order', $order->id, $item->id, $quantity, $item->type);
+                        EstimationService::createMovement('in', 'sales_order', $order->id, $item->id, $quantity, 'sales');
                         EstimationService::createProduction($item->id, $quantity, $item->type);
                     }
                 }
@@ -228,11 +228,11 @@ class SalesOrderController extends Controller
                 $order->quantity = $quantity;
                 $order->save();
 
-                EstimationService::editMovement('in', 'sales_order', $order->id, $product->id, $quantity, $product->type);
+                EstimationService::editMovement('in', 'sales_order', $order->id, $product->id, $quantity, 'sales');
                 EstimationService::editProduction($product->id, ($quantity - $old_quantity), $product->type);
 
                 foreach($product->components as $item) {
-                    EstimationService::editMovement('in', 'sales_order', $order->id, $item->id, $quantity, $item->type);
+                    EstimationService::editMovement('in', 'sales_order', $order->id, $item->id, $quantity, 'sales');
                     EstimationService::editProduction($item->id, ($quantity - $old_quantity), $item->type);
                 }
             }

@@ -93,7 +93,7 @@ class StockMovement extends Model
         if ($this->transaction_type === 'adjustment') {
             return $this->belongsTo(StockAdjustment::class, 'reference_id');
         } else if ($this->transaction_type === 'delivery') {
-            return $this->belongsTo(Delivery::class, 'reference_id');
+            return $this->belongsTo(DeliveryOrder::class, 'reference_id');
         } else if ($this->transaction_type === 'retur') {
             return $this->belongsTo(ReturnGood::class, 'reference_id');
         } else if ($this->transaction_type === 'cetak') {

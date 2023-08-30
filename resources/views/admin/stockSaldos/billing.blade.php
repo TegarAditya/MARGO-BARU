@@ -38,7 +38,7 @@
                         $total_in+= $item->in;
                         $total_out += $item->out;
 
-                        $terakhir = $pertama + $item->in - $item->out;
+                        $terakhir = $pertama + ($item->in + $item->out);
                         $total_akhir += $terakhir;
                     @endphp
                     <tr>

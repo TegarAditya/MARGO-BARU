@@ -133,10 +133,10 @@ class StockSaldoController extends Controller
                     $q->where('semester_id', $semester)
                     ->orWhere('stock' , '>', 0);
                 })->whereIn('type', ['L', 'P', 'K'])->get();
+        
 
         foreach($bookvariant as $book) {
             $before = StockSaldo::where('code', $lastmonth)->where('product_id', $book->id)->first();
-
             if ($before) {
                 $qty_awal = $before->qty_akhir;
             } else {
@@ -153,7 +153,7 @@ class StockSaldoController extends Controller
                 'qty_awal' => $qty_awal,
                 'in' => $book->in,
                 'out' => $book->out,
-                'qty_akhir' => $qty_awal + ($book->in - $book->out),
+                'qty_akhir' => $qty_awal + ($book->in + $book->out),
             ]);
         }
 

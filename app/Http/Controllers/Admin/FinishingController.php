@@ -104,7 +104,7 @@ class FinishingController extends Controller
         $jenjangs = Jenjang::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
         $no_spk = Finishing::generateNoSPKTemp(setting('current_semester'));
-        
+
         $today = Carbon::now()->format('d-m-Y');
 
         return view('admin.finishings.create', compact('vendors', 'jenjangs', 'no_spk', 'today'));
@@ -165,8 +165,8 @@ class FinishingController extends Controller
                     'done' => 0,
                 ]);
 
-                EstimationService::createMovement('out', 'finishing', $finishing->id, $product->id, -1 * $quantity, $product->type);
-                EstimationService::createProduction($product->id, -1 * $quantity, $product->type);
+                EstimationService::createMovement('out', 'finishing', $finishing->id, $product->id, $quantity, 'produksi');
+                EstimationService::createCetak($product->id, $quantity, $product->type);
 
                 foreach($product->components as $item) {
                     StockService::createMovement('out', 'produksi', $finishing->id, $date, $item->id, -1 * $quantity);
@@ -250,8 +250,8 @@ class FinishingController extends Controller
                         'cost' => $cost,
                     ]);
 
-                    EstimationService::editMovement('out', 'finishing', $finishing->id, $product->id, -1 * $quantity, $product->type);
-                    EstimationService::editProduction($product->id, ($quantity - $old_quantity), $product->type);
+                    EstimationService::editMovement('out', 'finishing', $finishing->id, $product->id, $quantity, 'produksi');
+                    EstimationService::editCetak($product->id, ($quantity - $old_quantity), $product->type);
 
                     foreach($product->components as $item) {
                         StockService::editMovement('out', 'produksi', $finishing->id, $date, $item->id, -1 * $quantity);
@@ -268,8 +268,8 @@ class FinishingController extends Controller
                         'done' => 0,
                     ]);
 
-                    EstimationService::createMovement('out', 'finishing', $finishing->id, $product->id, -1 * $quantity, $product->type);
-                    EstimationService::createProduction($product->id, -1 * $quantity, $product->type);
+                    EstimationService::createMovement('out', 'finishing', $finishing->id, $product->id, $quantity, 'produksi');
+                    EstimationService::createCetak($product->id, $quantity, $product->type);
 
                     foreach($product->components as $item) {
                         StockService::createMovement('out', 'produksi', $finishing->id, $date, $item->id, -1 * $quantity);
@@ -385,6 +385,9 @@ class FinishingController extends Controller
                     'done' => $status
                 ]);
 
+                EstimationService::createMovement('out', 'finishing', $finishing->id, $product, $quantity, 'realisasi');
+                EstimationService::createUpdateRealisasi($product, $quantity);
+
                 StockService::createMovement('in', 'produksi', $finishing->id, $date, $product, $quantity);
                 StockService::updateStock($product, $quantity);
             }
@@ -448,12 +451,15 @@ class FinishingController extends Controller
                     'done' => 1
                 ]);
 
+                EstimationService::createMovement('out', 'finishing', $finishing_item->finishing->id, $product, $quantity, 'realisasi');
+                EstimationService::createUpdateRealisasi($product, $quantity);
+
                 StockService::createMovement('in', 'produksi', $finishing_item->finishing->id, $date, $product, $quantity);
                 StockService::updateStock($product, $quantity);
             }
 
             $finishings = Finishing::whereIn('id', $finishing->unique())->get();
-            
+
             foreach($finishings as $item) {
                 $item->update([
                     'total_oplah' => $item->finishing_items->sum('quantity'),

@@ -95,6 +95,27 @@ class MarketingAreaTableSeeder extends Seeder
             [
                 'name'  => 'BANGLI',
             ],
+            [
+                'name'  => 'SEMARANG',
+            ],
+            [
+                'name'  => 'KLATEN',
+            ],
+            [
+                'name'  => 'MATESIH',
+            ],
+            [
+                'name'  => 'KARANGANYAR',
+            ],
+            [
+                'name'  => 'SALATIGA',
+            ],
+            [
+                'name'  => 'MAGELANG',
+            ],
+            [
+                'name'  => 'JOGJA',
+            ],
         ];
 
         MarketingArea::insert($cities);

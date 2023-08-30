@@ -17,7 +17,7 @@
                         <th></th>
                         <th>Sales</th>
                         <th>Saldo Awal</th>
-                        <th>Faktur</th>
+                        <th>Penjualan</th>
                         <th>Diskon</th>
                         <th>Retur</th>
                         <th>Pembayaran</th>

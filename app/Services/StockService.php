@@ -14,8 +14,31 @@ class StockService
     {
         $awal = StockMovement::where('product_id', $product)->where('transaction_type', 'awal')->first();
 
-        if (!$awal) {
-            $estimation = StockMovement::create([
+        if ($awal) {
+            StockMovement::create([
+                'warehouse' => 1,
+                'movement_date' => Carbon::now()->format('d-m-Y'),
+                'movement_type' => 'in',
+                'transaction_type' => 'awal',
+                'reference_id' => $product,
+                'reference_date' => Carbon::now()->format('d-m-Y'),
+                'product_id' => $product,
+                'quantity' => -1 * $awal->quantity,
+                'reversal_of_id' => $awal->id
+            ]);
+    
+            $stock = StockMovement::create([
+                'warehouse' => 1,
+                'movement_date' => Carbon::now()->format('d-m-Y'),
+                'movement_type' => 'in',
+                'transaction_type' => 'awal',
+                'reference_id' => $product,
+                'reference_date' => Carbon::now()->format('d-m-Y'),
+                'product_id' => $product,
+                'quantity' => $awal->quantity + $quantity,
+            ]);
+        } else {
+            $stock = StockMovement::create([
                 'warehouse' => 1,
                 'movement_date' => Carbon::now()->format('d-m-Y'),
                 'movement_type' => 'in',

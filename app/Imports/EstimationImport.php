@@ -64,11 +64,11 @@ class EstimationImport implements ToCollection, WithHeadingRow
                 ]);
 
                 if ($product->semester_id == $semester) {
-                    EstimationService::createMovement('in', 'sales_order', $estimasi_id, $product->id, $quantity, $product->type);
+                    EstimationService::createMovement('in', 'sales_order', $estimasi_id, $product->id, $quantity, 'sales');
                     EstimationService::createProduction($product->id, $quantity, $product->type);
 
                     foreach($product->components as $item) {
-                        EstimationService::createMovement('in', 'sales_order', $estimasi_id, $item->id, $quantity, $item->type);
+                        EstimationService::createMovement('in', 'sales_order', $estimasi_id, $item->id, $quantity, 'sales');
                         EstimationService::createProduction($item->id, $quantity, $item->type);
                     }
                 }
