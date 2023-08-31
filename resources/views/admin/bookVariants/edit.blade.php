@@ -173,7 +173,7 @@
             </div>
             <div class="form-group">
                 <label for="price">{{ trans('cruds.bookVariant.fields.price') }}</label>
-                <input class="form-control {{ $errors->has('price') ? 'is-invalid' : '' }}" type="number" name="price" id="price" value="{{ old('price', $bookVariant->price) }}" step="0.01">
+                <input class="form-control {{ $errors->has('price') ? 'is-invalid' : '' }}" type="number" name="price" id="price" value="{{ old('price', $bookVariant->price) }}" step="1">
                 @if($errors->has('price'))
                     <span class="text-danger">{{ $errors->first('price') }}</span>
                 @endif
@@ -181,7 +181,7 @@
             </div>
             <div class="form-group">
                 <label for="cost">{{ trans('cruds.bookVariant.fields.cost') }}</label>
-                <input class="form-control {{ $errors->has('cost') ? 'is-invalid' : '' }}" type="number" name="cost" id="cost" value="{{ old('cost', $bookVariant->cost) }}" step="0.01">
+                <input class="form-control {{ $errors->has('cost') ? 'is-invalid' : '' }}" type="number" name="cost" id="cost" value="{{ old('cost', $bookVariant->cost) }}" step="1">
                 @if($errors->has('cost'))
                     <span class="text-danger">{{ $errors->first('cost') }}</span>
                 @endif

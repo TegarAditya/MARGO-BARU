@@ -296,6 +296,43 @@ class BookVariantController extends Controller
         return response()->json(['id' => $media->id, 'url' => $media->getUrl()], Response::HTTP_CREATED);
     }
 
+    public function updatePrice(Request $request)
+    {
+        abort_if(Gate::denies('book_variant_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+
+        $query = BookVariant::where('type', 'L');
+
+        if (!empty($request->semester)) {
+            $query->where('semester_id', $request->semester);
+        }
+        if (!empty($request->jenjang)) {
+            $query->where('jenjang_id', $request->jenjang);
+        }
+        if (!empty($request->isi)) {
+            $query->where('isi_id', $request->isi);
+        }
+        if (!empty($request->cover)) {
+            $query->where('cover_id', $request->cover);
+        }
+        if (!empty($request->kurikulum)) {
+            $query->where('kurikulum_id', $request->kurikulum);
+        }
+        if (!empty($request->kelas)) {
+            $query->where('kelas_id', $request->kelas);
+        }
+        if (!empty($request->mapel)) {
+            $query->where('mapel_id', $request->mapel);
+        }
+
+        $book_variants = $query->update([
+            'price' => $request->price
+        ]);
+
+        Alert::success('Success', $book_variants . ' Produk Ditemukan, Harga berhasil diperbarui');
+
+        return redirect()->route('admin.book-variants.index');
+    }
+
     public function getProducts(Request $request)
     {
         $query = $request->input('q');

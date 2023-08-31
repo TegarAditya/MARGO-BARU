@@ -119,6 +119,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     Route::delete('book-variants/destroy', 'BookVariantController@massDestroy')->name('book-variants.massDestroy');
     Route::post('book-variants/media', 'BookVariantController@storeMedia')->name('book-variants.storeMedia');
     Route::post('book-variants/ckmedia', 'BookVariantController@storeCKEditorImages')->name('book-variants.storeCKEditorImages');
+    Route::post('book-variants/update-price', 'BookVariantController@updatePrice')->name('book-variants.updatePrice');
     Route::get('book-variants/get-products', 'BookVariantController@getProducts')->name('book-variants.getProducts');
     Route::get('book-variants/get-books', 'BookVariantController@getBooks')->name('book-variants.getBooks');
     Route::get('book-variants/get-book', 'BookVariantController@getBook')->name('book-variants.getBook');

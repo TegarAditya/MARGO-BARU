@@ -1,14 +1,97 @@
 @extends('layouts.admin')
 @section('content')
-{{-- @can('book_variant_create')
+@can('book_variant_edit')
     <div style="margin-bottom: 10px;" class="row">
         <div class="col-lg-12">
-            <a class="btn btn-success" href="{{ route('admin.book-variants.create') }}">
-                {{ trans('global.add') }} {{ trans('cruds.bookVariant.title_singular') }}
-            </a>
+            <button class="btn btn-primary" data-toggle="modal" data-target="#importModal">
+                Edit Harga
+            </button>
         </div>
     </div>
-@endcan --}}
+@endcan
+
+<div class="modal fade" id="importModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="myModalLabel">Edit Harga LKS Filter Tertentu</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal" method="POST" action="{{ route('admin.book-variants.updatePrice') }}" enctype="multipart/form-data">
+                    {{ csrf_field() }}
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label class="col-md-4" for="kurikulum_id">{{ trans('cruds.book.fields.kurikulum') }}</label>
+                                <div class="col-12">
+                                    <select style="width: 100%;" class="form-control select2 {{ $errors->has('kurikulum') ? 'is-invalid' : '' }}" name="kurikulum_id">
+                                        @foreach($kurikulums as $id => $entry)
+                                            <option value="{{ $id }}" {{ old('kurikulum_id') == $id ? 'selected' : '' }}>{{ $entry }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-4" for="mapel_id">{{ trans('cruds.book.fields.mapel') }}</label>
+                                <div class="col-12">
+                                    <select style="width: 100%;" class="form-control select2 {{ $errors->has('mapel') ? 'is-invalid' : '' }}" name="mapel_id">
+                                        @foreach($mapels as $id => $entry)
+                                            <option value="{{ $id }}" {{ old('mapel_id') == $id ? 'selected' : '' }}>{{ $entry }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-4" for="semester_id">{{ trans('cruds.book.fields.semester') }}</label>
+                                <div class="col-12">
+                                    <select style="width: 100%;" class="form-control select2 {{ $errors->has('semester') ? 'is-invalid' : '' }}" name="semester_id">
+                                        @foreach($semesters as $id => $entry)
+                                            <option value="{{ $id }}" {{ old('semester_id') == $id ? 'selected' : '' }}>{{ $entry }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-4" for="cover_id">{{ trans('cruds.book.fields.isi') }}</label>
+                                <div class="col-12">
+                                    <select style="width: 100%;" class="form-control select2 {{ $errors->has('isi') ? 'is-invalid' : '' }}" name="isi_id">
+                                        @foreach($isis as $id => $entry)
+                                            <option value="{{ $id }}" {{ old('isi_id') == $id ? 'selected' : '' }}>{{ $entry }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-4" for="cover_id">{{ trans('cruds.book.fields.cover') }}</label>
+                                <div class="col-12">
+                                    <select style="width: 100%;" class="form-control select2 {{ $errors->has('cover') ? 'is-invalid' : '' }}" name="cover_id">
+                                        @foreach($covers as $id => $entry)
+                                            <option value="{{ $id }}" {{ old('cover_id') == $id ? 'selected' : '' }}>{{ $entry }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-4" for="price">{{ trans('cruds.bookVariant.fields.price') }}</label>
+                                <div class="col-12">
+                                    <input class="form-control {{ $errors->has('price') ? 'is-invalid' : '' }}" type="number" name="price" value="{{ old('price', '0') }}" step="1" required>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-8 col-md-offset-4">
+                            <button type="submit" class="btn btn-primary">
+                                Change
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 <div class="card">
     <div class="card-header">
         {{ trans('cruds.bookVariant.title_singular') }} {{ trans('global.list') }}
@@ -20,8 +103,8 @@
                 <div class="col-4">
                     <div class="form-group">
                         <label>{{ trans('cruds.bookVariant.fields.type') }}</label>
-                        <select class="form-control {{ $errors->has('type') ? 'is-invalid' : '' }}" name="type" id="type">
-                            <option value disabled {{ old('type', null) === null ? 'selected' : '' }}>All</option>
+                        <select class="form-control select2 {{ $errors->has('type') ? 'is-invalid' : '' }}" name="type" id="type">
+                            <option value {{ old('type', null) === null ? 'selected' : '' }}>All</option>
                             @foreach(App\Models\BookVariant::TYPE_SELECT as $key => $label)
                                 <option value="{{ $key }}" {{ old('type', '') === (string) $key ? 'selected' : '' }}>{{ $label }}</option>
                             @endforeach
