@@ -10,7 +10,7 @@ class CreateIsisTable extends Migration
     {
         Schema::create('isis', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('code');
+            $table->string('code')->unique();
             $table->string('name');
             $table->timestamps();
             $table->softDeletes();

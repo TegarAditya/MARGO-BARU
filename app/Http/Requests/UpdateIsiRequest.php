@@ -20,6 +20,7 @@ class UpdateIsiRequest extends FormRequest
             'code' => [
                 'string',
                 'required',
+                'unique:isis,code,' . request()->route('isi')->id,
             ],
             'name' => [
                 'string',

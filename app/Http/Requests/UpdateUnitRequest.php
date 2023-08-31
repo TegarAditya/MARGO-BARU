@@ -20,6 +20,7 @@ class UpdateUnitRequest extends FormRequest
             'code' => [
                 'string',
                 'required',
+                'unique:units,code,' . request()->route('unit')->id,
             ],
             'name' => [
                 'string',

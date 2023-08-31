@@ -19,7 +19,8 @@ class UpdateHalamanRequest extends FormRequest
         return [
             'code' => [
                 'string',
-                'nullable',
+                'required',
+                'unique:halamen,code,' . request()->route('halaman')->id,
             ],
             'name' => [
                 'string',

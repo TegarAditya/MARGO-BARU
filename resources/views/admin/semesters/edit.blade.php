@@ -11,8 +11,8 @@
             @method('PUT')
             @csrf
             <div class="form-group">
-                <label for="code">{{ trans('cruds.semester.fields.code') }}</label>
-                <input class="form-control {{ $errors->has('code') ? 'is-invalid' : '' }}" type="text" name="code" id="code" value="{{ old('code', $semester->code) }}">
+                <label class="required" for="code">{{ trans('cruds.semester.fields.code') }}</label>
+                <input class="form-control {{ $errors->has('code') ? 'is-invalid' : '' }}" type="text" name="code" id="code" value="{{ old('code', $semester->code) }}" required>
                 @if($errors->has('code'))
                     <span class="text-danger">{{ $errors->first('code') }}</span>
                 @endif
@@ -39,7 +39,7 @@
                 @endif
                 <span class="help-block">{{ trans('cruds.semester.fields.type_helper') }}</span>
             </div>
-            <div class="form-group">
+            {{-- <div class="form-group">
                 <label for="start_date">{{ trans('cruds.semester.fields.start_date') }}</label>
                 <input class="form-control date {{ $errors->has('start_date') ? 'is-invalid' : '' }}" type="text" name="start_date" id="start_date" value="{{ old('start_date', $semester->start_date) }}">
                 @if($errors->has('start_date'))
@@ -54,7 +54,7 @@
                     <span class="text-danger">{{ $errors->first('end_date') }}</span>
                 @endif
                 <span class="help-block">{{ trans('cruds.semester.fields.end_date_helper') }}</span>
-            </div>
+            </div> --}}
             <div class="form-group">
                 <div class="form-check {{ $errors->has('status') ? 'is-invalid' : '' }}">
                     <input class="form-check-input" type="checkbox" name="status" id="status" value="1" {{ $semester->status || old('status', 0) === 1 ? 'checked' : '' }} required>

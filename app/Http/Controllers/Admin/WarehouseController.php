@@ -12,6 +12,7 @@ use Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Yajra\DataTables\Facades\DataTables;
+use Alert;
 
 class WarehouseController extends Controller
 {
@@ -69,6 +70,8 @@ class WarehouseController extends Controller
     {
         $warehouse = Warehouse::create($request->all());
 
+        Alert::success('Berhasil', 'Data berhasil ditambahkan');
+
         return redirect()->route('admin.warehouses.index');
     }
 
@@ -82,6 +85,8 @@ class WarehouseController extends Controller
     public function update(UpdateWarehouseRequest $request, Warehouse $warehouse)
     {
         $warehouse->update($request->all());
+
+        Alert::success('Berhasil', 'Data berhasil disimpan');
 
         return redirect()->route('admin.warehouses.index');
     }

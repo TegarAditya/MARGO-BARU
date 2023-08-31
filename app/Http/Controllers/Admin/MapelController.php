@@ -12,6 +12,7 @@ use Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Yajra\DataTables\Facades\DataTables;
+use Alert;
 
 class MapelController extends Controller
 {
@@ -69,6 +70,8 @@ class MapelController extends Controller
     {
         $mapel = Mapel::create($request->all());
 
+        Alert::success('Berhasil', 'Data berhasil ditambahkan');
+
         return redirect()->route('admin.mapels.index');
     }
 
@@ -83,6 +86,8 @@ class MapelController extends Controller
     {
         $mapel->update($request->all());
 
+        Alert::success('Berhasil', 'Data berhasil disimpan');
+
         return redirect()->route('admin.mapels.index');
     }
 
@@ -96,6 +101,15 @@ class MapelController extends Controller
     public function destroy(Mapel $mapel)
     {
         abort_if(Gate::denies('mapel_delete'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+
+        $relationMethods = ['book_variants'];
+
+        foreach ($relationMethods as $relationMethod) {
+            if ($mapel->$relationMethod()->count() > 0) {
+                Alert::warning('Error', 'Mapel telah digunakan, tidak bisa dihapus !');
+                return back();
+            }
+        }
 
         $mapel->delete();
 

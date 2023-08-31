@@ -19,7 +19,7 @@ class UpdateWarehouseRequest extends FormRequest
         return [
             'code' => [
                 'string',
-                'nullable',
+                'unique:warehouses,code,' . request()->route('warehouse')->id,
             ],
             'name' => [
                 'string',

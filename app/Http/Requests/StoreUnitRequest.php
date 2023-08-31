@@ -20,6 +20,7 @@ class StoreUnitRequest extends FormRequest
             'code' => [
                 'string',
                 'required',
+                'unique:units',
             ],
             'name' => [
                 'string',

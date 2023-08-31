@@ -73,6 +73,8 @@ class HalamanController extends Controller
     {
         $halaman = Halaman::create($request->all());
 
+        Alert::success('Berhasil', 'Data berhasil ditambahkan');
+
         return redirect()->route('admin.halaman.index');
     }
 
@@ -87,6 +89,8 @@ class HalamanController extends Controller
     {
         $halaman->update($request->all());
 
+        Alert::success('Berhasil', 'Data berhasil disimpan');
+
         return redirect()->route('admin.halaman.index');
     }
 
@@ -100,6 +104,15 @@ class HalamanController extends Controller
     public function destroy(Halaman $halaman)
     {
         abort_if(Gate::denies('halaman_delete'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+
+        $relationMethods = ['book_variants'];
+
+        foreach ($relationMethods as $relationMethod) {
+            if ($halaman->$relationMethod()->count() > 0) {
+                Alert::warning('Error', 'Halaman telah digunakan, tidak bisa dihapus !');
+                return back();
+            }
+        }
 
         $halaman->delete();
 

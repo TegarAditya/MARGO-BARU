@@ -19,7 +19,8 @@ class StoreWarehouseRequest extends FormRequest
         return [
             'code' => [
                 'string',
-                'nullable',
+                'required',
+                'unique:warehouses',
             ],
             'name' => [
                 'string',

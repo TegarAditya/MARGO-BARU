@@ -12,6 +12,7 @@ use Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Yajra\DataTables\Facades\DataTables;
+use Alert;
 
 class KurikulumController extends Controller
 {
@@ -69,6 +70,8 @@ class KurikulumController extends Controller
     {
         $kurikulum = Kurikulum::create($request->all());
 
+        Alert::success('Berhasil', 'Data berhasil ditambahkan');
+
         return redirect()->route('admin.kurikulums.index');
     }
 
@@ -83,6 +86,8 @@ class KurikulumController extends Controller
     {
         $kurikulum->update($request->all());
 
+        Alert::success('Berhasil', 'Data berhasil disimpan');
+
         return redirect()->route('admin.kurikulums.index');
     }
 
@@ -96,6 +101,15 @@ class KurikulumController extends Controller
     public function destroy(Kurikulum $kurikulum)
     {
         abort_if(Gate::denies('kurikulum_delete'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+
+        $relationMethods = ['book_variants'];
+
+        foreach ($relationMethods as $relationMethod) {
+            if ($kurikulum->$relationMethod()->count() > 0) {
+                Alert::warning('Error', 'Kurikulum telah digunakan, tidak bisa dihapus !');
+                return back();
+            }
+        }
 
         $kurikulum->delete();
 

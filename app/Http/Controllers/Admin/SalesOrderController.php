@@ -319,11 +319,9 @@ class SalesOrderController extends Controller
     {
         $semester = $request->semester;
         $salesperson = $request->salesperson;
-        // $payment_type = $request->payment_type;
 
         $orders = SalesOrder::where('salesperson_id', $salesperson)
             ->where('semester_id', $semester)
-            // ->where('payment_type', $payment_type)
             ->get();
 
         $salesOrder = $orders->first();

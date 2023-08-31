@@ -17,6 +17,11 @@ class StoreSemesterRequest extends FormRequest
     public function rules()
     {
         return [
+            'code' => [
+                'string',
+                'required',
+                'unique:semesters'
+            ],
             'name' => [
                 'string',
                 'required',

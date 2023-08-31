@@ -12,6 +12,7 @@ use Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Yajra\DataTables\Facades\DataTables;
+use Alert;
 
 class KelasController extends Controller
 {
@@ -69,6 +70,8 @@ class KelasController extends Controller
     {
         $kela = Kelas::create($request->all());
 
+        Alert::success('Berhasil', 'Data berhasil ditambahkan');
+
         return redirect()->route('admin.kelas.index');
     }
 
@@ -83,6 +86,8 @@ class KelasController extends Controller
     {
         $kela->update($request->all());
 
+        Alert::success('Berhasil', 'Data berhasil disimpan');
+
         return redirect()->route('admin.kelas.index');
     }
 
@@ -96,6 +101,15 @@ class KelasController extends Controller
     public function destroy(Kelas $kela)
     {
         abort_if(Gate::denies('kela_delete'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+
+        $relationMethods = ['book_variants'];
+
+        foreach ($relationMethods as $relationMethod) {
+            if ($kela->$relationMethod()->count() > 0) {
+                Alert::warning('Error', 'Kelas telah digunakan, tidak bisa dihapus !');
+                return back();
+            }
+        }
 
         $kela->delete();
 

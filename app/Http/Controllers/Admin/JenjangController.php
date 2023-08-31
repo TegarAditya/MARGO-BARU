@@ -12,6 +12,7 @@ use Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Yajra\DataTables\Facades\DataTables;
+use Alert;
 
 class JenjangController extends Controller
 {
@@ -69,6 +70,8 @@ class JenjangController extends Controller
     {
         $jenjang = Jenjang::create($request->all());
 
+        Alert::success('Berhasil', 'Data berhasil ditambahkan');
+
         return redirect()->route('admin.jenjangs.index');
     }
 
@@ -83,6 +86,8 @@ class JenjangController extends Controller
     {
         $jenjang->update($request->all());
 
+        Alert::success('Berhasil', 'Data berhasil disimpan');
+
         return redirect()->route('admin.jenjangs.index');
     }
 
@@ -96,6 +101,15 @@ class JenjangController extends Controller
     public function destroy(Jenjang $jenjang)
     {
         abort_if(Gate::denies('jenjang_delete'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+
+        $relationMethods = ['book_variants'];
+
+        foreach ($relationMethods as $relationMethod) {
+            if ($jenjang->$relationMethod()->count() > 0) {
+                Alert::warning('Error', 'Jenjang telah digunakan, tidak bisa dihapus !');
+                return back();
+            }
+        }
 
         $jenjang->delete();
 

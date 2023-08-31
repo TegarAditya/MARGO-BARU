@@ -10,7 +10,7 @@ class CreateHalamenTable extends Migration
     {
         Schema::create('halamen', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('code')->nullable();
+            $table->string('code')->unique();
             $table->string('name');
             $table->integer('value');
             $table->timestamps();

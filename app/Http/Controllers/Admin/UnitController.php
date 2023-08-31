@@ -12,6 +12,7 @@ use Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Yajra\DataTables\Facades\DataTables;
+use Alert;
 
 class UnitController extends Controller
 {
@@ -69,6 +70,8 @@ class UnitController extends Controller
     {
         $unit = Unit::create($request->all());
 
+        Alert::success('Berhasil', 'Data berhasil ditambahkan');
+
         return redirect()->route('admin.units.index');
     }
 
@@ -83,6 +86,8 @@ class UnitController extends Controller
     {
         $unit->update($request->all());
 
+        Alert::success('Berhasil', 'Data berhasil disimpan');
+
         return redirect()->route('admin.units.index');
     }
 
@@ -96,6 +101,15 @@ class UnitController extends Controller
     public function destroy(Unit $unit)
     {
         abort_if(Gate::denies('unit_delete'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+
+        $relationMethods = ['book_variants', 'materials'];
+
+        foreach ($relationMethods as $relationMethod) {
+            if ($unit->$relationMethod()->count() > 0) {
+                Alert::warning('Error', 'Unit telah digunakan, tidak bisa dihapus !');
+                return back();
+            }
+        }
 
         $unit->delete();
 

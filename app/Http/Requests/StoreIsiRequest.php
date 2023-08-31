@@ -20,6 +20,7 @@ class StoreIsiRequest extends FormRequest
             'code' => [
                 'string',
                 'required',
+                'unique:isis',
             ],
             'name' => [
                 'string',

@@ -64,4 +64,9 @@ class Semester extends Model
     {
         $this->attributes['end_date'] = $value ? Carbon::createFromFormat(config('panel.date_format'), $value)->format('Y-m-d') : null;
     }
+
+    public function book_variants()
+    {
+        return $this->hasMany(BookVariant::class, 'semester_id');
+    }
 }

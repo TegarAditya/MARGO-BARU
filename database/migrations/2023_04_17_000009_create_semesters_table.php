@@ -10,7 +10,7 @@ class CreateSemestersTable extends Migration
     {
         Schema::create('semesters', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('code')->nullable();
+            $table->string('code')->unique();
             $table->string('name');
             $table->string('type');
             $table->date('start_date')->nullable();

@@ -17,6 +17,11 @@ class UpdateSemesterRequest extends FormRequest
     public function rules()
     {
         return [
+            'code' => [
+                'string',
+                'required',
+                'unique:semesters,code,' . request()->route('semester')->id,
+            ],
             'name' => [
                 'string',
                 'required',

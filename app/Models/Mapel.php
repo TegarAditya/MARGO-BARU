@@ -32,4 +32,9 @@ class Mapel extends Model
     {
         return $date->format('Y-m-d H:i:s');
     }
+
+    public function book_variants()
+    {
+        return $this->hasMany(BookVariant::class, 'mapel_id');
+    }
 }

@@ -32,4 +32,14 @@ class Unit extends Model
     {
         return $date->format('Y-m-d H:i:s');
     }
+
+    public function book_variants()
+    {
+        return $this->hasMany(BookVariant::class, 'unit_id');
+    }
+
+    public function materials()
+    {
+        return $this->hasMany(Material::class, 'unit_id');
+    }
 }

@@ -12,6 +12,7 @@ use Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Yajra\DataTables\Facades\DataTables;
+use Alert;
 
 class CoverController extends Controller
 {
@@ -69,6 +70,8 @@ class CoverController extends Controller
     {
         $cover = Cover::create($request->all());
 
+        Alert::success('Berhasil', 'Data berhasil ditambahkan');
+
         return redirect()->route('admin.covers.index');
     }
 
@@ -82,6 +85,8 @@ class CoverController extends Controller
     public function update(UpdateCoverRequest $request, Cover $cover)
     {
         $cover->update($request->all());
+
+        Alert::success('Berhasil', 'Data berhasil disimpan');
 
         return redirect()->route('admin.covers.index');
     }
@@ -97,7 +102,18 @@ class CoverController extends Controller
     {
         abort_if(Gate::denies('cover_delete'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
+        $relationMethods = ['book_variants'];
+
+        foreach ($relationMethods as $relationMethod) {
+            if ($cover->$relationMethod()->count() > 0) {
+                Alert::warning('Error', 'Cover telah digunakan, tidak bisa dihapus !');
+                return back();
+            }
+        }
+
         $cover->delete();
+
+        Alert::success('Berhasil', 'Data berhasil dihapus');
 
         return back();
     }

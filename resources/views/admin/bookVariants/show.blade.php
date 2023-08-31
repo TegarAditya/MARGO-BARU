@@ -31,7 +31,7 @@
                             Name
                         </th>
                         <td>
-                            {{ $bookVariant->name }}
+                            {{ $bookVariant->short_name }}
                         </td>
                     </tr>
                     <tr>

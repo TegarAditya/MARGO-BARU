@@ -19,7 +19,8 @@ class StoreHalamanRequest extends FormRequest
         return [
             'code' => [
                 'string',
-                'nullable',
+                'required',
+                'unique:halamen',
             ],
             'name' => [
                 'string',

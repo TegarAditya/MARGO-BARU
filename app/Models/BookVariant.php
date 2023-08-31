@@ -112,7 +112,8 @@ class BookVariant extends Model implements HasMedia
         $name = $this->mapel?->name .' - '. $this->kelas?->name.' - '. $this->halaman?->name;
 
         if ($this->type !== 'L') {
-            $name = BookVariant::TYPE_SELECT[$this->type] ?? '' .' - '. $name;
+            $tipe = BookVariant::TYPE_SELECT[$this->type] ?? '';
+            return $tipe .' - '. $name;
         }
 
         return $name;
