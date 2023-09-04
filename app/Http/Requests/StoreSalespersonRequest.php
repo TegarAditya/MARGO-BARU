@@ -20,6 +20,7 @@ class StoreSalespersonRequest extends FormRequest
             'code' => [
                 'string',
                 'required',
+                'unique:salespeople',
             ],
             'name' => [
                 'string',

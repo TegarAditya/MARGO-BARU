@@ -39,6 +39,18 @@
                 <span class="help-block">{{ trans('cruds.groupArea.fields.provinsi_helper') }}</span>
             </div>
             <div class="form-group">
+                <label for="vendors">Marketing Area</label>
+                <div style="padding-bottom: 4px">
+                    <span class="btn btn-info btn-xs select-all" style="border-radius: 0">{{ trans('global.select_all') }}</span>
+                    <span class="btn btn-info btn-xs deselect-all" style="border-radius: 0">{{ trans('global.deselect_all') }}</span>
+                </div>
+                <select class="form-control select2 {{ $errors->has('marketing_areas') ? 'is-invalid' : '' }}" name="marketing_areas[]" id="marketing_areas" multiple>
+                    @foreach($marketing_areas as $id => $marketing_area)
+                        <option value="{{ $id }}" {{ in_array($id, old('marketing_areas', [])) ? 'selected' : '' }}>{{ $marketing_area }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="form-group">
                 <button class="btn btn-danger" type="submit">
                     {{ trans('global.save') }}
                 </button>

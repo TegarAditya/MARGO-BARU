@@ -262,9 +262,9 @@ class CetakController extends Controller
 
         $jenjangs = Jenjang::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
-        $materials = Material::where('category', 'plate')->whereHas('vendors', function ($q) use ($cetak) {
-            $q->where('id', $cetak->vendor_id);
-        })->orderBy('code', 'ASC')->pluck('name', 'id');
+        $materials = Material::where('category', 'plate')->orderBy('code', 'ASC')->pluck('name', 'id');
+
+        $no_spc = noRevisi($cetak->no_spc);
 
         $cetak->load('semester', 'vendor', 'jenjang');
 
@@ -278,7 +278,7 @@ class CetakController extends Controller
             Alert::warning('Warning', 'Perintah Plate sudah dieksekusi, tidak disarankan untuk di edit');
         }
 
-        return view('admin.cetaks.edit', compact('cetak', 'cetak_items', 'semesters', 'vendors', 'materials', 'jenjangs'));
+        return view('admin.cetaks.edit', compact('no_spc', 'cetak', 'cetak_items', 'semesters', 'vendors', 'materials', 'jenjangs'));
     }
 
     public function update(Request $request, Cetak $cetak)
@@ -286,6 +286,7 @@ class CetakController extends Controller
         // Validate the form data
         $validatedData = $request->validate([
             'date' => 'required',
+            'vendor_id' => 'required',
             'note' => 'nullable',
             'products' => 'required|array',
             'products.*' => 'exists:book_variants,id',
@@ -299,6 +300,7 @@ class CetakController extends Controller
         ]);
 
         $date = $validatedData['date'];
+        $vendor = $validatedData['vendor_id'];
         $note = $validatedData['note'];
         $products = $validatedData['products'];
         $quantities = $validatedData['quantities'];
@@ -306,7 +308,7 @@ class CetakController extends Controller
         $plate_quantities = $validatedData['plate_quantities'];
         $cetak_items = $validatedData['cetak_items'];
         $type = $cetak->type;
-        $vendor = $cetak->vendor_id;
+        $semester = $cetak->semester_id;
         $total_cost = 0;
 
         DB::beginTransaction();
@@ -324,8 +326,8 @@ class CetakController extends Controller
                     $halaman = Halaman::find($product->halaman_id)->value;
                     $cost = $this->costIsi($halaman, $quantity);
                 } else if ($type == 'cover') {
-                    $vendor = VendorCost::where('vendor_id', $vendor)->where('key', 'cover_cost')->first();
-                    $cost = $this->costCover($vendor ? $vendor->value : 35, $quantity);
+                    $vendor_cost = VendorCost::where('vendor_id', $vendor)->where('key', 'cover_cost')->first();
+                    $cost = $this->costCover($vendor_cost ? $vendor_cost->value : 35, $quantity);
                 }
 
                 $total_cost += $cost;
@@ -379,14 +381,15 @@ class CetakController extends Controller
                 }
             }
 
+            TransactionService::editProductionTransaction($date, 'Ongkos Cetak Produsi SPC '. $cetak->no_spc, $vendor, $semester, 'cetak', $cetak->id, $cetak->no_spc, $total_cost, 'credit');
+            
             $cetak->update([
                 'date' => $date,
+                'vendor_id' => $vendor,
                 'estimasi_oplah' => array_sum($quantities),
                 'total_cost' => $total_cost,
                 'note' => $note
             ]);
-
-            TransactionService::editProductionTransaction($date, 'Ongkos Cetak Produsi SPc '. $cetak->no_spc, $vendor, $semester, 'cetak', $cetak->id, $cetak->no_spc, $total_cost, 'credit');
 
             DB::commit();
 

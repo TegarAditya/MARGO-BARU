@@ -39,4 +39,9 @@ class GroupArea extends Model
     {
         return $date->format('Y-m-d H:i:s');
     }
+
+    public function marketing_areas()
+    {
+        return $this->hasMany(MarketingArea::class, 'group_area_id');
+    }
 }

@@ -20,6 +20,7 @@ class UpdateSalespersonRequest extends FormRequest
             'code' => [
                 'string',
                 'required',
+                'unique:salespeople,code,' . request()->route('salesperson')->id,
             ],
             'name' => [
                 'string',

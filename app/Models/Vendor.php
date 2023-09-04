@@ -62,4 +62,14 @@ class Vendor extends Model
     {
         return $this->hasOne(ProductionTransactionTotal::class, 'vendor_id');
     }
+
+    public function cetaks()
+    {
+        return $this->hasMany(Cetak::class, 'vendor_id');
+    }
+
+    public function finishings()
+    {
+        return $this->hasMany(Finishing::class, 'vendor_id');
+    }
 }

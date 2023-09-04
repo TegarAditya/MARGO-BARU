@@ -13,6 +13,7 @@ use Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Yajra\DataTables\Facades\DataTables;
+use Alert;
 
 class SettingController extends Controller
 {
@@ -74,6 +75,8 @@ class SettingController extends Controller
     {
         $setting = Setting::create($request->all());
 
+        Alert::success('Berhasil', 'Data berhasil ditambahkan');
+
         return redirect()->route('admin.settings.index');
     }
 
@@ -89,6 +92,8 @@ class SettingController extends Controller
     public function update(UpdateSettingRequest $request, Setting $setting)
     {
         $setting->update($request->all());
+
+        Alert::success('Berhasil', 'Data berhasil disimpan');
 
         return redirect()->route('admin.settings.index');
     }

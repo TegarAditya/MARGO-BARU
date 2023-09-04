@@ -12,6 +12,7 @@ use Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Yajra\DataTables\Facades\DataTables;
+use Alert;
 
 class VendorController extends Controller
 {
@@ -81,6 +82,8 @@ class VendorController extends Controller
     {
         $vendor = Vendor::create($request->all());
 
+        Alert::success('Success', 'Data Vendor Berhasil Ditambahkan');
+
         return redirect()->route('admin.vendors.index');
     }
 
@@ -95,6 +98,8 @@ class VendorController extends Controller
     {
         $vendor->update($request->all());
 
+        Alert::success('Success', 'Data Vendor Berhasil Disimpan');
+
         return redirect()->route('admin.vendors.index');
     }
 
@@ -108,6 +113,15 @@ class VendorController extends Controller
     public function destroy(Vendor $vendor)
     {
         abort_if(Gate::denies('vendor_delete'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+
+        $relationMethods = ['cetaks', 'finishings'];
+
+        foreach ($relationMethods as $relationMethod) {
+            if ($vendor->$relationMethod()->count() > 0) {
+                Alert::warning('Error', 'Vendor telah digunakan, tidak bisa dihapus !');
+                return back();
+            }
+        }
 
         $vendor->delete();
 

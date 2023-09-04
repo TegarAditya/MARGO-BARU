@@ -79,6 +79,8 @@ class SalespersonController extends Controller
     {
         $salesperson = Salesperson::create($request->all());
 
+        Alert::success('Success', 'Sales berhasil di tambahkan');
+
         return redirect()->route('admin.salespeople.index');
     }
 
@@ -97,6 +99,8 @@ class SalespersonController extends Controller
     {
         $salesperson->update($request->all());
 
+        Alert::success('Success', 'Data berhasil Disimpan');
+
         return redirect()->route('admin.salespeople.index');
     }
 
@@ -112,6 +116,15 @@ class SalespersonController extends Controller
     public function destroy(Salesperson $salesperson)
     {
         abort_if(Gate::denies('salesperson_delete'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+
+        $relationMethods = ['estimasi', 'invoices', 'payments', 'transactions'];
+
+        foreach ($relationMethods as $relationMethod) {
+            if ($salesperson->$relationMethod()->count() > 0) {
+                Alert::warning('Error', 'Sales telah digunakan, tidak bisa dihapus !');
+                return back();
+            }
+        }
 
         $salesperson->delete();
 

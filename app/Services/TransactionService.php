@@ -92,8 +92,7 @@ class TransactionService
     public static function editProductionTransaction($date, $description, $vendor, $semester,
         $type, $reference, $reference_no, $amount, $category)
     {
-        $reversal = ProductionTransaction::where('type', $type)->where('reference_id', $reference)->where('semester_id', $semester)
-                    ->where('vendor_id', $vendor)->orderBy('id', 'DESC')->first();
+        $reversal = ProductionTransaction::where('type', $type)->where('reference_id', $reference)->where('semester_id', $semester)->orderBy('id', 'DESC')->first();
 
         ProductionTransaction::create([
             'date' => Carbon::now()->format('d-m-Y'),

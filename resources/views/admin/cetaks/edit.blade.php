@@ -14,7 +14,7 @@
                 <div class="col-6">
                     <div class="form-group">
                         <label class="required" for="no_spc">{{ trans('cruds.cetak.fields.no_spc') }}</label>
-                        <input class="form-control {{ $errors->has('no_spc') ? 'is-invalid' : '' }}" type="text" name="no_spc" id="no_spc" value="{{ old('no_spc', $cetak->no_spc) }}" readonly>
+                        <input class="form-control {{ $errors->has('no_spc') ? 'is-invalid' : '' }}" type="text" name="no_spc" id="no_spc" value="{{ old('no_spc', $no_spc) }}" readonly>
                         @if($errors->has('no_spc'))
                             <span class="text-danger">{{ $errors->first('no_spc') }}</span>
                         @endif
@@ -34,7 +34,7 @@
                 <div class="col-6">
                     <div class="form-group">
                         <label class="required" for="vendor_id">{{ trans('cruds.cetak.fields.vendor') }}</label>
-                        <select class="form-control select2 {{ $errors->has('vendor') ? 'is-invalid' : '' }}" name="vendor_id" id="vendor_id" disabled>
+                        <select class="form-control select2 {{ $errors->has('vendor') ? 'is-invalid' : '' }}" name="vendor_id" id="vendor_id">
                             @foreach($vendors as $id => $entry)
                                 <option value="{{ $id }}" {{ (old('vendor_id') ? old('vendor_id') : $cetak->vendor->id ?? '') == $id ? 'selected' : '' }}>{{ $entry }}</option>
                             @endforeach
@@ -130,7 +130,7 @@
                                 <div class="col" style="min-width: 240px">
                                     <p class="mb-0 text-sm">Plate</p>
                                     <div class="form-group text-field m-0">
-                                        <select class="form-control text-center plates select2" name="plates[]" style="width: 100%;" tabIndex="-1" required>
+                                        <select class="form-control text-center plates select2" name="plates[]" style="width: 100%;" tabIndex="-1">
                                             <option value="">Belum Tahu</option>
                                             @foreach($materials as $id => $entry)
                                                 <option value="{{ $id }}" {{ $item->plate_id == $id ? 'selected' : '' }}>{{ $entry }}</option>

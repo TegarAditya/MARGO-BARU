@@ -8,10 +8,13 @@ use App\Http\Requests\MassDestroyGroupAreaRequest;
 use App\Http\Requests\StoreGroupAreaRequest;
 use App\Http\Requests\UpdateGroupAreaRequest;
 use App\Models\GroupArea;
+use App\Models\MarketingArea;
 use Gate;
+use DB;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Yajra\DataTables\Facades\DataTables;
+use Alert;
 
 class GroupAreaController extends Controller
 {
@@ -65,28 +68,80 @@ class GroupAreaController extends Controller
     {
         abort_if(Gate::denies('group_area_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        return view('admin.groupAreas.create');
+        $marketing_areas = MarketingArea::pluck('name', 'id');
+
+        return view('admin.groupAreas.create', compact('marketing_areas'));
     }
 
     public function store(StoreGroupAreaRequest $request)
     {
-        $groupArea = GroupArea::create($request->all());
+        DB::beginTransaction();
+        try {
+            $groupArea = GroupArea::create($request->all());
 
-        return redirect()->route('admin.group-areas.index');
+            if ($request->marketing_areas <> '')
+            {
+                MarketingArea::whereIn('id', $request->marketing_areas)->update([
+                    'group_area_id' => $groupArea->id
+                ]);
+            }
+
+            DB::commit();
+
+            Alert::success('Success', 'Group Area berhasil di simpan');
+
+            return redirect()->route('admin.group-areas.index');
+        } catch (\Exception $e) {
+            DB::rollback();
+
+            dd($e);
+
+            return redirect()->back()->with('error-message', $e->getMessage())->withInput();
+        }
     }
 
     public function edit(GroupArea $groupArea)
     {
         abort_if(Gate::denies('group_area_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        return view('admin.groupAreas.edit', compact('groupArea'));
+        $marketing_areas = MarketingArea::pluck('name', 'id');
+
+        return view('admin.groupAreas.edit', compact('groupArea', 'marketing_areas'));
     }
 
     public function update(UpdateGroupAreaRequest $request, GroupArea $groupArea)
     {
-        $groupArea->update($request->all());
+        DB::beginTransaction();
+        try {
+            $groupArea->update($request->all());
 
-        return redirect()->route('admin.group-areas.index');
+            $set = $groupArea->marketing_areas()->pluck('id')->toArray();
+            if ($set <> '')
+            {
+                MarketingArea::whereIn('id', $set)->update([
+                    'group_area_id' => null
+                ]);
+            }
+
+            if ($request->marketing_areas <> '')
+            {
+                MarketingArea::whereIn('id', $request->marketing_areas)->update([
+                    'group_area_id' => $groupArea->id
+                ]);
+            }
+
+            DB::commit();
+
+            Alert::success('Success', 'Group Area berhasil di simpan');
+
+            return redirect()->route('admin.group-areas.index');
+        } catch (\Exception $e) {
+            DB::rollback();
+
+            dd($e);
+
+            return redirect()->back()->with('error-message', $e->getMessage())->withInput();
+        }
     }
 
     public function show(GroupArea $groupArea)

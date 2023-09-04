@@ -13,6 +13,7 @@ use Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Yajra\DataTables\Facades\DataTables;
+use Alert;
 
 class VendorCostController extends Controller
 {
@@ -76,6 +77,8 @@ class VendorCostController extends Controller
     {
         $vendorCost = VendorCost::create($request->all());
 
+        Alert::success('Berhasil', 'Data berhasil ditambahkan');
+
         return redirect()->route('admin.vendor-costs.index');
     }
 
@@ -93,6 +96,8 @@ class VendorCostController extends Controller
     public function update(UpdateVendorCostRequest $request, VendorCost $vendorCost)
     {
         $vendorCost->update($request->all());
+
+        Alert::success('Berhasil', 'Data berhasil disimpan');
 
         return redirect()->route('admin.vendor-costs.index');
     }

@@ -29,7 +29,7 @@ class ProductionTransaction extends Model
     ];
 
     public const TYPE_SELECT = [
-        'cetak'     => 'Faktur',
+        'cetak'   => 'Cetak',
         'finishing' => 'Finishing',
         'bayar'     => 'Pembayaran',
     ];

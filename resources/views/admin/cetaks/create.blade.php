@@ -99,23 +99,12 @@
             </div>
             <hr style="margin: .5em -15px;border-color:#ccc" />
             <div class="row mb-4">
-                <div class="col-10">
+                <div class="col-12">
                     <div class="form-group">
                         <label for="product-search">Book Search</label>
                         <select id="product-search" class="form-control select2" style="width: 100%;">
                             <option></option>
                         </select>
-                    </div>
-                </div>
-                <div class="col-2 align-items-end align-self-center">
-                    <div class="col-auto mt-2" style="max-width: 200px">
-                        <label for="product-search" class="mb-0 text-sm">Pakai Estimasi</label>
-                        <div class="form-group text-field m-0">
-                            <div class="text-field-input">
-                                <input id="pakeestimasi" type="hidden" value="1">
-                                <input id="status" class="bootstrap-switch" type="checkbox" tabindex="-1" value="1" checked data-on-text="YES" data-off-text="NO">
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -236,6 +225,9 @@
                                     </p>
                                     <p class="mb-0 text-sm">
                                         Jenjang - Kurikulum : <strong>${product.jenjang.name} - ${product.kurikulum.name}</strong>
+                                    </p>
+                                    <p class="mb-0 text-sm">
+                                        Halaman : <strong>${product.halaman.name}</strong>
                                     </p>
                                     <p class="mb-0 text-sm">
                                         <strong>STOCK : ${product.stock}</strong>
