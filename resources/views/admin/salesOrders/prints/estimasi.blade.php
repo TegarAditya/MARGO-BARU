@@ -35,6 +35,7 @@
 
         @php
             $total_sisa = 0;
+            $total_pg = 0;
         @endphp
 
         <table cellspacing="0" cellpadding="0" class="table table-sm table-bordered" style="width: 100%">
@@ -46,6 +47,7 @@
                     <th width="1%">Kelas</th>
                     <th width="1%" class="text-center">Hal</th>
                     <th width="1%" class="text-center">Sisa</th>
+                    <th width="1%" class="text-center">PG </th>
                 </tr>
             </thead>
 
@@ -56,6 +58,12 @@
                     $total_sisa += $sisa;
 
                     $product = $order->product;
+
+                    $pg = $kelengkapan->where('product.jenjang_id', $product->jenjang_id)
+                            ->where('product.kurikulum_id', $product->kurikulum_id)
+                            ->where('product.mapel_id', $product->mapel_id)
+                            ->where('product.kelas_id', $product->kelas_id)
+                            ->where('product.semester_id', $product->semester_id);
                     @endphp
                     <tr>
                         <td class="text-center">{{ $loop->iteration }}</td>
@@ -64,6 +72,21 @@
                         <td class="text-center">{{ $product->kelas->code }}</td>
                         <td class="text-center">{{ $product->halaman->code }}</td>
                         <td class="text-center">{{ angka($sisa)}}</td>
+                        <td class="text-center">
+                            @if ($pg->count() > 0)
+                                @foreach ($pg as $key => $pg_item)
+                                    @php
+                                        $kelengkapan->forget($key);
+                                        $sisa_pg = max(0, $pg_item->quantity - $pg_item->moved);
+                                        $total_pg += $sisa_pg;
+                                    @endphp
+                                    {{ angka($sisa_pg)}}
+                                @endforeach
+                            @else
+                                -
+                            @endif
+                            
+                        </td>
                     </tr>
                 @endforeach
             </tbody>
@@ -71,6 +94,7 @@
                 <tr>
                     <th class="text-center" colspan="5"><b>Total</b></th>
                     <th width="1%" class="text-center">{{ angka($total_sisa) }}</th>
+                    <th width="1%" class="text-center">{{ angka($total_pg) }}</th>
                 </tr>
             </tfoot>
         </table>

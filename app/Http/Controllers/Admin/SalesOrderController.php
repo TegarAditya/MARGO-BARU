@@ -320,16 +320,19 @@ class SalesOrderController extends Controller
         $semester = $request->semester;
         $salesperson = $request->salesperson;
 
-        $orders = SalesOrder::where('salesperson_id', $salesperson)
+        $orders = SalesOrder::with('product')
+            ->where('salesperson_id', $salesperson)
             ->where('semester_id', $semester)
             ->get();
 
         $salesOrder = $orders->first();
         $salesOrder->load('semester', 'salesperson', 'product', 'jenjang', 'kurikulum');
 
-        $grouped = $orders->sortBy('product.kelas_id')->sortBy('product.mapel_id')->groupBy('jen_kum');
+        $grouped = $orders->where('product.type', 'L')->sortBy('product.kelas_id')->sortBy('product.mapel_id')->groupBy('jen_kum');
 
-        return view('admin.salesOrders.prints.estimasi', compact('salesOrder', 'orders', 'grouped'));
+        $kelengkapan = $orders->whereNotIn('product.type', ['L']);
+
+        return view('admin.salesOrders.prints.estimasi', compact('salesOrder', 'orders', 'grouped', 'kelengkapan'));
     }
 
 }
