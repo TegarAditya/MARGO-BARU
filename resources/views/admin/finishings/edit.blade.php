@@ -99,9 +99,20 @@
                                 <p class="mb-0 text-sm">
                                     <strong>ESTIMASI : {{ $product->estimasi_produksi ? ($product->estimasi_produksi->estimasi + $item->estimasi) : 0 }}</strong>
                                 </p>
-                                <p class="mb-0 text-sm">
+                                @foreach ($product->components as $component)
+                                    @if ($component->type == 'C' || $component->type == 'V')
+                                        <p class="mb-0 text-sm">
+                                            <strong>STOCK COVER : {{ $component->stock + $item->estimasi }}</strong>
+                                        </p>
+                                    @elseif ($component->type == 'I' || $component->type == 'S' || $component->type == 'U')
+                                        <p class="mb-0 text-sm">
+                                            <strong>STOCK ISI : {{ $component->stock + $item->estimasi }}</strong>
+                                        </p>
+                                    @endif
+                                @endforeach
+                                {{-- <p class="mb-0 text-sm">
                                     <strong>STOCK COVER/ISI : {{ $product->components->min('stock') + $item->estimasi  }}</strong>
-                                </p>
+                                </p> --}}
                             </div>
                             <div class="col offset-1 row align-items-end align-self-center">
                                 <input type="hidden" name="products[]" value="{{ $product->id }}">

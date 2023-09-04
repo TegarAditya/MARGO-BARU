@@ -174,42 +174,60 @@
                         <div class="item-product" id="product-${product.id}">
                             <div class="row">
                                 <div class="col-6 align-self-center">
-                                    <h6 class="text-sm product-name mb-1">(${product.book_type}) ${product.short_name}</h6>
+                                    <h6 class="text-sm product-name mb-1">(${product.book_type}) ${product.short_name}
+                                    </h6>
                                     <p class="mb-0 text-sm">
                                         Code : <strong>${product.code}</strong>
                                     </p>
                                     <p class="mb-0 text-sm">
-                                        Jenjang - Kurikulum : <strong>${product.jenjang.name} - ${product.kurikulum.name}</strong>
+                                        Jenjang - Kurikulum : <strong>${product.jenjang.name} -
+                                            ${product.kurikulum.name}</strong>
                                     </p>
                                     <p class="mb-0 text-sm">
                                         <strong>ESTIMASI : ${product.estimasi_produksi.estimasi}</strong>
-                                    </p>
-                                    <p class="mb-0 text-sm">
-                                        <strong>STOCK COVER/ISI : ${product.finishing_stock}</strong>
-                                    </p>
-                                </div>
-                                <div class="col offset-1 row align-items-end align-self-center">
-                                    <input type="hidden" name="products[]" value="${product.id}">
-                                    <div class="col" style="max-width: 210px">
-                                        <p class="mb-0 text-sm">Quantity</p>
-                                        <div class="form-group text-field m-0">
-                                            <div class="text-field-input px-2 py-0">
-                                                <input class="quantity" type="hidden" name="quantities[]" data-max="${Math.min(product.estimasi_produksi.estimasi, product.finishing_stock)}" value="1">
-                                                <input class="form-control text-center quantity_text" type="text" name="quantity_text[]" value="1" required>
-                                                <label class="text-field-border"></label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-auto pl-5">
-                                        <button type="button" class="btn btn-danger btn-sm product-delete" data-product-id="${product.id}" tabIndex="-1">
-                                            <i class="fa fa-trash"></i>
-                                        </button>
-                                    </div>
+                                    </p>`
+
+                                    product.components.forEach(element => {
+                                        if (element.type == 'C' || element.type == 'V') {
+                                            var text = `<p class="mb-0 text-sm">
+                                                <strong>STOCK COVER : ${element.stock}</strong>
+                                            </p>`
+                                        } else if (element.type == 'I' || element.type == 'S' || element.type == 'U') {
+                                            var text = `<p class="mb-0 text-sm">
+                                                <strong>STOCK ISI : ${element.stock}</strong>
+                                            </p>`
+                                        }
+                                        formHtml = formHtml.concat(text);
+                                    });
+
+                formHtml = formHtml.concat(
+                    `</div>
+                    <div class="col offset-1 row align-items-end align-self-center">
+                        <input type="hidden" name="products[]" value="${product.id}">
+                        <div class="col" style="max-width: 210px">
+                            <p class="mb-0 text-sm">Quantity</p>
+                            <div class="form-group text-field m-0">
+                                <div class="text-field-input px-2 py-0">
+                                    <input class="quantity" type="hidden" name="quantities[]"
+                                        data-max="${Math.min(product.estimasi_produksi.estimasi, product.finishing_stock)}"
+                                        value="1">
+                                    <input class="form-control text-center quantity_text" type="text" name="quantity_text[]"
+                                        value="1" required>
+                                    <label class="text-field-border"></label>
                                 </div>
                             </div>
-                            <hr style="margin: 1em -15px;border-color:#ccc" />
                         </div>
-                    `;
+                        <div class="col-auto pl-5">
+                            <button type="button" class="btn btn-danger btn-sm product-delete"
+                                data-product-id="${product.id}" tabIndex="-1">
+                                <i class="fa fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    </div>
+                    <hr style="margin: 1em -15px;border-color:#ccc" />
+                    </div>
+                    `);
                     $('#product-form').prepend(formHtml);
                     $('#product-search').val(null).trigger('change');
 
