@@ -13,6 +13,7 @@ class CreateBillsTable extends Migration
             $table->decimal('saldo_awal', 15, 2)->default(0);
             $table->decimal('jual', 15, 2)->default(0);
             $table->decimal('diskon', 15, 2)->default(0);
+            $table->decimal('adjustment', 15, 2)->default(0);
             $table->decimal('retur', 15, 2)->default(0);
             $table->decimal('bayar', 15, 2)->default(0);
             $table->decimal('potongan', 15, 2)->default(0);

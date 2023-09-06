@@ -106,7 +106,6 @@ class StockAdjustmentController extends Controller
             ]);
 
             $multiplier = ($operation == 'increase') ? 1 : -1;
-            $movement = ($operation == 'increase') ? 'in' : 'out';
 
             for ($i = 0; $i < count($products); $i++) {
                 $product = $products[$i];
@@ -119,7 +118,7 @@ class StockAdjustmentController extends Controller
                         'quantity' => $quantity
                     ]);
 
-                    StockService::createMovement($movement, 'adjustment', $adjustment->id, $date, $product, $multiplier * $quantity);
+                    StockService::createMovement('adjustment', 'adjustment', $adjustment->id, $date, $product, $multiplier * $quantity);
                     StockService::updateStock($product, $multiplier * $quantity);
                 } else if($type == 'material') {
                     $adjustment_item = StockAdjustmentDetail::create([
@@ -128,7 +127,7 @@ class StockAdjustmentController extends Controller
                         'quantity' => $quantity
                     ]);
 
-                    StockService::createMovementMaterial($movement, 'adjustment', $adjustment->id, $date, $product, $multiplier * $quantity);
+                    StockService::createMovementMaterial('adjustment', 'adjustment', $adjustment->id, $date, $product, $multiplier * $quantity);
                     StockService::updateStockMaterial($product, $multiplier * $quantity);
                 }
             }

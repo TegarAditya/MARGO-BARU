@@ -28,6 +28,7 @@ class Bill extends Model
         'saldo_awal',
         'jual',
         'diskon',
+        'adjustment',
         'retur',
         'bayar',
         'potongan',

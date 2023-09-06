@@ -18,6 +18,7 @@
                         <th>Product</th>
                         <th width="10%">Quantity Awal</th>
                         <th width="10%">In</th>
+                        <th width="10%">Adjustment</th>
                         <th width="10%">Out</th>
                         <th width="10%">Quantity Akhir</th>
                     </tr>
@@ -26,6 +27,7 @@
                 @php
                     $total_awal = 0;
                     $total_in = 0;
+                    $total_adjustment = 0;
                     $total_out = 0;
                     $total_akhir = 0;
                 @endphp
@@ -35,10 +37,11 @@
                         $pertama = $awal->in + $awal->out;
 
                         $total_awal += $pertama;
-                        $total_in+= $item->in;
+                        $total_in += $item->in;
+                        $total_adjustment += $item->adjustment;
                         $total_out += $item->out;
 
-                        $terakhir = $pertama + ($item->in + $item->out);
+                        $terakhir = $pertama + ($item->in + $item->adjustment + $item->out);
                         $total_akhir += $terakhir;
                     @endphp
                     <tr>
@@ -46,6 +49,7 @@
                         <td>{{ $item->name }}</td>
                         <td class="text-center">{{ angka($pertama) }}</td>
                         <td class="text-center">{{ angka($item->in) }}</td>
+                        <td class="text-center">{{ angka($item->adjustment) }}</td>
                         <td class="text-center">{{ angka($item->out) }}</td>
                         <td class="text-center">{{ angka($terakhir) }}</td>
                     </tr>
@@ -58,6 +62,7 @@
                         </td>
                         <td class="text-center">{{ angka($total_awal) }}</td>
                         <td class="text-center">{{ angka($total_in) }}</td>
+                        <td class="text-center">{{ angka($total_adjustment) }}</td>
                         <td class="text-center">{{ angka($total_out) }}</td>
                         <td class="text-center">{{ angka($total_akhir) }}</td>
                     </tr>

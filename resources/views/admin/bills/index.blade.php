@@ -80,6 +80,9 @@
                         {{ trans('cruds.bill.fields.diskon') }}
                     </th>
                     <th>
+                        Adjustment
+                    </th>
+                    <th>
                         {{ trans('cruds.bill.fields.retur') }}
                     </th>
                     <th>
@@ -123,6 +126,7 @@ $(function () {
         { data: 'saldo_awal', name: 'saldo_awal', class: 'text-right' },
         { data: 'jual', name: 'jual', class: 'text-right' },
         { data: 'diskon', name: 'diskon', class: 'text-right' },
+        { data: 'adjustment', name: 'adjustment', class: 'text-right' },
         { data: 'retur', name: 'retur', class: 'text-right' },
         { data: 'bayar', name: 'bayar', class: 'text-right' },
         { data: 'potongan', name: 'potongan', class: 'text-right' },

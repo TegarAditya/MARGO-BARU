@@ -12,6 +12,7 @@ class CreateTransactionTotalsTable extends Migration
             $table->bigIncrements('id');
             $table->decimal('total_invoice', 15, 2);
             $table->decimal('total_diskon', 15, 2);
+            $table->decimal('total_adjustment', 15, 2);
             $table->decimal('total_retur', 15, 2);
             $table->decimal('total_bayar', 15, 2);
             $table->decimal('total_potongan', 15, 2);

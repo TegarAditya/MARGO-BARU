@@ -1158,6 +1158,26 @@ class PermissionsTableSeeder extends Seeder
                 'id'    => 300,
                 'title' => 'estimation_access',
             ],
+            [
+                'id'    => 306,
+                'title' => 'bill_adjustment_create',
+            ],
+            [
+                'id'    => 307,
+                'title' => 'bill_adjustment_edit',
+            ],
+            [
+                'id'    => 308,
+                'title' => 'bill_adjustment_show',
+            ],
+            [
+                'id'    => 309,
+                'title' => 'bill_adjustment_delete',
+            ],
+            [
+                'id'    => 310,
+                'title' => 'bill_adjustment_access',
+            ],
         ];
 
         Permission::insert($permissions);

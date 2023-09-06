@@ -1,6 +1,10 @@
 @extends('layouts.admin')
 @section('content')
-
+<div class="row mb-4">
+    <div class="col-12">
+        <h1 class="m-0">Estimasi Internal</h1>
+    </div>
+</div>
 <div class="card">
     <div class="card-header">
         {{ trans('global.create') }} {{ trans('cruds.estimation.title_singular') }} Internal

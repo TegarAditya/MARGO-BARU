@@ -35,6 +35,7 @@ class BillingExport implements FromCollection, ShouldAutoSize
             'saldo_awal' => 'Saldo Awal',
             'penjualan' => 'Penjualan',
             'diskon' => 'Diskon',
+            'adjustment' => 'Adjustment',
             'retur' => 'Retur',
             'pembayaran' => 'Pembayaran',
             'potongan' => 'Potongan',
@@ -47,8 +48,8 @@ class BillingExport implements FromCollection, ShouldAutoSize
             $i++;
 
             $awal = $this->saldo_awal->where('id', $item->id)->first();
-            $pertama = $awal->pengambilan - ($awal->diskon + $awal->retur + $awal->bayar + $awal->potongan);
-            $terakhir = $pertama + ($item->pengambilan - ($item->diskon + $item->retur + $item->bayar + $item->potongan));
+            $pertama = $awal->pengambilan - ($awal->adjustment + $awal->diskon + $awal->retur + $awal->bayar + $awal->potongan);
+            $terakhir = $pertama + ($item->pengambilan - ($item->adjustment + $item->diskon + $item->retur + $item->bayar + $item->potongan));
 
             $row = [
                 'no' => $i,
@@ -57,6 +58,7 @@ class BillingExport implements FromCollection, ShouldAutoSize
                 'saldo_awal' => (string) $pertama,
                 'penjualan' => (string) $item->pengambilan,
                 'diskon' => (string) $item->diskon,
+                'adjustment' => (string) $item->adjustment,
                 'retur' => (string) $item->retur,
                 'pembayaran' => (string) $item->bayar,
                 'potongan' => (string) $item->potongan,

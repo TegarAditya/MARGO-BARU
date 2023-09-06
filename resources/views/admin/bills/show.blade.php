@@ -289,7 +289,6 @@
                         </div>
                     @endif
                 @endforeach
-
                 <hr class="my-2 text-right ml-5 mx-0" />
 
                 <div class="row text-right">
@@ -310,6 +309,90 @@
                             <span>Total Discount</span>
                             <br />
                             <span class="h5 mb-0 invoice-diskon"><strong>{{ money($invoices->sum('discount')) }}</strong></span>
+                        </p>
+                    </div>
+                </div>
+
+                @if($adjustments->count() > 0)
+                    <div class="row mb-2 border-top py-3 mt-5">
+                        <div class="col">
+                            <h6>Adjustment</h6>
+
+                            <p class="mb-0">Total Adjustment: {{ $adjustments->count() }}</p>
+                        </div>
+
+                        <div class="col-auto">
+                            <a href="{{ route('admin.bill-adjustments.create') }}" class="btn btn-sm btn-success">Tambah Adjustment</a>
+                        </div>
+                    </div>
+
+                    <table class="table table-bordered table-hover m-0">
+                        <thead>
+                            <tr>
+                                <th class="text-center" width="1%">No.</th>
+                                <th>No. Adjustment</th>
+                                <th class="text-center px-3" width="100">Tanggal</th>
+                                <th class="text-center px-3">Semester</th>
+                                <th class="text-center px-3" width="20%">Amount</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @forelse ($adjustments as $adjustment)
+                                <tr>
+                                    <td class="text-right px-3">{{ $loop->iteration }}.</td>
+                                    <td>
+                                        <div class="row text-center">
+                                            <div class="col">
+                                                <span>{{ $adjustment->no_adjustment }}</span>
+                                                {{-- <a href="{{ route('admin.payments.kwitansi', $pembayaran->id) }}" title="Cetak Pembayaran" target="_blank" class="text-info ml-1">
+                                                    <i class="fa fa-print"></i>
+                                                </a> --}}
+                                            </div>
+
+                                            <div class="col-auto">
+                                                <a href="{{ route('admin.bill-adjustments.edit', $adjustment->id) }}" title="Edit Adjustment" class="text-info ml-1">
+                                                    <i class="fa fa-edit"></i> Edit
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="text-center px-2">{{ $adjustment->date }}</td>
+                                    <td class="text-center">{{ $adjustment->semester->name }}</td>
+                                    <td class="text-right px-3">{{ money($adjustment->amount) }}</td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td class="px-3" colspan="5">Belum ada Adjustment</td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+
+                        <tfoot>
+                            <tr>
+                                <td class="text-center px-3" colspan="4">
+                                    <strong>Total</strong>
+                                </td>
+                                <td class="text-right px-3">
+                                    <strong>{{ money($adjustments->sum('amount')) }}</strong>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                @endif
+
+                <hr class="my-2 text-right ml-5 mx-0" />
+
+                <div class="row text-right">
+                    <div class="col text-left">
+
+                    </div>
+
+                    <div class="col-auto">
+                        <p class="mb-0">
+                            <span>Total Adjustment</span>
+                            <br />
+                            <span class="h5 mb-0 invoice-total"><strong>{{ money($adjustments->sum('amount')) }}</strong></span>
                         </p>
                     </div>
                 </div>
@@ -446,8 +529,9 @@
                 @php
                     $faktur = $invoices->sum('total');
                     $diskon = $invoices->sum('discount');
+                    $adjustment = $adjustments->sum('amount');
                     $retur = $returs->sum('nominal');
-                    $tagihan = $faktur - ($diskon + $retur);
+                    $tagihan = $faktur - ($adjustment + $diskon + $retur);
                 @endphp
 
                 <div class="col-auto">
@@ -480,6 +564,7 @@
                             <th>No. Kwitansi</th>
                             <th class="text-center px-3" width="100">Tanggal</th>
                             <th class="text-center px-3">Semester</th>
+                            <th class="text-center px-3">Metode Pembayaran</th>
                             <th class="text-center px-3" width="20%">Bayar</th>
                             <th class="text-center px-3" width="15%">Diskon</th>
                         </tr>
@@ -507,6 +592,7 @@
                                 </td>
                                 <td class="text-center px-2">{{ $pembayaran->date }}</td>
                                 <td class="text-center">{{ $pembayaran->semester->name }}</td>
+                                <td class="text-center">{{ App\Models\Payment::PAYMENT_METHOD_SELECT[$pembayaran->payment_method] }}</td>
                                 <td class="text-right px-3">{{ money($pembayaran->paid) }}</td>
                                 <td class="text-right px-3">
                                     <span>{{ money($pembayaran->discount) }}</span>

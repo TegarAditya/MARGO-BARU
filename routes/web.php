@@ -274,6 +274,10 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     // Sales Billing
     Route::resource('sales-billings', 'SalesBillingController');
 
+    // Bill Adjustment
+    Route::delete('bill-adjustments/destroy', 'BillAdjustmentController@massDestroy')->name('bill-adjustments.massDestroy');
+    Route::resource('bill-adjustments', 'BillAdjustmentController');
+
     // Payment
     Route::delete('payments/destroy', 'PaymentController@massDestroy')->name('payments.massDestroy');
     Route::get('payments/get-tagihan', 'PaymentController@getTagihan')->name('payments.getTagihan');

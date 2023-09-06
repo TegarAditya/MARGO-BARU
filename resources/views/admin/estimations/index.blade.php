@@ -9,7 +9,7 @@
     <div style="margin-bottom: 10px;" class="row">
         <div class="col-lg-12">
             <a class="btn btn-success" href="{{ route('admin.estimations.create') }}">
-                {{ trans('global.add') }} {{ trans('cruds.estimation.title_singular') }} Sales
+                {{ trans('global.add') }} Order Sales
             </a>
             <a class="btn btn-warning" href="{{ route('admin.estimations.create', ['salesperson' => 'internal']) }}">
                 {{ trans('global.add') }} {{ trans('cruds.estimation.title_singular') }} Internal

@@ -614,7 +614,7 @@
                         </a>
                     </li>
                 @endcan
-                @can('bill_access')
+                {{-- @can('bill_access')
                     <li class="nav-item">
                         <a href="{{ route("admin.bills.index") }}" class="nav-link {{ request()->is("admin/bills*") ? "active" : "" }}">
                             <i class="fa-fw nav-icon fas fa-dollar-sign">
@@ -625,10 +625,10 @@
                             </p>
                         </a>
                     </li>
-                @endcan
-                {{-- @can('tagihan_access')
-                    <li class="nav-item has-treeview {{ request()->is("admin/fees*") ? "menu-open" : "" }} {{ request()->is("admin/bills*") ? "menu-open" : "" }} {{ request()->is("admin/sales-billings*") ? "menu-open" : "" }} {{ request()->is("admin/rekap-billings*") ? "menu-open" : "" }}">
-                        <a class="nav-link nav-dropdown-toggle {{ request()->is("admin/fees*") ? "active" : "" }} {{ request()->is("admin/bills*") ? "active" : "" }} {{ request()->is("admin/sales-billings*") ? "active" : "" }} {{ request()->is("admin/rekap-billings*") ? "active" : "" }}" href="#">
+                @endcan --}}
+                @can('tagihan_access')
+                    <li class="nav-item has-treeview {{ request()->is("admin/bills*") ? "menu-open" : "" }} {{ request()->is("admin/bill-adjustments*") ? "menu-open" : "" }}">
+                        <a class="nav-link nav-dropdown-toggle {{ request()->is("admin/bills*") ? "active" : "" }} {{ request()->is("admin/bill-adjustments*") ? "active" : "" }}" href="#">
                             <i class="fa-fw nav-icon fas fa-file-invoice">
 
                             </i>
@@ -651,9 +651,21 @@
                                 </li>
                             @endcan
 
+                            @can('bill_adjustment_access')
+                                <li class="nav-item">
+                                    <a href="{{ route("admin.bill-adjustments.index") }}" class="nav-link {{ request()->is("admin/bill-adjustments") || request()->is("admin/bill-adjustments/*") ? "active" : "" }}">
+                                        <i class="fa-fw nav-icon fas fa-adjust">
+
+                                        </i>
+                                        <p>
+                                            {{ trans('cruds.billAdjustment.title') }}
+                                        </p>
+                                    </a>
+                                </li>
+                            @endcan
                         </ul>
                     </li>
-                @endcan --}}
+                @endcan
                 @can('payment_access')
                 <li class="nav-item">
                     <a href="{{ route("admin.payments.index") }}" class="nav-link {{ request()->is("admin/payments*") ? "active" : "" }}">

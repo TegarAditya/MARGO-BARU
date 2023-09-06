@@ -24,6 +24,7 @@ class TransactionTotal extends Model
         'salesperson_id',
         'total_invoice',
         'total_diskon',
+        'total_adjustment',
         'total_retur',
         'total_bayar',
         'total_potongan',
@@ -35,6 +36,7 @@ class TransactionTotal extends Model
     protected $casts = [
         'total_invoice' => 'double',
         'total_diskon' => 'double',
+        'total_adjustment' => 'double',
         'total_retur' => 'double',
         'total_bayar' => 'double',
         'total_potongan' => 'double',

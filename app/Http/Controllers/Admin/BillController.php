@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreBillRequest;
 use App\Http\Requests\UpdateBillRequest;
 use App\Models\Bill;
+use App\Models\BillAdjustment;
 use App\Models\Salesperson;
 use App\Models\Semester;
 use App\Models\Transaction;
@@ -66,6 +67,9 @@ class BillController extends Controller
             });
             $table->editColumn('diskon', function ($row) {
                 return $row->diskon ? money($row->diskon) : 0;
+            });
+            $table->editColumn('adjustment', function ($row) {
+                return $row->adjustment ? money($row->adjustment) : 0;
             });
             $table->editColumn('retur', function ($row) {
                 return $row->retur ? money($row->retur) : 0;
@@ -143,6 +147,8 @@ class BillController extends Controller
             $q->where('type', 'faktur')->where('semester_id', $semester)->select(DB::raw('COALESCE(SUM(amount), 0)'));
         }], 'amount')->withSum(['transactions as diskon' => function ($q) use ($semester) {
             $q->where('type', 'diskon')->where('semester_id', $semester)->select(DB::raw('COALESCE(SUM(amount), 0)'));
+        }], 'amount')->withSum(['transactions as adjustment' => function ($q) use ($semester) {
+            $q->where('type', 'adjustment')->where('semester_id', $semester)->select(DB::raw('COALESCE(SUM(amount), 0)'));
         }], 'amount')->withSum(['transactions as retur' => function ($q) use ($semester) {
             $q->where('type', 'retur')->where('semester_id', $semester)->select(DB::raw('COALESCE(SUM(amount), 0)'));
         }], 'amount')->withSum(['transactions as bayar' => function ($q) use ($semester) {
@@ -161,6 +167,7 @@ class BillController extends Controller
 
                 $faktur = $sale->pengambilan;
                 $diskon = $sale->diskon;
+                $adjustment = $sale->adjustment;
                 $retur = $sale->retur;
                 $bayar = $payment->bayar;
                 $potongan = $payment->potongan;
@@ -173,13 +180,14 @@ class BillController extends Controller
                         'saldo_awal' => $saldo_awal,
                         'jual' => $faktur,
                         'diskon' => $diskon,
+                        'adjustment' => $adjustment,
                         'retur' => $retur,
                         'bayar' => $bayar,
                         'potongan' => $potongan,
-                        'saldo_akhir' => ($saldo_awal + $faktur) - ($diskon + $retur + $bayar + $potongan),
-                        'tagihan' => $faktur - ($diskon + $retur),
+                        'saldo_akhir' => ($saldo_awal + $faktur) - ($adjustment + $diskon + $retur + $bayar + $potongan),
+                        'tagihan' => $faktur - ($adjustment + $diskon + $retur),
                         'pembayaran' => $pembayaran,
-                        'piutang' => ($saldo_awal + $faktur) - ($diskon + $retur + $pembayaran)
+                        'piutang' => ($saldo_awal + $faktur) - ($adjustment + $diskon + $retur + $pembayaran)
                     ]);
                 } else {
                     $previous = Bill::where('salesperson_id', $sale->id)->where('semester_id', prevSemester($semester))->first();
@@ -192,13 +200,14 @@ class BillController extends Controller
                         'saldo_awal' => $saldo_awal,
                         'jual' => $faktur,
                         'diskon' => $diskon,
+                        'adjustment' => $adjustment,
                         'retur' => $retur,
                         'bayar' => $bayar,
                         'potongan' => $potongan,
-                        'saldo_akhir' => ($saldo_awal + $faktur) - ($diskon + $retur + $bayar + $potongan),
-                        'tagihan' => $faktur - ($diskon + $retur),
+                        'saldo_akhir' => ($saldo_awal + $faktur) - ($adjustment + $diskon + $retur + $bayar + $potongan),
+                        'tagihan' => $faktur - ($adjustment + $diskon + $retur),
                         'pembayaran' => $pembayaran,
-                        'piutang' => ($saldo_awal + $faktur) - ($diskon + $retur + $pembayaran)
+                        'piutang' => ($saldo_awal + $faktur) - ($adjustment + $diskon + $retur + $pembayaran)
                     ]);
                 }
             }
@@ -231,6 +240,8 @@ class BillController extends Controller
             $q->where('type', 'faktur')->where('transaction_date', '<', $start)->select(DB::raw('COALESCE(SUM(amount), 0)'));
         }], 'amount')->withSum(['transactions as diskon' => function ($q) use ($start) {
             $q->where('type', 'diskon')->where('transaction_date', '<', $start)->select(DB::raw('COALESCE(SUM(amount), 0)'));
+        }], 'amount')->withSum(['transactions as adjustment' => function ($q) use ($start) {
+            $q->where('type', 'adjustment')->where('transaction_date', '<', $start)->select(DB::raw('COALESCE(SUM(amount), 0)'));
         }], 'amount')->withSum(['transactions as retur' => function ($q) use ($start) {
             $q->where('type', 'retur')->where('transaction_date', '<', $start)->select(DB::raw('COALESCE(SUM(amount), 0)'));
         }], 'amount')->withSum(['transactions as bayar' => function ($q) use ($start) {
@@ -243,6 +254,8 @@ class BillController extends Controller
             $q->where('type', 'faktur')->whereBetween('transaction_date', [$start, $end])->select(DB::raw('COALESCE(SUM(amount), 0)'));
         }], 'amount')->withSum(['transactions as diskon' => function ($q) use ($start, $end) {
             $q->where('type', 'diskon')->whereBetween('transaction_date', [$start, $end])->select(DB::raw('COALESCE(SUM(amount), 0)'));
+        }], 'amount')->withSum(['transactions as adjustment' => function ($q) use ($start, $end) {
+            $q->where('type', 'adjustment')->whereBetween('transaction_date', [$start, $end])->select(DB::raw('COALESCE(SUM(amount), 0)'));
         }], 'amount')->withSum(['transactions as retur' => function ($q) use ($start, $end) {
             $q->where('type', 'retur')->whereBetween('transaction_date', [$start, $end])->select(DB::raw('COALESCE(SUM(amount), 0)'));
         }], 'amount')->withSum(['transactions as bayar' => function ($q) use ($start, $end) {
@@ -264,11 +277,13 @@ class BillController extends Controller
         $semester = setting('current_semester');
 
         $invoices = Invoice::with('invoice_items')->where('salesperson_id', $salesperson)->where('semester_id', $semester)->get();
+        $adjustments = BillAdjustment::where('salesperson_id', $salesperson)->where('semester_id', $semester)->get();
         $returs = ReturnGood::with('retur_items')->where('salesperson_id', $salesperson)->where('semester_id', $semester)->get();
         $payments = Payment::where('salesperson_id', $salesperson)->where('semester_bayar_id', $semester)->get();
 
         $bills = collect([]);
         $invoices_old = collect([]);
+        $adjustments_old = collect([]);
         $returs_old = collect([]);
         $payments_old = collect([]);
 
@@ -284,10 +299,12 @@ class BillController extends Controller
         if ($bills->count() > 0) {
             foreach($bills as $item) {
                 $faktur = Invoice::with('invoice_items')->where('salesperson_id', $salesperson)->where('semester_id', $item->semester_id)->get();
+                $adjustment = BillAdjustment::with('retur_items')->where('salesperson_id', $salesperson)->where('semester_id', $item->semester_id)->get();
                 $retur = ReturnGood::with('retur_items')->where('salesperson_id', $salesperson)->where('semester_id', $item->semester_id)->get();
                 $bayar = Payment::where('salesperson_id', $salesperson)->where('semester_bayar_id', $item->semester_id)->get();
 
                 $invoices_old = $invoices_old->merge($faktur);
+                $adjustments_old = $adjustments_old->merge($adjustment);
                 $returs_old = $returs_old->merge($retur);
                 $payments_old = $payments_old->merge($bayar);
             }
@@ -298,7 +315,7 @@ class BillController extends Controller
         $salesperson = Salesperson::find($salesperson);
         $semester = Semester::find($semester);
 
-        return view('admin.bills.show', compact('salesperson', 'semester', 'invoices', 'returs', 'payments', 'bills', 'invoices_old', 'returs_old', 'payments_old', 'list_semester'));
+        return view('admin.bills.show', compact('salesperson', 'semester', 'invoices', 'adjustments', 'returs', 'payments', 'bills', 'invoices_old','adjustments_old', 'returs_old', 'payments_old', 'list_semester'));
     }
 
     public function cetakBilling(Request $request)
@@ -307,12 +324,14 @@ class BillController extends Controller
         $semester = setting('current_semester');
 
         $invoices = Invoice::with('invoice_items')->where('salesperson_id', $salesperson)->where('semester_id', $semester)->get();
+        $adjustments = BillAdjustment::where('salesperson_id', $salesperson)->where('semester_id', $semester)->get();
         $returs = ReturnGood::with('retur_items')->where('salesperson_id', $salesperson)->where('semester_id', $semester)->get();
         $payments = Payment::where('salesperson_id', $salesperson)->where('semester_bayar_id', $semester)->get();
         $billing = Bill::where('salesperson_id', $salesperson)->where('semester_id', $semester)->first();
 
         $bills = collect([]);
         $invoices_old = collect([]);
+        $adjustments_old = collect([]);
         $returs_old = collect([]);
         $payments_old = collect([]);
 
@@ -328,10 +347,12 @@ class BillController extends Controller
         if ($bills->count() > 0) {
             foreach($bills as $item) {
                 $faktur = Invoice::with('invoice_items')->where('salesperson_id', $salesperson)->where('semester_id', $item->semester_id)->get();
+                $adjustment = BillAdjustment::with('retur_items')->where('salesperson_id', $salesperson)->where('semester_id', $item->semester_id)->get();
                 $retur = ReturnGood::with('retur_items')->where('salesperson_id', $salesperson)->where('semester_id', $item->semester_id)->get();
                 $bayar = Payment::where('salesperson_id', $salesperson)->where('semester_bayar_id', $item->semester_id)->get();
 
                 $invoices_old = $invoices_old->merge($faktur);
+                $adjustments_old = $adjustments_old->merge($adjustment);
                 $returs_old = $returs_old->merge($retur);
                 $payments_old = $payments_old->merge($bayar);
             }
@@ -342,7 +363,7 @@ class BillController extends Controller
         $salesperson = Salesperson::find($salesperson);
         $semester = Semester::find($semester);
 
-        return view('admin.bills.saldo', compact('salesperson', 'semester', 'invoices', 'returs', 'payments', 'billing', 'bills', 'invoices_old', 'returs_old', 'payments_old', 'list_semester'));
+        return view('admin.bills.saldo', compact('salesperson', 'semester', 'invoices', 'adjustments', 'returs', 'payments', 'billing', 'bills', 'invoices_old', 'adjustments_old', 'returs_old', 'payments_old', 'list_semester'));
     }
 
     public function eksportRekapBilling(Request $request)

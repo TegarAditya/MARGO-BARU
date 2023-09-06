@@ -34,23 +34,24 @@ class TransactionService
     public static function editTransaction($date, $description, $salesperson, $semester,
         $type, $reference, $reference_no, $amount, $category)
     {
-        $reversal = Transaction::where('type', $type)->where('reference_id', $reference)->where('semester_id', $semester)
-                    ->where('salesperson_id', $salesperson)->orderBy('id', 'DESC')->first();
+        $reversal = Transaction::where('type', $type)->where('reference_id', $reference)->orderBy('id', 'DESC')->first();
 
-        Transaction::create([
+        $reversal_transaction = Transaction::create([
             'date' => Carbon::now()->format('d-m-Y'),
-            'description' => $description,
-            'salesperson_id' => $salesperson,
-            'semester_id' => $semester,
+            'description' => $reversal->description,
+            'salesperson_id' => $reversal->salesperson_id,
+            'semester_id' => $reversal->semester_id,
             'type' => $type,
             'reference_id' => $reference,
-            'reference_no' => $reference_no,
+            'reference_no' => $reversal->reference_no,
             'transaction_date' => $date,
             'amount' => -1 * $reversal->amount,
             'category' => $category,
             'status' => 0,
             'reversal_of_id' => $reversal->id
         ]);
+
+        event(new TransactionUpdated($reversal_transaction));
 
         $transaction = Transaction::create([
             'date' => Carbon::now()->format('d-m-Y'),
@@ -97,7 +98,7 @@ class TransactionService
         ProductionTransaction::create([
             'date' => Carbon::now()->format('d-m-Y'),
             'description' => $description,
-            'vendor_id' => $vendor,
+            'vendor_id' => $reversal->vendor,
             'semester_id' => $semester,
             'type' => $type,
             'reference_id' => $reference,

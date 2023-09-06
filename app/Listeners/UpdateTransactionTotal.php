@@ -45,6 +45,7 @@ class UpdateTransactionTotal
             $totalRecord->update([
                 'total_invoice' => $sum_amount['faktur'] ?? 0,
                 'total_diskon' => $sum_amount['diskon'] ?? 0,
+                'total_adjustment' => $sum_amount['adjustment'] ?? 0,
                 'total_retur' => $sum_amount['retur'] ?? 0,
                 'total_bayar' => $sum_amount['bayar'] ?? 0,
                 'total_potongan' => $sum_amount['potongan'] ?? 0,
@@ -54,6 +55,7 @@ class UpdateTransactionTotal
                 'salesperson_id' => $salesperson,
                 'total_invoice' => $sum_amount['faktur'] ?? 0,
                 'total_diskon' => $sum_amount['diskon'] ?? 0,
+                'total_adjustment' => $sum_amount['adjustment'] ?? 0,
                 'total_retur' => $sum_amount['retur'] ?? 0,
                 'total_bayar' => $sum_amount['bayar'] ?? 0,
                 'total_potongan' => $sum_amount['potongan'] ?? 0,
@@ -72,6 +74,7 @@ class UpdateTransactionTotal
 
         $faktur = $bill_amount['faktur'] ?? 0;
         $diskon = $bill_amount['diskon'] ?? 0;
+        $adjustment = $bill_amount['adjustment'] ?? 0;
         $retur = $bill_amount['retur'] ?? 0;
         $bayar = $payment->bayar;
         $potongan = $payment->potongan;
@@ -84,13 +87,14 @@ class UpdateTransactionTotal
                 'saldo_awal' => $saldo_awal,
                 'jual' => $faktur,
                 'diskon' => $diskon,
+                'adjustment' => $adjustment,
                 'retur' => $retur,
                 'bayar' => $bayar,
                 'potongan' => $potongan,
-                'saldo_akhir' => ($saldo_awal + $faktur) - ($diskon + $retur + $bayar + $potongan),
+                'saldo_akhir' => ($saldo_awal + $faktur) - ($adjustment + $diskon + $retur + $bayar + $potongan),
                 'tagihan' => $faktur - ($diskon + $retur),
                 'pembayaran' => $pembayaran,
-                'piutang' => ($saldo_awal + $faktur) - ($diskon + $retur + $pembayaran)
+                'piutang' => ($saldo_awal + $faktur) - ($adjustment + $diskon + $retur + $pembayaran)
             ]);
         } else {
             $previous = Bill::where('salesperson_id', $salesperson)->where('semester_id', prevSemester($semester))->first();
@@ -103,13 +107,14 @@ class UpdateTransactionTotal
                 'saldo_awal' => $saldo_awal,
                 'jual' => $faktur,
                 'diskon' => $diskon,
+                'adjustment' => $adjustment,
                 'retur' => $retur,
                 'bayar' => $bayar,
                 'potongan' => $potongan,
-                'saldo_akhir' => ($saldo_awal + $faktur) - ($diskon + $retur + $bayar + $potongan),
+                'saldo_akhir' => ($saldo_awal + $faktur) - ($adjustment + $diskon + $retur + $bayar + $potongan),
                 'tagihan' => $faktur - ($diskon + $retur),
                 'pembayaran' => $pembayaran,
-                'piutang' => ($saldo_awal + $faktur) - ($diskon + $retur + $pembayaran)
+                'piutang' => ($saldo_awal + $faktur) - ($adjustment + $diskon + $retur + $pembayaran)
             ]);
         }
     }

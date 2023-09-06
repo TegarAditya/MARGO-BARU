@@ -277,6 +277,9 @@
                         {{ trans('cruds.stockSaldo.fields.in') }}
                     </th>
                     <th>
+                        Adjustment
+                    </th>
+                    <th>
                         {{ trans('cruds.stockSaldo.fields.out') }}
                     </th>
                     <th>
@@ -319,6 +322,7 @@ $(function () {
         { data: 'periode', name: 'periode', class: 'text-center'  },
         { data: 'qty_awal', name: 'qty_awal', class: 'text-center'  },
         { data: 'in', name: 'in', class: 'text-center'  },
+        { data: 'adjustment', name: 'adjustment', class: 'text-center'  },
         { data: 'out', name: 'out', class: 'text-center'  },
         { data: 'qty_akhir', name: 'qty_akhir', class: 'text-center'  }
     ],

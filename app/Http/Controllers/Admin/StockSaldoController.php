@@ -76,6 +76,9 @@ class StockSaldoController extends Controller
             $table->editColumn('in', function ($row) {
                 return $row->in ? angka($row->in) : 0;
             });
+            $table->editColumn('adjustment', function ($row) {
+                return $row->adjustment ? angka($row->adjustment) : 0;
+            });
             $table->editColumn('out', function ($row) {
                 return $row->out ? angka($row->out) : 0;
             });
@@ -127,6 +130,8 @@ class StockSaldoController extends Controller
 
         $bookvariant = BookVariant::withSum(['movement as in' => function ($q) use ($start, $end) {
                     $q->where('movement_type', 'in')->whereBetween('movement_date', [$start, $end])->select(DB::raw('COALESCE(SUM(quantity), 0)'));
+                }], 'quantity')->withSum(['movement as adjustment' => function ($q) use ($start, $end) {
+                    $q->where('movement_type', 'adjustment')->whereBetween('movement_date', [$start, $end])->select(DB::raw('COALESCE(SUM(quantity), 0)'));
                 }], 'quantity')->withSum(['movement as out' => function ($q) use ($start, $end) {
                     $q->where('movement_type', 'out')->whereBetween('movement_date', [$start, $end])->select(DB::raw('COALESCE(SUM(quantity), 0)'));
                 }], 'quantity')->where(function($q) use ($semester) {
@@ -152,8 +157,9 @@ class StockSaldoController extends Controller
                 'end_date' => $end->format('d-m-Y'),
                 'qty_awal' => $qty_awal,
                 'in' => $book->in,
+                'adjustment' => $book->adjustment,
                 'out' => $book->out,
-                'qty_akhir' => $qty_awal + ($book->in + $book->out),
+                'qty_akhir' => $qty_awal + ($book->in + $book->adjustment + $book->out),
             ]);
         }
 
@@ -223,6 +229,8 @@ class StockSaldoController extends Controller
 
         $awal = BookVariant::withSum(['movement as in' => function ($q) use ($start, $end) {
             $q->where('movement_type', 'in')->where('movement_date', '<', $start)->select(DB::raw('COALESCE(SUM(quantity), 0)'));
+        }], 'quantity')->withSum(['movement as adjustment' => function ($q) use ($start, $end) {
+            $q->where('movement_type', 'adjustment')->where('movement_date', '<', $start)->select(DB::raw('COALESCE(SUM(quantity), 0)'));
         }], 'quantity')->withSum(['movement as out' => function ($q) use ($start, $end) {
             $q->where('movement_type', 'out')->where('movement_date', '<', $start)->select(DB::raw('COALESCE(SUM(quantity), 0)'));
         }], 'quantity')->where(function($q) use ($semester) {
@@ -253,6 +261,8 @@ class StockSaldoController extends Controller
 
         $akhir = BookVariant::withSum(['movement as in' => function ($q) use ($start, $end) {
             $q->where('movement_type', 'in')->whereBetween('movement_date', [$start, $end])->select(DB::raw('COALESCE(SUM(quantity), 0)'));
+        }], 'quantity')->withSum(['movement as adjustment' => function ($q) use ($start, $end) {
+            $q->where('movement_type', 'adjustment')->whereBetween('movement_date', [$start, $end])->select(DB::raw('COALESCE(SUM(quantity), 0)'));
         }], 'quantity')->withSum(['movement as out' => function ($q) use ($start, $end) {
             $q->where('movement_type', 'out')->whereBetween('movement_date', [$start, $end])->select(DB::raw('COALESCE(SUM(quantity), 0)'));
         }], 'quantity')->where(function($q) use ($semester) {

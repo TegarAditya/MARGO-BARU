@@ -29,7 +29,7 @@
                 <div class="col-6">
                     <div class="form-group">
                         <label class="required" for="no_kwitansi">{{ trans('cruds.payment.fields.no_kwitansi') }}</label>
-                        <input class="form-control {{ $errors->has('no_kwitansi') ? 'is-invalid' : '' }}" type="text" name="no_kwitansi" id="no_kwitansi" value="{{ old('no_kwitansi', $payment->no_kwitansi) }}" readonly>
+                        <input class="form-control {{ $errors->has('no_kwitansi') ? 'is-invalid' : '' }}" type="text" name="no_kwitansi" id="no_kwitansi" value="{{ old('no_kwitansi', $no_kwitansi) }}" readonly>
                         @if($errors->has('no_kwitansi'))
                             <span class="text-danger">{{ $errors->first('no_kwitansi') }}</span>
                         @endif

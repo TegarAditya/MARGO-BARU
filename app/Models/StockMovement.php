@@ -37,6 +37,7 @@ class StockMovement extends Model
     public const MOVEMENT_TYPE_SELECT = [
         'in'         => 'In',
         'out'        => 'Out',
+        'adjustment' => 'Adjustment',
         'revisi'     => 'Revisi'
     ];
 

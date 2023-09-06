@@ -200,15 +200,18 @@ class PaymentController extends Controller
 
         $salespeople = Salesperson::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
+        $no_kwitansi = noRevisi($payment->no_kwitansi);
+
         $payment->load('salesperson', 'semester');
 
-        return view('admin.payments.edit', compact('payment', 'salespeople', 'semesters'));
+        return view('admin.payments.edit', compact('payment', 'salespeople', 'semesters', 'no_kwitansi'));
     }
 
     public function update(Request $request, Payment $payment)
     {
         // Validate the form data
         $validatedData = $request->validate([
+            'no_kwitansi' => 'required',
             'date' => 'required',
             'salesperson_id' => 'required',
             'semester_id' => 'required',
@@ -219,6 +222,7 @@ class PaymentController extends Controller
             'note' => 'nullable'
         ]);
 
+        $no_kwitansi = $validatedData['no_kwitansi'];
         $date = $validatedData['date'];
         $salesperson = $validatedData['salesperson_id'];
         $semester = $validatedData['semester_id'];
@@ -228,11 +232,10 @@ class PaymentController extends Controller
         $nominal = $validatedData['nominal'];
         $note = $validatedData['note'];
 
-        $reference_no = $payment->no_kwitansi;
-
         DB::beginTransaction();
         try {
             $payment->update([
+                'no_kwitansi' => $no_kwitansi,
                 'date' => $date,
                 'salesperson_id' => $salesperson,
                 'semester_id' => $semester,
@@ -243,8 +246,8 @@ class PaymentController extends Controller
                 'note' => $note
             ]);
 
-            TransactionService::editTransaction($date, 'Pembayaran dengan No Kwitansi ' .$reference_no.' dan Catatan :'. $note, $salesperson, $semester, 'bayar', $payment->id, $reference_no, $bayar, 'credit');
-            TransactionService::editTransaction($date, 'Diskon dari Pembayaran dengan No Kwitansi ' .$reference_no.' dan Catatan :'. $note, $salesperson, $semester, 'diskon', $payment->id, $reference_no, $diskon, 'credit');
+            TransactionService::editTransaction($date, 'Pembayaran dengan No Kwitansi ' .$no_kwitansi.' dan Catatan :'. $note, $salesperson, setting('current_semester'), 'bayar', $payment->id, $no_kwitansi, $bayar, 'credit');
+            TransactionService::editTransaction($date, 'Diskon dari Pembayaran dengan No Kwitansi ' .$no_kwitansi.' dan Catatan :'. $note, $salesperson, setting('current_semester'), 'potongan', $payment->id, $no_kwitansi, $diskon, 'credit');
 
             DB::commit();
 

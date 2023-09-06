@@ -33,6 +33,7 @@ class StockSaldo extends Model
         'end_date',
         'qty_awal',
         'in',
+        'adjustment',
         'out',
         'qty_akhir',
         'created_by_id',

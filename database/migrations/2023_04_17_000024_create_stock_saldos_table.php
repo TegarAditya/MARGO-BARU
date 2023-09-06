@@ -16,6 +16,7 @@ class CreateStockSaldosTable extends Migration
             $table->date('end_date');
             $table->float('qty_awal', 15, 2);
             $table->float('in', 15, 2);
+            $table->float('adjustment', 15, 2);
             $table->float('out', 15, 2);
             $table->float('qty_akhir', 15, 2);
             $table->timestamps();
