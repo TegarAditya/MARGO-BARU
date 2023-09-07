@@ -37,7 +37,7 @@
                 <div class="col-4">
                     <div class="form-group">
                         <label>{{ trans('cruds.bookVariant.fields.type') }}</label>
-                        <select class="form-control {{ $errors->has('type') ? 'is-invalid' : '' }}" name="type" id="type">
+                        <select class="form-control {{ $errors->has('type') ? 'is-invalid' : '' }}" name="type">
                             <option value disabled {{ old('type', null) === null ? 'selected' : '' }}>All</option>
                             @foreach(App\Models\BookVariant::TYPE_SELECT as $key => $label)
                                 <option value="{{ $key }}" {{ old('type', '') === (string) $key ? 'selected' : '' }}>{{ $label }}</option>
@@ -52,7 +52,7 @@
                 <div class="col-4">
                     <div class="form-group">
                         <label for="jenjang_id">{{ trans('cruds.book.fields.jenjang') }}</label>
-                        <select class="form-control select2 {{ $errors->has('jenjang') ? 'is-invalid' : '' }}" name="jenjang_id" id="jenjang_id">
+                        <select class="form-control select2 {{ $errors->has('jenjang') ? 'is-invalid' : '' }}" name="jenjang_id">
                             @foreach($jenjangs as $id => $entry)
                                 <option value="{{ $id }}" {{ old('jenjang_id') == $id ? 'selected' : '' }}>{{ $entry }}</option>
                             @endforeach
@@ -66,7 +66,7 @@
                 <div class="col-4">
                     <div class="form-group">
                         <label for="mapel_id">{{ trans('cruds.book.fields.mapel') }}</label>
-                        <select class="form-control select2 {{ $errors->has('mapel') ? 'is-invalid' : '' }}" name="mapel_id" id="mapel_id">
+                        <select class="form-control select2 {{ $errors->has('mapel') ? 'is-invalid' : '' }}" name="mapel_id">
                             @foreach($mapels as $id => $entry)
                                 <option value="{{ $id }}" {{ old('mapel_id') == $id ? 'selected' : '' }}>{{ $entry }}</option>
                             @endforeach
@@ -80,7 +80,7 @@
                 <div class="col-4">
                     <div class="form-group">
                         <label for="kelas_id">{{ trans('cruds.bookVariant.fields.kelas') }}</label>
-                        <select class="form-control select2 {{ $errors->has('kelas') ? 'is-invalid' : '' }}" name="kelas_id" id="kelas_id">
+                        <select class="form-control select2 {{ $errors->has('kelas') ? 'is-invalid' : '' }}" name="kelas_id">
                             @foreach($kelas as $id => $entry)
                                 <option value="{{ $id }}" {{ old('kelas_id') == $id ? 'selected' : '' }}>{{ $entry }}</option>
                             @endforeach
@@ -94,7 +94,7 @@
                 <div class="col-4">
                     <div class="form-group">
                         <label for="cover_id">{{ trans('cruds.book.fields.isi') }}</label>
-                        <select class="form-control select2 {{ $errors->has('isi') ? 'is-invalid' : '' }}" name="isi_id" id="isi_id">
+                        <select class="form-control select2 {{ $errors->has('isi') ? 'is-invalid' : '' }}" name="isi_id">
                             @foreach($isis as $id => $entry)
                                 <option value="{{ $id }}" {{ old('isi_id') == $id ? 'selected' : '' }}>{{ $entry }}</option>
                             @endforeach
@@ -108,7 +108,7 @@
                 <div class="col-4">
                     <div class="form-group">
                         <label for="cover_id">{{ trans('cruds.book.fields.cover') }}</label>
-                        <select class="form-control select2 {{ $errors->has('cover') ? 'is-invalid' : '' }}" name="cover_id" id="cover_id">
+                        <select class="form-control select2 {{ $errors->has('cover') ? 'is-invalid' : '' }}" name="cover_id">
                             @foreach($covers as $id => $entry)
                                 <option value="{{ $id }}" {{ old('cover_id') == $id ? 'selected' : '' }}>{{ $entry }}</option>
                             @endforeach

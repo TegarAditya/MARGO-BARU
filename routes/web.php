@@ -301,6 +301,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
 
     // Production Estimation
     Route::delete('production-estimations/destroy', 'ProductionEstimationController@massDestroy')->name('production-estimations.massDestroy');
+    Route::post('production-estimations/jangka', 'ProductionEstimationController@jangka')->name('production-estimations.jangka');
     Route::resource('production-estimations', 'ProductionEstimationController');
 
     // Production Payment

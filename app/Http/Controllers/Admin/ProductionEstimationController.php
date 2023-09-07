@@ -22,6 +22,10 @@ use Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Yajra\DataTables\Facades\DataTables;
+use Illuminate\Support\Facades\Date;
+use Carbon\Carbon;
+use Alert;
+use DB;
 
 class ProductionEstimationController extends Controller
 {
@@ -189,5 +193,81 @@ class ProductionEstimationController extends Controller
         }
 
         return response(null, Response::HTTP_NO_CONTENT);
+    }
+
+    public function jangka(Request $request)
+    {
+        if ($request->has('date') && $request->date && $dates = explode(' - ', $request->date)) {
+            $start = Date::parse($dates[0])->startOfDay();
+            $end = !isset($dates[1]) ? $start->clone()->endOfMonth() : Date::parse($dates[1])->endOfDay();
+        } else {
+            $start = Carbon::now()->startOfMonth();
+            $end = Carbon::now();
+        }
+
+        $semester = setting('current_semester');
+
+        $awal = BookVariant::whereHas('estimasi_produksi')->withSum(['movement as in' => function ($q) use ($start, $end) {
+            $q->whereIn('transaction_type', ['cetak', 'produksi'])->where('movement_type', 'in')->where('movement_date', '<', $start)->select(DB::raw('COALESCE(SUM(quantity), 0)'));
+        }], 'quantity')->withSum(['movement as out' => function ($q) use ($start, $end) {
+            $q->whereIn('transaction_type', ['cetak', 'produksi'])->where('movement_type', 'out')->where('movement_date', '<', $start)->select(DB::raw('COALESCE(SUM(quantity), 0)'));
+        }], 'quantity')->where(function($q) use ($semester) {
+            $q->where('semester_id', $semester)
+            ->orWhere('stock' , '>', 0);
+        });
+        // ->whereIn('type', ['L', 'P', 'K']);
+
+        if (!empty($request->type)) {
+            $awal->where('type', $request->type);
+        }
+        if (!empty($request->jenjang)) {
+            $awal->where('jenjang_id', $request->jenjang);
+        }
+        if (!empty($request->isi)) {
+            $awal->where('isi_id', $request->isi);
+        }
+        if (!empty($request->cover)) {
+            $awal->where('cover_id', $request->cover);
+        }
+        if (!empty($request->kelas)) {
+            $awal->where('kelas_id', $request->kelas);
+        }
+        if (!empty($request->mapel)) {
+            $awal->where('mapel_id', $request->mapel);
+        }
+
+        $saldo_awal = $awal->get();
+
+        $akhir = BookVariant::whereHas('estimasi_produksi')->withSum(['movement as in' => function ($q) use ($start, $end) {
+            $q->whereIn('transaction_type', ['cetak', 'produksi'])->where('movement_type', 'in')->whereBetween('movement_date', [$start, $end])->select(DB::raw('COALESCE(SUM(quantity), 0)'));
+        }], 'quantity')->withSum(['movement as out' => function ($q) use ($start, $end) {
+            $q->whereIn('transaction_type', ['cetak', 'produksi'])->where('movement_type', 'out')->whereBetween('movement_date', [$start, $end])->select(DB::raw('COALESCE(SUM(quantity), 0)'));
+        }], 'quantity')->where(function($q) use ($semester) {
+            $q->where('semester_id', $semester)
+            ->orWhere('stock' , '>', 0);
+        });
+        // ->whereIn('type', ['L', 'P', 'K']);
+
+        if (!empty($request->type)) {
+            $akhir->where('type', $request->type);
+        }
+        if (!empty($request->jenjang)) {
+            $akhir->where('jenjang_id', $request->jenjang);
+        }
+        if (!empty($request->isi)) {
+            $akhir->where('isi_id', $request->isi);
+        }
+        if (!empty($request->cover)) {
+            $akhir->where('cover_id', $request->cover);
+        }
+        if (!empty($request->kelas)) {
+            $akhir->where('kelas_id', $request->kelas);
+        }
+        if (!empty($request->mapel)) {
+            $akhir->where('mapel_id', $request->mapel);
+        }
+        $saldo_akhir = $akhir->orderBy('semester_id', 'DESC')->orderBy('jenjang_id', 'ASC')->orderBy('mapel_id', 'ASC')->orderBy('kelas_id', 'ASC')->orderBy('cover_id', 'ASC')->get();
+
+        return view('admin.productionEstimations.jangka', compact('start', 'end', 'saldo_awal', 'saldo_akhir'));
     }
 }

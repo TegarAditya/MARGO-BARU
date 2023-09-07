@@ -760,7 +760,7 @@
 
                                         </i>
                                         <p>
-                                            Rekap Estimasi
+                                            Rekap
                                         </p>
                                     </a>
                                 </li>
