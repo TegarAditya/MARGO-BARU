@@ -137,23 +137,21 @@ class ReturnGoodController extends Controller
             ]);
 
             $nominal = 0;
-            $flag_cash = false;
+            // $flag_cash = false;
 
             for ($i = 0; $i < count($products); $i++) {
                 $product = $products[$i];
-                $book = BookVariant::find($product);
                 $order = $orders[$i];
-                $price = $book->price;
+
+                $invoice_item = InvoiceItem::where('semester_id', $semester_retur)->where('salesperson_id', $salesperson)->where('product_id', $product )->first();
+                if (!$invoice_item) {
+                    throw new \Exception('Product tidak ditemukan');
+                }
+
+                $price = $invoice_item->price - $invoice_item->discount;
                 $quantity = $quantities[$i];
                 $total = (int) $price * $quantity;
                 $nominal += $total;
-
-                if (!$flag_cash) {
-                    $sales_order = SalesOrder::find($order);
-                    if ($sales_order->payment_type == 'cash') {
-                        $flag_cash = true;
-                    }
-                }
 
                 $retur_item = ReturnGoodItem::create([
                     'retur_id' => $retur->id,
@@ -175,26 +173,26 @@ class ReturnGoodController extends Controller
             $note = 'Retur from '.$retur->no_retur;
             TransactionService::createTransaction($date, $note, $salesperson, $semester, 'retur', $retur->id, $retur->no_retur, $nominal, 'credit');
 
-            if ($flag_cash) {
-                InvoiceItem::where('salesperson_id', $salesperson)->where('semester_id', $semester)->where('discount', '>', 0)
-                ->update([
-                    'discount' => 0,
-                    'total_discount' => 0
-                ]);
+            // if ($flag_cash) {
+            //     InvoiceItem::where('salesperson_id', $salesperson)->where('semester_id', $semester)->where('discount', '>', 0)
+            //     ->update([
+            //         'discount' => 0,
+            //         'total_discount' => 0
+            //     ]);
 
-                $invoices = Invoice::where('salesperson_id', $salesperson)->where('semester_id', $semester)->where('discount', '>', 0)->get();
-                $note_transaksi = 'Diskon di cancel karena retur no '.$retur->no_retur;
+            //     $invoices = Invoice::where('salesperson_id', $salesperson)->where('semester_id', $semester)->where('discount', '>', 0)->get();
+            //     $note_transaksi = 'Diskon di cancel karena retur no '.$retur->no_retur;
 
-                foreach($invoices as $invoice) {
-                    $total = $invoice->total;
-                    TransactionService::editTransaction($date, $note_transaksi, $salesperson, $semester, 'diskon', $invoice->id, $invoice->no_faktur, 0, 'credit');
-                    $invoice->update([
-                        'discount' => 0,
-                        'nominal' => $total,
-                        'retur' => 1
-                    ]);
-                }
-            }
+            //     foreach($invoices as $invoice) {
+            //         $total = $invoice->total;
+            //         TransactionService::editTransaction($date, $note_transaksi, $salesperson, $semester, 'diskon', $invoice->id, $invoice->no_faktur, 0, 'credit');
+            //         $invoice->update([
+            //             'discount' => 0,
+            //             'nominal' => $total,
+            //             'retur' => 1
+            //         ]);
+            //     }
+            // }
 
             $retur->nominal = $nominal;
             $retur->save();
@@ -230,6 +228,7 @@ class ReturnGoodController extends Controller
     {
          // Validate the form data
         $validatedData = $request->validate([
+            'no_retur' => 'required',
             'date' => 'required',
             'retur_id' =>'required',
             'retur_items' => 'required|array',
@@ -240,11 +239,14 @@ class ReturnGoodController extends Controller
             'quantities.*' => 'numeric|min:1',
         ]);
 
+        $no_retur = $validatedData['no_retur'];
         $date = $validatedData['date'];
         $retur = $validatedData['retur_id'];
         $products = $validatedData['products'];
         $retur_items = $validatedData['retur_items'];
         $quantities = $validatedData['quantities'];
+        $semester_retur = $returnGood->semester_retur_id;
+        $salesperson = $returnGood->salesperson_id;
 
         DB::beginTransaction();
         try {
@@ -252,9 +254,13 @@ class ReturnGoodController extends Controller
 
             for ($i = 0; $i < count($products); $i++) {
                 $product = $products[$i];
-                $book = BookVariant::find($product);
 
-                $price = $book->price;
+                $invoice_item = InvoiceItem::where('semester_id', $semester_retur)->where('salesperson_id', $salesperson)->where('product_id', $product )->first();
+                if (!$invoice_item) {
+                    throw new \Exception('Product tidak ditemukan');
+                }
+
+                $price = $invoice_item->price - $invoice_item->discount;
                 $quantity = $quantities[$i];
                 $total = (int) $price * $quantity;
                 $nominal += $total;
@@ -274,15 +280,14 @@ class ReturnGoodController extends Controller
                 EstimationService::updateRetur($order, ($quantity - $old_quantity));
             }
 
-            $salesperson = $returnGood->salesperson_id;
-            $semester = $returnGood->semester_id;
-
             $returnGood->update([
+                'semester_id' => setting('current_semester'),
+                'no_retur' => $no_retur,
                 'date' => $date,
                 'nominal' => $nominal
             ]);
 
-            TransactionService::editTransaction($date, 'Retur from '.$retur->no_retur , $salesperson, $semester, 'retur', $retur->id, $retur->no_retur, $nominal, 'credit');
+            TransactionService::editTransaction($date, 'Retur from '.$no_retur, $salesperson, setting('current_semester'), 'retur', $returnGood->id, $no_retur, $nominal, 'credit');
 
             DB::commit();
 

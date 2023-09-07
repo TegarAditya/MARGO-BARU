@@ -186,6 +186,7 @@ class DeliveryOrderController extends Controller
     {
         // Validate the form data
         $validatedData = $request->validate([
+            'no_suratjalan' => 'required',
             'date' => 'required',
             'delivery_items' => 'required|array',
             'delivery_items.*' => 'exists:delivery_order_items,id',
@@ -195,6 +196,7 @@ class DeliveryOrderController extends Controller
             'quantities.*' => 'numeric|min:0',
         ]);
 
+        $no_suratjalan = $validatedData['no_suratjalan'];
         $date = $validatedData['date'];
         $delivery_items = $validatedData['delivery_items'];
         $products = $validatedData['products'];
@@ -203,6 +205,7 @@ class DeliveryOrderController extends Controller
         DB::beginTransaction();
         try {
             $deliveryOrder->update([
+                'no_suratjalan' => $no_suratjalan,
                 'date' => $date,
             ]);
 

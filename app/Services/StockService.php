@@ -26,7 +26,7 @@ class StockService
                 'quantity' => -1 * $awal->quantity,
                 'reversal_of_id' => $awal->id
             ]);
-    
+
             $stock = StockMovement::create([
                 'warehouse' => 1,
                 'movement_date' => Carbon::now()->format('d-m-Y'),
@@ -97,7 +97,7 @@ class StockService
         StockMovement::create([
             'warehouse' => 1,
             'movement_date' => Carbon::now()->format('d-m-Y'),
-            'movement_type' => 'revisi',
+            'movement_type' => $type_movement,
             'transaction_type' => $transaction_type,
             'reference_id' => $reference,
             'reference_date' => $date,

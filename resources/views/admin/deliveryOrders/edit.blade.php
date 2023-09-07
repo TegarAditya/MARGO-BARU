@@ -22,7 +22,7 @@
                 <div class="col-6">
                     <div class="form-group">
                         <label class="required" for="no_suratjalan">{{ trans('cruds.deliveryOrder.fields.no_suratjalan') }}</label>
-                        <input class="form-control {{ $errors->has('no_suratjalan') ? 'is-invalid' : '' }}" type="text" name="no_suratjalan" id="no_suratjalan" value="{{ old('no_suratjalan', $deliveryOrder->no_suratjalan) }}" readonly>
+                        <input class="form-control {{ $errors->has('no_suratjalan') ? 'is-invalid' : '' }}" type="text" name="no_suratjalan" id="no_suratjalan" value="{{ old('no_suratjalan', noRevisi($deliveryOrder->no_suratjalan)) }}" readonly>
                         @if($errors->has('no_suratjalan'))
                             <span class="text-danger">{{ $errors->first('no_suratjalan') }}</span>
                         @endif

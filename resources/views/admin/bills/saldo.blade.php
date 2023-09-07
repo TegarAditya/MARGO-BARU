@@ -321,7 +321,7 @@
 
     <tfoot>
         <tr>
-            <td class="text-center" colspan="3">
+            <td class="text-center" colspan="4">
                 <strong>Total</strong>
             </td>
             <td class="text-right">

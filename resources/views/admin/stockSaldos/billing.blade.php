@@ -46,7 +46,11 @@
                     @endphp
                     <tr>
                         <td></td>
-                        <td>{{ $item->name }}</td>
+                        <td><a class="px-1" href="{{ route('admin.book-variants.show', $item->id) }}" title="Show">
+                            <i class="fas fa-eye text-success fa-lg"></i>
+                        </a>
+                        {{ $item->name }}
+                    </td>
                         <td class="text-center">{{ angka($pertama) }}</td>
                         <td class="text-center">{{ angka($item->in) }}</td>
                         <td class="text-center">{{ angka($item->adjustment) }}</td>

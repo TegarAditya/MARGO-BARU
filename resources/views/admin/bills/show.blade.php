@@ -379,23 +379,24 @@
                             </tr>
                         </tfoot>
                     </table>
+
+                    <hr class="my-2 text-right ml-5 mx-0" />
+
+                    <div class="row text-right">
+                        <div class="col text-left">
+
+                        </div>
+
+                        <div class="col-auto">
+                            <p class="mb-0">
+                                <span>Total Adjustment</span>
+                                <br />
+                                <span class="h5 mb-0 invoice-total"><strong>{{ money($adjustments->sum('amount')) }}</strong></span>
+                            </p>
+                        </div>
+                    </div>
                 @endif
 
-                <hr class="my-2 text-right ml-5 mx-0" />
-
-                <div class="row text-right">
-                    <div class="col text-left">
-
-                    </div>
-
-                    <div class="col-auto">
-                        <p class="mb-0">
-                            <span>Total Adjustment</span>
-                            <br />
-                            <span class="h5 mb-0 invoice-total"><strong>{{ money($adjustments->sum('amount')) }}</strong></span>
-                        </p>
-                    </div>
-                </div>
             </section>
 
             {{-- Retur --}}
@@ -505,7 +506,7 @@
 
                                 <tfoot>
                                     <tr>
-                                        <td colspan="3" class="text-center"><strong>Total</strong></td>
+                                        <td colspan="4" class="text-center"><strong>Total</strong></td>
                                         <td class="text-center"><b>{{ angka($returnGood->retur_items->sum('quantity')) }}</b></td>
                                         <td class="text-right px-2"><b>{{ money($returnGood->nominal) }}</b></td>
                                     </tr>
@@ -600,14 +601,14 @@
                             </tr>
                         @empty
                             <tr>
-                                <td class="px-3" colspan="6">Belum ada pembayaran</td>
+                                <td class="px-3" colspan="7">Belum ada pembayaran</td>
                             </tr>
                         @endforelse
                     </tbody>
 
                     <tfoot>
                         <tr>
-                            <td class="text-center px-3" colspan="4">
+                            <td class="text-center px-3" colspan="5">
                                 <strong>Total</strong>
                             </td>
                             <td class="text-right px-3">
@@ -939,14 +940,14 @@
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td class="px-3" colspan="5">Tidak ada Pembayaran</td>
+                                            <td class="px-3" colspan="6">Tidak ada Pembayaran</td>
                                         </tr>
                                     @endforelse
                                 </tbody>
 
                                 <tfoot>
                                     <tr>
-                                        <td colspan="3">Total</td>
+                                        <td colspan="4">Total</td>
                                         <td class="text-right px-2"><strong>{{ money($payments->sum('paid')) }}</strong></td>
                                         <td class="text-right px-2"><strong>{{ money($payments->sum('discount')) }}</strong></td>
                                     </tr>

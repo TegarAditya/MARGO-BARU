@@ -7,6 +7,12 @@
     </div>
 
     <div class="card-body">
+        @if (session()->has('error-message'))
+            <p class="text-danger">
+                {{session()->get('error-message')}}
+            </p>
+        @endif
+
         <form method="POST" action="{{ route("admin.return-goods.update", [$returnGood->id]) }}" enctype="multipart/form-data">
             @method('PUT')
             @csrf
@@ -15,7 +21,7 @@
                 <div class="col-6">
                     <div class="form-group">
                         <label class="required" for="no_retur">{{ trans('cruds.returnGood.fields.no_retur') }}</label>
-                        <input class="form-control {{ $errors->has('no_retur') ? 'is-invalid' : '' }}" type="text" name="no_retur" id="no_retur" value="{{ old('no_retur', $returnGood->no_retur) }}" disabled>
+                        <input class="form-control {{ $errors->has('no_retur') ? 'is-invalid' : '' }}" type="text" name="no_retur" id="no_retur" value="{{ old('no_retur', noRevisi($returnGood->no_retur)) }}" readonly>
                         @if($errors->has('no_retur'))
                             <span class="text-danger">{{ $errors->first('no_retur') }}</span>
                         @endif

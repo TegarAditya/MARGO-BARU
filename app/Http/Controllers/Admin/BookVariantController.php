@@ -248,7 +248,7 @@ class BookVariantController extends Controller
 
         $bookVariant->load('book', 'jenjang', 'semester', 'kurikulum', 'halaman', 'warehouse', 'unit', 'components', 'isi', 'cover');
 
-        $stockMovements = StockMovement::with(['product'])->where('product_id', $bookVariant->id)->orderBy('created_at', 'DESC')->get();
+        $stockMovements = StockMovement::with(['product'])->where('product_id', $bookVariant->id)->latest()->get();
 
         return view('admin.bookVariants.show', compact('bookVariant', 'stockMovements'));
     }

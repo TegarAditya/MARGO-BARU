@@ -156,6 +156,10 @@
                                 <td></td>
                                 <td class="text-center">
                                     {{ App\Models\StockMovement::MOVEMENT_TYPE_SELECT[$stockMovement->movement_type] ?? '' }}
+                                    @if($stockMovement->reversal_of_id)
+                                        <br>
+                                        (Reversal)
+                                    @endif
                                 </td>
                                 <td class="text-center">
                                     @if ($stockMovement->transaction_type == 'adjustment')
