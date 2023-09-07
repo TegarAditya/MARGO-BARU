@@ -166,7 +166,6 @@
                                             <div class="text-field-input px-2 py-0">
                                                 <input type="hidden" name="products[]" value="${product.id}">
                                                 <input class="quantity" type="hidden" name="quantities[]">
-                                                <input type="hidden" name="payment_types[]" value="cash">
                                                 <input class="form-control text-center quantity_text" type="text" name="quantity_text[]" value="1" required>
                                                 <label class="text-field-border"></label>
                                             </div>
@@ -184,7 +183,6 @@
                     `;
                     $('#product-form').prepend(formHtml);
                     $('#product-search').val(null).trigger('change');
-                    $('.payment_types').select2();
 
                     var productForm = $('#product-form');
                     var productItem = productForm.find('.item-product');

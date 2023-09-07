@@ -80,18 +80,7 @@ class EstimationController extends Controller
                 return $row->salesperson ? $row->salesperson->name : 'Internal';
             });
 
-            $table->editColumn('payment_type', function ($row) {
-                return $row->payment_type ? Estimation::PAYMENT_TYPE_SELECT[$row->payment_type] : '';
-            });
-            $table->addColumn('created_by_name', function ($row) {
-                return $row->created_by ? $row->created_by->name : '';
-            });
-
-            $table->addColumn('updated_by_name', function ($row) {
-                return $row->updated_by ? $row->updated_by->name : '';
-            });
-
-            $table->rawColumns(['actions', 'placeholder', 'semester', 'salesperson', 'created_by', 'updated_by']);
+            $table->rawColumns(['actions', 'placeholder', 'semester', 'salesperson']);
 
             return $table->make(true);
         }
@@ -132,7 +121,6 @@ class EstimationController extends Controller
             'jenjang_id' => 'nullable',
             'products' => 'required|array',
             'products.*' => 'exists:book_variants,id',
-            'payment_types' => 'required|array',
             'quantities' => 'required|array',
             'quantities.*' => 'numeric|min:1',
         ]);
@@ -140,7 +128,6 @@ class EstimationController extends Controller
         $date = $validatedData['date'];
         $semester = setting('current_semester');
         $salesperson = $validatedData['salesperson_id'] ?? null;
-        $payment_types = $validatedData['payment_types'];
         $products = $validatedData['products'];
         $quantities = $validatedData['quantities'];
 
@@ -155,14 +142,12 @@ class EstimationController extends Controller
 
             for ($i = 0; $i < count($products); $i++) {
                 $product = BookVariant::find($products[$i]);
-                $payment = $payment_types[$i];
                 $quantity = $quantities[$i];
 
                 $estimasi_item = EstimationItem::create([
                     'estimation_id' => $estimasi->id,
                     'semester_id' => $semester,
                     'salesperson_id' => $salesperson,
-                    'payment_type' => $payment,
                     'product_id' => $product->id,
                     'jenjang_id' => $product->jenjang_id,
                     'kurikulum_id' => $product->kurikulum_id,
@@ -176,8 +161,7 @@ class EstimationController extends Controller
                     'jenjang_id' => $product->jenjang_id,
                     'kurikulum_id' => $product->kurikulum_id
                 ], [
-                    'payment_type' => $payment,
-                    'no_order' => SalesOrder::generateNoOrder($semester, $salesperson, $payment),
+                    'no_order' => SalesOrder::generateNoOrder($semester, $salesperson),
                     'quantity' => DB::raw("quantity + $quantity"),
                 ]);
 
@@ -243,7 +227,6 @@ class EstimationController extends Controller
             'date' => 'required',
             'products' => 'required|array',
             'products.*' => 'exists:book_variants,id',
-            'payment_types' => 'required|array',
             'quantities' => 'required|array',
             'quantities.*' => 'numeric|min:0',
             'estimasi_items' => 'required|array',
@@ -254,7 +237,6 @@ class EstimationController extends Controller
         $estimasi_items = $validatedData['estimasi_items'];
         $products = $validatedData['products'];
         $quantities = $validatedData['quantities'];
-        $payment_types = $validatedData['payment_types'];
 
         $semester = $estimation->semester_id;
         $salesperson = $estimation->salesperson_id;
@@ -268,7 +250,6 @@ class EstimationController extends Controller
 
             for ($i = 0; $i < count($products); $i++) {
                 $product = BookVariant::find($products[$i]);
-                $type = $payment_types[$i];
                 $quantity = $quantities[$i];
 
                 $estimasi_item = EstimationItem::find($estimasi_items[$i]);
@@ -280,10 +261,6 @@ class EstimationController extends Controller
                 $old_quantity = $estimasi_item->quantity;
                 $old_order = $order->quantity;
 
-                if ($type !== $order->payment_type) {
-                    $order->no_order = SalesOrder::generateNoOrder($semester, $salesperson, $type);
-                    $order->payment_type = $type;
-                }
                 $order->quantity = ($old_order - $old_quantity) + $quantity;
                 $order->save();
 

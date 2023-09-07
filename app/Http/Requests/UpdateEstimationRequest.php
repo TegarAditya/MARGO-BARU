@@ -34,9 +34,6 @@ class UpdateEstimationRequest extends FormRequest
                 'required',
                 'integer',
             ],
-            'payment_type' => [
-                'required',
-            ],
         ];
     }
 }

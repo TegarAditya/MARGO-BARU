@@ -58,21 +58,6 @@
                 </div>
                 <div class="col-6">
                     <div class="form-group">
-                        <label class="required">{{ trans('cruds.salesOrder.fields.payment_type') }}</label>
-                        <select class="form-control select2 {{ $errors->has('payment_type') ? 'is-invalid' : '' }}" name="payment_type" id="payment_type" disabled>
-                            <option value disabled {{ old('payment_type', null) === null ? 'selected' : '' }}>{{ trans('global.pleaseSelect') }}</option>
-                            @foreach(App\Models\SalesOrder::PAYMENT_TYPE_SELECT as $key => $label)
-                                <option value="{{ $key }}" {{ old('payment_type', $salesOrder->payment_type) === (string) $key ? 'selected' : '' }}>{{ $label }}</option>
-                            @endforeach
-                        </select>
-                        @if($errors->has('payment_type'))
-                            <span class="text-danger">{{ $errors->first('payment_type') }}</span>
-                        @endif
-                        <span class="help-block">{{ trans('cruds.salesOrder.fields.payment_type_helper') }}</span>
-                    </div>
-                </div>
-                <div class="col-6">
-                    <div class="form-group">
                         <label for="jenjang_id">{{ trans('cruds.salesOrder.fields.jenjang') }}</label>
                         <select class="form-control select2 {{ $errors->has('jenjang') ? 'is-invalid' : '' }}" name="jenjang_id" id="jenjang_id">
                             @foreach($jenjangs as $id => $entry)
@@ -197,7 +182,6 @@
                             q: params.term,
                             semester: $('#semester_id').val(),
                             salesperson: $('#salesperson_id').val(),
-                            type: $('#payment_type').val(),
                             jenjang: $('#jenjang_id').val()
                         };
                     },
@@ -246,14 +230,13 @@
                 data: {
                     id: productId,
                     semester: $('#semester_id').val(),
-                    salesperson: $('#salesperson_id').val(),
-                    type: $('#payment_type').val()
+                    salesperson: $('#salesperson_id').val()
                 },
                 success: function(product) {
                     var formHtml = `
                         <div class="item-product" id="product-${product.id}">
                             <div class="row">
-                                <div class="col-6 align-self-center">
+                                <div class="col-7 align-self-center">
                                     <h6 class="text-sm product-name mb-1">(${product.book_type}) ${product.short_name}</h6>
                                     <p class="mb-0 text-sm">
                                         Code : <strong>${product.code}</strong>
@@ -269,15 +252,6 @@
                                     </p>
                                 </div>
                                 <div class="col offset-1 row align-items-end align-self-center">
-                                    <div class="col" style="min-width: 160px">
-                                        <p class="mb-0 text-sm">Payment Type</p>
-                                        <div class="form-group text-field m-0">
-                                            <select class="form-control text-center select2" name="payment_types[]" style="width: 100%;" tabIndex="-1" required>
-                                                <option value="cash" ${product.payment_type == 'cash' ? 'selected' : ''}>Cash</option>
-                                                <option value="retur" ${product.payment_type == 'retur' ? 'selected' : ''}>Retur</option>
-                                            </select>
-                                        </div>
-                                    </div>
                                     <div class="col" style="max-width: 160px">
                                         <p class="mb-0 text-sm">Estimasi</p>
                                         <div class="form-group text-field m-0">

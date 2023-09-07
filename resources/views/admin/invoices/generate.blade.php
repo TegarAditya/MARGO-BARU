@@ -103,9 +103,6 @@
                                 <p class="mb-0 text-sm">
                                     Jenjang - Kurikulum : <strong>{{ $product->jenjang->name }} - {{ $product->book->cover->name }} - {{ $product->book->kurikulum->name }}</strong>
                                 </p>
-                                <p class="mb-0 text-sm">
-                                    Payment Type: <strong>{{ strtoupper($item->delivery_order->payment_type) }}</strong>
-                                </p>
                             </div>
                             <input type="hidden" name="delivery_items[]" value="{{ $item->id }}">
                             <input type="hidden" name="products[]" value="{{ $product->id }}">
@@ -137,7 +134,7 @@
                                         <div class="text-field-input px-2 py-0 pr-3">
                                             <span class="text-sm mr-1">Rp</span>
                                             <input class="diskon" type="hidden" name="diskons[]" data-max="{{ $product->price }}" value="0">
-                                            <input class="form-control text-right diskon_text" type="text" name="diskon_text[]" value="0" {{ ($item->sales_order->payment_type == 'cash' && !isRetur($item->sales_order->no_order)) ? 'required' : 'readonly' }}>
+                                            <input class="form-control text-right diskon_text" type="text" name="diskon_text[]" value="0" required>
                                             <label class="text-field-border"></label>
                                         </div>
                                     </div>

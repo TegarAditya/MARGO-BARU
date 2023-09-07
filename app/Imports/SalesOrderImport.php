@@ -26,7 +26,6 @@ class SalesOrderImport implements ToCollection, WithHeadingRow
             $salesperson = Salesperson::where('code', $row['sales'])->first();
             $semester = setting('current_semester');
             $product = BookVariant::where('code', $row['buku'])->first();
-            $payment_type = $row['pembayaran'];
             $quantity = $row['estimasi'];
 
             DB::beginTransaction();
@@ -39,8 +38,7 @@ class SalesOrderImport implements ToCollection, WithHeadingRow
                     'jenjang_id' => $product->jenjang_id,
                     'kurikulum_id' => $product->kurikulum_id
                 ], [
-                    'payment_type' => SalesOrder::PAYMENT_TYPE_SELECT[$payment_type],
-                    'no_order' => SalesOrder::generateNoOrder($semester, $salesperson, $payment_type),
+                    'no_order' => SalesOrder::generateNoOrder($semester, $salesperson),
                     'quantity' => DB::raw("quantity + $quantity"),
                     'moved' => 0,
                     'retur' => 0

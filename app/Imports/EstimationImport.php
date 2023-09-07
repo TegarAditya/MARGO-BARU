@@ -33,7 +33,6 @@ class EstimationImport implements ToCollection, WithHeadingRow
         try {
             foreach ($rows as $row) {
                 $product = BookVariant::where('code', $row['buku'])->first();
-                $payment = $row['pembayaran'];
                 $quantity = $row['estimasi'];
 
                 $estimasi_id = $this->estimasi->id;
@@ -44,7 +43,6 @@ class EstimationImport implements ToCollection, WithHeadingRow
                     'estimation_id' => $estimasi_id,
                     'semester_id' => $semester,
                     'salesperson_id' => $salesperson,
-                    'payment_type' => $payment,
                     'product_id' => $product->id,
                     'jenjang_id' => $product->jenjang_id,
                     'kurikulum_id' => $product->kurikulum_id,
@@ -58,7 +56,6 @@ class EstimationImport implements ToCollection, WithHeadingRow
                     'jenjang_id' => $product->jenjang_id,
                     'kurikulum_id' => $product->kurikulum_id
                 ], [
-                    'payment_type' => $payment,
                     'no_order' => SalesOrder::generateNoOrder($semester, $salesperson, $payment),
                     'quantity' => DB::raw("quantity + $quantity"),
                 ]);

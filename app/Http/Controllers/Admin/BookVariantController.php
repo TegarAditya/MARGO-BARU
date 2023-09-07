@@ -461,7 +461,7 @@ class BookVariantController extends Controller
                 ->join('sales_orders', 'sales_orders.product_id', '=', 'estimation_items.product_id')
                 ->where('book_variants.id', $id)
                 ->where('estimation_items.estimation_id', $estimasi)
-                ->first(['book_variants.*','estimation_items.id as estimasi_id', 'estimation_items.quantity as estimasi', 'estimation_items.payment_type as payment_type', 'sales_orders.moved as terkirim']);
+                ->first(['book_variants.*','estimation_items.id as estimasi_id', 'estimation_items.quantity as estimasi', 'sales_orders.moved as terkirim']);
         $product->load('book', 'jenjang', 'cover', 'kurikulum', 'isi');
 
         return response()->json($product);

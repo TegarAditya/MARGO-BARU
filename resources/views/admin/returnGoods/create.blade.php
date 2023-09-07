@@ -155,8 +155,7 @@
                 data: {
                     id: productId,
                     semester: $('#semester_id').val(),
-                    salesperson: $('#salesperson_id').val(),
-                    type: $('#payment_type').val()
+                    salesperson: $('#salesperson_id').val()
                 },
                 success: function(product) {
                     var formHtml = `

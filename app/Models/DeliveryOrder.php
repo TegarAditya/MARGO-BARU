@@ -19,11 +19,6 @@ class DeliveryOrder extends Model
 
     public const BULAN_ROMAWI = array(1=>"I","II","III", "IV", "V","VI","VII","VIII","IX","X", "XI","XII");
 
-    public const PAYMENT_TYPE_SELECT = [
-        'cash'  => 'Cash',
-        'retur' => 'Retur',
-    ];
-
     protected $dates = [
         'date',
         'created_at',
@@ -36,7 +31,6 @@ class DeliveryOrder extends Model
         'date',
         'semester_id',
         'salesperson_id',
-        'payment_type',
         'address',
         'faktur',
         'created_by_id',

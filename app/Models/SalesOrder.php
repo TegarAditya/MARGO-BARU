@@ -21,16 +21,10 @@ class SalesOrder extends Model
         'deleted_at',
     ];
 
-    public const PAYMENT_TYPE_SELECT = [
-        'cash'  => 'Cash',
-        'retur' => 'Retur',
-    ];
-
     protected $fillable = [
         'no_order',
         'semester_id',
         'salesperson_id',
-        'payment_type',
         'product_id',
         'jenjang_id',
         'kurikulum_id',
@@ -81,18 +75,18 @@ class SalesOrder extends Model
         return $this->belongsTo(Kurikulum::class, 'kurikulum_id');
     }
 
-    public static function generateNoOrder($semester, $salesperson, $payment_type) {
+    public static function generateNoOrder($semester, $salesperson) {
         $semester = Semester::find($semester);
         $salesperson = Salesperson::find($salesperson);
 
-        $code = 'ORD/'.strtoupper($salesperson->code ?? 'INTERNAL').'/'.strtoupper($payment_type).'/'.$semester->code;
+        $code = 'ORD/'.strtoupper($salesperson->code ?? 'INTERNAL').'/'.$semester->code;
 
         return $code;
     }
 
     public static function generateNoOrderTemp($semester) {
         $semester = Semester::find($semester);
-        $code = 'ORD/SALES/TYPE/'.$semester?->code;
+        $code = 'ORD/SALES/'.$semester?->code;
         return $code;
     }
 }

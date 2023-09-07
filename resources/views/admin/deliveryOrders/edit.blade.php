@@ -53,21 +53,6 @@
                         <span class="help-block">{{ trans('cruds.deliveryOrder.fields.salesperson_helper') }}</span>
                     </div>
                 </div>
-                <div class="col-6">
-                    <div class="form-group">
-                        <label class="required">{{ trans('cruds.deliveryOrder.fields.payment_type') }}</label>
-                        <select class="form-control {{ $errors->has('payment_type') ? 'is-invalid' : '' }}" name="payment_type" id="payment_type" disabled>
-                            <option value disabled {{ old('payment_type', null) === null ? 'selected' : '' }}>{{ trans('global.pleaseSelect') }}</option>
-                            @foreach(App\Models\DeliveryOrder::PAYMENT_TYPE_SELECT as $key => $label)
-                            <option value="{{ $key }}" {{ old('payment_type', $deliveryOrder->payment_type) === (string) $key ? 'selected' : '' }}>{{ $label }}</option>
-                            @endforeach
-                        </select>
-                        @if($errors->has('payment_type'))
-                            <span class="text-danger">{{ $errors->first('payment_type') }}</span>
-                        @endif
-                        <span class="help-block">{{ trans('cruds.deliveryOrder.fields.payment_type_helper') }}</span>
-                    </div>
-                </div>
             </div>
 
             <hr style="margin: .5em -15px;border-color:#ccc" />
@@ -191,7 +176,7 @@
                                         </div>
                                     </div>
                                     <div class="col-auto pl-5">
-                                        <button type="button" class="btn btn-danger btn-sm product-delete" data-product-id="${product.id}">
+                                        <button type="button" class="btn btn-danger btn-sm product-delete" data-product-id="${product.id}" tabIndex="-1">
                                             <i class="fa fa-trash"></i>
                                         </button>
                                     </div>
@@ -221,8 +206,8 @@
                         quantity.on('change', function(e) {
                             var el = $(e.currentTarget);
                             var valueNum = parseInt(el.val());
-                            if (valueNum < 1) {
-                                el.val(1);
+                            if (valueNum < 0) {
+                                el.val(0);
                                 quantityText.val(1).trigger('change');
                             }
                         }).trigger('change');

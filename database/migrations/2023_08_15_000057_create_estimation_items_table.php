@@ -10,7 +10,6 @@ class CreateEstimationItemsTable extends Migration
     {
         Schema::create('estimation_items', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('payment_type');
             $table->integer('quantity');
             $table->timestamps();
             $table->softDeletes();

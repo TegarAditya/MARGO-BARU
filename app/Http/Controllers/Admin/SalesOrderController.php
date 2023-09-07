@@ -108,7 +108,6 @@ class SalesOrderController extends Controller
         $validatedData = $request->validate([
             // 'semester_id' =>'required',
             'salesperson_id' => 'required',
-            'payment_type' => 'required',
             'jenjang_id' => 'nullable',
             'products' => 'required|array',
             'products.*' => 'exists:book_variants,id',
@@ -118,7 +117,6 @@ class SalesOrderController extends Controller
 
         $semester = setting('current_semester');
         $salesperson = $validatedData['salesperson_id'];
-        $payment_type = $validatedData['payment_type'];
         $products = $validatedData['products'];
         $quantities = $validatedData['quantities'];
         $today = Carbon::now()->format('d-m-Y');
@@ -136,8 +134,7 @@ class SalesOrderController extends Controller
                     'jenjang_id' => $product->jenjang_id,
                     'kurikulum_id' => $product->kurikulum_id
                 ], [
-                    'payment_type' => $payment_type,
-                    'no_order' => SalesOrder::generateNoOrder($semester, $salesperson, $payment_type),
+                    'no_order' => SalesOrder::generateNoOrder($semester, $salesperson),
                     'quantity' => DB::raw("quantity + $quantity"),
                 ]);
 
@@ -170,7 +167,6 @@ class SalesOrderController extends Controller
 
         $semester = $request->semester;
         $salesperson = $request->salesperson;
-        $payment_type = $request->payment_type;
 
         $semesters = Semester::orderBy('code', 'DESC')->where('status', 1)->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
@@ -180,7 +176,6 @@ class SalesOrderController extends Controller
 
         $orders = SalesOrder::where('salesperson_id', $salesperson)
                     ->where('semester_id', $semester)
-                    ->where('payment_type', $payment_type)
                     ->orderBy('product_id', 'ASC')
                     ->get();
 
@@ -195,36 +190,28 @@ class SalesOrderController extends Controller
          $validatedData = $request->validate([
             'products' => 'required|array',
             'products.*' => 'exists:book_variants,id',
-            'payment_types' => 'required|array',
             'quantities' => 'required|array',
             'quantities.*' => 'numeric|min:1',
         ]);
         $products = $validatedData['products'];
         $quantities = $validatedData['quantities'];
-        $types = $validatedData['payment_types'];
         $today = Carbon::now()->format('d-m-Y');
         $semester = $salesOrder->semester_id;
         $salesperson = $salesOrder->salesperson_id;
-        $payment_type = $salesOrder->payment_type;
 
         DB::beginTransaction();
         try {
             for ($i = 0; $i < count($products); $i++) {
                 $product = BookVariant::find($products[$i]);
-                $type = $types[$i];
                 $quantity = $quantities[$i];
 
                 $order = SalesOrder::where('semester_id', $semester)
                         ->where('salesperson_id', $salesperson)
-                        ->where('payment_type', $payment_type)
                         ->where('product_id', $product->id)
                         ->first();
 
                 $old_quantity = $order->quantity;
-                if ($type !== $order->payment_type) {
-                    $order->no_order = SalesOrder::generateNoOrder($semester, $salesperson, $type);
-                    $order->payment_type = $type;
-                }
+
                 $order->quantity = $quantity;
                 $order->save();
 

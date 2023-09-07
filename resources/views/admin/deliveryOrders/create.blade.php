@@ -65,21 +65,6 @@
                         <span class="help-block">{{ trans('cruds.deliveryOrder.fields.salesperson_helper') }}</span>
                     </div>
                 </div>
-                <div class="col-6">
-                    <div class="form-group">
-                        <label class="required">{{ trans('cruds.deliveryOrder.fields.payment_type') }}</label>
-                        <select class="form-control {{ $errors->has('payment_type') ? 'is-invalid' : '' }}" name="payment_type" id="payment_type" required>
-                            <option value disabled {{ old('payment_type', null) === null ? 'selected' : '' }}>{{ trans('global.pleaseSelect') }}</option>
-                            @foreach(App\Models\DeliveryOrder::PAYMENT_TYPE_SELECT as $key => $label)
-                                <option value="{{ $key }}" {{ old('payment_type', '') === (string) $key ? 'selected' : '' }}>{{ $label }}</option>
-                            @endforeach
-                        </select>
-                        @if($errors->has('payment_type'))
-                            <span class="text-danger">{{ $errors->first('payment_type') }}</span>
-                        @endif
-                        <span class="help-block">{{ trans('cruds.deliveryOrder.fields.payment_type_helper') }}</span>
-                    </div>
-                </div>
             </div>
             <hr style="margin: .5em -15px;border-color:#ccc" />
             <div class="row mb-4">
@@ -123,7 +108,6 @@
                             q: params.term,
                             // semester: $('#semester_id').val(),
                             salesperson: $('#salesperson_id').val(),
-                            type: $('#payment_type').val(),
                             jenjang: $('#jenjang_id').val()
                         };
                     },
@@ -172,8 +156,7 @@
                 data: {
                     id: productId,
                     semester: $('#semester_id').val(),
-                    salesperson: $('#salesperson_id').val(),
-                    type: $('#payment_type').val()
+                    salesperson: $('#salesperson_id').val()
                 },
                 success: function(product) {
                     var formHtml = `

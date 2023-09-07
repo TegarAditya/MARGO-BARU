@@ -174,7 +174,7 @@
                     var formHtml = `
                         <div class="item-product" id="product-${product.id}">
                             <div class="row">
-                                <div class="col-6 align-self-center">
+                                <div class="col-7 align-self-center">
                                     <h6 class="text-sm product-name mb-1">(${product.book_type}) ${product.short_name}</h6>
                                     <p class="mb-0 text-sm">
                                         Code : <strong>${product.code}</strong>
@@ -187,15 +187,6 @@
                                     </p>
                                 </div>
                                 <div class="col offset-1 row align-items-end align-self-center">
-                                    <div class="col" style="min-width: 120px">
-                                        <p class="mb-0 text-sm">Payment Type</p>
-                                        <div class="form-group text-field m-0">
-                                            <select class="form-control payment_types select2" name="payment_types[]" style="width: 100%;" tabIndex="-1" required>
-                                                <option value="cash">Cash</option>
-                                                <option value="retur">Retur</option>
-                                            </select>
-                                        </div>
-                                    </div>
                                     <div class="col" style="max-width: 200px">
                                         <p class="mb-0 text-sm">Estimasi</p>
                                         <div class="form-group text-field m-0">
@@ -219,7 +210,6 @@
                     `;
                     $('#product-form').prepend(formHtml);
                     $('#product-search').val(null).trigger('change');
-                    $('.payment_types').select2();
 
                     var productForm = $('#product-form');
                     var productItem = productForm.find('.item-product');

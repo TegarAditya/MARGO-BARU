@@ -37,9 +37,6 @@ class DeliveryOrderController extends Controller
             if (!empty($request->semester)) {
                 $query->where('semester_id', $request->semester);
             }
-            if (!empty($request->payment_type)) {
-                $query->where('payment_type', $request->payment_type);
-            }
 
             $table = Datatables::of($query);
 
@@ -116,7 +113,6 @@ class DeliveryOrderController extends Controller
             'date' => 'required',
             // 'semester_id' =>'required',
             'salesperson_id' => 'required',
-            'payment_type' => 'required',
             'orders' => 'required|array',
             'orders.*' => 'exists:sales_orders,id',
             'products' => 'required|array',
@@ -128,7 +124,6 @@ class DeliveryOrderController extends Controller
         $date = $validatedData['date'];
         $semester = setting('current_semester');
         $salesperson = $validatedData['salesperson_id'];
-        $payment_type = $validatedData['payment_type'];
         $products = $validatedData['products'];
         $orders = $validatedData['orders'];
         $quantities = $validatedData['quantities'];
@@ -140,7 +135,6 @@ class DeliveryOrderController extends Controller
                 'date' => $date,
                 'semester_id' => $semester,
                 'salesperson_id' => $salesperson,
-                'payment_type' => $payment_type,
             ]);
 
             for ($i = 0; $i < count($products); $i++) {
@@ -198,7 +192,7 @@ class DeliveryOrderController extends Controller
             'products' => 'required|array',
             'products.*' => 'exists:book_variants,id',
             'quantities' => 'required|array',
-            'quantities.*' => 'numeric|min:1',
+            'quantities.*' => 'numeric|min:0',
         ]);
 
         $date = $validatedData['date'];
@@ -260,7 +254,7 @@ class DeliveryOrderController extends Controller
 
         $delivery_items = DeliveryOrderItem::with('product')->where('delivery_order_id', $deliveryOrder->id)->get();
 
-        $delivery_items = $delivery_items->sortBy('product.kelas_id')->sortBy('product.mapel_id')->sortBy('product.kurikulum_id')->sortBy('product.jenjang_id');
+        $delivery_items = $delivery_items->sortBy('product.type')->sortBy('product.kelas_id')->sortBy('product.mapel_id')->sortBy('product.kurikulum_id')->sortBy('product.jenjang_id');
 
         return view('admin.deliveryOrders.prints.surat-jalan', compact('deliveryOrder', 'delivery_items'));
     }
@@ -318,12 +312,10 @@ class DeliveryOrderController extends Controller
         $query = $request->input('q');
         $semester = setting('current_semester');
         $salesperson = $request->input('salesperson');
-        $type = $request->input('type');
         $jenjang = $request->input('jenjang');
 
-        $query = BookVariant::whereHas('estimasi', function ($q) use ($semester, $salesperson, $type) {
+        $query = BookVariant::whereHas('estimasi', function ($q) use ($semester, $salesperson) {
                     $q->where('salesperson_id', $salesperson)
-                    ->where('payment_type', $type)
                     ->where('semester_id', $semester);
                 })->where(function($q) use ($query) {
                     $q->where('code', 'LIKE', "%{$query}%")
@@ -355,14 +347,12 @@ class DeliveryOrderController extends Controller
         $id = $request->input('id');
         $semester = setting('current_semester');
         $salesperson = $request->input('salesperson');
-        $type = $request->input('type');
 
         $product = BookVariant::join('sales_orders', 'sales_orders.product_id', '=', 'book_variants.id')
                 ->where('book_variants.id', $id)
                 ->where('sales_orders.semester_id', $semester)
                 ->where('sales_orders.salesperson_id', $salesperson)
-                ->where('sales_orders.payment_type', $type)
-                ->first(['book_variants.*', 'sales_orders.quantity as estimasi', 'sales_orders.moved as terkirim', 'sales_orders.id as order_id', 'sales_orders.payment_type as payment_type']);
+                ->first(['book_variants.*', 'sales_orders.quantity as estimasi', 'sales_orders.moved as terkirim', 'sales_orders.id as order_id']);
         $product->load('book', 'jenjang', 'cover', 'kurikulum', 'isi');
 
         return response()->json($product);

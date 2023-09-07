@@ -19,16 +19,10 @@ class EstimationItem extends Model
         'deleted_at',
     ];
 
-    public const PAYMENT_TYPE_SELECT = [
-        'cash'  => 'Cash',
-        'retur' => 'Retur',
-    ];
-
     protected $fillable = [
         'estimation_id',
         'semester_id',
         'salesperson_id',
-        'payment_type',
         'product_id',
         'jenjang_id',
         'kurikulum_id',

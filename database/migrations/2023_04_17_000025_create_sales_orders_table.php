@@ -11,7 +11,6 @@ class CreateSalesOrdersTable extends Migration
         Schema::create('sales_orders', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('no_order')->nullable();
-            $table->string('payment_type');
             $table->integer('quantity');
             $table->integer('moved')->default(0);
             $table->integer('retur')->default(0);

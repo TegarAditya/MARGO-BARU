@@ -40,21 +40,6 @@
                         <span class="help-block">{{ trans('cruds.salesOrder.fields.salesperson_helper') }}</span>
                     </div>
                 </div>
-                <div class="col-6">
-                    <div class="form-group">
-                        <label class="required">{{ trans('cruds.salesOrder.fields.payment_type') }}</label>
-                        <select class="form-control {{ $errors->has('payment_type') ? 'is-invalid' : '' }}" name="payment_type" id="payment_type" required>
-                            <option value disabled {{ old('payment_type', null) === null ? 'selected' : '' }}>{{ trans('global.pleaseSelect') }}</option>
-                            @foreach(App\Models\SalesOrder::PAYMENT_TYPE_SELECT as $key => $label)
-                                <option value="{{ $key }}" {{ old('payment_type', '') === (string) $key ? 'selected' : '' }}>{{ $label }}</option>
-                            @endforeach
-                        </select>
-                        @if($errors->has('payment_type'))
-                            <span class="text-danger">{{ $errors->first('payment_type') }}</span>
-                        @endif
-                        <span class="help-block">{{ trans('cruds.salesOrder.fields.payment_type_helper') }}</span>
-                    </div>
-                </div>
             </div>
             <div class="row">
                 <div class="col-6">

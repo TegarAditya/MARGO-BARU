@@ -242,15 +242,6 @@
                                     </p>
                                 </div>
                                 <div class="col offset-1 row align-items-end align-self-center">
-                                    <div class="col" style="min-width: 160px">
-                                        <p class="mb-0 text-sm">Payment Type</p>
-                                        <div class="form-group text-field m-0">
-                                            <select class="form-control payment_types select2" name="payment_types[]" style="width: 100%;" tabIndex="-1" required>
-                                                <option value="cash" ${product.payment_type == 'cash' ? 'selected' : ''}>Cash</option>
-                                                <option value="retur" ${product.payment_type == 'retur' ? 'selected' : ''}>Retur</option>
-                                            </select>
-                                        </div>
-                                    </div>
                                     <div class="col" style="max-width: 160px">
                                         <p class="mb-0 text-sm">Estimasi</p>
                                         <div class="form-group text-field m-0">
@@ -275,7 +266,6 @@
                     `;
                     $('#product-form').prepend(formHtml);
                     $('#product-search').val(null).trigger('change');
-                    $('.payment_types').select2();
 
                     var productForm = $('#product-form');
                     var productItem = productForm.find('.item-product');

@@ -69,11 +69,14 @@
         @foreach ($delivery_items as $item)
             @php
             $product = $item->product;
+            if ($item->quantity <= 0) {
+                continue;
+            }
             $total_item += $item->quantity;
             @endphp
         <tr>
             <td class="px-3">{{ $loop->iteration }}</td>
-            <td>{{ $product->jenjang->name ?? '' }} - {{ $product->kurikulum->code ?? '' }}</td>
+            <td>{{ $product->type != 'L' ? App\Models\BookVariant::TYPE_SELECT[$product->type] : '' }} {{ $product->jenjang->name ?? '' }} - {{ $product->kurikulum->code ?? '' }}</td>
             <td>{{ $product->cover->name ?? '' }}</td>
             <td>{{ $product->mapel->name }}</td>
             <td class="text-center">{{ $product->kelas->code ?? '' }}</td>

@@ -34,9 +34,6 @@ class StoreEstimationRequest extends FormRequest
                 'required',
                 'integer',
             ],
-            'payment_type' => [
-                'required',
-            ],
         ];
     }
 }
