@@ -67,7 +67,7 @@
 @endif
 
 <h5 class="mb-3">Faktur Penjualan</h5>
-@foreach ($invoices as $invoice)
+@foreach ($invoices->sortBy('type') as $invoice)
     @if($invoice->type == 'jual')
         <div class="row">
             <div class="col-6">
@@ -98,7 +98,7 @@
             </thead>
 
             <tbody>
-                @foreach ($invoice->invoice_items as $item)
+                @foreach ($invoice->invoice_items->sortBy('product.type')->sortBy('product.kelas_id')->sortBy('product.mapel_id') as $item)
                     @php
                     $product = $item->product;
                     @endphp
@@ -250,7 +250,7 @@
             </thead>
 
             <tbody>
-                @foreach ($returnGood->retur_items as $item)
+                @foreach ($returnGood->retur_items->sortBy('product.type')->sortBy('product.kelas_id')->sortBy('product.mapel_id') as $item)
                     @php
                         $product = $item->product;
                     @endphp

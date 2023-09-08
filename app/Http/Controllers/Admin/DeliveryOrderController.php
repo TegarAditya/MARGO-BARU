@@ -257,9 +257,11 @@ class DeliveryOrderController extends Controller
 
         $delivery_items = DeliveryOrderItem::with('product')->where('delivery_order_id', $deliveryOrder->id)->get();
 
-        $delivery_items = $delivery_items->sortBy('product.type')->sortBy('product.kelas_id')->sortBy('product.mapel_id')->sortBy('product.kurikulum_id')->sortBy('product.jenjang_id');
+        $lks = $delivery_items->where('product.type', 'L')->sortBy('product.type')->sortBy('product.kelas_id')->sortBy('product.mapel_id')->sortBy('product.kurikulum_id')->sortBy('product.jenjang_id');
 
-        return view('admin.deliveryOrders.prints.surat-jalan', compact('deliveryOrder', 'delivery_items'));
+        $kelengkapan =  $delivery_items->whereNotIn('product.type', ['L']);
+
+        return view('admin.deliveryOrders.prints.surat-jalan', compact('deliveryOrder', 'lks', 'kelengkapan'));
     }
 
     public function destroy(DeliveryOrder $deliveryOrder)

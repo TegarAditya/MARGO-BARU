@@ -60,35 +60,104 @@
         <th width="1%" class="text-center">Kelas</th>
         <th width="1%" class="text-center">Hal</th>
         <th class="px-3" width="1%">Jumlah</th>
+        <th class="px-3" width="1%">PG</th>
     </thead>
 
     <tbody>
         @php
             $total_item = 0;
+            $total_pg = 0;
         @endphp
-        @foreach ($delivery_items as $item)
+        @foreach ($lks as $item)
             @php
             $product = $item->product;
+
             if ($item->quantity <= 0) {
                 continue;
             }
             $total_item += $item->quantity;
+
+            $pg = $kelengkapan->where('product.jenjang_id', $product->jenjang_id)
+                    ->where('product.kurikulum_id', $product->kurikulum_id)
+                    ->where('product.mapel_id', $product->mapel_id)
+                    ->where('product.kelas_id', $product->kelas_id)
+                    ->where('product.semester_id', $product->semester_id)
+                    ->where('product.isi_id', $product->isi_id)
+                    ->where('product.cover_id', $product->cover_id)
+                    ->first();
+
+            if (!$pg) {
+                $pg = $kelengkapan->where('product.jenjang_id', $product->jenjang_id)
+                    ->where('product.kurikulum_id', $product->kurikulum_id)
+                    ->where('product.mapel_id', $product->mapel_id)
+                    ->where('product.kelas_id', $product->kelas_id)
+                    ->where('product.semester_id', $product->semester_id)
+                    ->where('product.isi_id', $product->isi_id)
+                    ->first();
+            }
+
+            if (!$pg) {
+                $pg = $kelengkapan->where('product.jenjang_id', $product->jenjang_id)
+                    ->where('product.kurikulum_id', $product->kurikulum_id)
+                    ->where('product.mapel_id', $product->mapel_id)
+                    ->where('product.kelas_id', $product->kelas_id)
+                    ->where('product.semester_id', $product->semester_id)
+                    ->first();
+            }
             @endphp
         <tr>
             <td class="px-3">{{ $loop->iteration }}</td>
-            <td>{{ $product->type != 'L' ? App\Models\BookVariant::TYPE_SELECT[$product->type] : '' }} {{ $product->jenjang->name ?? '' }} - {{ $product->kurikulum->code ?? '' }}</td>
+            <td>{{ $product->jenjang->name ?? '' }} - {{ $product->kurikulum->code ?? '' }}</td>
             <td>{{ $product->cover->name ?? '' }}</td>
             <td>{{ $product->mapel->name }}</td>
             <td class="text-center">{{ $product->kelas->code ?? '' }}</td>
             <td class="text-center">{{ $product->halaman->code ?? '' }}</td>
             <td class="px-3 text-center">{{ angka($item->quantity) }}</td>
+            <td class="text-center">
+                @if ($pg)
+                    @php
+                        $kelengkapan = $kelengkapan->filter(function ($item) use ($pg) {
+                            return $item->id !== $pg->id;
+                        });
+
+                        $sisa_pg = max(0, $pg->quantity - $pg->moved);
+                        $total_pg += $sisa_pg;
+                    @endphp
+                    {{ angka($sisa_pg)}}
+                @else
+                    -
+                @endif
+            </td>
         </tr>
         @endforeach
+        @if ($kelengkapan->count() > 0)
+            @foreach ($kelengkapan->sortBy('product.kelas_id')->sortBy('product.mapel_id') as $item)
+                @php
+                $product = $item->product;
+
+                if ($item->quantity <= 0) {
+                    continue;
+                }
+                $total_pg += $item->quantity;
+                @endphp
+            <tr>
+                <td class="px-3">{{ $loop->iteration }}</td>
+                <td>{{ $product->jenjang->name ?? '' }} - {{ $product->kurikulum->code ?? '' }}</td>
+                <td>{{ $product->cover->name ?? '' }}</td>
+                <td>{{ $product->mapel->name }}</td>
+                <td class="text-center">{{ $product->kelas->code ?? '' }}</td>
+                <td class="text-center">{{ $product->halaman->code ?? '' }}</td>
+                <td class="px-3 text-center">-</td>
+                <td class="px-3 text-center">{{ angka($item->quantity) }}</td>
+            </tr>
+            @endforeach
+        @endif
     </tbody>
     <tfoot>
         <tr>
             <th colspan="6" class="text-center"><strong>TOTAL</strong></th>
             <th class="text-center"><strong>{{ angka($total_item) }}</strong></th>
+            <th class="text-center"><strong>{{ angka($total_pg) }}</strong></th>
         </tr>
     </tfoot>
 </table>

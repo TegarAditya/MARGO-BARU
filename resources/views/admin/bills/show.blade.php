@@ -86,7 +86,7 @@
                     </div>
                 </div>
 
-                @foreach ($invoices as $invoice)
+                @foreach ($invoices->sortBy('type') as $invoice)
                     @if($invoice->type == 'jual')
                         <div class="card">
                             <div class="card-body px-3 py-2">
@@ -159,7 +159,7 @@
                                     </thead>
 
                                     <tbody>
-                                        @forelse ($invoice->invoice_items as $item)
+                                        @forelse ($invoice->invoice_items->sortBy('product.type')->sortBy('product.kelas_id')->sortBy('product.mapel_id') as $item)
                                             @php
                                                 $product = $item->product;
                                             @endphp
@@ -485,7 +485,7 @@
                                 </thead>
 
                                 <tbody>
-                                    @forelse ($returnGood->retur_items as $item)
+                                    @forelse ($returnGood->retur_items->sortBy('product.type')->sortBy('product.kelas_id')->sortBy('product.mapel_id') as $item)
                                         @php
                                             $product = $item->product;
                                         @endphp
