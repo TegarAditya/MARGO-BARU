@@ -26,6 +26,7 @@ use Carbon\Carbon;
 use Alert;
 use DB;
 use Illuminate\Support\Facades\Date;
+use App\Exports\StockExport;
 
 class StockSaldoController extends Controller
 {
@@ -241,25 +242,25 @@ class StockSaldoController extends Controller
         if (!empty($request->type)) {
             $awal->where('type', $request->type);
         }
-        if (!empty($request->jenjang)) {
-            $awal->where('jenjang_id', $request->jenjang);
+        if (!empty($request->jenjang_id)) {
+            $awal->where('jenjang_id', $request->jenjang_id);
         }
-        if (!empty($request->isi)) {
-            $awal->where('isi_id', $request->isi);
+        if (!empty($request->isi_id)) {
+            $awal->where('isi_id', $request->isi_id);
         }
-        if (!empty($request->cover)) {
-            $awal->where('cover_id', $request->cover);
+        if (!empty($request->cover_id)) {
+            $awal->where('cover_id', $request->cover_id);
         }
-        if (!empty($request->kelas)) {
-            $awal->where('kelas_id', $request->kelas);
+        if (!empty($request->kelas_id)) {
+            $awal->where('kelas_id', $request->kelas_id);
         }
-        if (!empty($request->mapel)) {
-            $awal->where('mapel_id', $request->mapel);
+        if (!empty($request->mapel_id)) {
+            $awal->where('mapel_id', $request->mapel_id);
         }
 
         $saldo_awal = $awal->get();
 
-        $akhir = BookVariant::withSum(['movement as in' => function ($q) use ($start, $end) {
+        $akhir = BookVariant::with('isi', 'cover')->withSum(['movement as in' => function ($q) use ($start, $end) {
             $q->where('movement_type', 'in')->whereBetween('movement_date', [$start, $end])->select(DB::raw('COALESCE(SUM(quantity), 0)'));
         }], 'quantity')->withSum(['movement as adjustment' => function ($q) use ($start, $end) {
             $q->where('movement_type', 'adjustment')->whereBetween('movement_date', [$start, $end])->select(DB::raw('COALESCE(SUM(quantity), 0)'));
@@ -273,23 +274,27 @@ class StockSaldoController extends Controller
         if (!empty($request->type)) {
             $akhir->where('type', $request->type);
         }
-        if (!empty($request->jenjang)) {
-            $akhir->where('jenjang_id', $request->jenjang);
+        if (!empty($request->jenjang_id)) {
+            $akhir->where('jenjang_id', $request->jenjang_id);
         }
-        if (!empty($request->isi)) {
-            $akhir->where('isi_id', $request->isi);
+        if (!empty($request->isi_id)) {
+            $akhir->where('isi_id', $request->isi_id);
         }
-        if (!empty($request->cover)) {
-            $akhir->where('cover_id', $request->cover);
+        if (!empty($request->cover_id)) {
+            $akhir->where('cover_id', $request->cover_id);
         }
-        if (!empty($request->kelas)) {
-            $akhir->where('kelas_id', $request->kelas);
+        if (!empty($request->kelas_id)) {
+            $akhir->where('kelas_id', $request->kelas_id);
         }
-        if (!empty($request->mapel)) {
-            $akhir->where('mapel_id', $request->mapel);
+        if (!empty($request->mapel_id)) {
+            $akhir->where('mapel_id', $request->mapel_id);
         }
         $saldo_akhir = $akhir->orderBy('semester_id', 'DESC')->orderBy('jenjang_id', 'ASC')->orderBy('mapel_id', 'ASC')->orderBy('kelas_id', 'ASC')->orderBy('cover_id', 'ASC')->get();
-
-        return view('admin.stockSaldos.billing', compact('start', 'end', 'saldo_awal', 'saldo_akhir'));
+        
+        if ($request->has('export')) {
+            return (new StockExport($saldo_awal, $saldo_akhir))->download('STOCK SALDO PERIODE ' . $start->format('d-F-Y') .' sd '. $end->format('d-F-Y') .'.xlsx');
+        } else {
+            return view('admin.stockSaldos.billing', compact('start', 'end', 'saldo_awal', 'saldo_akhir'));
+        }
     }
 }

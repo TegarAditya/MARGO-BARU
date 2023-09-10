@@ -122,9 +122,8 @@
             </div>
 
             <div class="form-group mt-3">
-                <button class="btn btn-primary" type="submit">
-                    Generate
-                </button>
+                <button type="submit" class="btn btn-primary mr-2">Generate</button>
+                <button type="submit" value="export" name="export" class="btn btn-warning">Export</button>
             </div>
         </form>
     </div>
@@ -250,9 +249,7 @@
             </div>
 
             <div class="form-group mt-3">
-                <button class="btn btn-success" type="submit">
-                    Filter
-                </button>
+                <button type="submit" class="btn btn-success">Filter</button>
             </div>
         </form>
     </div>
