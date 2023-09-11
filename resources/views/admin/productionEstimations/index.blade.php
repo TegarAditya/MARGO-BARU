@@ -5,6 +5,13 @@
         <h1 class="m-0">Estimasi Produksi</h1>
     </div>
 </div>
+<div style="margin-bottom: 10px;" class="row">
+    <div class="col-lg-12">
+        <a class="btn btn-success" href="{{ route('admin.production-estimations.coverExport') }}">
+            Export By Cover
+        </a>
+    </div>
+</div>
 <div class="card">
     <div class="card-header">
         <strong>REKAP PRODUKSI PERIODE TANGGAL</strong>
@@ -122,9 +129,8 @@
             </div>
 
             <div class="form-group mt-3">
-                <button class="btn btn-primary" type="submit">
-                    Generate
-                </button>
+                <button type="submit" class="btn btn-primary">Generate</button>
+                <button type="submit" value="export" name="export" class="btn btn-warning">Export</button>
             </div>
         </form>
     </div>

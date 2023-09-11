@@ -29,7 +29,25 @@ class RolesController extends Controller
 
         $permissions = Permission::pluck('title', 'id');
 
-        return view('admin.roles.create', compact('permissions'));
+        $groupedPermissions = [];
+
+        foreach ($permissions as $id => $name) {
+            // Split the permission name by the dash separator
+            $parts = explode('_', $name);
+
+            // The first part (index 0) is used as the group name
+            $groupName = $parts[0];
+
+            // If the group doesn't exist, create it
+            if (!isset($groupedPermissions[$groupName])) {
+                $groupedPermissions[$groupName] = [];
+            }
+
+            // Add the permission to the group with its corresponding ID
+            $groupedPermissions[$groupName][$id] = $name;
+        }
+
+        return view('admin.roles.create', compact('permissions', 'groupedPermissions'));
     }
 
     public function store(StoreRoleRequest $request)
@@ -46,9 +64,27 @@ class RolesController extends Controller
 
         $permissions = Permission::pluck('title', 'id');
 
+        $groupedPermissions = [];
+
+        foreach ($permissions as $id => $name) {
+            // Split the permission name by the dash separator
+            $parts = explode('_', $name);
+
+            // The first part (index 0) is used as the group name
+            $groupName = $parts[0];
+
+            // If the group doesn't exist, create it
+            if (!isset($groupedPermissions[$groupName])) {
+                $groupedPermissions[$groupName] = [];
+            }
+
+            // Add the permission to the group with its corresponding ID
+            $groupedPermissions[$groupName][$id] = $name;
+        }
+
         $role->load('permissions');
 
-        return view('admin.roles.edit', compact('permissions', 'role'));
+        return view('admin.roles.edit', compact('permissions', 'role', 'groupedPermissions'));
     }
 
     public function update(UpdateRoleRequest $request, Role $role)

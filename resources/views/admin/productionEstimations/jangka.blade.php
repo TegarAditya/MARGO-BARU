@@ -24,22 +24,22 @@
                 </thead>
                 <tbody>
                 @php
-                    $total_awal = 0;
+                    // $total_awal = 0;
                     $total_in = 0;
                     $total_out = 0;
-                    $total_akhir = 0;
+                    // $total_akhir = 0;
                 @endphp
                 @foreach ($saldo_akhir as $item)
                     @php
-                        $awal = $saldo_awal->where('id', $item->id)->first();
-                        $pertama = $awal->in + $awal->out;
+                        // $awal = $saldo_awal->where('id', $item->id)->first();
+                        // $pertama = $awal->in + $awal->out;
 
-                        $total_awal += $pertama;
+                        // $total_awal += $pertama;
                         $total_in += $item->in;
                         $total_out += $item->out;
 
-                        $terakhir = $pertama + ($item->in + $item->out);
-                        $total_akhir += $terakhir;
+                        // $terakhir = $pertama + ($item->in + $item->out);
+                        // $total_akhir += $terakhir;
                     @endphp
                     <tr>
                         <td></td>

@@ -24,8 +24,12 @@
                     <span class="btn btn-info btn-xs deselect-all" style="border-radius: 0">{{ trans('global.deselect_all') }}</span>
                 </div>
                 <select class="form-control select2 {{ $errors->has('permissions') ? 'is-invalid' : '' }}" name="permissions[]" id="permissions" multiple required>
-                    @foreach($permissions as $id => $permission)
-                        <option value="{{ $id }}" {{ in_array($id, old('permissions', [])) ? 'selected' : '' }}>{{ $permission }}</option>
+                    @foreach ($groupedPermissions as $groupName => $groupPermissions)
+                        <optgroup label="{{ $groupName }}">
+                        @foreach ($groupPermissions as $id => $name)
+                            <option value="{{ $id }}" {{ in_array($id, old('permissions', [])) ? 'selected' : '' }}>{{ $name }}</option>
+                        @endforeach
+                        </optgroup>
                     @endforeach
                 </select>
                 @if($errors->has('permissions'))

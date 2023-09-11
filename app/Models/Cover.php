@@ -37,4 +37,16 @@ class Cover extends Model
     {
         return $this->hasMany(BookVariant::class, 'cover_id');
     }
+
+    public function production_estimations()
+    {
+        return $this->hasManyThrough(
+            ProductionEstimation::class,
+            BookVariant::class,
+            'cover_id',
+            'product_id',
+            'id',
+            'id'
+        );
+    }
 }
