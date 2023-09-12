@@ -1178,6 +1178,10 @@ class PermissionsTableSeeder extends Seeder
                 'id'    => 310,
                 'title' => 'bill_adjustment_access',
             ],
+            [
+                'id'    => 311,
+                'title' => 'direktur',
+            ],
         ];
 
         Permission::insert($permissions);

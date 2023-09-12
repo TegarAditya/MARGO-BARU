@@ -897,7 +897,46 @@
                         </ul>
                     </li>
                 @endcan
-                <li class="nav-item">
+                @can('direktur')
+                    <li class="nav-item has-treeview {{ request()->is("admin/estimasi-saldos*") || request()->is("admin/bills*") || request()->is("admin/sales-orders*") ? "menu-open" : "" }}">
+                        <a class="nav-link nav-dropdown-toggle {{ request()->is("admin/estimasi-saldos*") || request()->is("admin/bills*") || request()->is("admin/sales-orders*") ? "active" : "" }}" href="#">
+                            <i class="fa-fw nav-icon fas fa-file-invoice">
+
+                            </i>
+                            <p>
+                                Laporan Direktur
+                                <i class="right fa fa-fw fa-angle-left nav-icon"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            @can('estimasi_saldo_access')
+                                <li class="nav-item">
+                                    <a href="{{ route("admin.estimasi-saldos.index") }}" class="nav-link {{ request()->is("admin/estimasi-saldos") || request()->is("admin/estimasi-saldos/*") || request()->is("admin/sales-orders*") ? "active" : "" }}">
+                                        <i class="fa-fw nav-icon fas fa-file-invoice-dollar">
+
+                                        </i>
+                                        <p>
+                                            Pengiriman Sales
+                                        </p>
+                                    </a>
+                                </li>
+                            @endcan
+                            @can('bill_access')
+                                <li class="nav-item">
+                                    <a href="{{ route("admin.bills.index") }}" class="nav-link {{ request()->is("admin/bills") || request()->is("admin/bills/*") ? "active" : "" }}">
+                                        <i class="fa-fw nav-icon fas fa-dollar-sign">
+
+                                        </i>
+                                        <p>
+                                            Pembayaran Sales
+                                        </p>
+                                    </a>
+                                </li>
+                            @endcan
+                        </ul>
+                    </li>
+                @endcan
+                {{-- <li class="nav-item">
                     <a href="{{ route("admin.systemCalendar") }}" class="nav-link {{ request()->is("admin/system-calendar") || request()->is("admin/system-calendar/*") ? "active" : "" }}">
                         <i class="fas fa-fw fa-calendar nav-icon">
 
@@ -906,7 +945,7 @@
                             {{ trans('global.systemCalendar') }}
                         </p>
                     </a>
-                </li>
+                </li> --}}
                 @if(file_exists(app_path('Http/Controllers/Auth/ChangePasswordController.php')))
                     @can('profile_password_edit')
                         <li class="nav-item">
