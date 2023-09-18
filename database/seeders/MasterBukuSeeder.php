@@ -34,6 +34,7 @@ class MasterBukuSeeder extends Seeder
         ('MII', 'MI'),
         ('MTS', 'MTS'),
         ('MAA', 'MA'),
+        ('MAK', 'SMA / SMK'),
         ('SMK', 'SMK'),
         ('SMW', 'SMA WAJIB'),
         ('SMM', 'SMA PEMINATAN'),
