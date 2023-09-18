@@ -257,7 +257,7 @@ class BookVariantController extends Controller
     {
         abort_if(Gate::denies('book_variant_delete'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $relationMethods = ['estimasi', 'estimasi_produksi', 'movement'];
+        $relationMethods = ['estimasi', 'estimasi_produksi'];
 
         foreach ($relationMethods as $relationMethod) {
             if ($bookVariant->$relationMethod()->count() > 0) {
