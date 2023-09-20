@@ -21,6 +21,7 @@ use Yajra\DataTables\Facades\DataTables;
 use Carbon\Carbon;
 use DB;
 use Alert;
+use Excel;
 use App\Services\EstimationService;
 use App\Imports\EstimationImport;
 
@@ -349,7 +350,7 @@ class EstimationController extends Controller
         ]);
 
         try {
-            Excel::import(new EstimationImport($estimasi), $file);
+            Excel::import(new EstimationImport($estimasi->id), $file);
         } catch (\Exception $e) {
             Alert::error('Error', $e->getMessage());
             return redirect()->back();
