@@ -174,7 +174,7 @@ class BookController extends Controller
                             'type' => $key,
                         ],
                         [
-                            'name' => BookVariant::generateName($key, $jenjang_id, $kurikulum_id, $mapel_id, $kelas_id, $semester_id, $cover_id, $isi_id),
+                            'name' => BookVariant::generateName($key, $jenjang_id, $kurikulum_id, $mapel_id, $kelas_id, $semester_id, $isi_id, $cover_id),
                             'jenjang_id' => $jenjang_id,
                             'kurikulum_id' => $kurikulum_id,
                             'isi_id' => ($key == 'C')  ? $isi_id : null,
@@ -224,7 +224,7 @@ class BookController extends Controller
                             'type' => $key,
                         ],
                         [
-                            'name' => BookVariant::generateName($key, $jenjang_id, $kurikulum_id, $mapel_id, $kelas_id, $semester_id, $cover_id, $isi_id),
+                            'name' => BookVariant::generateName($key, $jenjang_id, $kurikulum_id, $mapel_id, $kelas_id, $semester_id, $isi_id, $cover_id),
                             'jenjang_id' => $jenjang_id,
                             'kurikulum_id' => $kurikulum_id,
                             'isi_id' => ($key == 'V')  ? $isi_id : null,
@@ -251,7 +251,7 @@ class BookController extends Controller
                         'type' => 'K',
                     ],
                     [
-                        'name' => BookVariant::generateName('K', $jenjang_id, $kurikulum_id, $mapel_id, $kelas_id, $semester_id, $cover_id, $isi_id),
+                        'name' => BookVariant::generateName('K', $jenjang_id, $kurikulum_id, $mapel_id, $kelas_id, $semester_id, $isi_id, $cover_id),
                         'jenjang_id' => $jenjang_id,
                         'semester_id' => $semester_id,
                         'kurikulum_id' => $kurikulum_id,
@@ -274,7 +274,7 @@ class BookController extends Controller
                             'type' => $key,
                         ],
                         [
-                            'name' => BookVariant::generateName($key, $jenjang_id, $kurikulum_id, $mapel_id, $kelas_id, $semester_id, $cover_id, $isi_id),
+                            'name' => BookVariant::generateName($key, $jenjang_id, $kurikulum_id, $mapel_id, $kelas_id, $semester_id, $isi_id, $cover_id),
                             'jenjang_id' => $jenjang_id,
                             'kurikulum_id' => $kurikulum_id,
                             'isi_id' => ($key == 'U')  ? $isi_id : null,
