@@ -58,7 +58,7 @@ class EstimationImport implements ToCollection, WithHeadingRow
                     'jenjang_id' => $product->jenjang_id,
                     'kurikulum_id' => $product->kurikulum_id
                 ], [
-                    'no_order' => SalesOrder::generateNoOrder($semester, $salesperson, $payment),
+                    'no_order' => SalesOrder::generateNoOrder($semester, $salesperson),
                     'quantity' => DB::raw("quantity + $quantity"),
                 ]);
 
