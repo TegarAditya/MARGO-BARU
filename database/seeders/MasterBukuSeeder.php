@@ -34,7 +34,8 @@ class MasterBukuSeeder extends Seeder
         ('MII', 'MI'),
         ('MTS', 'MTS'),
         ('MAA', 'MA'),
-        ('MAK', 'SMA / SMK'),
+        ('SKA', 'SMA / SMK'),
+        ('AMS', 'SMA / MA'),
         ('SMK', 'SMK'),
         ('SMW', 'SMA WAJIB'),
         ('SMM', 'SMA PEMINATAN'),
@@ -131,6 +132,8 @@ class MasterBukuSeeder extends Seeder
         ('PKK', 'PKK'),
         ('BKO', 'BIMBINGAN KONSELING'),
         ('PKW', 'PKWU'),
+        ('MTP', 'MATEMATIKA PEMINATAN'),
+        ('PIS', 'PROJEK IPAS'),
         ('SBD', 'SENI BUDAYA');";
 
         DB::unprepared($mapel);

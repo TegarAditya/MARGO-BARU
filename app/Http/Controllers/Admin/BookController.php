@@ -109,7 +109,7 @@ class BookController extends Controller
         return view('admin.books.create', compact('isis', 'covers', 'jenjangs', 'kelas', 'kurikulums', 'mapels', 'semesters', 'halamen'));
     }
 
-    public function store(StoreBookRequest $request)
+    public function store(Request $request)
     {
         $kelas = $request->kelas;
         $jenjang_id = $request->jenjang_id;
@@ -336,7 +336,7 @@ class BookController extends Controller
         return view('admin.books.edit', compact('book', 'covers', 'jenjangs', 'kelas', 'kurikulums', 'mapels', 'semesters'));
     }
 
-    public function update(UpdateBookRequest $request, Book $book)
+    public function update(Request $request, Book $book)
     {
         $book->update($request->all());
 
