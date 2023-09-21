@@ -276,7 +276,7 @@
                             <hr style="margin: 1em -15px;border-color:#ccc" />
                         </div>
                     `;
-                    $('#product-form').prepend(formHtml);
+                    $('#product-form').append(formHtml);
                     $('#product-search').val(null).trigger('change');
 
                     var productForm = $('#product-form');
