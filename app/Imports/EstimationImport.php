@@ -35,6 +35,10 @@ class EstimationImport implements ToCollection, WithHeadingRow
         try {
             foreach ($rows as $row) {
                 $product = BookVariant::where('code', $row['buku'])->first();
+                if (!$product) {
+                    continue;
+                }
+
                 $quantity = $row['estimasi'];
 
                 $estimasi_id = $this->estimasi->id;
@@ -76,7 +80,7 @@ class EstimationImport implements ToCollection, WithHeadingRow
             DB::commit();
         } catch (\Exception $e) {
             DB::rollback();
-            dd($e->getMessage());
+            dd($e);
             Alert::error('Error', $e->getMessage());
 
             return redirect()->back();
