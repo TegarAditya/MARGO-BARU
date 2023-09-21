@@ -220,7 +220,7 @@
                 var max = parseInt(el.data('max'));
                 console.log(max);
                 var valueNum = parseInt(el.val());
-                if (valueNum < 1 ) {
+                if (valueNum < 0 ) {
                     el.val(0);
                     diskonText.val(0);
                 }else if (valueNum > max) {

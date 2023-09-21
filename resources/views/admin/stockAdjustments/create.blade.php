@@ -208,9 +208,9 @@
                         quantity.on('change', function(e) {
                             var el = $(e.currentTarget);
                             var valueNum = parseInt(el.val());
-                            if (valueNum < 1) {
-                                el.val(1);
-                                quantityText.val(1).trigger('change');
+                            if (valueNum < 0) {
+                                el.val(0);
+                                quantityText.val(0).trigger('change');
                             }
                         }).trigger('change');
                     });

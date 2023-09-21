@@ -330,9 +330,9 @@
             plateQuantity.on('change', function(e) {
                 var el = $(e.currentTarget);
                 var valueNum = parseInt(el.val());
-                if (valueNum < 1) {
-                    el.val(1);
-                    plateQuantityText.val(1).trigger('change');
+                if (valueNum < 0) {
+                    el.val(0);
+                    plateQuantityText.val(0).trigger('change');
                 }
             }).trigger('change');
         });

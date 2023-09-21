@@ -5,7 +5,7 @@
 @endsection
 
 @section('header.left')
-<table cellspacing="0" cellpadding="0" class="text-sm" style="width: 10cm">
+<table cellspacing="0" cellpadding="0" class="text-sm" style="width: 5cm">
     <tbody>
 
         <tr>
