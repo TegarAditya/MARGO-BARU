@@ -97,9 +97,9 @@
                     <th>
                         {{ trans('cruds.cetak.fields.type') }}
                     </th>
-                    <th>
+                    {{-- <th>
                         Ongkos Cetak
-                    </th>
+                    </th> --}}
                     <th>
                         &nbsp;
                     </th>
@@ -137,7 +137,7 @@ $(function () {
         { data: 'semester_name', name: 'semester.name', class: 'text-center' },
         { data: 'vendor_name', name: 'vendor.name', class: 'text-center' },
         { data: 'type', name: 'type', class: 'text-center' },
-        { data: 'total_cost', name: 'total_cost', class: 'text-right' },
+        // { data: 'total_cost', name: 'total_cost', class: 'text-right' },
         // { data: 'total_oplah', name: 'total_oplah' },
         // { data: 'note', name: 'note' },
         { data: 'actions', name: '{{ trans('global.actions') }}', class: 'text-center' }

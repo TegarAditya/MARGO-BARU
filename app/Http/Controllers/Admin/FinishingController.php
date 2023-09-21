@@ -99,7 +99,7 @@ class FinishingController extends Controller
     {
         abort_if(Gate::denies('finishing_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $vendors = Vendor::where('type', 'finishing')->get()->pluck('full_name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $vendors = Vendor::where('type', 'finishing')->orderBy('code', 'ASC')->get()->pluck('full_name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
         $jenjangs = Jenjang::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
@@ -195,7 +195,7 @@ class FinishingController extends Controller
     {
         abort_if(Gate::denies('finishing_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $vendors = Vendor::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $vendors = Vendor::where('type', 'finishing')->orderBy('code', 'ASC')->get()->pluck('full_name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
         $jenjangs = Jenjang::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
