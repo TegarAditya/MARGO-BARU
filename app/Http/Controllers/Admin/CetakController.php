@@ -55,6 +55,16 @@ class CetakController extends Controller
             $table->addColumn('actions', '&nbsp;');
 
             $table->editColumn('actions', function ($row) {
+                $cetakItemStatus = $row->cetak_items->where('done', '=', 1)->count();
+
+                if ($cetakItemStatus == 0) {
+                    $realisasi = 'danger';
+                } elseif ($cetakItemStatus == $row->cetak_items->count()) {
+                    $realisasi = 'success';
+                } else {
+                    $realisasi = 'warning';
+                }
+
                 $btn = '
                     <a class="px-1" href="'.route('admin.cetaks.show', $row->id).'" title="Show">
                         <i class="fas fa-eye text-success fa-lg"></i>
@@ -65,8 +75,8 @@ class CetakController extends Controller
                     <a class="px-1" href="'.route('admin.cetaks.edit', $row->id).'" title="Edit">
                         <i class="fas fa-edit fa-lg"></i>
                     </a>
-                    <a class="px-1" href="'.route('admin.cetaks.realisasi', $row->id).'" title="Realisasi">
-                        <i class="fas fa-tasks text-danger fa-lg"></i>
+                    <a class="px-1" href="'.route('admin.cetaks.realisasi', $row->id).'" title="Realisasi '.Cetak::TIPE_REALISASI[$realisasi].'">
+                        <i class="fas fa-tasks text-'.$realisasi.' fa-lg"></i>
                     </a>
                 ';
                 // if($row->cetak_items->where('done', 0)->count()) {
@@ -382,7 +392,7 @@ class CetakController extends Controller
             }
 
             TransactionService::editProductionTransaction($date, 'Ongkos Cetak Produsi SPC '. $cetak->no_spc, $vendor, $semester, 'cetak', $cetak->id, $cetak->no_spc, $total_cost, 'credit');
-            
+
             $cetak->update([
                 'date' => $date,
                 'vendor_id' => $vendor,

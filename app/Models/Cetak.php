@@ -24,6 +24,12 @@ class Cetak extends Model
         'cover' => 'Cover',
     ];
 
+    public const TIPE_REALISASI = [
+        'danger'  => 'Belum Sama Sekali',
+        'warning' => 'Sudah Sebagian',
+        'success' => 'Sudah Semua',
+    ];
+
     protected $dates = [
         'date',
         'created_at',

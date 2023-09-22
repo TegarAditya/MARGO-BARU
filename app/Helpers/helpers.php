@@ -10,6 +10,8 @@ use App\Models\Setting;
 use App\Models\Semester;
 use App\Models\DeliveryOrder;
 use App\Models\SalesOrder;
+use App\Models\Cetak;
+use App\Models\CetakItem;
 
 
 if (! function_exists('formatCurrency')) {
@@ -154,6 +156,22 @@ if (! function_exists('noRevisi')) {
             $angka = substr($no, -2);
             $angka = intval($angka) + 1;
             return $prefix.sprintf("%02d", $angka);
+        }
+    }
+}
+
+if (! function_exists('cetakDone')) {
+    function cetakDone($cetak_id)
+    {
+        $cetak_items = CetakItem::where('cetak_id', $cetak_id)->get();
+        $cetakItemStatus = $cetak_items->where('done', '=', 1)->count();
+
+        if ($cetakItemStatus == 0) {
+            return 'danger';
+        } elseif ($cetakItemStatus == $cetak_items->count()) {
+            return 'success';
+        } else {
+            return 'warning';
         }
     }
 }
