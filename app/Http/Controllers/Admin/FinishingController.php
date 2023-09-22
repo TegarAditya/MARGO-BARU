@@ -30,7 +30,7 @@ class FinishingController extends Controller
         abort_if(Gate::denies('finishing_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         if ($request->ajax()) {
-            $query = Finishing::with(['semester', 'vendor'])->select(sprintf('%s.*', (new Finishing)->table))->latest();
+            $query = Finishing::with(['semester', 'vendor', 'finishing_items'])->select(sprintf('%s.*', (new Finishing)->table))->latest();
             if (!empty($request->vendor)) {
                 $query->where('vendor_id', $request->vendor);
             }
@@ -43,6 +43,16 @@ class FinishingController extends Controller
             $table->addColumn('actions', '&nbsp;');
 
             $table->editColumn('actions', function ($row) {
+                $finishingStatus = $row->finishing_items->where('done', '=', 1)->count();
+
+                if ($finishingStatus == 0) {
+                    $realisasi = 'danger';
+                } elseif ($finishingStatus == $row->finishing_items->count()) {
+                    $realisasi = 'success';
+                } else {
+                    $realisasi = 'warning';
+                }
+
                 $btn = '
                     <a class="px-1" href="'.route('admin.finishings.show', $row->id).'" title="Show">
                         <i class="fas fa-eye text-success fa-lg"></i>
@@ -53,8 +63,8 @@ class FinishingController extends Controller
                     <a class="px-1" href="'.route('admin.finishings.edit', $row->id).'" title="Edit">
                         <i class="fas fa-edit fa-lg"></i>
                     </a>
-                    <a class="px-1" href="'.route('admin.finishings.realisasi', $row->id).'" title="Realisasi">
-                        <i class="fas fa-tasks text-danger fa-lg"></i>
+                    <a class="px-1" href="'.route('admin.finishings.realisasi', $row->id).'" title="Realisasi '.Finishing::TIPE_REALISASI[$realisasi].'">
+                        <i class="fas fa-tasks text-'.$realisasi.' fa-lg"></i>
                     </a>
                 ';
 

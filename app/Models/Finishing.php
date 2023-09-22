@@ -17,6 +17,12 @@ class Finishing extends Model
 
     public const BULAN_ROMAWI = array(1=>"I","II","III", "IV", "V","VI","VII","VIII","IX","X", "XI","XII");
 
+    public const TIPE_REALISASI = [
+        'danger'  => 'Belum Sama Sekali',
+        'warning' => 'Sudah Sebagian',
+        'success' => 'Sudah Semua',
+    ];
+
     public $table = 'finishings';
 
     protected $dates = [

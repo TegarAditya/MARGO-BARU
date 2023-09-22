@@ -82,9 +82,9 @@
                     <th>
                         {{ trans('cruds.finishing.fields.vendor') }}
                     </th>
-                    <th>
+                    {{-- <th>
                         Ongkos
-                    </th>
+                    </th> --}}
                     <th>
                         &nbsp;
                     </th>
@@ -119,7 +119,7 @@ $(function () {
         { data: 'date', name: 'date', class: 'text-center' },
         { data: 'semester_name', name: 'semester.name', class: 'text-center' },
         { data: 'vendor_name', name: 'vendor.name', class: 'text-center' },
-        { data: 'total_cost', name: 'total_cost', class: 'text-right' },
+        // { data: 'total_cost', name: 'total_cost', class: 'text-right' },
         { data: 'actions', name: '{{ trans('global.actions') }}', class: 'text-center' }
     ],
     orderCellsTop: true,
