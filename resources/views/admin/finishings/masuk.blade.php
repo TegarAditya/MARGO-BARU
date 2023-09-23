@@ -170,7 +170,7 @@
                                         <div class="form-group text-field m-0">
                                             <div class="text-field-input px-2 py-1">
                                                 <input class="done" type="hidden" name="done[]" value="${ item.done }">
-                                                <input class="status bootstrap-switch" type="checkbox" ${ item.done ? 'checked readonly' : ''  } tabindex="-1" value="1" data-on-text="DONE" data-off-text="N/Y">
+                                                <input class="status bootstrap-switch" type="checkbox" ${ item.done == 1 ? 'checked' : ''  } tabindex="-1" value="1" data-on-text="DONE" data-off-text="N/Y">
                                             </div>
                                         </div>
                                     </div>
