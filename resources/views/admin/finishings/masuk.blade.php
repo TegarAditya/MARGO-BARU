@@ -190,6 +190,8 @@
                     var productForm = $('#product-form');
                     var productItem = productForm.find('.item-product');
 
+                    $(".status").bootstrapSwitch();
+
                     productItem.each(function(index, item) {
                         var product = $(item);
                         var quantity = product.find('.quantity');
@@ -197,8 +199,6 @@
                         var max = quantity.data('max');
                         var status = product.find('.status');
                         var done = product.find('.done');
-
-                        status.bootstrapSwitch('state', 0);
 
                         quantityText.on('input change', function(e) {
                             var value = numeral(e.target.value);
