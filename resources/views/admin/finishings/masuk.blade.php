@@ -149,6 +149,9 @@
                                     <p class="mb-0 text-sm">
                                         <strong>Realisasi Sekarang : ${item.quantity}</strong>
                                     </p>
+                                    <p class="mb-0 text-sm">
+                                        <strong>Sisa : ${item.estimasi - item.quantity}</strong>
+                                    </p>
                                 </div>
                                 <div class="col row align-items-end align-self-center">
                                     <input type="hidden" name="products[]" value="${item.product_id}">
@@ -195,7 +198,7 @@
                         var status = product.find('.status');
                         var done = product.find('.done');
 
-                        status.bootstrapSwitch('state', $(this).prop('checked'));
+                        status.bootstrapSwitch();
 
                         quantityText.on('input change', function(e) {
                             var value = numeral(e.target.value);
