@@ -44,21 +44,6 @@
                         <span class="help-block">{{ trans('cruds.stockAdjustment.fields.operation_helper') }}</span>
                     </div>
                 </div>
-                <div class="col-6">
-                    <div class="form-group">
-                        <label>{{ trans('cruds.stockAdjustment.fields.type') }}</label>
-                        <select class="form-control {{ $errors->has('type') ? 'is-invalid' : '' }}" name="type" id="type">
-                            <option value disabled {{ old('type', null) === null ? 'selected' : '' }}>{{ trans('global.pleaseSelect') }}</option>
-                            @foreach(App\Models\StockAdjustment::TYPE_SELECT as $key => $label)
-                                <option value="{{ $key }}" {{ old('type', $stockAdjustment->type) === (string) $key ? 'selected' : '' }}>{{ $label }}</option>
-                            @endforeach
-                        </select>
-                        @if($errors->has('type'))
-                            <span class="text-danger">{{ $errors->first('type') }}</span>
-                        @endif
-                        <span class="help-block">{{ trans('cruds.stockAdjustment.fields.type_helper') }}</span>
-                    </div>
-                </div>
                 <div class="col-12">
                     <div class="form-group">
                         <label class="required" for="reason">{{ trans('cruds.stockAdjustment.fields.reason') }}</label>

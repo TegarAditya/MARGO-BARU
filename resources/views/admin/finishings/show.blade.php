@@ -88,6 +88,7 @@
                                     <th class="text-center px-2" width="1%">SPK</th>
                                     <th class="text-center px-2" width="10%">Ongkos</th>
                                     <th class="text-center px-2" width="1%">Realisasi</th>
+                                    <th class="text-center px-2" width="1%">Status</th>
                                 </tr>
                             </thead>
 
@@ -100,8 +101,7 @@
                                     @php
                                     $product = $item->product;
                                     $totalestimasi += $item->estimasi;
-                                    if ($item->done) $totalrealisasi += $item->quantity;
-
+                                    $totalrealisasi += $item->quantity;
                                     @endphp
                                     <tr>
                                         <td class="text-right px-3">{{ $loop->iteration }}.</td>
@@ -109,8 +109,9 @@
                                         <td class="text-center px-2">{{ $product->halaman->code }}</td>
                                         <td class="text-center px-2">{{ angka($item->estimasi) }}</td>
                                         <td class="text-center px-2">{{ money($item->cost) }}</td>
+                                        <td class="text-center px-2">{{ angka($item->quantity) }}</td>
                                         <td class="text-center px-2">
-                                            {{ $item->done ? angka($item->quantity) : 'Not Yet' }}
+                                            {{ $item->done ? 'Done'  : 'Not Yet' }}
                                         </td>
                                     </tr>
                                 @endforeach
@@ -121,6 +122,7 @@
                                     <td class="text-center px-2"><strong>{{ angka($totalestimasi) }}</strong></td>
                                     <td class="text-center px-2"><strong>{{ money($finishing->total_cost) }}</strong></td>
                                     <td class="text-center px-2"><strong>{{ angka($totalrealisasi) }}</strong></td>
+                                    <td></td>
                                 </tr>
                             </tfoot>
                         </table>

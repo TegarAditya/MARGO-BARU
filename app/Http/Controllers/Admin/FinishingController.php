@@ -170,7 +170,7 @@ class FinishingController extends Controller
                     'semester_id' => $semester,
                     'product_id' => $product->id,
                     'estimasi' => $quantity,
-                    'quantity'=> $quantity,
+                    'quantity'=> 0,
                     'cost' => $cost,
                     'done' => 0,
                 ]);
@@ -256,7 +256,7 @@ class FinishingController extends Controller
                     $old_quantity = $detail->estimasi;
                     $detail->update([
                         'estimasi' => $quantity,
-                        'quantity' => $quantity,
+                        'quantity' => 0,
                         'cost' => $cost,
                     ]);
 
@@ -273,7 +273,7 @@ class FinishingController extends Controller
                         'semester_id' => $finishing->semester_id,
                         'product_id' => $product->id,
                         'estimasi' => $quantity,
-                        'quantity'=> $quantity,
+                        'quantity'=> 0,
                         'cost' => $cost,
                         'done' => 0,
                     ]);
@@ -367,7 +367,7 @@ class FinishingController extends Controller
             'finishing_items' => 'required|array',
             'finishing_items.*' => 'exists:finishing_items,id',
             'quantities' => 'required|array',
-            'quantities.*' => 'numeric|min:1',
+            'quantities.*' => 'numeric|min:0',
             'done' => 'required|array',
         ]);
 
@@ -387,6 +387,7 @@ class FinishingController extends Controller
                     continue;
                 }
 
+                $quantity_old = $finishing_item->quantity;
                 $product = $products[$i];
                 $quantity = $quantities[$i];
 
@@ -395,10 +396,10 @@ class FinishingController extends Controller
                     'done' => $status
                 ]);
 
-                EstimationService::createMovement('out', 'finishing', $finishing->id, $product, $quantity, 'realisasi');
+                EstimationService::createMovement('out', 'finishing', $finishing->id, $product, $quantity - $quantity_old, 'realisasi');
                 EstimationService::createUpdateRealisasi($product, $quantity);
 
-                StockService::createMovement('in', 'produksi', $finishing->id, $date, $product, $quantity);
+                StockService::createMovement('in', 'produksi', $finishing->id, $date, $product, $quantity - $quantity_old);
                 StockService::updateStock($product, $quantity);
             }
 
@@ -438,11 +439,13 @@ class FinishingController extends Controller
             'finishing_items.*' => 'exists:finishing_items,id',
             'quantities' => 'required|array',
             'quantities.*' => 'numeric|min:1',
+            'done' => 'required|array'
         ]);
 
         $products = $validatedData['products'];
         $finishing_items = $validatedData['finishing_items'];
         $quantities = $validatedData['quantities'];
+        $status = $validatedData['done'];
         $date = Carbon::now()->format('d-m-Y');
         $finishing = collect();
 
@@ -455,10 +458,11 @@ class FinishingController extends Controller
 
                 $product = $products[$i];
                 $quantity = $quantities[$i];
+                $done = $status[$i];
 
                 $finishing_item->update([
-                    'quantity' => $quantity,
-                    'done' => 1
+                    'quantity' => DB::raw("quantity + $quantity"),
+                    'done' => $done
                 ]);
 
                 EstimationService::createMovement('out', 'finishing', $finishing_item->finishing->id, $product, $quantity, 'realisasi');

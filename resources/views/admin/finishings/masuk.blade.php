@@ -146,17 +146,28 @@
                                     <p class="mb-0 text-sm">
                                         <strong>SPK Finishing : ${item.estimasi}</strong>
                                     </p>
+                                    <p class="mb-0 text-sm">
+                                        <strong>Realisasi Sekarang : ${item.quantity}</strong>
+                                    </p>
                                 </div>
-                                <div class="col offset-1 row align-items-end align-self-center">
+                                <div class="col row align-items-end align-self-center">
                                     <input type="hidden" name="products[]" value="${item.product_id}">
                                     <input type="hidden" name="finishing_items[]" value="${ item.id }">
                                     <div class="col" style="max-width: 160px">
                                         <p class="mb-0 text-sm">Realisasi</p>
                                         <div class="form-group text-field m-0">
                                             <div class="text-field-input px-2 py-0">
-                                                <input class="quantity" type="hidden" name="quantities[]" value="${ item.quantity }">
-                                                <input class="form-control text-center quantity_text" type="text" name="quantity_text[]" value="${ item.quantity }" required>
+                                                <input class="quantity" type="hidden" name="quantities[]" value="1">
+                                                <input class="form-control text-center quantity_text" type="text" name="quantity_text[]" value="1" required>
                                                 <label class="text-field-border"></label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col" style="max-width: 200px">
+                                        <div class="form-group text-field m-0">
+                                            <div class="text-field-input px-2 py-1">
+                                                <input class="done" type="hidden" name="done[]" value="${ item.done }">
+                                                <input class="status bootstrap-switch" type="checkbox" ${ item.done ? 'checked readonly' : ''  } tabindex="-1" value="1" data-on-text="DONE" data-off-text="N/Y">
                                             </div>
                                         </div>
                                     </div>
@@ -181,6 +192,10 @@
                         var quantity = product.find('.quantity');
                         var quantityText = product.find('.quantity_text');
                         var max = quantity.data('max');
+                        var status = product.find('.status');
+                        var done = product.find('.done');
+
+                        status.bootstrapSwitch('state', $(this).prop('checked'));
 
                         quantityText.on('input change', function(e) {
                             var value = numeral(e.target.value);
@@ -202,6 +217,14 @@
                                 quantityText.val(max).trigger('change');
                             }
                         }).trigger('change');
+
+                        status.on('switchChange.bootstrapSwitch', function (event, state) {
+                            if (state) {
+                                done.val(1);
+                            } else {
+                                done.val(0);
+                            }
+                        });
                     });
                 },
                 error: function(xhr, status, error) {
