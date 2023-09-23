@@ -198,7 +198,7 @@
                         var status = product.find('.status');
                         var done = product.find('.done');
 
-                        status.bootstrapSwitch();
+                        status.bootstrapSwitch('state', 0);
 
                         quantityText.on('input change', function(e) {
                             var value = numeral(e.target.value);
