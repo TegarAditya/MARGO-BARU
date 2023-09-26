@@ -204,6 +204,8 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     // Estimation
     Route::delete('estimations/destroy', 'EstimationController@massDestroy')->name('estimations.massDestroy');
     Route::post('estimations/import', 'EstimationController@import')->name('estimations.import');
+    Route::get('estimations/{estimation}/adjust', 'EstimationController@adjust')->name('estimations.adjust');
+    Route::post('estimations/adjust', 'EstimationController@adjustSave')->name('estimations.adjustSave');
     Route::resource('estimations', 'EstimationController');
 
     // Delivery Order
@@ -212,6 +214,8 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     Route::get('delivery-orders/get-delivery-order', 'DeliveryOrderController@getDeliveryOrder')->name('delivery-orders.getDeliveryOrder');
     Route::get('delivery-orders/get-estimasi', 'DeliveryOrderController@getEstimasi')->name('delivery-orders.getEstimasi');
     Route::get('delivery-orders/get-info-estimasi', 'DeliveryOrderController@getInfoEstimasi')->name('delivery-orders.getInfoEstimasi');
+    Route::get('delivery-orders/{delivery_order}/adjust', 'DeliveryOrderController@adjust')->name('delivery-orders.adjust');
+    Route::post('delivery-orders/adjust', 'DeliveryOrderController@adjustSave')->name('delivery-orders.adjustSave');
     Route::resource('delivery-orders', 'DeliveryOrderController');
 
     // Delivery Order Item

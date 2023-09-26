@@ -14,8 +14,7 @@
             </p>
         @endif
 
-        <form method="POST" action="{{ route("admin.delivery-orders.update", [$deliveryOrder->id]) }}" enctype="multipart/form-data">
-            @method('PUT')
+        <form method="POST" action="{{ route("admin.delivery-orders.adjustSave") }}" enctype="multipart/form-data">
             @csrf
             <input type="hidden" name="delivery_id" id="delivery_id" value="{{$deliveryOrder->id}}">
             <div class="row">
@@ -53,6 +52,20 @@
                         <span class="help-block">{{ trans('cruds.deliveryOrder.fields.salesperson_helper') }}</span>
                     </div>
                 </div>
+                <div class="col-6">
+                    <div class="form-group">
+                        <label for="jenjang_id">{{ trans('cruds.salesOrder.fields.jenjang') }}</label>
+                        <select class="form-control select2 {{ $errors->has('jenjang') ? 'is-invalid' : '' }}" name="jenjang_id" id="jenjang_id">
+                            @foreach($jenjangs as $id => $entry)
+                                <option value="{{ $id }}" {{ old('jenjang_id') == $id ? 'selected' : '' }}>{{ $entry }}</option>
+                            @endforeach
+                        </select>
+                        @if($errors->has('jenjang'))
+                            <span class="text-danger">{{ $errors->first('jenjang') }}</span>
+                        @endif
+                        <span class="help-block">{{ trans('cruds.salesOrder.fields.jenjang_helper') }}</span>
+                    </div>
+                </div>
             </div>
             <div class="row">
                 <div class="col-2">
@@ -60,13 +73,6 @@
                         <button class="btn btn-success btn-block" data-toggle="modal" data-target="#listModal" type="button">
                             List
                         </button>
-                    </div>
-                </div>
-                <div class="col-2">
-                    <div class="form-group">
-                        <a href="{{ route('admin.delivery-orders.adjust', $deliveryOrder->id) }}" class="btn btn-primary btn-block">
-                            Tambah Item
-                        </a>
                     </div>
                 </div>
             </div>
@@ -158,13 +164,14 @@
             templateResult: formatProduct,
             templateSelection: formatProductSelection,
             ajax: {
-                    url: "{{ route('admin.book-variants.getDelivery') }}",
+                    url: "{{ route('admin.delivery-orders.getEstimasi') }}",
                     dataType: 'json',
                     delay: 250,
                     data: function(params) {
                         return {
                             q: params.term,
-                            delivery: $('#delivery_id').val(),
+                            salesperson: $('#salesperson_id').val(),
+                            jenjang: $('#jenjang_id').val(),
                         };
                     },
                     processResults: function(data) {
@@ -206,12 +213,12 @@
             }
 
             $.ajax({
-                url: "{{ route('admin.book-variants.getInfoDelivery') }}",
+                url: "{{ route('admin.delivery-orders.getInfoEstimasi') }}",
                 type: 'GET',
                 dataType: 'json',
                 data: {
                     id: productId,
-                    delivery: $('#delivery_id').val(),
+                    salesperson: $('#salesperson_id').val()
                 },
                 success: function(product) {
                     function sortItems() {
@@ -240,7 +247,10 @@
                                         <strong>ESTIMASI : ${product.estimasi}</strong>
                                     </p>
                                     <p class="mb-0 text-sm">
-                                        <strong>TERKIRIM : ${product.terkirim - product.quantity}</strong>
+                                        <strong>TERKIRIM : ${product.terkirim}</strong>
+                                    </p>
+                                    <p class="mb-0 text-sm">
+                                        <strong>STOCK : ${product.stock}</strong>
                                     </p>
                                 </div>
                                 <div class="col offset-1 row align-items-end align-self-center">
@@ -249,9 +259,9 @@
                                         <div class="form-group text-field m-0">
                                             <div class="text-field-input px-2 py-0">
                                                 <input type="hidden" name="products[]" value="${product.id}">
-                                                <input type="hidden" name="delivery_items[]" value="${product.delivery_item_id}">
-                                                <input class="quantity" type="hidden" name="quantities[]" data-max="${product.estimasi - product.terkirim}" value="${product.quantity}">
-                                                <input class="form-control text-center quantity_text" type="text" name="quantity_text[]" value="${product.quantity}" required>
+                                                <input type="hidden" name="orders[]" value="${product.order_id}">
+                                                <input class="quantity" type="hidden" name="quantities[]" data-max="${Math.min(product.estimasi - product.terkirim, product.stock)}" value="1">
+                                                <input class="form-control text-center quantity_text" type="text" name="quantity_text[]" value="1" required>
                                                 <label class="text-field-border"></label>
                                             </div>
                                         </div>
@@ -278,6 +288,7 @@
                         var product = $(item);
                         var quantity = product.find('.quantity');
                         var quantityText = product.find('.quantity_text');
+                        var max = quantity.data('max');
 
                         quantityText.on('input change', function(e) {
                             var value = numeral(e.target.value);
@@ -291,7 +302,23 @@
                             var valueNum = parseInt(el.val());
                             if (valueNum < 0) {
                                 el.val(0);
-                                quantityText.val(1).trigger('change');
+                                quantityText.val(0).trigger('change');
+                            }
+
+                            if (valueNum > max) {
+                                Swal.fire({
+                                    title: 'Quantity Exceeded',
+                                    text: 'The input quantity exceeds the maximum allowed.',
+                                    icon: 'warning',
+                                    showCancelButton: true,
+                                    confirmButtonText: 'I Know',
+                                    cancelButtonText: 'Cancel'
+                                }).then((result) => {
+                                    if (result.isConfirmed) {
+                                        max = valueNum + 100;
+                                        quantity.data('max', valueNum + 100);
+                                    }
+                                });
                             }
                         }).trigger('change');
                     });

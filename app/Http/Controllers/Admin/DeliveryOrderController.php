@@ -11,6 +11,7 @@ use App\Models\DeliveryOrder;
 use App\Models\DeliveryOrderItem;
 use App\Models\Salesperson;
 use App\Models\Semester;
+use App\Models\Jenjang;
 use Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -99,11 +100,13 @@ class DeliveryOrderController extends Controller
 
         $salespeople = Salesperson::whereHas('estimasi')->get()->pluck('full_name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
+        $jenjangs = Jenjang::pluck('name', 'id')->prepend('All', '');
+
         $no_suratjalan = DeliveryOrder::generateNoSJ(setting('current_semester'));
 
         $today = Carbon::now()->format('d-m-Y');
 
-        return view('admin.deliveryOrders.create', compact('salespeople', 'semesters', 'no_suratjalan', 'today'));
+        return view('admin.deliveryOrders.create', compact('salespeople', 'semesters', 'jenjangs', 'no_suratjalan', 'today'));
     }
 
     public function store(Request $request)
@@ -173,13 +176,13 @@ class DeliveryOrderController extends Controller
     {
         abort_if(Gate::denies('delivery_order_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $semesters = Semester::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
-
         $salespeople = Salesperson::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
         $deliveryOrder->load('semester', 'salesperson');
 
-        return view('admin.deliveryOrders.edit', compact('deliveryOrder', 'salespeople', 'semesters'));
+        $delivery_items = DeliveryOrderItem::where('delivery_order_id', $deliveryOrder->id)->get();
+
+        return view('admin.deliveryOrders.edit', compact('deliveryOrder', 'salespeople', 'delivery_items'));
     }
 
     public function update(Request $request, DeliveryOrder $deliveryOrder)
@@ -230,11 +233,119 @@ class DeliveryOrderController extends Controller
 
             DB::commit();
 
-            Alert::success('Success', 'Silahkan Update Invoicenya Juga')->showConfirmButton('Oke', '#3085d6');
+            if ($deliveryOrder->faktur) {
+                Alert::success('Success', 'Silahkan Update Invoicenya Juga')->showConfirmButton('Oke', '#3085d6');
+                return redirect()->route('admin.invoices.generate', $deliveryOrder->id);
+            }
 
-            return redirect()->route('admin.invoices.generate', $deliveryOrder->id);
+            Alert::success('Success', 'Delivery Order berhasil di simpan');
+
+            return redirect()->route('admin.delivery-orders.index');
         } catch (\Exception $e) {
             DB::rollback();
+
+            return redirect()->back()->with('error-message', $e->getMessage())->withInput();
+        }
+    }
+
+    public function adjust(DeliveryOrder $deliveryOrder)
+    {
+        abort_if(Gate::denies('delivery_order_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+
+        $salespeople = Salesperson::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+
+        $jenjangs = Jenjang::pluck('name', 'id')->prepend('All', '');
+
+        $deliveryOrder->load('semester', 'salesperson');
+
+        $delivery_items = DeliveryOrderItem::where('delivery_order_id', $deliveryOrder->id)->get();
+
+        return view('admin.deliveryOrders.adjust', compact('deliveryOrder', 'salespeople', 'jenjangs', 'delivery_items'));
+    }
+
+    public function adjustSave(Request $request)
+    {
+        // Validate the form data
+        $validatedData = $request->validate([
+            'delivery_id' => 'required',
+            'no_suratjalan' => 'required',
+            'date' => 'required',
+            'orders' => 'required|array',
+            'orders.*' => 'exists:sales_orders,id',
+            'products' => 'required|array',
+            'products.*' => 'exists:book_variants,id',
+            'quantities' => 'required|array',
+            'quantities.*' => 'numeric|min:1',
+        ]);
+
+        $delivery_id = $validatedData['delivery_id'];
+        $no_suratjalan = $validatedData['no_suratjalan'];
+        $date = $validatedData['date'];
+
+        $products = $validatedData['products'];
+        $orders = $validatedData['orders'];
+        $quantities = $validatedData['quantities'];
+
+        $deliveryOrder = DeliveryOrder::find($delivery_id);
+
+        $semester = $deliveryOrder->semester_id;
+        $salesperson = $deliveryOrder->salesperson_id;
+
+        DB::beginTransaction();
+        try {
+            for ($i = 0; $i < count($products); $i++) {
+                $product = $products[$i];
+                $order = $orders[$i];
+                $quantity = $quantities[$i];
+
+                $delivery_item = DeliveryOrderItem::where('delivery_order_id', $delivery_id)->where('sales_order_id', $order)->where('product_id', $product)->first();
+
+                if ($delivery_item) {
+                    $old_quantity = $delivery_item->quantity;
+
+                    $delivery_item->quantity += $quantity;
+                    $delivery_item->save();
+
+                    StockService::editMovement('out', 'delivery', $deliveryOrder->id, $date, $product, -1 * ($quantity + $old_quantity));
+                    StockService::updateStock($product, -1 * $quantity);
+
+                    EstimationService::updateMoved($order, $quantity);
+                } else {
+                    DeliveryOrderItem::create([
+                        'delivery_order_id' => $deliveryOrder->id,
+                        'sales_order_id' => $order,
+                        'semester_id' => $semester,
+                        'salesperson_id' => $salesperson,
+                        'product_id' => $product,
+                        'quantity' => $quantity
+                    ]);
+
+                    StockService::createMovement('out', 'delivery', $deliveryOrder->id, $date, $product, -1 * $quantity);
+                    StockService::updateStock($product, -1 * $quantity);
+
+                    EstimationService::updateMoved($order, $quantity);
+                }
+            }
+
+            $deliveryOrder->update([
+                'no_suratjalan' => $no_suratjalan,
+                'date' => $date,
+            ]);
+
+            DB::commit();
+
+            if ($deliveryOrder->faktur) {
+                Alert::success('Success', 'Silahkan Update Invoicenya Juga')->showConfirmButton('Oke', '#3085d6');
+                return redirect()->route('admin.invoices.generate', $deliveryOrder->id);
+            }
+
+            Alert::success('Success', 'Delivery Order berhasil di simpan');
+
+            return redirect()->route('admin.delivery-orders.index');
+        } catch (\Exception $e) {
+            DB::rollback();
+
+            dd($e);
 
             return redirect()->back()->with('error-message', $e->getMessage())->withInput();
         }

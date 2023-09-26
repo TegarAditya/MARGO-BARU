@@ -248,7 +248,7 @@ class BookVariantController extends Controller
 
         $bookVariant->load('book', 'jenjang', 'semester', 'kurikulum', 'halaman', 'warehouse', 'unit', 'components', 'isi', 'cover');
 
-        $stockMovements = StockMovement::with(['product'])->where('product_id', $bookVariant->id)->latest()->get();
+        $stockMovements = StockMovement::with(['product'])->where('product_id', $bookVariant->id)->orderBy('id', 'DESC')->get();
 
         return view('admin.bookVariants.show', compact('bookVariant', 'stockMovements'));
     }
@@ -458,7 +458,7 @@ class BookVariantController extends Controller
         $estimasi = $request->input('estimasi');
 
         $product = BookVariant::join('estimation_items', 'estimation_items.product_id', '=', 'book_variants.id')
-                ->join('sales_orders', 'sales_orders.product_id', '=', 'estimation_items.product_id')
+                ->join('sales_orders', 'sales_orders.salesperson_id', '=', 'estimation_items.salesperson_id')
                 ->where('book_variants.id', $id)
                 ->where('estimation_items.estimation_id', $estimasi)
                 ->first(['book_variants.*','estimation_items.id as estimasi_id', 'estimation_items.quantity as estimasi', 'sales_orders.moved as terkirim']);

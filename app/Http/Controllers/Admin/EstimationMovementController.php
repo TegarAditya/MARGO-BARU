@@ -16,7 +16,7 @@ class EstimationMovementController extends Controller
         abort_if(Gate::denies('estimation_movement_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         if ($request->ajax()) {
-            $query = EstimationMovement::with(['reference', 'product', 'reversal_of'])->select(sprintf('%s.*', (new EstimationMovement)->table));
+            $query = EstimationMovement::with(['reference', 'product', 'reversal_of'])->select(sprintf('%s.*', (new EstimationMovement)->table))->latest();
             $table = Datatables::of($query);
 
             $table->addColumn('placeholder', '&nbsp;');

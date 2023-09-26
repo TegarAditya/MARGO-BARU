@@ -1,56 +1,73 @@
 @extends('layouts.admin')
 @section('content')
-
+<div class="row mb-4">
+    <div class="col-12">
+        <h1 class="m-0">Order Sales</h1>
+    </div>
+</div>
 <div class="card">
     <div class="card-header">
-        <h1>Formulir Edit Pengiriman</h1>
+        {{ trans('global.edit') }} {{ trans('cruds.estimation.title_singular') }}
     </div>
 
     <div class="card-body">
-
         @if (session()->has('error-message'))
             <p class="text-danger">
                 {{session()->get('error-message')}}
             </p>
         @endif
 
-        <form method="POST" action="{{ route("admin.delivery-orders.update", [$deliveryOrder->id]) }}" enctype="multipart/form-data">
-            @method('PUT')
+        <form method="POST" action="{{ route("admin.estimations.adjustSave") }}" enctype="multipart/form-data">
             @csrf
-            <input type="hidden" name="delivery_id" id="delivery_id" value="{{$deliveryOrder->id}}">
+            <input type="hidden" name="estimation_id" id="estimation_id" value="{{$estimation->id}}">
+            <input type="hidden" id="semester_id" value="{{ setting('current_semester') }}">
             <div class="row">
                 <div class="col-6">
                     <div class="form-group">
-                        <label class="required" for="no_suratjalan">{{ trans('cruds.deliveryOrder.fields.no_suratjalan') }}</label>
-                        <input class="form-control {{ $errors->has('no_suratjalan') ? 'is-invalid' : '' }}" type="text" name="no_suratjalan" id="no_suratjalan" value="{{ old('no_suratjalan', noRevisi($deliveryOrder->no_suratjalan)) }}" readonly>
-                        @if($errors->has('no_suratjalan'))
-                            <span class="text-danger">{{ $errors->first('no_suratjalan') }}</span>
+                        <label class="required" for="no_estimasi">{{ trans('cruds.estimation.fields.no_estimasi') }}</label>
+                        <input class="form-control {{ $errors->has('no_estimasi') ? 'is-invalid' : '' }}" type="text" name="no_estimasi" id="no_estimasi" value="{{ old('no_estimasi', $no_estimasi) }}" readonly required>
+                        @if($errors->has('no_estimasi'))
+                            <span class="text-danger">{{ $errors->first('no_estimasi') }}</span>
                         @endif
-                        <span class="help-block">{{ trans('cruds.deliveryOrder.fields.no_suratjalan_helper') }}</span>
+                        <span class="help-block">{{ trans('cruds.estimation.fields.no_estimasi_helper') }}</span>
                     </div>
                 </div>
                 <div class="col-6">
                     <div class="form-group">
-                        <label class="required" for="date">{{ trans('cruds.deliveryOrder.fields.date') }}</label>
-                        <input class="form-control date {{ $errors->has('date') ? 'is-invalid' : '' }}" type="text" name="date" id="date" value="{{ old('date', $deliveryOrder->date) }}" required>
+                        <label class="required" for="date">{{ trans('cruds.estimation.fields.date') }}</label>
+                        <input class="form-control date {{ $errors->has('date') ? 'is-invalid' : '' }}" type="text" name="date" id="date" value="{{ old('date', $estimation->date) }}" required>
                         @if($errors->has('date'))
                             <span class="text-danger">{{ $errors->first('date') }}</span>
                         @endif
-                        <span class="help-block">{{ trans('cruds.deliveryOrder.fields.date_helper') }}</span>
+                        <span class="help-block">{{ trans('cruds.estimation.fields.date_helper') }}</span>
                     </div>
                 </div>
                 <div class="col-6">
                     <div class="form-group">
-                        <label class="required" for="salesperson_id">{{ trans('cruds.deliveryOrder.fields.salesperson') }}</label>
+                        <label class="required" for="salesperson_id">{{ trans('cruds.estimation.fields.salesperson') }}</label>
                         <select class="form-control select2 {{ $errors->has('salesperson') ? 'is-invalid' : '' }}" name="salesperson_id" id="salesperson_id" disabled>
                             @foreach($salespeople as $id => $entry)
-                                <option value="{{ $id }}" {{ (old('salesperson_id') ? old('salesperson_id') : $deliveryOrder->salesperson->id ?? '') == $id ? 'selected' : '' }}>{{ $entry }}</option>
+                                <option value="{{ $id }}" {{ (old('salesperson_id') ? old('salesperson_id') : $estimation->salesperson->id ?? '') == $id ? 'selected' : '' }}>{{ $entry }}</option>
                             @endforeach
                         </select>
                         @if($errors->has('salesperson'))
                             <span class="text-danger">{{ $errors->first('salesperson') }}</span>
                         @endif
-                        <span class="help-block">{{ trans('cruds.deliveryOrder.fields.salesperson_helper') }}</span>
+                        <span class="help-block">{{ trans('cruds.estimation.fields.salesperson_helper') }}</span>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="form-group">
+                        <label for="jenjang_id">{{ trans('cruds.salesOrder.fields.jenjang') }}</label>
+                        <select class="form-control select2 {{ $errors->has('jenjang') ? 'is-invalid' : '' }}" name="jenjang_id" id="jenjang_id">
+                            @foreach($jenjangs as $id => $entry)
+                                <option value="{{ $id }}" {{ (old('jenjang_id') ? old('jenjang_id') : $salesOrder->jenjang->id ?? '') == $id ? 'selected' : '' }}>{{ $entry }}</option>
+                            @endforeach
+                        </select>
+                        @if($errors->has('jenjang'))
+                            <span class="text-danger">{{ $errors->first('jenjang') }}</span>
+                        @endif
+                        <span class="help-block">{{ trans('cruds.salesOrder.fields.jenjang_helper') }}</span>
                     </div>
                 </div>
             </div>
@@ -62,15 +79,7 @@
                         </button>
                     </div>
                 </div>
-                <div class="col-2">
-                    <div class="form-group">
-                        <a href="{{ route('admin.delivery-orders.adjust', $deliveryOrder->id) }}" class="btn btn-primary btn-block">
-                            Tambah Item
-                        </a>
-                    </div>
-                </div>
             </div>
-
             <hr style="margin: .5em -15px;border-color:#ccc" />
             <div class="row mb-4">
                 <div class="col-12">
@@ -100,7 +109,7 @@
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title" id="myModalLabel">Daftar Surat Jalan</h4>
+                <h4 class="modal-title" id="myModalLabel">Daftar Estimasi Sales</h4>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
             </div>
             <div class="modal-body">
@@ -112,34 +121,32 @@
                         <table cellspacing="0" cellpadding="0" class="table table-sm table-bordered" style="width: 100%">
                             <thead>
                                 <tr>
-                                    <th class="text-center" width="1%">No.</th>
-                                    <th>Jenjang</th>
-                                    <th>Tema/Mapel</th>
-                                    <th class="text-center px-3" width="1%">Quantity</th>
+                                    <th width="1%" class="text-center">No.</th>
+                                    <th>Nama Produk</th>
+                                    <th width="1%" class="text-center">Halaman</th>
+                                    <th width="1%" class="text-center">Estimasi</th>
                                 </tr>
                             </thead>
 
                             <tbody>
-                                @php
-                                    $total_item = 0;
-                                @endphp
-                                @foreach($delivery_items as $item)
+                                @foreach ($estimasi_list as $item)
                                     @php
+                                    $total_estimasi += $item->quantity;
+
                                     $product = $item->product;
-                                    $total_item += $item->quantity;
                                     @endphp
                                     <tr>
-                                        <td class="text-right px-3">{{ $loop->iteration }}.</td>
-                                        <td class="text-center">{{ $product->jenjang->name ?? '' }} - {{ $product->kurikulum->code ?? '' }}</td>
+                                        <td class="text-center">{{ $loop->iteration }}</td>
                                         <td>{{ $product->name }}</td>
-                                        <td class="text-center px-3">{{ $item->quantity }}</td>
+                                        <td class="text-center">{{ $product->halaman->code }}</td>
+                                        <td class="text-center">{{ angka($item->quantity) }}</td>
                                     </tr>
                                 @endforeach
                             </tbody>
                             <tfoot>
                                 <tr>
                                     <th class="text-center" colspan="3"><b>Total</b></th>
-                                    <th class="text-center">{{ angka($total_item) }}</th>
+                                    <th class="text-center">{{ angka($total_estimasi) }}</th>
                                 </tr>
                             </tfoot>
                         </table>
@@ -149,6 +156,7 @@
         </div>
     </div>
 </div>
+
 @endsection
 
 @section('scripts')
@@ -158,13 +166,14 @@
             templateResult: formatProduct,
             templateSelection: formatProductSelection,
             ajax: {
-                    url: "{{ route('admin.book-variants.getDelivery') }}",
+                    url: "{{ route('admin.book-variants.getBooks') }}",
                     dataType: 'json',
                     delay: 250,
                     data: function(params) {
                         return {
                             q: params.term,
-                            delivery: $('#delivery_id').val(),
+                            semester: $('#semester_id').val(),
+                            jenjang: $('#jenjang_id').val()
                         };
                     },
                     processResults: function(data) {
@@ -206,13 +215,9 @@
             }
 
             $.ajax({
-                url: "{{ route('admin.book-variants.getInfoDelivery') }}",
+                url: "{{ route('admin.book-variants.getBook') }}" +  '?id=' + productId,
                 type: 'GET',
                 dataType: 'json',
-                data: {
-                    id: productId,
-                    delivery: $('#delivery_id').val(),
-                },
                 success: function(product) {
                     function sortItems() {
                         const productForm = $('#product-form');
@@ -228,7 +233,7 @@
                     var formHtml = `
                         <div class="item-product" id="product-${product.id}">
                             <div class="row">
-                                <div class="col-8 align-self-center">
+                                <div class="col-7 align-self-center">
                                     <h6 class="text-sm product-name mb-1">(${product.book_type}) ${product.short_name}</h6>
                                     <p class="mb-0 text-sm">
                                         Code : <strong>${product.code}</strong>
@@ -237,21 +242,17 @@
                                         Jenjang - Kurikulum : <strong>${product.jenjang.name} - ${product.kurikulum.name}</strong>
                                     </p>
                                     <p class="mb-0 text-sm">
-                                        <strong>ESTIMASI : ${product.estimasi}</strong>
-                                    </p>
-                                    <p class="mb-0 text-sm">
-                                        <strong>TERKIRIM : ${product.terkirim - product.quantity}</strong>
+                                        Cover - Isi : <strong>${product.cover.name ?? ''} - ${product.isi.name ?? ''}</strong>
                                     </p>
                                 </div>
                                 <div class="col offset-1 row align-items-end align-self-center">
-                                    <div class="col" style="max-width: 160px">
-                                        <p class="mb-0 text-sm">Dikirim</p>
+                                    <div class="col" style="max-width: 200px">
+                                        <p class="mb-0 text-sm">Estimasi</p>
                                         <div class="form-group text-field m-0">
                                             <div class="text-field-input px-2 py-0">
                                                 <input type="hidden" name="products[]" value="${product.id}">
-                                                <input type="hidden" name="delivery_items[]" value="${product.delivery_item_id}">
-                                                <input class="quantity" type="hidden" name="quantities[]" data-max="${product.estimasi - product.terkirim}" value="${product.quantity}">
-                                                <input class="form-control text-center quantity_text" type="text" name="quantity_text[]" value="${product.quantity}" required>
+                                                <input class="quantity" type="hidden" name="quantities[]">
+                                                <input class="form-control text-center quantity_text" type="text" name="quantity_text[]" value="1" required>
                                                 <label class="text-field-border"></label>
                                             </div>
                                         </div>
@@ -266,6 +267,7 @@
                             <hr style="margin: 1em -15px;border-color:#ccc" />
                         </div>
                     `;
+
                     $('#product-form').prepend(formHtml);
                     $('#product-search').val(null).trigger('change');
 
@@ -291,7 +293,7 @@
                             var valueNum = parseInt(el.val());
                             if (valueNum < 0) {
                                 el.val(0);
-                                quantityText.val(1).trigger('change');
+                                quantityText.val(0).trigger('change');
                             }
                         }).trigger('change');
                     });
@@ -301,11 +303,11 @@
                 }
             });
         });
-    });
 
-    $('#product-form').on('click', '.product-delete', function() {
-        var productId = $(this).data('product-id');
-        $('#product-' + productId).remove();
+        $('#product-form').on('click', '.product-delete', function() {
+            var productId = $(this).data('product-id');
+            $('#product-' + productId).remove();
+        });
     });
 </script>
 @endsection

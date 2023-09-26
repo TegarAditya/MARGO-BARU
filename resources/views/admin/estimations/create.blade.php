@@ -219,9 +219,10 @@
                             <hr style="margin: 1em -15px;border-color:#ccc" />
                         </div>
                     `;
-                    sortItems();
                     $('#product-form').prepend(formHtml);
                     $('#product-search').val(null).trigger('change');
+
+                    sortItems();
 
                     var productForm = $('#product-form');
                     var productItem = productForm.find('.item-product');

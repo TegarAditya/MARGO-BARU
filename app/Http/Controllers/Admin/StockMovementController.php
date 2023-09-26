@@ -21,7 +21,7 @@ class StockMovementController extends Controller
         abort_if(Gate::denies('stock_movement_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         if ($request->ajax()) {
-            $query = StockMovement::with(['warehouse', 'product', 'material', 'reversal_of'])->select(sprintf('%s.*', (new StockMovement)->table))->latest();
+            $query = StockMovement::with(['warehouse', 'product', 'material', 'reversal_of'])->select(sprintf('%s.*', (new StockMovement)->table))->orderBy('id', 'DESC');
             $table = Datatables::of($query);
 
             $table->editColumn('movement_type', function ($row) {
@@ -29,7 +29,11 @@ class StockMovementController extends Controller
             });
 
             $table->addColumn('product_code', function ($row) {
-                return $row->product ? $row->product->code : $row->material->code;
+                if ($row->product) {
+                    return $row->product->code. ' <a class="px-1" title="Product" href="'.route('admin.book-variants.show', $row->product_id).'"><i class="fas fa-eye text-success fa-lg"></i></a>';
+                } else {
+                    return $row->material->code. ' <a class="px-1" title="Material" href="'.route('admin.materials.show', $row->material_id).'"><i class="fas fa-eye text-success fa-lg"></i></a>';
+                }
             });
 
             $table->addColumn('product_name', function ($row) {
@@ -62,7 +66,7 @@ class StockMovementController extends Controller
                 return $row->transaction_type ? StockMovement::TRANSACTION_TYPE_SELECT[$row->transaction_type] : '';
             });
 
-            $table->rawColumns(['product', 'reference', 'material']);
+            $table->rawColumns(['product_code', 'product_name', 'reference']);
 
             return $table->make(true);
         }

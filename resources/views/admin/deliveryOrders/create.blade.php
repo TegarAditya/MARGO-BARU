@@ -65,6 +65,20 @@
                         <span class="help-block">{{ trans('cruds.deliveryOrder.fields.salesperson_helper') }}</span>
                     </div>
                 </div>
+                <div class="col-6">
+                    <div class="form-group">
+                        <label for="jenjang_id">{{ trans('cruds.salesOrder.fields.jenjang') }}</label>
+                        <select class="form-control select2 {{ $errors->has('jenjang') ? 'is-invalid' : '' }}" name="jenjang_id" id="jenjang_id">
+                            @foreach($jenjangs as $id => $entry)
+                                <option value="{{ $id }}" {{ old('jenjang_id') == $id ? 'selected' : '' }}>{{ $entry }}</option>
+                            @endforeach
+                        </select>
+                        @if($errors->has('jenjang'))
+                            <span class="text-danger">{{ $errors->first('jenjang') }}</span>
+                        @endif
+                        <span class="help-block">{{ trans('cruds.salesOrder.fields.jenjang_helper') }}</span>
+                    </div>
+                </div>
             </div>
             <hr style="margin: .5em -15px;border-color:#ccc" />
             <div class="row mb-4">
@@ -155,10 +169,20 @@
                 dataType: 'json',
                 data: {
                     id: productId,
-                    semester: $('#semester_id').val(),
                     salesperson: $('#salesperson_id').val()
                 },
                 success: function(product) {
+                    function sortItems() {
+                        const productForm = $('#product-form');
+                        const items = productForm.children('.item-product');
+                        items.sort(function(a, b) {
+                            const idA = parseInt(a.id.split('-')[1]);
+                            const idB = parseInt(b.id.split('-')[1]);
+                            return idA - idB;
+                        });
+                        productForm.empty().append(items);
+                    }
+
                     var formHtml = `
                         <div class="item-product" id="product-${product.id}">
                             <div class="row">
@@ -205,6 +229,8 @@
                     `;
                     $('#product-form').prepend(formHtml);
                     $('#product-search').val(null).trigger('change');
+
+                    sortItems();
 
                     var productForm = $('#product-form');
                     var productItem = productForm.find('.item-product');

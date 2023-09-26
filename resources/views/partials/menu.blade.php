@@ -847,7 +847,7 @@
 
                             </i>
                             <p>
-                                {{ trans('cruds.aquarium.title') }}
+                                Pra - Cetak
                                 <i class="right fa fa-fw fa-angle-left nav-icon"></i>
                             </p>
                         </a>

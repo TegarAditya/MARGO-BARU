@@ -301,6 +301,132 @@ class EstimationController extends Controller
         }
     }
 
+    public function adjust(Estimation $estimation)
+    {
+        abort_if(Gate::denies('estimation_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+
+        $jenjangs = Jenjang::pluck('name', 'id')->prepend('All', '');
+
+        $estimation->load('semester', 'salesperson');
+
+        $no_estimasi = noRevisi($estimation->no_estimasi);
+
+        $estimasi_list = EstimationItem::where('estimation_id', $estimation->id)->get();
+
+        if ($estimation->salesperson_id == 0) {
+            return view('admin.estimations.editInternal', compact('estimation', 'estimasi_list', 'jenjangs', 'no_estimasi'));
+        }
+
+        $salespeople = Salesperson::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+
+        return view('admin.estimations.adjust', compact('estimation', 'estimasi_list', 'salespeople', 'jenjangs', 'no_estimasi'));
+    }
+
+    public function adjustSave(Request $request)
+    {
+        // Validate the form data
+        $validatedData = $request->validate([
+            'no_estimasi' => 'required',
+            'estimation_id' => 'required',
+            'date' => 'required',
+            'salesperson_id' => 'nullable',
+            'jenjang_id' => 'nullable',
+            'products' => 'required|array',
+            'products.*' => 'exists:book_variants,id',
+            'quantities' => 'required|array',
+            'quantities.*' => 'numeric|min:1',
+        ]);
+
+        $no_estimasi = $validatedData['no_estimasi'];
+        $estimation = $validatedData['estimation_id'];
+        $date = $validatedData['date'];
+        $products = $validatedData['products'];
+        $quantities = $validatedData['quantities'];
+
+        $estimasi = Estimation::find($estimation);
+
+        $semester = $estimasi->semester_id;
+        $salesperson = $estimasi->salesperson_id;
+
+        DB::beginTransaction();
+        try {
+            for ($i = 0; $i < count($products); $i++) {
+                $product = BookVariant::find($products[$i]);
+                $quantity = $quantities[$i];
+
+                $estimasi_item = EstimationItem::where('estimation_id', $estimasi->id)->where('product_id', $product->id)->first();
+
+                if ($estimasi_item) {
+                    $old_quantity = $estimasi_item->quantity;
+
+                    $estimasi_item->quantity += $quantity;
+                    $estimasi_item->save();
+
+                    if ($product->semester_id == $semester) {
+                        if ($salesperson) {
+                            EstimationService::editMovement('in', 'sales_order', $estimasi->id, $product->id, $old_quantity + $quantity, 'sales');
+                            EstimationService::editProduction($product->id, $quantity, $product->type);
+
+                            foreach($product->components as $item) {
+                                EstimationService::editMovement('in', 'sales_order', $estimasi->id, $item->id, $old_quantity + $quantity, 'sales');
+                                EstimationService::editProduction($item->id, $quantity, $item->type);
+                            }
+                        }
+                    }
+                } else {
+                    EstimationItem::create([
+                        'estimation_id' => $estimasi->id,
+                        'semester_id' => $semester,
+                        'salesperson_id' => $salesperson,
+                        'product_id' => $product->id,
+                        'jenjang_id' => $product->jenjang_id,
+                        'kurikulum_id' => $product->kurikulum_id,
+                        'quantity' => $quantity
+                    ]);
+
+                    if ($product->semester_id == $semester) {
+                        if ($salesperson) {
+                            EstimationService::createMovement('in', 'sales_order', $estimasi->id, $product->id, $quantity, 'sales');
+                            EstimationService::createProduction($product->id, $quantity, $product->type);
+
+                            foreach($product->components as $item) {
+                                EstimationService::createMovement('in', 'sales_order', $estimasi->id, $item->id, $quantity, 'sales');
+                                EstimationService::createProduction($item->id, $quantity, $item->type);
+                            }
+                        }
+                    }
+
+                }
+
+                $order = SalesOrder::updateOrCreate([
+                    'semester_id' => $semester,
+                    'salesperson_id' => $salesperson,
+                    'product_id' => $product->id,
+                    'jenjang_id' => $product->jenjang_id,
+                    'kurikulum_id' => $product->kurikulum_id
+                ], [
+                    'no_order' => SalesOrder::generateNoOrder($semester, $salesperson),
+                    'quantity' => DB::raw("quantity + $quantity"),
+                ]);
+            }
+
+            $estimasi->update([
+                'no_estimasi' => $no_estimasi,
+                'date' => $date,
+            ]);
+
+            DB::commit();
+
+            Alert::success('Success', 'Estimasi berhasil di simpan');
+
+            return redirect()->route('admin.estimations.index');
+        } catch (\Exception $e) {
+            DB::rollback();
+
+            return redirect()->back()->with('error-message', $e->getMessage())->withInput();
+        }
+    }
+
     public function show(Estimation $estimation)
     {
         abort_if(Gate::denies('estimation_show'), Response::HTTP_FORBIDDEN, '403 Forbidden');

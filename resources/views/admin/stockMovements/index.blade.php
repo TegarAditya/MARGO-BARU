@@ -51,7 +51,7 @@ $(function () {
             { data: 'quantity', name: 'quantity', class: 'text-center' }
         ],
         orderCellsTop: true,
-        order: [[ 1, 'desc' ]],
+        // order: [[ 1, 'desc' ]],
         pageLength: 50,
     };
     let table = $('.datatable-StockMovement').DataTable(dtOverrideGlobals);
