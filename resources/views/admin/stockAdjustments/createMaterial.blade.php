@@ -147,6 +147,17 @@
                 type: 'GET',
                 dataType: 'json',
                 success: function(product) {
+                    function sortItems() {
+                        const productForm = $('#product-form');
+                        const items = productForm.children('.item-product');
+                        items.sort(function(a, b) {
+                            const idA = parseInt(a.id.split('-')[1]);
+                            const idB = parseInt(b.id.split('-')[1]);
+                            return idA - idB;
+                        });
+                        productForm.empty().append(items);
+                    }
+
                     var formHtml = `
                         <div class="item-product" id="product-${product.id}">
                             <div class="row">
@@ -186,6 +197,8 @@
                     `;
                     $('#product-form').prepend(formHtml);
                     $('#product-search').val(null).trigger('change');
+
+                    sortItems();
 
                     var productForm = $('#product-form');
                     var productItem = productForm.find('.item-product');

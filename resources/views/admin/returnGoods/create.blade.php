@@ -158,6 +158,17 @@
                     salesperson: $('#salesperson_id').val()
                 },
                 success: function(product) {
+                    function sortItems() {
+                        const productForm = $('#product-form');
+                        const items = productForm.children('.item-product');
+                        items.sort(function(a, b) {
+                            const idA = parseInt(a.id.split('-')[1]);
+                            const idB = parseInt(b.id.split('-')[1]);
+                            return idA - idB;
+                        });
+                        productForm.empty().append(items);
+                    }
+
                     var formHtml = `
                         <div class="item-product" id="product-${product.id}">
                             <div class="row">
@@ -204,6 +215,8 @@
 
                     var productForm = $('#product-form');
                     var productItem = productForm.find('.item-product');
+
+                    sortItems();
 
                     productItem.each(function(index, item) {
                         var product = $(item);
