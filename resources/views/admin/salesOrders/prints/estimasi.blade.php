@@ -55,7 +55,7 @@
                 @foreach ($value as $order)
                     @php
                     $sisa = max(0, $order->quantity - $order->moved);
-                    if ($sisa < 0 || $order->quantity < 0) {
+                    if ($sisa <= 0 || $order->quantity <= 0) {
                         continue;
                     }
                     $total_sisa += $sisa;
@@ -147,7 +147,7 @@
                 @foreach ($kelengkapan->sortBy('product.kelas_id')->sortBy('product.mapel_id') as $order)
                     @php
                     $sisa = max(0, $order->quantity - $order->moved);
-                    if ($sisa < 0 || $order->quantity < 0) {
+                    if ($sisa <= 0 || $order->quantity <= 0) {
                         continue;
                     }
                     $total_sisa_pg += $sisa;
