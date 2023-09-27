@@ -22,19 +22,19 @@ class EstimationService
         ]);
     }
 
-    public static function createProduction($product, $quantity, $type)
+    public static function createProduction($product, $quantity, $type, $type_produksi)
     {
         $production = ProductionEstimation::where('product_id', $product)->where('type', $type)->first();
 
         if ($production) {
-            $production->sales += $quantity;
-            $production->estimasi = ($production->internal + max(0, $production->sales - $production->internal)) - $production->produksi;
+            $production->{$type_produksi} += $quantity;
+            $production->estimasi = ($production->internal + $production->eksternal + max(0, $production->sales - $production->internal)) - $production->produksi;
             $production->save();
         } else {
             $new = ProductionEstimation::create([
                 'product_id' => $product,
                 'type' => $type,
-                'sales' => $quantity,
+                $type_produksi => $quantity,
                 'estimasi' => $quantity,
             ]);
         }
@@ -46,7 +46,7 @@ class EstimationService
 
         if ($production) {
             $production->internal += $quantity;
-            $production->estimasi = ($production->internal + max(0, $production->sales - $production->internal)) - $production->produksi;
+            $production->estimasi = ($production->internal + $production->eksternal + max(0, $production->sales - $production->internal)) - $production->produksi;
             $production->save();
         } else {
             $new = ProductionEstimation::create([
@@ -64,7 +64,7 @@ class EstimationService
 
         if ($production) {
             $production->produksi += $quantity;
-            $production->estimasi = ($production->internal + max(0, $production->sales - $production->internal)) - $production->produksi;
+            $production->estimasi = ($production->internal + $production->eksternal + max(0, $production->sales - $production->internal)) - $production->produksi;
             $production->save();
         }
     }
@@ -96,13 +96,13 @@ class EstimationService
     }
     //Edit movement menggunakan quantity baru
     //Edit production menggunakan quantity selisih
-    public static function editProduction($product, $quantity, $type)
+    public static function editProduction($product, $quantity, $type, $type_produksi)
     {
         $production = ProductionEstimation::where('product_id', $product)->where('type', $type)->first();
 
         if ($production) {
-            $production->sales += $quantity;
-            $production->estimasi = ($production->internal + max(0, $production->sales - $production->internal)) - $production->produksi;
+            $production->{$type_produksi} += $quantity;
+            $production->estimasi = ($production->internal + $production->eksternal + max(0, $production->sales - $production->internal)) - $production->produksi;
             $production->save();
         }
     }
@@ -113,7 +113,7 @@ class EstimationService
 
         if ($production) {
             $production->internal += $quantity;
-            $production->estimasi = ($production->internal + max(0, $production->sales - $production->internal)) - $production->produksi;
+            $production->estimasi = ($production->internal + $production->eksternal + max(0, $production->sales - $production->internal)) - $production->produksi;
             $production->save();
         }
     }
@@ -124,7 +124,7 @@ class EstimationService
 
         if ($production) {
             $production->produksi += $quantity;
-            $production->estimasi = ($production->internal + max(0, $production->sales - $production->internal)) - $production->produksi;
+            $production->estimasi = ($production->internal + $production->eksternal + max(0, $production->sales - $production->internal)) - $production->produksi;
             $production->save();
         }
     }

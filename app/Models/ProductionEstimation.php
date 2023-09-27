@@ -26,6 +26,7 @@ class ProductionEstimation extends Model
         'estimasi',
         'sales',
         'internal',
+        'eksternal',
         'produksi',
         'realisasi',
         'created_at',
