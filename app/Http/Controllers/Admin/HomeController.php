@@ -228,16 +228,36 @@ class HomeController
 
     public function god()
     {
-        $rekap = ProductionEstimation::whereHas('product', function ($query) {
-            $query->where('code', 'LIKE', '%MMP%')
-            ->where('type', 'L');
-        })->get();
+        abort(403, 'Unauthorized action.');
 
-        foreach ($rekap as $item) {
-            $code = substr($item->code, 2, 18);
-            dd($code);
+        DB::beginTransaction();
+        try {
+            $rekap = ProductionEstimation::whereHas('product', function ($query) {
+                $query->where('code', 'LIKE', '%MMP%')
+                ->where('type', 'L');
+            })->get();
+
+            foreach ($rekap as $item) {
+                $code = substr($item->product->code, 2, 18);
+
+                $isi = ProductionEstimation::whereHas('product', function ($query) use ($code) {
+                    $query->where('code', 'LIKE', '%'.$code.'%')
+                    ->where('type', 'I');
+                })->first();
+
+                $item->eksternal = $isi->eksternal;
+
+                $item->estimasi = $isi->eksternal;
+
+                $item->save();
+            }
+
+            DB::commit();
+
+            Alert::success('Success', 'God has spoken to thou');
+        } catch (\Exception $e) {
+            DB::rollback();
+            dd($e);
         }
-
-        dd('aaa');
     }
 }
