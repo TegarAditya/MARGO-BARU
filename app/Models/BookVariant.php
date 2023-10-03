@@ -250,7 +250,7 @@ class BookVariant extends Model implements HasMedia
             $cover = $isi;
         }
 
-        if ($key == 'I' || $key == 'S' || $key == 'K' || $key == 'U') {
+        if ($key == 'P' || $key == 'I' || $key == 'S' || $key == 'K' || $key == 'U') {
             return $key. '-' . $base. '/'. $isi;
         }
 
@@ -269,11 +269,7 @@ class BookVariant extends Model implements HasMedia
         $isi = Isi::find($isi_id)->name ?? 'Tidak Ada';
         $cover = Cover::find($cover_id)->name ?? 'Tidak Ada';
 
-        if ($key == 'K') {
-            return BookVariant::TYPE_SELECT[$key]. ' - '. $jenjang. ' - '. $kurikulum. ' - '. $mapel. ' - ' .$kelas. ' - '. $semester. ' - ('. $isi .') ';
-        }
-
-        if ($key == 'I' || $key == 'S' || $key == 'U') {
+        if ($key == 'P' || $key == 'K' || $key == 'I' || $key == 'S' || $key == 'U') {
             return BookVariant::TYPE_SELECT[$key]. ' - '. $jenjang. ' - '. $kurikulum. ' - '. $mapel. ' - ' .$kelas. ' - '. $semester. ' - ('. $isi .') ';
         }
 
