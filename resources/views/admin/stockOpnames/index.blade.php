@@ -17,13 +17,14 @@
     </div>
 
     <div class="card-body">
-        <form id="filterform">
+        <form id="filterform" method="POST" action="{{ route("admin.stock-opnames.export") }}" enctype="multipart/form-data">
+            @csrf
             <div class="row">
                 <div class="col-4">
                     <div class="form-group">
                         <label>{{ trans('cruds.bookVariant.fields.type') }}</label>
                         <select class="form-control select2 {{ $errors->has('type') ? 'is-invalid' : '' }}" name="type" id="type">
-                            <option value disabled {{ old('type', null) === null ? 'selected' : '' }}>{{ trans('global.pleaseSelect') }}</option>
+                            <option value {{ old('type', null) === null ? 'selected' : '' }}>All</option>
                             @foreach(App\Models\BookVariant::TYPE_SELECT as $key => $label)
                                 <option value="{{ $key }}" {{ old('type', '') === (string) $key ? 'selected' : '' }}>{{ $label }}</option>
                             @endforeach
@@ -32,48 +33,6 @@
                             <span class="text-danger">{{ $errors->first('type') }}</span>
                         @endif
                         <span class="help-block">{{ trans('cruds.bookVariant.fields.type_helper') }}</span>
-                    </div>
-                </div>
-                <div class="col-4">
-                    <div class="form-group">
-                        <label for="semester_id">{{ trans('cruds.book.fields.semester') }}</label>
-                        <select class="form-control select2 {{ $errors->has('semester') ? 'is-invalid' : '' }}" name="semester_id" id="semester_id">
-                            @foreach($semesters as $id => $entry)
-                                <option value="{{ $id }}" {{ old('semester_id') == $id ? 'selected' : '' }}>{{ $entry }}</option>
-                            @endforeach
-                        </select>
-                        @if($errors->has('semester'))
-                            <span class="text-danger">{{ $errors->first('semester') }}</span>
-                        @endif
-                        <span class="help-block">{{ trans('cruds.book.fields.semester_helper') }}</span>
-                    </div>
-                </div>
-                <div class="col-4">
-                    <div class="form-group">
-                        <label for="cover_id">{{ trans('cruds.book.fields.cover') }}</label>
-                        <select class="form-control select2 {{ $errors->has('cover') ? 'is-invalid' : '' }}" name="cover_id" id="cover_id">
-                            @foreach($covers as $id => $entry)
-                                <option value="{{ $id }}" {{ old('cover_id') == $id ? 'selected' : '' }}>{{ $entry }}</option>
-                            @endforeach
-                        </select>
-                        @if($errors->has('cover'))
-                            <span class="text-danger">{{ $errors->first('cover') }}</span>
-                        @endif
-                        <span class="help-block">{{ trans('cruds.book.fields.cover_helper') }}</span>
-                    </div>
-                </div>
-                <div class="col-4">
-                    <div class="form-group">
-                        <label for="kurikulum_id">{{ trans('cruds.book.fields.kurikulum') }}</label>
-                        <select class="form-control select2 {{ $errors->has('kurikulum') ? 'is-invalid' : '' }}" name="kurikulum_id" id="kurikulum_id">
-                            @foreach($kurikulums as $id => $entry)
-                                <option value="{{ $id }}" {{ old('kurikulum_id') == $id ? 'selected' : '' }}>{{ $entry }}</option>
-                            @endforeach
-                        </select>
-                        @if($errors->has('kurikulum'))
-                            <span class="text-danger">{{ $errors->first('kurikulum') }}</span>
-                        @endif
-                        <span class="help-block">{{ trans('cruds.book.fields.kurikulum_helper') }}</span>
                     </div>
                 </div>
                 <div class="col-4">
@@ -92,6 +51,20 @@
                 </div>
                 <div class="col-4">
                     <div class="form-group">
+                        <label for="kurikulum_id">{{ trans('cruds.book.fields.kurikulum') }}</label>
+                        <select class="form-control select2 {{ $errors->has('kurikulum') ? 'is-invalid' : '' }}" name="kurikulum_id" id="kurikulum_id">
+                            @foreach($kurikulums as $id => $entry)
+                                <option value="{{ $id }}" {{ old('kurikulum_id') == $id ? 'selected' : '' }}>{{ $entry }}</option>
+                            @endforeach
+                        </select>
+                        @if($errors->has('kurikulum'))
+                            <span class="text-danger">{{ $errors->first('kurikulum') }}</span>
+                        @endif
+                        <span class="help-block">{{ trans('cruds.book.fields.kurikulum_helper') }}</span>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="form-group">
                         <label for="mapel_id">{{ trans('cruds.book.fields.mapel') }}</label>
                         <select class="form-control select2 {{ $errors->has('mapel') ? 'is-invalid' : '' }}" name="mapel_id" id="mapel_id">
                             @foreach($mapels as $id => $entry)
@@ -104,12 +77,67 @@
                         <span class="help-block">{{ trans('cruds.book.fields.mapel_helper') }}</span>
                     </div>
                 </div>
+                <div class="col-4">
+                    <div class="form-group">
+                        <label for="kelas_id">{{ trans('cruds.bookVariant.fields.kelas') }}</label>
+                        <select class="form-control select2 {{ $errors->has('kelas') ? 'is-invalid' : '' }}" name="kelas_id" id="kelas_id">
+                            @foreach($kelas as $id => $entry)
+                                <option value="{{ $id }}" {{ old('kelas_id') == $id ? 'selected' : '' }}>{{ $entry }}</option>
+                            @endforeach
+                        </select>
+                        @if($errors->has('kelas'))
+                            <span class="text-danger">{{ $errors->first('kelas') }}</span>
+                        @endif
+                        <span class="help-block">{{ trans('cruds.bookVariant.fields.kelas_helper') }}</span>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="form-group">
+                        <label for="semester_id">{{ trans('cruds.book.fields.semester') }}</label>
+                        <select class="form-control select2 {{ $errors->has('semester') ? 'is-invalid' : '' }}" name="semester_id" id="semester_id">
+                            @foreach($semesters as $id => $entry)
+                                <option value="{{ $id }}" {{ old('semester_id') == $id ? 'selected' : '' }}>{{ $entry }}</option>
+                            @endforeach
+                        </select>
+                        @if($errors->has('semester'))
+                            <span class="text-danger">{{ $errors->first('semester') }}</span>
+                        @endif
+                        <span class="help-block">{{ trans('cruds.book.fields.semester_helper') }}</span>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="form-group">
+                        <label for="cover_id">{{ trans('cruds.book.fields.isi') }}</label>
+                        <select class="form-control select2 {{ $errors->has('isi') ? 'is-invalid' : '' }}" name="isi_id" id="isi_id">
+                            @foreach($isis as $id => $entry)
+                                <option value="{{ $id }}" {{ old('isi_id') == $id ? 'selected' : '' }}>{{ $entry }}</option>
+                            @endforeach
+                        </select>
+                        @if($errors->has('isi'))
+                            <span class="text-danger">{{ $errors->first('isi') }}</span>
+                        @endif
+                        <span class="help-block">{{ trans('cruds.book.fields.cover_helper') }}</span>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="form-group">
+                        <label for="cover_id">{{ trans('cruds.book.fields.cover') }}</label>
+                        <select class="form-control select2 {{ $errors->has('cover') ? 'is-invalid' : '' }}" name="cover_id" id="cover_id">
+                            @foreach($covers as $id => $entry)
+                                <option value="{{ $id }}" {{ old('cover_id') == $id ? 'selected' : '' }}>{{ $entry }}</option>
+                            @endforeach
+                        </select>
+                        @if($errors->has('cover'))
+                            <span class="text-danger">{{ $errors->first('cover') }}</span>
+                        @endif
+                        <span class="help-block">{{ trans('cruds.book.fields.cover_helper') }}</span>
+                    </div>
+                </div>
             </div>
 
             <div class="form-group mt-3">
-                <button class="btn btn-primary" type="submit">
-                    Filter
-                </button>
+                <button id="buttonFilter" class="btn btn-primary">Filter</button>
+                <button type="submit" value="export" name="export" class="btn btn-warning">Export</button>
             </div>
         </form>
     </div>
@@ -155,10 +183,11 @@ $(function () {
             data: function(data) {
                 data.type = $('#type').val(),
                 data.semester = $('#semester_id').val(),
+                data.isi = $('#isi_id').val(),
                 data.cover = $('#cover_id').val(),
                 data.kurikulum = $('#kurikulum_id').val(),
                 data.jenjang = $('#jenjang_id').val(),
-                data.kelas = $('#kelas_id').val()
+                data.kelas = $('#kelas_id').val(),
                 data.mapel = $('#mapel_id').val()
             }
         },
@@ -198,7 +227,7 @@ $(function () {
         .columns.adjust();
     });
 
-    $("#filterform").submit(function(event) {
+    $("#buttonFilter").click(function(event) {
         event.preventDefault();
         table.ajax.reload();
     });

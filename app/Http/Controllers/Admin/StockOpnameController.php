@@ -16,11 +16,14 @@ use App\Models\Jenjang;
 use App\Models\Kurikulum;
 use App\Models\Semester;
 use App\Models\Unit;
+use App\Models\Isi;
 use App\Models\Cover;
 use App\Models\Kelas;
 use App\Models\Mapel;
 use Yajra\DataTables\Facades\DataTables;
 use DB;
+use Carbon\Carbon;
+use App\Exports\StockOpname;
 
 class StockOpnameController extends Controller
 {
@@ -36,6 +39,12 @@ class StockOpnameController extends Controller
             }
             if (!empty($request->semester)) {
                 $query->where('semester_id', $request->semester);
+            }
+            if (!empty($request->jenjang)) {
+                $query->where('jenjang_id', $request->jenjang);
+            }
+            if (!empty($request->isi)) {
+                $query->where('isi_id', $request->isi);
             }
             if (!empty($request->cover)) {
                 $query->where('cover_id', $request->cover);
@@ -105,19 +114,21 @@ class StockOpnameController extends Controller
             return $table->make(true);
         }
 
-        $jenjangs = Jenjang::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $jenjangs = Jenjang::pluck('name', 'id')->prepend('All', '');
 
-        $kurikulums = Kurikulum::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $kurikulums = Kurikulum::pluck('name', 'id')->prepend('All', '');
 
-        $mapels = Mapel::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $mapels = Mapel::pluck('name', 'id')->prepend('All', '');
 
-        $kelas = Kelas::pluck('name', 'id');
+        $kelas = Kelas::pluck('name', 'id')->prepend('All', '');
 
-        $covers = Cover::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $covers = Cover::pluck('name', 'id')->prepend('All', '');
 
-        $semesters = Semester::where('status', 1)->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $isis = Isi::pluck('name', 'id')->prepend('All', '');
 
-        return view('admin.stockOpnames.index', compact('covers', 'jenjangs', 'kelas', 'kurikulums', 'mapels', 'semesters'));
+        $semesters = Semester::where('status', 1)->pluck('name', 'id')->prepend('All', '');
+
+        return view('admin.stockOpnames.index', compact('covers', 'jenjangs', 'kelas', 'kurikulums', 'mapels', 'semesters', 'isis'));
     }
 
 
@@ -125,7 +136,7 @@ class StockOpnameController extends Controller
 
         $buku = BookVariant::where('type', 'L')->where('stock','>', 0)->selectRaw('stock * price AS total_price')->get();
         $pg = BookVariant::where('type', 'P')->where('stock','>', 0)->selectRaw('stock * price AS total_price')->get();
-        
+
         // $summary_jenjang = Product::where('stock', '>', '0')->with('jenjang')->selectRaw('jenjang_id, SUM(stock) as total_stock, SUM(stock * price) AS total_price, SUM(stock * hpp) AS total_hpp')->groupBy('jenjang_id')->get();
         // $summary_semester = Product::where('stock', '>', '0')->with('semester')->selectRaw('semester_id, SUM(stock) as total_stock, SUM(stock * price) AS total_price, SUM(stock * hpp) AS total_hpp')->groupBy('semester_id')->get();
 
@@ -192,5 +203,39 @@ class StockOpnameController extends Controller
         }
 
         return response(null, Response::HTTP_NO_CONTENT);
+    }
+
+    public function export(Request $request)
+    {
+        $query = BookVariant::with(['book', 'components', 'jenjang', 'semester', 'kurikulum', 'halaman', 'warehouse', 'unit']);
+
+        if (!empty($request->type)) {
+            $query->where('type', $request->type);
+        }
+        if (!empty($request->jenjang_id)) {
+            $query->where('jenjang_id', $request->jenjang_id);
+        }
+        if (!empty($request->kurikulum_id)) {
+            $query->where('kurikulum_id', $request->kurikulum_id);
+        }
+        if (!empty($request->isi_id)) {
+            $query->where('isi_id', $request->isi_id);
+        }
+        if (!empty($request->cover_id)) {
+            $query->where('cover_id', $request->cover_id);
+        }
+        if (!empty($request->kelas_id)) {
+            $query->where('kelas_id', $request->kelas_id);
+        }
+        if (!empty($request->mapel_id)) {
+            $query->where('mapel_id', $request->mapel_id);
+        }
+        if (!empty($request->semester_id)) {
+            $query->where('semester_id', $request->semester_id);
+        }
+
+        $stock_opname = $query->get();
+
+        return (new StockOpname($stock_opname))->download('STOCK OPNAME TANGGAL ' . Carbon::now()->format('d-F-Y') .'.xlsx');
     }
 }
