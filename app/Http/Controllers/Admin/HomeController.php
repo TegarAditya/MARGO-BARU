@@ -3,7 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use LaravelDaily\LaravelCharts\Classes\LaravelChart;
-
+use App\Models\EstimationMovement;
+use App\Models\ProductionEstimation;
 class HomeController
 {
     public function index()
@@ -223,5 +224,20 @@ class HomeController
         }
 
         return view('home', compact('chart2', 'chart3', 'chart4', 'chart5', 'settings1', 'settings6', 'settings7', 'settings8'));
+    }
+
+    public function god()
+    {
+        $rekap = ProductionEstimation::whereHas('product', function ($query) {
+            $query->where('code', 'LIKE', '%MMP%')
+            ->where('type', 'L');
+        })->get();
+
+        foreach ($rekap as $item) {
+            $code = substr($item->code, 2, 18);
+            dd($code);
+        }
+
+        dd('aaa');
     }
 }
