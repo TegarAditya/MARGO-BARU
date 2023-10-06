@@ -119,6 +119,18 @@ class BookVariant extends Model implements HasMedia
         return $name;
     }
 
+    public function getKelengkapanNameAttribute()
+    {
+        $name = ($this->isi ? $this->isi->name : '') .''. ($this->isi && $this->cover ? ' - ' : ' ') .''. ($this->cover ? $this->cover->name : '');
+        $halaman = $this->halaman ? $this->halaman->name : 'Halaman KOSONG';
+        if ($this->type !== 'L') {
+            $tipe = BookVariant::TYPE_SELECT[$this->type] ?? '';
+            return $tipe .' - '.$halaman .' - '. $name;
+        }
+
+        return $name;
+    }
+
     public function getBookTypeAttribute()
     {
         $name = BookVariant::TYPE_SELECT[$this->type] ?? '';

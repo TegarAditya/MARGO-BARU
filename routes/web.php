@@ -124,6 +124,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     Route::get('book-variants/get-products', 'BookVariantController@getProducts')->name('book-variants.getProducts');
     Route::get('book-variants/get-books', 'BookVariantController@getBooks')->name('book-variants.getBooks');
     Route::get('book-variants/get-book', 'BookVariantController@getBook')->name('book-variants.getBook');
+    Route::get('book-variants/get-pg', 'BookVariantController@getPg')->name('book-variants.getPg');
     Route::get('book-variants/get-estimasi', 'BookVariantController@getEstimasi')->name('book-variants.getEstimasi');
     Route::get('book-variants/get-info-estimasi', 'BookVariantController@getInfoEstimasi')->name('book-variants.getInfoEstimasi');
     Route::get('book-variants/get-delivery', 'BookVariantController@getDelivery')->name('book-variants.getDelivery');

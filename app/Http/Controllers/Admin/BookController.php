@@ -519,7 +519,6 @@ class BookController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
 
-            dd($e);
             Alert::error('Error', $e->getMessage());
 
             return redirect()->back()->withInput();
