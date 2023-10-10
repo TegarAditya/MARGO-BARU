@@ -46,6 +46,9 @@ class BillController extends Controller
                     <a class="px-1" href="'.route('admin.bills.cetakBilling', ['salesperson' => $row->salesperson_id]).'" title="Print Saldo" target="_blank">
                         <i class="fas fa-print text-secondary fa-lg"></i>
                     </a>
+                    <a class="px-1" href="'.route('admin.bills.cetakBilling', ['salesperson' => $row->salesperson_id, 'rekap' => 1]).'" title="Print Rekap Saldo" target="_blank">
+                        <i class="fas fa-print text-danger fa-lg"></i>
+                    </a>
                 ';
 
                 return $btn;
@@ -362,6 +365,10 @@ class BillController extends Controller
 
         $salesperson = Salesperson::find($salesperson);
         $semester = Semester::find($semester);
+
+        if ($request->rekap == 1) {
+            return view('admin.bills.rekap_saldo', compact('salesperson', 'semester', 'invoices', 'adjustments', 'returs', 'payments', 'billing', 'bills', 'invoices_old', 'adjustments_old', 'returs_old', 'payments_old', 'list_semester'));
+        }
 
         return view('admin.bills.saldo', compact('salesperson', 'semester', 'invoices', 'adjustments', 'returs', 'payments', 'billing', 'bills', 'invoices_old', 'adjustments_old', 'returs_old', 'payments_old', 'list_semester'));
     }

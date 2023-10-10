@@ -340,6 +340,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     Route::put('cetaks/realisasi/{cetak}', 'CetakController@realisasiStore')->name('cetaks.realiasasiStore');
     Route::get('cetaks/print-spc/{cetak}', 'CetakController@printSpc')->name('cetaks.printSpc');
     Route::get('cetaks/isi-cover', 'CetakController@getIsiCover')->name('cetaks.getIsiCover');
+    Route::post('cetaks/rekap', 'CetakController@rekap')->name('cetaks.rekap');
     Route::resource('cetaks', 'CetakController');
 
     // Cetak Item
@@ -353,6 +354,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     Route::get('finishings/{finishing}/realisasi', 'FinishingController@realisasi')->name('finishings.realisasi');
     Route::put('finishings/realisasi/{finishing}', 'FinishingController@realisasiStore')->name('finishings.realiasasiStore');
     Route::get('finishings/print-spk/{finishing}', 'FinishingController@printSpk')->name('finishings.printSpk');
+    Route::post('finishings/rekap', 'FinishingController@rekap')->name('finishings.rekap');
     Route::resource('finishings', 'FinishingController');
 
     // Finishing Item

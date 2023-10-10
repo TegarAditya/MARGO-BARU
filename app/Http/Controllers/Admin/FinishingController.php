@@ -22,6 +22,8 @@ use Alert;
 use Carbon\Carbon;
 use App\Services\EstimationService;
 use App\Services\StockService;
+use App\Exports\FinishingRekapExport;
+use Illuminate\Support\Facades\Date;
 
 class FinishingController extends Controller
 {
@@ -501,6 +503,33 @@ class FinishingController extends Controller
         $finishing_items = FinishingItem::with('product')->where('finishing_id', $finishing->id)->get();
 
         return view('admin.finishings.spk', compact('finishing', 'finishing_items'));
+    }
+
+    public function rekap(Request $request)
+    {
+        if ($request->has('date') && $request->date && $dates = explode(' - ', $request->date)) {
+            $start = Date::parse($dates[0])->startOfDay();
+            $end = !isset($dates[1]) ? $start->clone()->endOfMonth() : Date::parse($dates[1])->endOfDay();
+        } else {
+            $start = Carbon::now()->startOfMonth();
+            $end = Carbon::now();
+        }
+
+        $query = Finishing::whereBetween('date', [$start, $end]);
+
+        if (!empty($request->type)) {
+            $query->where('type', $request->type);
+        }
+        if (!empty($request->vendor)) {
+            $query->where('vendor_id', $request->vendor);
+        }
+        if (!empty($request->semester)) {
+            $query->where('semester_id', $request->semester);
+        }
+
+        $rekap = $query->orderBy('date', 'ASC')->get();
+
+        return (new FinishingRekapExport($rekap))->download('REKAP FINISHING PERIODE ' . $start->format('d-F-Y') .' sd '. $end->format('d-F-Y') .'.xlsx');
     }
 
     function costFinishing($halaman, $quantity)

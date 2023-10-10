@@ -23,8 +23,30 @@
     </div>
 
     <div class="card-body">
-        <form id="filterform">
+        <form id="filterform" method="POST" action="{{ route("admin.finishings.rekap") }}" enctype="multipart/form-data">
+            @csrf
             <div class="row">
+                <div class="col-12">
+                    <div class="form-group">
+                        <label class="required" for="date">Tanggal</label>
+                        <x-admin.form-group
+                            type="text"
+                            id="date"
+                            name="date"
+                            containerClass=" m-0"
+                            boxClass=" px-2 py-1"
+                            class="form-control-sm"
+                            value="{{ request('date', old('date'))}}"
+                            placeholder="Pilih Tanggal"
+                        >
+                            <x-slot name="right">
+                                <button type="button" class="btn btn-sm border-0 btn-default px-2 date-clear" data-action="+" style="display:{{ !request('date', old('date')) ? 'none' : 'block' }}">
+                                    <i class="fa fa-times"></i>
+                                </button>
+                            </x-slot>
+                        </x-admin.form-group>
+                    </div>
+                </div>
                 <div class="col-6">
                     <div class="form-group">
                         <label for="semester_id">{{ trans('cruds.cetak.fields.semester') }}</label>
@@ -56,9 +78,8 @@
             </div>
 
             <div class="form-group mt-3">
-                <button class="btn btn-success" type="submit">
-                    Filter
-                </button>
+                <button id="buttonFilter" class="btn btn-success">Filter</button>
+                <button type="submit" value="export" name="export" class="btn btn-warning">Rekap</button>
             </div>
         </form>
     </div>
@@ -99,6 +120,7 @@
 @endsection
 @section('scripts')
 @parent
+<script src="https://cdn.jsdelivr.net/npm/@easepick/bundle@1.2.0/dist/index.umd.min.js"></script>
 <script>
 $(function () {
   let dtOverrideGlobals = {
@@ -132,11 +154,36 @@ $(function () {
             .columns.adjust();
     });
 
-    $("#filterform").submit(function(event) {
+    var picker = new easepick.create({
+        element: $('#date').get(0),
+        css: [
+            'https://cdn.jsdelivr.net/npm/@easepick/bundle@1.2.0/dist/index.css',
+        ],
+        plugins: ['RangePlugin', 'LockPlugin'],
+        RangePlugin: {
+            tooltip: true,
+        },
+        LockPlugin: {
+            maxDate: new Date(),
+        },
+    });
+
+    picker.on('select', function(e) {
+        $('#date').trigger('change');
+        $('.date-clear').show();
+    });
+
+    $('.date-clear').on('click', function(e) {
+        e.preventDefault();
+
+        picker.clear();
+        $(e.currentTarget).hide();
+    });
+
+    $("#buttonFilter").click(function(event) {
         event.preventDefault();
         table.ajax.reload();
     });
-
 });
 
 </script>

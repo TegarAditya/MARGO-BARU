@@ -72,7 +72,7 @@ class BookVariantController extends Controller
 
             $table->editColumn('actions', function ($row) {
                 $viewGate      = 'book_variant_show';
-                $editGate      = 'book_variant_edit';
+                $editGate      = 'book_variant_edit_hidden';
                 $deleteGate    = 'book_variant_delete';
                 $crudRoutePart = 'book-variants';
 

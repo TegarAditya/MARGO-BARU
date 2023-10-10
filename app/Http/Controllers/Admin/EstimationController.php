@@ -206,14 +206,15 @@ class EstimationController extends Controller
                 $product = BookVariant::find($pgs[$i]);
                 $quantity = $pg_quantities[$i];
 
-                $estimasi_item = EstimationItem::create([
+                $estimasi_item = EstimationItem::updateOrCreate([
                     'estimation_id' => $estimasi->id,
                     'semester_id' => $semester,
                     'salesperson_id' => $salesperson,
                     'product_id' => $product->id,
                     'jenjang_id' => $product->jenjang_id,
                     'kurikulum_id' => $product->kurikulum_id,
-                    'quantity' => $quantity
+                ], [
+                    'quantity' => DB::raw("quantity + $quantity")
                 ]);
 
                 $order = SalesOrder::updateOrCreate([
@@ -518,7 +519,7 @@ class EstimationController extends Controller
 
         $estimation->load('semester', 'salesperson');
 
-        $estimasi_list = EstimationItem::where('estimation_id', $estimation->id)->get();
+        $estimasi_list = EstimationItem::where('estimation_id', $estimation->id)->get()->sortBy('product.kelas_id')->sortBy('product.mapel_id')->sortBy('product.type');
 
         return view('admin.estimations.show', compact('estimation', 'estimasi_list'));
     }

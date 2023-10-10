@@ -29,6 +29,8 @@ use Carbon\Carbon;
 use App\Services\EstimationService;
 use App\Services\StockService;
 use App\Services\TransactionService;
+use App\Exports\CetakRekapExport;
+use Illuminate\Support\Facades\Date;
 
 class CetakController extends Controller
 {
@@ -584,5 +586,32 @@ class CetakController extends Controller
         }
 
         return response()->json($formattedItems);
+    }
+
+    public function rekap(Request $request)
+    {
+        if ($request->has('date') && $request->date && $dates = explode(' - ', $request->date)) {
+            $start = Date::parse($dates[0])->startOfDay();
+            $end = !isset($dates[1]) ? $start->clone()->endOfMonth() : Date::parse($dates[1])->endOfDay();
+        } else {
+            $start = Carbon::now()->startOfMonth();
+            $end = Carbon::now();
+        }
+
+        $query = Cetak::whereBetween('date', [$start, $end]);
+
+        if (!empty($request->type)) {
+            $query->where('type', $request->type);
+        }
+        if (!empty($request->vendor)) {
+            $query->where('vendor_id', $request->vendor);
+        }
+        if (!empty($request->semester)) {
+            $query->where('semester_id', $request->semester);
+        }
+
+        $rekap = $query->orderBy('date', 'ASC')->get();
+
+        return (new CetakRekapExport($rekap))->download('REKAP CETAK PERIODE ' . $start->format('d-F-Y') .' sd '. $end->format('d-F-Y') .'.xlsx');
     }
 }
