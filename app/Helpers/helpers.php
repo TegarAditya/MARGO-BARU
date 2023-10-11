@@ -12,6 +12,7 @@ use App\Models\DeliveryOrder;
 use App\Models\SalesOrder;
 use App\Models\Cetak;
 use App\Models\CetakItem;
+use App\Models\PlatePrintItem;
 
 
 if (! function_exists('formatCurrency')) {
@@ -173,6 +174,24 @@ if (! function_exists('cetakDone')) {
         } else {
             return 'warning';
         }
+    }
+}
+
+if (! function_exists('checkPlateTask')) {
+    function checkPlateTask()
+    {
+        $tasks = PlatePrintItem::where('status', 'created')->where('semester_id', setting('current_semester'))->count();
+
+        return $tasks;
+    }
+}
+
+if (! function_exists('checkPlateWorking')) {
+    function checkPlateWorking()
+    {
+        $tasks = PlatePrintItem::where('status', 'accepted')->where('semester_id', setting('current_semester'))->count();
+
+        return $tasks;
     }
 }
 

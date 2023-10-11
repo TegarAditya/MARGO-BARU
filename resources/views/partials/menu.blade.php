@@ -870,6 +870,9 @@
                                         </i>
                                         <p>
                                             Task List
+                                            @if(checkPlateTask() > 0)
+                                                <span class="badge badge-info right">{{ checkPlateTask() }}</span>
+                                            @endif
                                         </p>
                                     </a>
                                 </li>
@@ -880,6 +883,10 @@
                                         </i>
                                         <p>
                                             Realisasi List
+                                            @if(checkPlateWorking() > 0)
+                                                <span class="badge badge-info right">{{ checkPlateWorking() }}</span>
+                                            @endif
+                                        </p>
                                         </p>
                                     </a>
                                 </li>
