@@ -219,21 +219,10 @@
                 type: 'GET',
                 dataType: 'json',
                 success: function(product) {
-                    function sortItems() {
-                        const productForm = $('#product-form');
-                        const items = productForm.children('.item-product');
-                        items.sort(function(a, b) {
-                            const idA = parseInt(a.id.split('-')[1]);
-                            const idB = parseInt(b.id.split('-')[1]);
-                            return idA - idB;
-                        });
-                        productForm.empty().append(items);
-                    }
-
                     var formHtml = `
                         <div class="item-product" id="product-${product.id}">
                             <div class="row">
-                                <div class="col-7 align-self-center">
+                                <div class="col-5 align-self-center">
                                     <h6 class="text-sm product-name mb-1">(${product.book_type}) ${product.short_name}</h6>
                                     <p class="mb-0 text-sm">
                                         Code : <strong>${product.code}</strong>
@@ -257,21 +246,84 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-auto pl-5">
-                                        <button type="button" class="btn btn-danger btn-sm product-delete" data-product-id="${product.id}" tabIndex="-1">
-                                            <i class="fa fa-trash"></i>
-                                        </button>
+                    `;
+                    if (product.type == 'L') {
+                        formHtml += `<div class="col" style="min-width: 240px">
+                                        <p class="mb-0 text-sm">Pegangan Guru</p>
+                                        <div class="form-group text-field m-0">
+                                            <select class="form-control text-center pegeh" name="pgs[]" style="width: 100%;" tabIndex="-1" data-product="${product.id}">
+                                                <option></option>
+                                            </select>
+                                        </div>
                                     </div>
+                                    <div class="col" style="max-width: 160px">
+                                        <p class="mb-0 text-sm">Estimasi PG</p>
+                                        <div class="form-group text-field m-0">
+                                            <div class="text-field-input px-2 py-0">
+                                                <input class="pg_quantity" type="hidden" name="pg_quantities[]" value="0">
+                                                <input class="form-control text-center pg_quantity_text" type="text" name="pg_quantity_text[]" value="0" required>
+                                                <label class="text-field-border"></label>
+                                            </div>
+                                        </div>
+                                    </div>`;
+                    }
+                    formHtml += `<div class="col-auto pl-5">
+                                    <button type="button" class="btn btn-danger btn-sm product-delete" data-product-id="${product.id}" tabIndex="-1">
+                                        <i class="fa fa-trash"></i>
+                                    </button>
                                 </div>
                             </div>
-                            <hr style="margin: 1em -15px;border-color:#ccc" />
                         </div>
+                        <hr style="margin: 1em -15px;border-color:#ccc" />
+                    </div>
                     `;
-
-                    $('#product-form').prepend(formHtml);
+                    $('#product-form').append(formHtml);
                     $('#product-search').val(null).trigger('change');
 
+                    if (!product.halaman_id) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Buku Belum Input Halaman!',
+                            showConfirmButton: false,
+                            timer: 2000
+                        });
+                    }
+
                     sortItems();
+
+                    $('.pegeh').select2({
+                        ajax: {
+                            url: "{{ route('admin.book-variants.getPg') }}",
+                            data: function() {
+                                return {
+                                    id: $(this).data('product')
+                                };
+                            },
+                            dataType: 'json',
+                            processResults: function(data) {
+                                if (data.length > 0) {
+                                    // If data is not empty, return the processed results
+                                    return {
+                                        results: data
+                                    };
+                                } else {
+                                    // If data is empty, show the SweetAlert alert and return empty results
+                                    Swal.fire({
+                                        title: 'Pegangan Guru Not Found',
+                                        text: 'Pegangan Guru Not Foundk',
+                                        icon: 'warning',
+                                        showCancelButton: true,
+                                        confirmButtonText: 'Okay',
+                                        cancelButtonText: 'Cancel'
+                                    });
+
+                                    return {
+                                        results: []
+                                    };
+                                }
+                            }
+                        }
+                    });
 
                     var productForm = $('#product-form');
                     var productItem = productForm.find('.item-product');
@@ -280,8 +332,10 @@
                         var product = $(item);
                         var quantity = product.find('.quantity');
                         var quantityText = product.find('.quantity_text');
+                        var pgQuantity = product.find('.pg_quantity');
+                        var pgQuantityText = product.find('.pg_quantity_text');
 
-                        quantityText.on('input change', function(e) {
+                        quantityText.on('input', function(e) {
                             var value = numeral(e.target.value);
 
                             quantityText.val(value.format('0,0'));
@@ -296,6 +350,22 @@
                                 quantityText.val(0).trigger('change');
                             }
                         }).trigger('change');
+
+                        pgQuantityText.on('input', function(e) {
+                            var value = numeral(e.target.value);
+
+                            pgQuantityText.val(value.format('0,0'));
+                            pgQuantity.val(value.value()).trigger('change');
+                        }).trigger('change');
+
+                        pgQuantity.on('change', function(e) {
+                            var el = $(e.currentTarget);
+                            var valueNum = parseInt(el.val());
+                            if (valueNum < 0) {
+                                el.val(0);
+                                pgQuantityText.val(0).trigger('change');
+                            }
+                        }).trigger('change');
                     });
                 },
                 error: function(xhr, status, error) {
@@ -308,6 +378,21 @@
             var productId = $(this).data('product-id');
             $('#product-' + productId).remove();
         });
+
+        function sortItems() {
+            var productForm = $('#product-form');
+            var items = productForm.find('.item-product').get();
+
+            items.sort(function(a, b) {
+                const idA = parseInt(a.id.split('-')[1]);
+                const idB = parseInt(b.id.split('-')[1]);
+                return idA - idB;
+            });
+
+            $("select.pegeh.select2-hidden-accessible").select2('destroy');
+
+            productForm.empty().append(items);
+        }
     });
 </script>
 @endsection
