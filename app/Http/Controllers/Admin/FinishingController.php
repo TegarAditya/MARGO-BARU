@@ -385,7 +385,8 @@ class FinishingController extends Controller
                 $finishing_item = FinishingItem::find($finishing_items[$i]);
 
                 $status = $done[$i];
-                if ($finishing_item->done || !$status) {
+                if ($finishing_item->done) {
+                    // if ($finishing_item->done || !$status) {
                     continue;
                 }
 
