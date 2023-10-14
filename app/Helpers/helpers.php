@@ -8,6 +8,7 @@
 
 use App\Models\Setting;
 use App\Models\Semester;
+use App\Models\Vendor;
 use App\Models\DeliveryOrder;
 use App\Models\SalesOrder;
 use App\Models\Cetak;
@@ -192,6 +193,24 @@ if (! function_exists('checkPlateWorking')) {
         $tasks = PlatePrintItem::where('status', 'accepted')->where('semester_id', setting('current_semester'))->count();
 
         return $tasks;
+    }
+}
+
+if (! function_exists('getVendorName')) {
+    function getVendorName($id)
+    {
+        $vendor = Vendor::find($id);
+
+        return $vendor ? $vendor->name : '';
+    }
+}
+
+if (! function_exists('getSemesterName')) {
+    function getSemesterName($id)
+    {
+        $semester = Semester::find($id);
+
+        return $semester ? $semester->name : '';
     }
 }
 

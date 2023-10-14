@@ -79,7 +79,8 @@
 
             <div class="form-group mt-3">
                 <button id="buttonFilter" class="btn btn-success">Filter</button>
-                <button type="submit" value="export" name="export" class="btn btn-warning">Rekap</button>
+                <button type="submit" value="export" name="export" class="btn btn-warning">Rekap SPK</button>
+                <button type="submit" value="realisasi" name="realisasi" class="btn btn-danger">Rekap Realisasi</button>
             </div>
         </form>
     </div>

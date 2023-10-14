@@ -23,6 +23,7 @@ use Carbon\Carbon;
 use App\Services\EstimationService;
 use App\Services\StockService;
 use App\Exports\FinishingRekapExport;
+use App\Exports\RealisasiRekapExport;
 use Illuminate\Support\Facades\Date;
 
 class FinishingController extends Controller
@@ -516,15 +517,33 @@ class FinishingController extends Controller
             $end = Carbon::now();
         }
 
+        if ($request->has('realisasi')) {
+            if (!$request->vendor_id) {
+                Alert::warning('Warning', 'Vendor Kosong !');
+                return back();
+            }
+            $semester = $request->semester_id ?? setting('current_semester');
+            $vendor = $request->vendor_id;
+
+            $realisasi = BookVariant::whereHas('finishing')->withSum(['finishing as estimasi' => function ($q) use ($semester, $vendor) {
+                $q->where('semester_id', $semester)->whereHas('finishing', function ($q) use ($vendor) {
+                    $q->where('vendor_id', $vendor);
+                })->select(DB::raw('COALESCE(SUM(estimasi), 0)'));
+            }], 'estimasi')->withSum(['finishing as quantity' => function ($q) use ($semester, $vendor) {
+                $q->where('semester_id', $semester)->whereHas('finishing', function ($q) use ($vendor) {
+                    $q->where('vendor_id', $vendor);
+                })->select(DB::raw('COALESCE(SUM(quantity), 0)'));
+            }], 'quantity')->where('semester_id', $semester)->get();
+
+            return (new RealisasiRekapExport($realisasi))->download('REKAP REALISASI '. getVendorName($vendor) .' PERIODE '. str_replace(array("/", "\\", ":", "*", "?", "«", "<", ">", "|"), "-", getSemesterName($semester)) .'.xlsx');
+        }
+
         $query = Finishing::whereBetween('date', [$start, $end]);
 
-        if (!empty($request->type)) {
-            $query->where('type', $request->type);
-        }
-        if (!empty($request->vendor)) {
+        if (!empty($request->vendor_id)) {
             $query->where('vendor_id', $request->vendor);
         }
-        if (!empty($request->semester)) {
+        if (!empty($request->semester_id)) {
             $query->where('semester_id', $request->semester);
         }
 
@@ -532,6 +551,7 @@ class FinishingController extends Controller
 
         return (new FinishingRekapExport($rekap))->download('REKAP FINISHING PERIODE ' . $start->format('d-F-Y') .' sd '. $end->format('d-F-Y') .'.xlsx');
     }
+
 
     function costFinishing($halaman, $quantity)
     {
