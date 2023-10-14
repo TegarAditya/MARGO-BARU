@@ -533,7 +533,8 @@ class FinishingController extends Controller
                 $q->where('semester_id', $semester)->whereHas('finishing', function ($q) use ($vendor) {
                     $q->where('vendor_id', $vendor);
                 })->select(DB::raw('COALESCE(SUM(quantity), 0)'));
-            }], 'quantity')->where('semester_id', $semester)->get();
+            }], 'quantity')->where('semester_id', $semester)->orderBy('jenjang_id', 'ASC')->orderBy('mapel_id', 'ASC')
+                ->orderBy('kelas_id', 'ASC')->orderBy('cover_id', 'ASC')->get();
 
             return (new RealisasiRekapExport($realisasi))->download('REKAP REALISASI '. getVendorName($vendor) .' PERIODE '. str_replace(array("/", "\\", ":", "*", "?", "«", "<", ">", "|"), "-", getSemesterName($semester)) .'.xlsx');
         }
