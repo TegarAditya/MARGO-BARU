@@ -385,15 +385,15 @@ class FinishingController extends Controller
             for ($i = 0; $i < count($products); $i++) {
                 $finishing_item = FinishingItem::find($finishing_items[$i]);
 
-                $status = $done[$i];
-                if ($finishing_item->done) {
-                    // if ($finishing_item->done || !$status) {
-                    continue;
-                }
-
                 $quantity_old = $finishing_item->quantity;
                 $product = $products[$i];
                 $quantity = $quantities[$i];
+                $status = $done[$i];
+
+                if ($finishing_item->done || $quantity_old == $quantity) {
+                    // if ($finishing_item->done || !$status) {
+                    continue;
+                }
 
                 $finishing_item->update([
                     'quantity' => $quantity,
