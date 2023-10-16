@@ -401,10 +401,10 @@ class FinishingController extends Controller
                 ]);
 
                 EstimationService::createMovement('out', 'finishing', $finishing->id, $product, $quantity - $quantity_old, 'realisasi');
-                EstimationService::createUpdateRealisasi($product, $quantity);
+                EstimationService::createUpdateRealisasi($product, $quantity - $quantity_old);
 
                 StockService::createMovement('in', 'produksi', $finishing->id, $date, $product, $quantity - $quantity_old);
-                StockService::updateStock($product, $quantity);
+                StockService::updateStock($product, $quantity - $quantity_old);
             }
 
             $finishing->update([
