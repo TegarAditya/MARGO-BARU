@@ -74,6 +74,22 @@
                                 {{ money($cetak->total_cost) }}
                             </td>
                         </tr>
+                        <tr>
+                            <th>
+                                Dibuat Oleh
+                            </th>
+                            <td>
+                                {{ $cetak->created_by->name }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>
+                                Diedit Oleh
+                            </th>
+                            <td>
+                                {{ $cetak->updated_by->name }}
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </section>

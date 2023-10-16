@@ -98,6 +98,9 @@
                         Discount
                     </th>
                     <th>
+                        Diedit Oleh
+                    </th>
+                    <th>
                         &nbsp;
                     </th>
                 </tr>
@@ -132,6 +135,7 @@ $(function () {
         { data: 'salesperson_name', name: 'salesperson.name', class: 'text-center' },
         { data: 'total', name: 'total', class: 'text-right' },
         { data: 'discount', name: 'discount', class: 'text-right' },
+        { data: 'updated_by', name: 'updated_by', class: 'text-center' },
         { data: 'actions', name: '{{ trans('global.actions') }}', class: 'text-center' }
     ],
     orderCellsTop: true,

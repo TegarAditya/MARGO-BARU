@@ -75,6 +75,9 @@
                         {{ trans('cruds.returnGood.fields.nominal') }}
                     </th>
                     <th>
+                        Diedit Oleh
+                    </th>
+                    <th>
                         &nbsp;
                     </th>
                 </tr>
@@ -110,6 +113,7 @@ $(function () {
         { data: 'salesperson_name', name: 'salesperson.name', class: 'text-center' },
         { data: 'semester_name', name: 'semester.name', class: 'text-center' },
         { data: 'nominal', name: 'nominal', class: 'text-right' },
+        { data: 'updated_by', name: 'updated_by', class: 'text-center' },
         { data: 'actions', name: '{{ trans('global.actions') }}', class: 'text-center' }
     ],
     orderCellsTop: true,

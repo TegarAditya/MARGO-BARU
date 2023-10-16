@@ -80,7 +80,11 @@ class DeliveryOrderController extends Controller
                 return $row->salesperson ? $row->salesperson->short_name : '';
             });
 
-            $table->rawColumns(['actions', 'placeholder', 'semester', 'salesperson']);
+            $table->addColumn('updated_by', function ($row) {
+                return $row->updated_by ? $row->updated_by->name : '';
+            });
+
+            $table->rawColumns(['actions', 'placeholder', 'semester', 'salesperson', 'updated_by']);
 
             return $table->make(true);
         }

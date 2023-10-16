@@ -70,6 +70,9 @@
                         {{ trans('cruds.deliveryOrder.fields.salesperson') }}
                     </th>
                     <th>
+                        Diedit Oleh
+                    </th>
+                    <th>
                         &nbsp;
                     </th>
                 </tr>
@@ -103,6 +106,7 @@ $(function () {
         { data: 'date', name: 'date', class: 'text-center' },
         { data: 'semester_name', name: 'semester.name', class: 'text-center' },
         { data: 'salesperson_name', name: 'salesperson.name', class: 'text-center' },
+        { data: 'updated_by', name: 'updated_by', class: 'text-center' },
         { data: 'actions', name: '{{ trans('global.actions') }}', class: 'text-center' }
     ],
     orderCellsTop: true,

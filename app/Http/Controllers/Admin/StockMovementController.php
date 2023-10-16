@@ -24,6 +24,10 @@ class StockMovementController extends Controller
             $query = StockMovement::with(['warehouse', 'product', 'material', 'reversal_of'])->select(sprintf('%s.*', (new StockMovement)->table))->orderBy('id', 'DESC');
             $table = Datatables::of($query);
 
+            $table->editColumn('id', function ($row) {
+                return '#'.$row->id;
+            });
+
             $table->editColumn('movement_type', function ($row) {
                 return $row->movement_type ? StockMovement::MOVEMENT_TYPE_SELECT[$row->movement_type] : '';
             });
@@ -66,7 +70,11 @@ class StockMovementController extends Controller
                 return $row->transaction_type ? StockMovement::TRANSACTION_TYPE_SELECT[$row->transaction_type] : '';
             });
 
-            $table->rawColumns(['product_code', 'product_name', 'reference']);
+            $table->addColumn('pengedit', function ($row) {
+                return $row->pengedit ? $row->pengedit->name : '';
+            });
+
+            $table->rawColumns(['product_code', 'product_name', 'reference', 'pengedit']);
 
             return $table->make(true);
         }

@@ -117,6 +117,14 @@
                             @endforeach
                         </td>
                     </tr>
+                    <tr>
+                        <th>
+                            Diedit Oleh
+                        </th>
+                        <td>
+                            <b>{{ $bookVariant->pengedit->name ?? '' }}<b>
+                        </td>
+                    </tr>
                 </tbody>
             </table>
             <h3 class="mt-5 mb-3">History Product Movement</h3>
@@ -144,6 +152,9 @@
                             </th>
                             <th>
                                 Date
+                            </th>
+                            <th>
+                                Diedit Oleh
                             </th>
                         </tr>
                     </thead>
@@ -187,6 +198,9 @@
                                 </td>
                                 <td class="text-center">
                                     {{ $stockMovement->created_at ?? '' }}
+                                </td>
+                                <td class="text-center">
+                                    {{ $stockMovement->pengedit ? $stockMovement->pengedit->name : '' }}
                                 </td>
                             </tr>
                         @php

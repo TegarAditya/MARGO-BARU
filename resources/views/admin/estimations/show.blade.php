@@ -47,6 +47,22 @@
                                 {{ $estimation->semester->name ?? '' }}
                             </td>
                         </tr>
+                        <tr>
+                            <th width="150">
+                                Dibuat Oleh
+                            </th>
+                            <td>
+                                {{ $estimation->created_by->name ?? '' }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th width="150">
+                                Diedit Oleh
+                            </th>
+                            <td>
+                                {{ $estimation->updated_by->name ?? '' }}
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </section>

@@ -88,6 +88,22 @@
                             {{ $payment->note }}
                         </td>
                     </tr>
+                    <tr>
+                        <th>
+                            dibuat Oleh
+                        </th>
+                        <td>
+                            {{ $payment->created_by->name }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>
+                            Diedit Oleh
+                        </th>
+                        <td>
+                            {{ $payment->updated_by->name }}
+                        </td>
+                    </tr>
                 </tbody>
             </table>
             <div class="form-group">

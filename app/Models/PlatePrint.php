@@ -77,6 +77,16 @@ class PlatePrint extends Model
         return $this->hasMany(PlatePrintItem::class, 'plate_print_id');
     }
 
+    public function created_by()
+    {
+        return $this->belongsTo(User::class, 'created_by_id');
+    }
+
+    public function updated_by()
+    {
+        return $this->belongsTo(User::class, 'updated_by_id');
+    }
+
     public static function generateNoSPK($semester) {
         $data = self::where('semester_id', $semester)->count();
         $semester = Semester::find($semester);

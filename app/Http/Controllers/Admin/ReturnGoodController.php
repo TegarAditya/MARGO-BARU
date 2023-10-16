@@ -76,7 +76,11 @@ class ReturnGoodController extends Controller
                 return $row->nominal ? money($row->nominal) : '';
             });
 
-            $table->rawColumns(['actions', 'placeholder', 'salesperson', 'semester']);
+            $table->addColumn('updated_by', function ($row) {
+                return $row->updated_by ? $row->updated_by->name : '';
+            });
+
+            $table->rawColumns(['actions', 'placeholder', 'salesperson', 'semester', 'updated_by']);
 
             return $table->make(true);
         }

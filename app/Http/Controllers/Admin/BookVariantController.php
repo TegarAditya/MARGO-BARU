@@ -121,8 +121,11 @@ class BookVariantController extends Controller
             $table->editColumn('cost', function ($row) {
                 return $row->cost ? $row->cost : '';
             });
+            $table->addColumn('pengedit', function ($row) {
+                return $row->pengedit ? $row->pengedit->name : '';
+            });
 
-            $table->rawColumns(['actions', 'placeholder', 'jenjang', 'semester', 'kurikulum', 'halaman', 'buku']);
+            $table->rawColumns(['actions', 'placeholder', 'jenjang', 'semester', 'kurikulum', 'halaman', 'buku', 'pengedit']);
 
             return $table->make(true);
         }

@@ -68,6 +68,22 @@
                                 {{ $platePrint->note }}
                             </td>
                         </tr>
+                        <tr>
+                            <th>
+                                Dibuat Oleh
+                            </th>
+                            <td>
+                                {{ $platePrint->created_by->name }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>
+                                Diedit Oleh
+                            </th>
+                            <td>
+                                {{ $platePrint->updated_by->name }}
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </section>

@@ -87,6 +87,16 @@ class Payment extends Model
         return $this->belongsTo(Semester::class, 'semester_bayar_id');
     }
 
+    public function created_by()
+    {
+        return $this->belongsTo(User::class, 'created_by_id');
+    }
+
+    public function updated_by()
+    {
+        return $this->belongsTo(User::class, 'updated_by_id');
+    }
+
     public static function generateNoKwitansi($semester) {
         $data = self::where('semester_id', $semester)->count();
         $semester = Semester::find($semester);

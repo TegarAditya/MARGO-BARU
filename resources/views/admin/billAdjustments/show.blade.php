@@ -68,6 +68,22 @@
                             {{ $billAdjustment->note }}
                         </td>
                     </tr>
+                    <tr>
+                        <th>
+                            Dibuat Oleh
+                        </th>
+                        <td>
+                            {{ $billAdjustment->created_by->name }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>
+                            Diedit Oleh
+                        </th>
+                        <td>
+                            {{ $billAdjustment->updated_by->name }}
+                        </td>
+                    </tr>
                 </tbody>
             </table>
             <div class="form-group">

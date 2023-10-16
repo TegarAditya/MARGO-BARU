@@ -64,6 +64,22 @@
                                 {{ money($finishing->total_cost) }}
                             </td>
                         </tr>
+                        <tr>
+                            <th>
+                                Dibuat Oleh
+                            </th>
+                            <td>
+                                {{ $finishing->created_by->name }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>
+                                Diedit Oleh
+                            </th>
+                            <td>
+                                {{ $finishing->updated_by->name }}
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </section>

@@ -120,4 +120,9 @@ class StockMovement extends Model
     {
         return $this->belongsTo(self::class, 'reversal_of_id');
     }
+
+    public function pengedit()
+    {
+        return $this->belongsTo(User::class, 'updated_by_id');
+    }
 }

@@ -70,6 +70,16 @@ class ReturnGood extends Model
         return $this->belongsTo(Semester::class, 'semester_id');
     }
 
+    public function created_by()
+    {
+        return $this->belongsTo(User::class, 'created_by_id');
+    }
+
+    public function updated_by()
+    {
+        return $this->belongsTo(User::class, 'updated_by_id');
+    }
+
     public static function generateNoRetur($semester) {
         $data = self::where('semester_id', $semester)->count();
         $semester = Semester::find($semester);

@@ -200,6 +200,11 @@ class BookVariant extends Model implements HasMedia
         return $this->belongsTo(Unit::class, 'unit_id');
     }
 
+    public function pengedit()
+    {
+        return $this->belongsTo(User::class, 'updated_by_id');
+    }
+
     public function estimasi()
     {
         return $this->hasMany(SalesOrder::class, 'product_id');

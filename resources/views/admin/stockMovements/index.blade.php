@@ -10,6 +10,9 @@
             <thead>
                 <tr>
                     <th>
+                        ID
+                    </th>
+                    <th>
                         Reference
                     </th>
                     <th>
@@ -23,6 +26,9 @@
                     </th>
                     <th>
                         {{ trans('cruds.stockMovement.fields.quantity') }}
+                    </th>
+                    <th>
+                        Diedit Oleh
                     </th>
                 </tr>
             </thead>
@@ -44,11 +50,13 @@ $(function () {
         aaSorting: [],
         ajax: "{{ route('admin.stock-movements.index') }}",
         columns: [
+            { data: 'id', name: 'id', class: 'text-center' },
             { data: 'reference', name: 'reference', class: 'text-center' },
             { data: 'movement_type', name: 'movement_type', class: 'text-center' },
             { data: 'product_code', name: 'product.code', class: 'text-center' },
             { data: 'product_name', name: 'product.name' },
-            { data: 'quantity', name: 'quantity', class: 'text-center' }
+            { data: 'quantity', name: 'quantity', class: 'text-center' },
+            { data: 'pengedit', name: 'pengedit', class: 'text-center' }
         ],
         orderCellsTop: true,
         // order: [[ 1, 'desc' ]],

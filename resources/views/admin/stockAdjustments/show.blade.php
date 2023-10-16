@@ -52,6 +52,22 @@
                                 {{ $stockAdjustment->note }}
                             </td>
                         </tr>
+                        <tr>
+                            <th>
+                                Dibuat Oleh
+                            </th>
+                            <td>
+                                {{ $stockAdjustment->created_by->name }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>
+                                Diedit Oleh
+                            </th>
+                            <td>
+                                {{ $stockAdjustment->updated_by->name }}
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </section>
