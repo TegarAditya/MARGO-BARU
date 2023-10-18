@@ -232,7 +232,7 @@ class DeliveryPlateController extends Controller
 
         $items = PlatePrintItem::with('product', 'product.jenjang', 'product.isi', 'product.cover', 'product.kurikulum')->where('surat_jalan_id', $deliveryPlate->id)->get();
 
-        $items = $items->sortBy('product.kelas_id')->sortBy('product.mapel_id')->sortBy('product.kurikulum_id')->sortBy('product.jenjang_id');
+        $items = $items->sortBy('product.nama_urut')->sortBy('product.kurikulum_id')->sortBy('product.jenjang_id');
 
         return view('admin.deliveryPlates.sj', compact('deliveryPlate', 'items'));
     }

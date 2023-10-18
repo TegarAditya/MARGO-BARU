@@ -313,7 +313,7 @@ class ReturnGoodController extends Controller
 
         $details = ReturnGoodItem::with('product')->where('retur_id', $returnGood->id)->get();
 
-        $retur_items = $details->sortBy('product.kelas_id')->sortBy('product.mapel_id')->sortBy('product.kurikulum_id')->sortBy('product.jenjang_id');
+        $retur_items = $details->sortBy('product.nama_urut')->sortBy('product.kurikulum_id')->sortBy('product.jenjang_id');
 
         return view('admin.returnGoods.show', compact('returnGood', 'retur_items'));
     }
@@ -344,7 +344,7 @@ class ReturnGoodController extends Controller
 
         $details = ReturnGoodItem::with('product')->where('retur_id', $retur->id)->get();
 
-        $retur_items = $details->sortBy('product.kelas_id')->sortBy('product.mapel_id')->sortBy('product.kurikulum_id')->sortBy('product.jenjang_id');
+        $retur_items = $details->sortBy('product.kelas_id')->sortBy('product.nama_urut')->sortBy('product.jenjang_id');
 
         return view('admin.returnGoods.faktur', compact('retur', 'retur_items'));
     }

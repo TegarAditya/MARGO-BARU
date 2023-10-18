@@ -581,7 +581,7 @@ class EstimationController extends Controller
 
         $estimation->load('semester', 'salesperson');
 
-        $estimasi_list = EstimationItem::where('estimation_id', $estimation->id)->get()->sortBy('product.kelas_id')->sortBy('product.mapel_id')->sortBy('product.type');
+        $estimasi_list = EstimationItem::where('estimation_id', $estimation->id)->get()->sortBy('product.nama_urut')->sortBy('product.type');
 
         return view('admin.estimations.show', compact('estimation', 'estimasi_list'));
     }

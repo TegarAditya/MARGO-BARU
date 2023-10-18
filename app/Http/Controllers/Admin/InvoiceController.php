@@ -474,7 +474,7 @@ class InvoiceController extends Controller
 
         $details = InvoiceItem::with('product')->where('invoice_id', $invoice->id)->get();
 
-        $invoice_items = $details->sortBy('product.kelas_id')->sortBy('product.mapel_id')->sortBy('product.kurikulum_id')->sortBy('product.jenjang_id');
+        $invoice_items = $details->sortBy('product.nama_urut')->sortBy('product.kurikulum_id')->sortBy('product.jenjang_id');
 
         return view('admin.invoices.show', compact('invoice', 'invoice_items'));
     }
@@ -489,7 +489,7 @@ class InvoiceController extends Controller
 
         $details = InvoiceItem::with('product')->where('invoice_id', $invoice->id)->get();
 
-        $invoice_items = $details->sortBy('product.kelas_id')->sortBy('product.mapel_id')->sortBy('product.kurikulum_id')->sortBy('product.jenjang_id');
+        $invoice_items = $details->sortBy('product.nama_urut')->sortBy('product.kurikulum_id')->sortBy('product.jenjang_id');
 
         return view('admin.invoices.faktur', compact('invoice', 'invoice_items'));
     }

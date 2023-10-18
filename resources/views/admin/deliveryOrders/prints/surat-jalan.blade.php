@@ -131,7 +131,7 @@
         </tr>
         @endforeach
         @if ($kelengkapan->count() > 0)
-            @foreach ($kelengkapan->sortBy('product.kelas_id')->sortBy('product.mapel_id') as $item)
+            @foreach ($kelengkapan->sortBy('product.nama_urut') as $item)
                 @php
                 $product = $item->product;
 

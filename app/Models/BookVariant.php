@@ -79,6 +79,7 @@ class BookVariant extends Model implements HasMedia
         'short_name',
         'book_type',
         'photo',
+        'nama_urut'
     ];
 
     protected $casts = [
@@ -293,5 +294,13 @@ class BookVariant extends Model implements HasMedia
         if ($key == 'C' || $key == 'V') {
             return BookVariant::TYPE_SELECT[$key]. ' - '. $jenjang. ' - '. $kurikulum. ' - '. $mapel. ' - ' .$kelas. ' - '. $semester. ' - ('. $cover .') ';
         }
+    }
+
+    public function getNamaUrutAttribute()
+    {
+        if (str_contains($this->name, 'TEMA ') ) {
+            return $this->kelas?->name . ' '. $this->mapel?->name;
+        }
+        return $this->mapel?->name. ' '. $this->kelas?->name;
     }
 }

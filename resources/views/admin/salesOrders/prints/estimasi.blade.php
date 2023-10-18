@@ -144,7 +144,7 @@
             </thead>
 
             <tbody>
-                @foreach ($kelengkapan->sortBy('product.kelas_id')->sortBy('product.mapel_id') as $order)
+                @foreach ($kelengkapan->sortBy('product.nama_urut') as $order)
                     @php
                     $sisa = max(0, $order->quantity - $order->moved);
                     if ($sisa <= 0 || $order->quantity <= 0) {

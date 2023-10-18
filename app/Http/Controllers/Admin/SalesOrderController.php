@@ -262,7 +262,7 @@ class SalesOrderController extends Controller
 
         $salesOrder = SalesOrder::where('salesperson_id', $salesperson)->where('semester_id', $semester)->get();
 
-        $grouped = $orders->sortBy('product.kelas_id')->sortBy('product.mapel_id')->groupBy('jen_kum');
+        $grouped = $orders->sortBy('product.nama_urut')->groupBy('jen_kum');
 
         $semester = Semester::find($semester);
         $salesperson = Salesperson::find($salesperson);
@@ -327,7 +327,7 @@ class SalesOrderController extends Controller
         $salesOrder = $orders->first();
         $salesOrder->load('semester', 'salesperson', 'product', 'jenjang', 'kurikulum');
 
-        $grouped = $orders->where('product.type', 'L')->sortBy('product.kelas_id')->sortBy('product.mapel_id')->groupBy('jen_kum');
+        $grouped = $orders->where('product.type', 'L')->sortBy('product.nama_urut')->groupBy('jen_kum');
 
         $kelengkapan = $orders->whereNotIn('product.type', ['L']);
 

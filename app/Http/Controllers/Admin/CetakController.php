@@ -535,7 +535,7 @@ class CetakController extends Controller
 
         $cetak_items = CetakItem::with('product', 'product.jenjang', 'product.isi', 'product.cover', 'product.kurikulum')->where('cetak_id', $cetak->id)->get();
 
-        $cetak_items = $cetak_items->sortBy('product.kelas_id')->sortBy('product.mapel_id')->sortBy('product.kurikulum_id')->sortBy('product.jenjang_id');
+        $cetak_items = $cetak_items->sortBy('product.nama_urut')->sortBy('product.kurikulum_id')->sortBy('product.jenjang_id');
 
         if($cetak->type == 'isi') {
             return view('admin.cetaks.spc_isi', compact('cetak', 'cetak_items'));

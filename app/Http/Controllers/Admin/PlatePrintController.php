@@ -323,7 +323,7 @@ class PlatePrintController extends Controller
 
         $items = $query->get();
 
-        $items = $items->sortBy('product.kelas_id')->sortBy('product.mapel_id')->sortBy('product.kurikulum_id')->sortBy('product.jenjang_id');
+        $items = $items->sortBy('product.nama_urut')->sortBy('product.kurikulum_id')->sortBy('product.jenjang_id');
 
         return view('admin.platePrints.spk', compact('plate', 'items'));
     }

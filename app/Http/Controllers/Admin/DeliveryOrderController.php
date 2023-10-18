@@ -372,7 +372,7 @@ class DeliveryOrderController extends Controller
 
         $delivery_items = DeliveryOrderItem::with('product')->where('delivery_order_id', $deliveryOrder->id)->get();
 
-        $lks = $delivery_items->where('product.type', 'L')->sortBy('product.type')->sortBy('product.kelas_id')->sortBy('product.mapel_id')->sortBy('product.kurikulum_id')->sortBy('product.jenjang_id');
+        $lks = $delivery_items->where('product.type', 'L')->sortBy('product.type')->sortBy('product.nama_urut')->sortBy('product.kurikulum_id')->sortBy('product.jenjang_id');
 
         $kelengkapan =  $delivery_items->whereNotIn('product.type', ['L']);
 
