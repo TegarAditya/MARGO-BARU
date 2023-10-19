@@ -99,7 +99,7 @@
                                     <tr>
                                         <td class="text-right px-3">{{ $loop->iteration }}.</td>
                                         <td>{{ $product->name }}</td>
-                                        <td class="text-center px-2">{{ $product->halaman->code }}</td>
+                                        <td class="text-center px-2">{{ $product->halaman->code ?? 'KOSONG' }}</td>
                                         <td class="text-center px-2">{{ angka($item->quantity) }}</td>
                                     </tr>
                                 @endforeach

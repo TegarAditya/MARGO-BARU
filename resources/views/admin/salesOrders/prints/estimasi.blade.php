@@ -95,7 +95,7 @@
                         <td>{{ $product->cover->name }}</td>
                         <td>{{ $product->mapel->name }}</td>
                         <td class="text-center">{{ $product->kelas->code }}</td>
-                        <td class="text-center">{{ $product->halaman->code }}</td>
+                        <td class="text-center">{{ $product->halaman->code ?? 'KOSONG' }}</td>
                         <td class="text-center">{{ angka($sisa)}}</td>
                         <td class="text-center">
                             @if ($pg)
@@ -159,7 +159,7 @@
                         <td>{{ $product->cover->name }}</td>
                         <td>{{ $product->mapel->name }}</td>
                         <td class="text-center">{{ $product->kelas->code }}</td>
-                        <td class="text-center">{{ $product->halaman->code }}</td>
+                        <td class="text-center">{{ $product->halaman->code ?? 'KOSONG' }}</td>
                         <td class="text-center">{{ angka($sisa)}}</td>
                     </tr>
                 @endforeach

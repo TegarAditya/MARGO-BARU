@@ -87,7 +87,7 @@
                                         <tr>
                                             <td class="text-right px-3">{{ $loop->iteration }}.</td>
                                             <td>{{ $order->name }}</td>
-                                            <td class="text-center">{{ $order->halaman->code }}</td>
+                                            <td class="text-center">{{ $order->halaman->code ?? 'KOSONG' }}</td>
                                             <td class="text-center">
                                                 @foreach ($estimation_items as $item)
                                                     @php
