@@ -49,7 +49,7 @@
                             <div class="form-group">
                                 <label class="required col-md-4" for="salesperson_id">{{ trans('cruds.estimation.fields.salesperson') }}</label>
                                 <div class="col-md-8">
-                                    <select style="width: 100%;" class="form-control select2 {{ $errors->has('salesperson') ? 'is-invalid' : '' }}" name="salesperson_id" id="salesperson_id" required>
+                                    <select style="width: 100%;" class="form-control select2 {{ $errors->has('salesperson') ? 'is-invalid' : '' }}" name="salesperson_id" required>
                                         @foreach($salespeople as $id => $entry)
                                             <option value="{{ $id }}" {{ old('salesperson_id') == $id ? 'selected' : '' }}>{{ $entry }}</option>
                                         @endforeach
