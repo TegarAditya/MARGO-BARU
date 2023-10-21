@@ -135,8 +135,8 @@ class EstimationController extends Controller
         $salesperson = $validatedData['salesperson_id'] ?? null;
         $products = $validatedData['products'];
         $quantities = $validatedData['quantities'];
-        $pgs = $validatedData['pgs'];
-        $pg_quantities = $validatedData['pg_quantities'];
+        $pgs = $validatedData['pgs'] ?? null;
+        $pg_quantities = $validatedData['pg_quantities'] ?? null;
 
         DB::beginTransaction();
         try {
@@ -199,57 +199,59 @@ class EstimationController extends Controller
                 }
             }
 
-            for ($i = 0; $i < count($pgs); $i++) {
-                if (!$pgs[$i] || $pg_quantities <= 0) {
-                    continue;
-                }
-                $product = BookVariant::find($pgs[$i]);
-                $quantity = $pg_quantities[$i];
-
-                $estimasi_item = EstimationItem::updateOrCreate([
-                    'estimation_id' => $estimasi->id,
-                    'semester_id' => $semester,
-                    'salesperson_id' => $salesperson,
-                    'product_id' => $product->id,
-                    'jenjang_id' => $product->jenjang_id,
-                    'kurikulum_id' => $product->kurikulum_id,
-                ], [
-                    'quantity' => DB::raw("quantity + $quantity")
-                ]);
-
-                $order = SalesOrder::updateOrCreate([
-                    'semester_id' => $semester,
-                    'salesperson_id' => $salesperson,
-                    'product_id' => $product->id,
-                    'jenjang_id' => $product->jenjang_id,
-                    'kurikulum_id' => $product->kurikulum_id
-                ], [
-                    'no_order' => SalesOrder::generateNoOrder($semester, $salesperson),
-                    'quantity' => DB::raw("quantity + $quantity"),
-                ]);
-
-                if ($product->semester_id == $semester) {
-                    if ($product->isi->code !== 'MMJ' || $product->cover->code !== 'MMJ') {
-                        $type_produksi = 'eksternal';
-                    } else {
-                        $type_produksi = 'sales';
+            if ($pgs) {
+                for ($i = 0; $i < count($pgs); $i++) {
+                    if (!$pgs[$i] || $pg_quantities <= 0) {
+                        continue;
                     }
+                    $product = BookVariant::find($pgs[$i]);
+                    $quantity = $pg_quantities[$i];
 
-                    if ($salesperson) {
-                        EstimationService::createMovement('in', 'sales_order', $estimasi->id, $product->id, $quantity, $type_produksi);
-                        EstimationService::createProduction($product->id, $quantity, $product->type, $type_produksi);
+                    $estimasi_item = EstimationItem::updateOrCreate([
+                        'estimation_id' => $estimasi->id,
+                        'semester_id' => $semester,
+                        'salesperson_id' => $salesperson,
+                        'product_id' => $product->id,
+                        'jenjang_id' => $product->jenjang_id,
+                        'kurikulum_id' => $product->kurikulum_id,
+                    ], [
+                        'quantity' => DB::raw("quantity + $quantity")
+                    ]);
 
-                        foreach($product->components as $item) {
-                            EstimationService::createMovement('in', 'sales_order', $estimasi->id, $item->id, $quantity, $type_produksi);
-                            EstimationService::createProduction($item->id, $quantity, $item->type, $type_produksi);
+                    $order = SalesOrder::updateOrCreate([
+                        'semester_id' => $semester,
+                        'salesperson_id' => $salesperson,
+                        'product_id' => $product->id,
+                        'jenjang_id' => $product->jenjang_id,
+                        'kurikulum_id' => $product->kurikulum_id
+                    ], [
+                        'no_order' => SalesOrder::generateNoOrder($semester, $salesperson),
+                        'quantity' => DB::raw("quantity + $quantity"),
+                    ]);
+
+                    if ($product->semester_id == $semester) {
+                        if ($product->isi->code !== 'MMJ' || $product->cover->code !== 'MMJ') {
+                            $type_produksi = 'eksternal';
+                        } else {
+                            $type_produksi = 'sales';
                         }
-                    } else {
-                        EstimationService::createMovement('in', 'sales_order', $estimasi->id, $product->id, $quantity, 'internal');
-                        EstimationService::createInternal($product->id, $quantity, $product->type);
 
-                        foreach($product->components as $item) {
-                            EstimationService::createMovement('in', 'sales_order', $estimasi->id, $item->id, $quantity, 'internal');
-                            EstimationService::createInternal($item->id, $quantity, $item->type);
+                        if ($salesperson) {
+                            EstimationService::createMovement('in', 'sales_order', $estimasi->id, $product->id, $quantity, $type_produksi);
+                            EstimationService::createProduction($product->id, $quantity, $product->type, $type_produksi);
+
+                            foreach($product->components as $item) {
+                                EstimationService::createMovement('in', 'sales_order', $estimasi->id, $item->id, $quantity, $type_produksi);
+                                EstimationService::createProduction($item->id, $quantity, $item->type, $type_produksi);
+                            }
+                        } else {
+                            EstimationService::createMovement('in', 'sales_order', $estimasi->id, $product->id, $quantity, 'internal');
+                            EstimationService::createInternal($product->id, $quantity, $product->type);
+
+                            foreach($product->components as $item) {
+                                EstimationService::createMovement('in', 'sales_order', $estimasi->id, $item->id, $quantity, 'internal');
+                                EstimationService::createInternal($item->id, $quantity, $item->type);
+                            }
                         }
                     }
                 }
@@ -420,8 +422,8 @@ class EstimationController extends Controller
         $date = $validatedData['date'];
         $products = $validatedData['products'];
         $quantities = $validatedData['quantities'];
-        $pgs = $validatedData['pgs'];
-        $pg_quantities = $validatedData['pg_quantities'];
+        $pgs = $validatedData['pgs'] ?? null;
+        $pg_quantities = $validatedData['pg_quantities'] ?? null;
 
         $estimasi = Estimation::find($estimation);
 
@@ -502,57 +504,59 @@ class EstimationController extends Controller
                 ]);
             }
 
-            for ($i = 0; $i < count($pgs); $i++) {
-                if (!$pgs[$i] || $pg_quantities <= 0) {
-                    continue;
-                }
-                $product = BookVariant::find($pgs[$i]);
-                $quantity = $pg_quantities[$i];
-
-                $estimasi_item = EstimationItem::updateOrCreate([
-                    'estimation_id' => $estimasi->id,
-                    'semester_id' => $semester,
-                    'salesperson_id' => $salesperson,
-                    'product_id' => $product->id,
-                    'jenjang_id' => $product->jenjang_id,
-                    'kurikulum_id' => $product->kurikulum_id,
-                ], [
-                    'quantity' => DB::raw("quantity + $quantity")
-                ]);
-
-                $order = SalesOrder::updateOrCreate([
-                    'semester_id' => $semester,
-                    'salesperson_id' => $salesperson,
-                    'product_id' => $product->id,
-                    'jenjang_id' => $product->jenjang_id,
-                    'kurikulum_id' => $product->kurikulum_id
-                ], [
-                    'no_order' => SalesOrder::generateNoOrder($semester, $salesperson),
-                    'quantity' => DB::raw("quantity + $quantity"),
-                ]);
-
-                if ($product->semester_id == $semester) {
-                    if ($product->isi->code !== 'MMJ' || $product->cover->code !== 'MMJ') {
-                        $type_produksi = 'eksternal';
-                    } else {
-                        $type_produksi = 'sales';
+            if ($pgs) {
+                for ($i = 0; $i < count($pgs); $i++) {
+                    if (!$pgs[$i] || $pg_quantities <= 0) {
+                        continue;
                     }
+                    $product = BookVariant::find($pgs[$i]);
+                    $quantity = $pg_quantities[$i];
 
-                    if ($salesperson) {
-                        EstimationService::createMovement('in', 'sales_order', $estimasi->id, $product->id, $quantity, $type_produksi);
-                        EstimationService::createProduction($product->id, $quantity, $product->type, $type_produksi);
+                    $estimasi_item = EstimationItem::updateOrCreate([
+                        'estimation_id' => $estimasi->id,
+                        'semester_id' => $semester,
+                        'salesperson_id' => $salesperson,
+                        'product_id' => $product->id,
+                        'jenjang_id' => $product->jenjang_id,
+                        'kurikulum_id' => $product->kurikulum_id,
+                    ], [
+                        'quantity' => DB::raw("quantity + $quantity")
+                    ]);
 
-                        foreach($product->components as $item) {
-                            EstimationService::createMovement('in', 'sales_order', $estimasi->id, $item->id, $quantity, $type_produksi);
-                            EstimationService::createProduction($item->id, $quantity, $item->type, $type_produksi);
+                    $order = SalesOrder::updateOrCreate([
+                        'semester_id' => $semester,
+                        'salesperson_id' => $salesperson,
+                        'product_id' => $product->id,
+                        'jenjang_id' => $product->jenjang_id,
+                        'kurikulum_id' => $product->kurikulum_id
+                    ], [
+                        'no_order' => SalesOrder::generateNoOrder($semester, $salesperson),
+                        'quantity' => DB::raw("quantity + $quantity"),
+                    ]);
+
+                    if ($product->semester_id == $semester) {
+                        if ($product->isi->code !== 'MMJ' || $product->cover->code !== 'MMJ') {
+                            $type_produksi = 'eksternal';
+                        } else {
+                            $type_produksi = 'sales';
                         }
-                    } else {
-                        EstimationService::createMovement('in', 'sales_order', $estimasi->id, $product->id, $quantity, 'internal');
-                        EstimationService::createInternal($product->id, $quantity, $product->type);
 
-                        foreach($product->components as $item) {
-                            EstimationService::createMovement('in', 'sales_order', $estimasi->id, $item->id, $quantity, 'internal');
-                            EstimationService::createInternal($item->id, $quantity, $item->type);
+                        if ($salesperson) {
+                            EstimationService::createMovement('in', 'sales_order', $estimasi->id, $product->id, $quantity, $type_produksi);
+                            EstimationService::createProduction($product->id, $quantity, $product->type, $type_produksi);
+
+                            foreach($product->components as $item) {
+                                EstimationService::createMovement('in', 'sales_order', $estimasi->id, $item->id, $quantity, $type_produksi);
+                                EstimationService::createProduction($item->id, $quantity, $item->type, $type_produksi);
+                            }
+                        } else {
+                            EstimationService::createMovement('in', 'sales_order', $estimasi->id, $product->id, $quantity, 'internal');
+                            EstimationService::createInternal($product->id, $quantity, $product->type);
+
+                            foreach($product->components as $item) {
+                                EstimationService::createMovement('in', 'sales_order', $estimasi->id, $item->id, $quantity, 'internal');
+                                EstimationService::createInternal($item->id, $quantity, $item->type);
+                            }
                         }
                     }
                 }
