@@ -177,7 +177,7 @@
                                         <div class="form-group text-field m-0">
                                             <div class="text-field-input px-2 py-0">
                                                 <input type="hidden" name="products[]" value="${product.id}">
-                                                <input class="quantity" type="hidden" name="quantities[]">
+                                                <input class="quantity" type="hidden" name="quantities[]" value="1">
                                                 <input class="form-control text-center quantity_text" type="text" name="quantity_text[]" value="1" required>
                                                 <label class="text-field-border"></label>
                                             </div>

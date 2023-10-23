@@ -14,7 +14,7 @@
             </p>
         @endif
 
-        <form method="POST" action="{{ route("admin.delivery-orders.update", [$deliveryOrder->id]) }}" enctype="multipart/form-data">
+        <form method="POST" action="{{ route("admin.delivery-orders.update", [$deliveryOrder->id]) }}" enctype="multipart/form-data" onkeypress="return event.keyCode != 13;">
             @method('PUT')
             @csrf
             <input type="hidden" name="delivery_id" id="delivery_id" value="{{$deliveryOrder->id}}">

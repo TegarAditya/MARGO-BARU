@@ -14,7 +14,7 @@
             </p>
         @endif
 
-        <form method="POST" action="{{ route("admin.delivery-orders.store") }}" enctype="multipart/form-data">
+        <form method="POST" action="{{ route("admin.delivery-orders.store") }}" enctype="multipart/form-data" onkeypress="return event.keyCode != 13;">
             @csrf
             <div class="row">
                 <div class="col-6">
