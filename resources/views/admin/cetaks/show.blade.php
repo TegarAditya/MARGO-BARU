@@ -131,7 +131,7 @@
                                     @endphp
                                     <tr>
                                         <td class="text-right px-3">{{ $loop->iteration }}.</td>
-                                        <td>{{ $product->name }}</td>
+                                        <td>{{ $product->name }} <a class="px-1" title="Product" href="{{ route('admin.book-variants.show', $item->product_id) }}"><i class="fas fa-eye text-success fa-lg"></i></a></td>
                                         <td class="text-center px-2">{{ $product->halaman->code }}</td>
                                         <td class="text-center px-2">{{ angka($item->estimasi) }}</td>
                                         <td class="text-center px-2">{{ money($item->cost) }}</td>

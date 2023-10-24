@@ -84,9 +84,15 @@ class StockService
     }
 
     public static function updateStock($product_id, $quantity) {
-        $product = BookVariant::where('id', $product_id)->update([
-            'stock' => DB::raw("stock + $quantity")
-        ]);
+        $product = BookVariant::find($product_id);
+        if (!$product) {
+            throw new \Exception('Book Variant tidak Ditemukan');
+        }
+        $product->stock += $quantity;
+        $product->save();
+        // $product = BookVariant::where('id', $product_id)->update([
+        //     'stock' => DB::raw("stock + $quantity")
+        // ]);
     }
 
     public static function editMovement($type_movement, $transaction_type, $reference, $date, $product, $quantity)
