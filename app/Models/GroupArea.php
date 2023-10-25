@@ -33,6 +33,7 @@ class GroupArea extends Model
         'jateng' => 'Jawa Tengah',
         'jatim'  => 'Jawa Timur',
         'jabar'  => 'Jawa Barat',
+        'luar_jawa'  => 'Luar Jawa',
     ];
 
     protected function serializeDate(DateTimeInterface $date)
