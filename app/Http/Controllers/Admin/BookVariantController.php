@@ -64,6 +64,9 @@ class BookVariantController extends Controller
             if (!empty($request->mapel)) {
                 $query->where('mapel_id', $request->mapel);
             }
+            if (!empty($request->halaman)) {
+                $query->where('halaman_id', $request->halaman);
+            }
 
             $table = Datatables::of($query);
 
