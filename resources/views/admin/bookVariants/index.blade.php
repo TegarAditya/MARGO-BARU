@@ -35,7 +35,7 @@
                             <div class="form-group">
                                 <label class="col-md-4" for="halaman_id">{{ trans('cruds.bookVariant.fields.halaman') }}</label>
                                 <div class="col-12">
-                                    <select style="width: 100%;" class="form-control select2 {{ $errors->has('halaman') ? 'is-invalid' : '' }}" name="halaman_id" id="halaman_id" required>
+                                    <select style="width: 100%;" class="form-control select2 {{ $errors->has('halaman') ? 'is-invalid' : '' }}" name="halaman_id" required>
                                         @foreach($halamen as $id => $entry)
                                             <option value="{{ $id }}" {{ old('halaman_id') == $id ? 'selected' : '' }}>{{ $entry }}</option>
                                         @endforeach
@@ -45,7 +45,7 @@
                             <div class="form-group">
                                 <label class="col-md-4" for="jenjang_id">{{ trans('cruds.bookVariant.fields.jenjang') }}</label>
                                 <div class="col-12">
-                                    <select style="width: 100%;" class="form-control select2 {{ $errors->has('jenjang') ? 'is-invalid' : '' }}" name="jenjang_id" id="jenjang_id">
+                                    <select style="width: 100%;" class="form-control select2 {{ $errors->has('jenjang') ? 'is-invalid' : '' }}" name="jenjang_id">
                                         @foreach($jenjangs as $id => $entry)
                                             <option value="{{ $id }}" {{ old('jenjang_id') == $id ? 'selected' : '' }}>{{ $entry }}</option>
                                         @endforeach
@@ -213,6 +213,20 @@
                         <span class="help-block">{{ trans('cruds.book.fields.cover_helper') }}</span>
                     </div>
                 </div>
+                <div class="col-4">
+                    <div class="form-group">
+                        <label class="required" for="halaman_id">{{ trans('cruds.bookVariant.fields.halaman') }}</label>
+                        <select class="form-control select2 {{ $errors->has('halaman') ? 'is-invalid' : '' }}" name="halaman_id" id="halaman_id" required>
+                            @foreach($halamen as $id => $entry)
+                                <option value="{{ $id }}" {{ old('halaman_id') == $id ? 'selected' : '' }}>{{ $entry }}</option>
+                            @endforeach
+                        </select>
+                        @if($errors->has('halaman'))
+                            <span class="text-danger">{{ $errors->first('halaman') }}</span>
+                        @endif
+                        <span class="help-block">{{ trans('cruds.bookVariant.fields.halaman_helper') }}</span>
+                    </div>
+                </div>
             </div>
 
             <div class="form-group mt-3">
@@ -273,6 +287,7 @@ $(function () {
                 data.jenjang = $('#jenjang_id').val(),
                 data.kelas = $('#kelas_id').val(),
                 data.mapel = $('#mapel_id').val()
+                data.halaman = $('#halaman_id').val()
             }
         },
         columns: [{
