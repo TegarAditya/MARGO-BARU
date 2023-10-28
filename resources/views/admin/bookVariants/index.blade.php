@@ -215,8 +215,8 @@
                 </div>
                 <div class="col-4">
                     <div class="form-group">
-                        <label class="required" for="halaman_id">{{ trans('cruds.bookVariant.fields.halaman') }}</label>
-                        <select class="form-control select2 {{ $errors->has('halaman') ? 'is-invalid' : '' }}" name="halaman_id" id="halaman_id" required>
+                        <label for="halaman_id">{{ trans('cruds.bookVariant.fields.halaman') }}</label>
+                        <select class="form-control select2 {{ $errors->has('halaman') ? 'is-invalid' : '' }}" name="halaman_id" id="halaman_id">
                             @foreach($halamen as $id => $entry)
                                 <option value="{{ $id }}" {{ old('halaman_id') == $id ? 'selected' : '' }}>{{ $entry }}</option>
                             @endforeach
