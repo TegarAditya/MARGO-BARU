@@ -35,7 +35,7 @@
                             <div class="form-group">
                                 <label class="col-md-4" for="halaman_id">{{ trans('cruds.bookVariant.fields.halaman') }}</label>
                                 <div class="col-12">
-                                    <select class="form-control select2 {{ $errors->has('halaman') ? 'is-invalid' : '' }}" name="halaman_id" id="halaman_id">
+                                    <select style="width: 100%;" class="form-control select2 {{ $errors->has('halaman') ? 'is-invalid' : '' }}" name="halaman_id" id="halaman_id">
                                         @foreach($halamen as $id => $entry)
                                             <option value="{{ $id }}" {{ old('halaman_id') == $id ? 'selected' : '' }}>{{ $entry }}</option>
                                         @endforeach
@@ -45,7 +45,7 @@
                             <div class="form-group">
                                 <label class="col-md-4" for="jenjang_id">{{ trans('cruds.bookVariant.fields.jenjang') }}</label>
                                 <div class="col-12">
-                                    <select class="form-control select2 {{ $errors->has('jenjang') ? 'is-invalid' : '' }}" name="jenjang_id" id="jenjang_id" required>
+                                    <select style="width: 100%;" class="form-control select2 {{ $errors->has('jenjang') ? 'is-invalid' : '' }}" name="jenjang_id" id="jenjang_id" required>
                                         @foreach($jenjangs as $id => $entry)
                                             <option value="{{ $id }}" {{ old('jenjang_id') == $id ? 'selected' : '' }}>{{ $entry }}</option>
                                         @endforeach
