@@ -23,34 +23,30 @@
                     <div class="row">
                         <div class="col-12">
                             <div class="form-group">
-                                <label class="col-md-4" for="kurikulum_id">{{ trans('cruds.book.fields.kurikulum') }}</label>
-                                <div class="col-12">
-                                    <select style="width: 100%;" class="form-control select2 {{ $errors->has('kurikulum') ? 'is-invalid' : '' }}" name="kurikulum_id">
-                                        @foreach($kurikulums as $id => $entry)
-                                            <option value="{{ $id }}" {{ old('kurikulum_id') == $id ? 'selected' : '' }}>{{ $entry }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="col-md-4" for="mapel_id">{{ trans('cruds.book.fields.mapel') }}</label>
-                                <div class="col-12">
-                                    <select style="width: 100%;" class="form-control select2 {{ $errors->has('mapel') ? 'is-invalid' : '' }}" name="mapel_id">
-                                        @foreach($mapels as $id => $entry)
-                                            <option value="{{ $id }}" {{ old('mapel_id') == $id ? 'selected' : '' }}>{{ $entry }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="form-group">
                                 <label class="col-md-4" for="semester_id">{{ trans('cruds.book.fields.semester') }}</label>
                                 <div class="col-12">
                                     <select style="width: 100%;" class="form-control select2 {{ $errors->has('semester') ? 'is-invalid' : '' }}" name="semester_id">
                                         @foreach($semesters as $id => $entry)
-                                            <option value="{{ $id }}" {{ old('semester_id') == $id ? 'selected' : '' }}>{{ $entry }}</option>
+                                            <option value="{{ $id }}" {{ (old('semester_id') ? old('semester_id') : setting('current_semester') ?? '') == $id ? 'selected' : '' }}>{{ $entry }}</option>
                                         @endforeach
                                     </select>
                                 </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="required" for="halaman_id">{{ trans('cruds.bookVariant.fields.halaman') }}</label>
+                                <select class="form-control select2 {{ $errors->has('halaman') ? 'is-invalid' : '' }}" name="halaman_id" id="halaman_id">
+                                    @foreach($halamen as $id => $entry)
+                                        <option value="{{ $id }}" {{ old('halaman_id') == $id ? 'selected' : '' }}>{{ $entry }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="required" for="jenjang_id">{{ trans('cruds.bookVariant.fields.jenjang') }}</label>
+                                <select class="form-control select2 {{ $errors->has('jenjang') ? 'is-invalid' : '' }}" name="jenjang_id" id="jenjang_id" required>
+                                    @foreach($jenjangs as $id => $entry)
+                                        <option value="{{ $id }}" {{ old('jenjang_id') == $id ? 'selected' : '' }}>{{ $entry }}</option>
+                                    @endforeach
+                                </select>
                             </div>
                             <div class="form-group">
                                 <label class="col-md-4" for="cover_id">{{ trans('cruds.book.fields.isi') }}</label>

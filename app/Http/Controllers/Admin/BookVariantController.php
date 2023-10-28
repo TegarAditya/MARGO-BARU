@@ -132,6 +132,8 @@ class BookVariantController extends Controller
 
         $jenjangs = Jenjang::pluck('name', 'id')->prepend('All', '');
 
+        $halamen = Halaman::pluck('name', 'id')->prepend('All', '');
+
         $kurikulums = Kurikulum::pluck('name', 'id')->prepend('All', '');
 
         $mapels = Mapel::pluck('name', 'id')->prepend('All', '');
@@ -144,7 +146,7 @@ class BookVariantController extends Controller
 
         $semesters = Semester::where('status', 1)->pluck('name', 'id')->prepend('All', '');
 
-        return view('admin.bookVariants.index', compact('covers', 'jenjangs', 'kelas', 'kurikulums', 'mapels', 'semesters', 'isis'));
+        return view('admin.bookVariants.index', compact('covers', 'jenjangs', 'kelas', 'kurikulums', 'mapels', 'semesters', 'isis', 'halamen'));
     }
 
     public function create()
@@ -305,26 +307,20 @@ class BookVariantController extends Controller
 
         $query = BookVariant::where('type', 'L');
 
-        if (!empty($request->semester)) {
-            $query->where('semester_id', $request->semester);
+        if (!empty($request->semester_id)) {
+            $query->where('semester_id', $request->semester_id);
         }
-        if (!empty($request->jenjang)) {
-            $query->where('jenjang_id', $request->jenjang);
+        if (!empty($request->halaman_id)) {
+            $query->where('halaman_id', $request->halaman_id);
         }
-        if (!empty($request->isi)) {
-            $query->where('isi_id', $request->isi);
+        if (!empty($request->jenjang_id)) {
+            $query->where('jenjang_id', $request->jenjang_id);
         }
-        if (!empty($request->cover)) {
-            $query->where('cover_id', $request->cover);
+        if (!empty($request->isi_id)) {
+            $query->where('isi_id', $request->isi_id);
         }
-        if (!empty($request->kurikulum)) {
-            $query->where('kurikulum_id', $request->kurikulum);
-        }
-        if (!empty($request->kelas)) {
-            $query->where('kelas_id', $request->kelas);
-        }
-        if (!empty($request->mapel)) {
-            $query->where('mapel_id', $request->mapel);
+        if (!empty($request->cover_id)) {
+            $query->where('cover_id', $request->cover_id);
         }
 
         $book_variants = $query->update([
