@@ -4,6 +4,9 @@ namespace App\Http\Controllers\Admin;
 
 use LaravelDaily\LaravelCharts\Classes\LaravelChart;
 use App\Models\EstimationMovement;
+use App\Models\Estimation;
+use App\Models\EstimationItem;
+use App\Models\SalesOrder;
 use App\Models\ProductionEstimation;
 class HomeController
 {
@@ -227,6 +230,44 @@ class HomeController
     }
 
     public function god()
+    {
+        // abort(403, 'Unauthorized action.');
+
+        DB::beginTransaction();
+        try {
+            $estimasi_items = EstimationItem::where('estimation_id', 87)->delete();
+            $estimasi = Estimation::where('id', 87)->delete();
+            $sales_order = SalesOrder::where('no_order', 'ORD/53/0223')->where('quantity', '<=', 0)->where('moved', '<=', 0)->delete();
+
+            DB::commit();
+
+            Alert::success('Success', 'God has spoken to thou');
+        } catch (\Exception $e) {
+            DB::rollback();
+            dd($e);
+        }
+    }
+
+    public function deleteEstimasi()
+    {
+        abort(403, 'Unauthorized action.');
+
+        DB::beginTransaction();
+        try {
+            $estimasi_items = EstimationItem::where('estimation_id', 87)->delete();
+            $estimasi = Estimation::where('id', 87)->delete();
+            $sales_order = SalesOrder::where('no_order', 'ORD/53/0223')->where('quantity', '<=', 0)->where('moved', '<=', 0)->delete();
+
+            DB::commit();
+
+            Alert::success('Success', 'God has spoken to thou');
+        } catch (\Exception $e) {
+            DB::rollback();
+            dd($e);
+        }
+    }
+
+    public function checkRekapProduksi()
     {
         abort(403, 'Unauthorized action.');
 
