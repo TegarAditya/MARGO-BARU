@@ -8,6 +8,7 @@ use App\Models\Estimation;
 use App\Models\EstimationItem;
 use App\Models\SalesOrder;
 use App\Models\ProductionEstimation;
+use DB;
 class HomeController
 {
     public function index()
@@ -241,7 +242,7 @@ class HomeController
 
             DB::commit();
 
-            Alert::success('Success', 'God has spoken to thou');
+            dd('God has spoken to thou');
         } catch (\Exception $e) {
             DB::rollback();
             dd($e);
@@ -260,7 +261,7 @@ class HomeController
 
             DB::commit();
 
-            Alert::success('Success', 'God has spoken to thou');
+            dd('God has spoken to thou');
         } catch (\Exception $e) {
             DB::rollback();
             dd($e);
@@ -295,7 +296,7 @@ class HomeController
 
             DB::commit();
 
-            Alert::success('Success', 'God has spoken to thou');
+            dd('God has spoken to thou');
         } catch (\Exception $e) {
             DB::rollback();
             dd($e);
