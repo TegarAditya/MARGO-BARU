@@ -742,8 +742,8 @@
                     </li>
                 @endcan --}}
                 @can('produksi_access')
-                    <li class="nav-item has-treeview {{ request()->is("admin/production-estimations*") ? "menu-open" : "" }} {{ request()->is("admin/plate-prints*") ? "menu-open" : "" }} {{ request()->is("admin/cetaks*") ? "menu-open" : "" }} {{ request()->is("admin/cetak-items*") ? "menu-open" : "" }} {{ request()->is("admin/finishings*") ? "menu-open" : "" }} {{ request()->is("admin/finishing-items*") ? "menu-open" : "" }}">
-                        <a class="nav-link nav-dropdown-toggle {{ request()->is("admin/production-estimations*") ? "active" : "" }} {{ request()->is("admin/plate-prints*") ? "active" : "" }} {{ request()->is("admin/cetaks*") ? "active" : "" }} {{ request()->is("admin/cetak-items*") ? "active" : "" }} {{ request()->is("admin/finishings*") ? "active" : "" }} {{ request()->is("admin/finishing-items*") ? "active" : "" }}" href="#">
+                    <li class="nav-item has-treeview {{ request()->is("admin/production-estimations*") ? "menu-open" : "" }} {{ request()->is("admin/plate-prints*") ? "menu-open" : "" }} {{ request()->is("admin/cetaks*") ? "menu-open" : "" }} {{ request()->is("admin/cetak-items*") ? "menu-open" : "" }} {{ request()->is("admin/finishings*") ? "menu-open" : "" }} {{ request()->is("admin/finishing-items*") ? "menu-open" : "" }} {{ request()->is("admin/finishing-masuks*") ? "menu-open" : "" }}">
+                        <a class="nav-link nav-dropdown-toggle {{ request()->is("admin/production-estimations*") ? "active" : "" }} {{ request()->is("admin/plate-prints*") ? "active" : "" }} {{ request()->is("admin/cetaks*") ? "active" : "" }} {{ request()->is("admin/cetak-items*") ? "active" : "" }} {{ request()->is("admin/finishings*") ? "active" : "" }} {{ request()->is("admin/finishing-items*") ? "active" : "" }} {{ request()->is("admin/finishing-masuks*") ? "active" : "" }}" href="#">
                             <i class="fa-fw nav-icon fas fa-print">
 
                             </i>
@@ -803,7 +803,7 @@
                             @endcan --}}
                             @can('finishing_access')
                                 <li class="nav-item">
-                                    <a href="{{ route("admin.finishings.index") }}" class="nav-link {{ request()->is("admin/finishings") || request()->is("admin/finishings/*") ? "active" : "" }}">
+                                    <a href="{{ route("admin.finishings.index") }}" class="nav-link {{ request()->is("admin/finishings") || request()->is("admin/finishings/*") || request()->is("admin/finishing-masuks*") ? "active" : "" }}">
                                         <i class="fa-fw nav-icon fas fa-book-open">
 
                                         </i>

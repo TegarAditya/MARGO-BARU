@@ -25,6 +25,7 @@ use App\Services\EstimationService;
 use App\Services\StockService;
 use App\Exports\FinishingRekapExport;
 use App\Exports\RealisasiRekapExport;
+use App\Exports\MasukRekapExport;
 use Illuminate\Support\Facades\Date;
 
 class FinishingController extends Controller
@@ -557,6 +558,20 @@ class FinishingController extends Controller
                 ->orderBy('kelas_id', 'ASC')->orderBy('cover_id', 'ASC')->get();
 
             return (new RealisasiRekapExport($realisasi))->download('REKAP REALISASI '. getVendorName($vendor) .' PERIODE '. str_replace(array("/", "\\", ":", "*", "?", "«", "<", ">", "|"), "-", getSemesterName($semester)) .'.xlsx');
+        }
+
+        if ($request->has('masuk')) {
+            $query = FinishingMasuk::select('no_spk', DB::raw('sum(quantity) as quantity'))->whereBetween('date', [$start, $end]);
+            if (!empty($request->vendor_id)) {
+                $query->where('vendor_id', $request->vendor);
+            }
+            if (!empty($request->semester_id)) {
+                $query->where('semester_id', $request->semester);
+            }
+
+            $masuk = $query->groupBy('no_spk')->orderBy('date', 'ASC')->get();
+
+            return (new MasukRekapExport($masuk))->download('REKAP BUKU MASUK PERIODE ' . $start->format('d-F-Y') .' sd '. $end->format('d-F-Y') .'.xlsx');
         }
 
         $query = Finishing::whereBetween('date', [$start, $end]);

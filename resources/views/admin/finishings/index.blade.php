@@ -84,6 +84,7 @@
                 <button id="buttonFilter" class="btn btn-success">Filter</button>
                 <button type="submit" value="export" name="export" class="btn btn-warning">Rekap SPK</button>
                 <button type="submit" value="realisasi" name="realisasi" class="btn btn-danger">Rekap Realisasi</button>
+                <button type="submit" value="masuk" name="masuk" class="btn btn-secondary">Rekap Buku Masuk</button>
             </div>
         </form>
     </div>
