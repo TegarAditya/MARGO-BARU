@@ -12,6 +12,7 @@ use App\Models\DeliveryOrderItem;
 use App\Models\Salesperson;
 use App\Models\Semester;
 use App\Models\Jenjang;
+use App\Models\SalesOrder;
 use Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -125,7 +126,11 @@ class DeliveryOrderController extends Controller
             'products' => 'required|array',
             'products.*' => 'exists:book_variants,id',
             'quantities' => 'required|array',
-            'quantities.*' => 'numeric|min:1',
+            'quantities.*' => 'numeric|min:0',
+            'pgs' => 'nullable|array',
+            'pgs.*' => 'nullable|exists:book_variants,id',
+            'pg_quantities' => 'nullable|array',
+            'pg_quantities.*' => 'numeric|min:0',
         ]);
 
         $date = $validatedData['date'];
@@ -134,6 +139,8 @@ class DeliveryOrderController extends Controller
         $products = $validatedData['products'];
         $orders = $validatedData['orders'];
         $quantities = $validatedData['quantities'];
+        $pgs = $validatedData['pgs'] ?? null;
+        $pg_quantities = $validatedData['pg_quantities'] ?? null;
 
         DB::beginTransaction();
         try {
@@ -162,6 +169,30 @@ class DeliveryOrderController extends Controller
                 StockService::updateStock($product, -1 * $quantity);
 
                 EstimationService::updateMoved($order, $quantity);
+            }
+
+            if ($pgs) {
+                for ($i = 0; $i < count($pgs); $i++) {
+                    if (!$pgs[$i] || $pg_quantities <= 0) {
+                        continue;
+                    }
+                    $product = $pgs[$i];
+                    $quantity = $quantities[$i];
+                    $order = SalesOrder::where('product_id', $product)->where('salesperson_id', $salesperson)->where('semester_id', $semester)->first()->id ?? null;
+                    $delivery_item = DeliveryOrderItem::create([
+                        'delivery_order_id' => $delivery->id,
+                        'sales_order_id' => $order,
+                        'semester_id' => $semester,
+                        'salesperson_id' => $salesperson,
+                        'product_id' => $product,
+                        'quantity' => $quantity
+                    ]);
+
+                    StockService::createMovement('out', 'delivery', $delivery->id, $date, $product, -1 * $quantity);
+                    StockService::updateStock($product, -1 * $quantity);
+
+                    EstimationService::updateMoved($order, $quantity);
+                }
             }
 
             DB::commit();
@@ -280,7 +311,11 @@ class DeliveryOrderController extends Controller
             'products' => 'required|array',
             'products.*' => 'exists:book_variants,id',
             'quantities' => 'required|array',
-            'quantities.*' => 'numeric|min:1',
+            'quantities.*' => 'numeric|min:0',
+            'pgs' => 'nullable|array',
+            'pgs.*' => 'nullable|exists:book_variants,id',
+            'pg_quantities' => 'nullable|array',
+            'pg_quantities.*' => 'numeric|min:0',
         ]);
 
         $delivery_id = $validatedData['delivery_id'];
@@ -290,6 +325,8 @@ class DeliveryOrderController extends Controller
         $products = $validatedData['products'];
         $orders = $validatedData['orders'];
         $quantities = $validatedData['quantities'];
+        $pgs = $validatedData['pgs'] ?? null;
+        $pg_quantities = $validatedData['pg_quantities'] ?? null;
 
         $deliveryOrder = DeliveryOrder::find($delivery_id);
 
@@ -331,6 +368,42 @@ class DeliveryOrderController extends Controller
                     StockService::updateStock($product, -1 * $quantity);
 
                     EstimationService::updateMoved($order, $quantity);
+                }
+            }
+
+            if ($pgs) {
+                for ($i = 0; $i < count($pgs); $i++) {
+                    $product = $products[$i];
+                    $quantity = $quantities[$i];
+                    $order = SalesOrder::where('product_id', $product)->where('salesperson_id', $salesperson)->where('semester_id', $semester)->first()->id ?? null;
+
+                    $delivery_item = DeliveryOrderItem::where('delivery_order_id', $delivery_id)->where('sales_order_id', $order)->where('product_id', $product)->first();
+
+                    if ($delivery_item) {
+                        $old_quantity = $delivery_item->quantity;
+
+                        $delivery_item->quantity += $quantity;
+                        $delivery_item->save();
+
+                        StockService::editMovement('out', 'delivery', $deliveryOrder->id, $date, $product, -1 * ($quantity + $old_quantity));
+                        StockService::updateStock($product, -1 * $quantity);
+
+                        EstimationService::updateMoved($order, $quantity);
+                    } else {
+                        DeliveryOrderItem::create([
+                            'delivery_order_id' => $deliveryOrder->id,
+                            'sales_order_id' => $order,
+                            'semester_id' => $semester,
+                            'salesperson_id' => $salesperson,
+                            'product_id' => $product,
+                            'quantity' => $quantity
+                        ]);
+
+                        StockService::createMovement('out', 'delivery', $deliveryOrder->id, $date, $product, -1 * $quantity);
+                        StockService::updateStock($product, -1 * $quantity);
+
+                        EstimationService::updateMoved($order, $quantity);
+                    }
                 }
             }
 

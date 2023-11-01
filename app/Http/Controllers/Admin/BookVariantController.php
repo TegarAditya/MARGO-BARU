@@ -453,6 +453,42 @@ class BookVariantController extends Controller
         return response()->json($formattedMaterials);
     }
 
+    public function getPgDelivery(Request $request)
+    {
+        $product_id = $request->input('product');
+        $order_id = $request->input('order');
+
+        $product = BookVariant::find($product_id);
+
+        $kelengkapan = BookVariant::whereHas('estimasi', function ($q) use ($order_id) {
+                            $q->where('id', $order_id);
+                        })
+                        ->where('jenjang_id', $product->jenjang_id)
+                        ->where('kurikulum_id', $product->kurikulum_id)
+                        ->where('mapel_id', $product->mapel_id)
+                        ->where('kelas_id', $product->kelas_id)
+                        ->where('semester_id', $product->semester_id)
+                        ->get();
+
+        $formattedMaterials = [];
+
+        foreach ($kelengkapan as $material) {
+            $formattedMaterials[] = [
+                'id' => $material->id,
+                'text' => $material->kelengkapan_name,
+                'halaman' => $material->halaman_id
+            ];
+        }
+
+        $formattedMaterials[] = [
+            'id' => '',
+            'text' => 'Kosong',
+        ];
+
+
+        return response()->json($formattedMaterials);
+    }
+
     public function getEstimasi(Request $request)
     {
         $query = $request->input('q');
