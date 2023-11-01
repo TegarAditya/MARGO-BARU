@@ -208,6 +208,7 @@ class DeliveryOrderController extends Controller
         $delivery_items = $validatedData['delivery_items'];
         $products = $validatedData['products'];
         $quantities = $validatedData['quantities'];
+        $delivery_faktur = $deliveryOrder->faktur;
 
         DB::beginTransaction();
         try {
@@ -237,7 +238,7 @@ class DeliveryOrderController extends Controller
 
             DB::commit();
 
-            if ($deliveryOrder->faktur) {
+            if ($delivery_faktur) {
                 Alert::success('Success', 'Silahkan Update Invoicenya Juga')->showConfirmButton('Oke', '#3085d6');
                 return redirect()->route('admin.invoices.generate', $deliveryOrder->id);
             }
@@ -292,6 +293,8 @@ class DeliveryOrderController extends Controller
 
         $deliveryOrder = DeliveryOrder::find($delivery_id);
 
+        $delivery_faktur = $deliveryOrder->faktur;
+
         $semester = $deliveryOrder->semester_id;
         $salesperson = $deliveryOrder->salesperson_id;
 
@@ -338,7 +341,7 @@ class DeliveryOrderController extends Controller
 
             DB::commit();
 
-            if ($deliveryOrder->faktur) {
+            if ($delivery_faktur) {
                 Alert::success('Success', 'Silahkan Update Invoicenya Juga')->showConfirmButton('Oke', '#3085d6');
                 return redirect()->route('admin.invoices.generate', $deliveryOrder->id);
             }

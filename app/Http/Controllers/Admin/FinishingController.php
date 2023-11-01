@@ -8,6 +8,7 @@ use App\Http\Requests\StoreFinishingRequest;
 use App\Http\Requests\UpdateFinishingRequest;
 use App\Models\Finishing;
 use App\Models\FinishingItem;
+use App\Models\FinishingMasuk;
 use App\Models\Semester;
 use App\Models\Vendor;
 use App\Models\BookVariant;
@@ -431,12 +432,17 @@ class FinishingController extends Controller
         $vendors = Vendor::where('type', 'finishing')->get()->pluck('full_name', 'id')->prepend(trans('global.pleaseSelect'), '');
         $jenjangs = Jenjang::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
-        return view('admin.finishings.masuk', compact('vendors', 'jenjangs'));
+        $today = Carbon::now()->format('d-m-Y');
+
+        return view('admin.finishings.masuk', compact('vendors', 'jenjangs', 'today'));
     }
 
     public function masukStore(Request $request)
     {
         $validatedData = $request->validate([
+            'no_spk' => 'required',
+            'date' => 'required',
+            'vendor_id' => 'required',
             'products' => 'required|array',
             'products.*' => 'exists:book_variants,id',
             'finishing_items' => 'required|array',
@@ -446,6 +452,9 @@ class FinishingController extends Controller
             'done' => 'required|array'
         ]);
 
+        $no_spk = $validatedData['no_spk'];
+        $date = $validatedData['date'];
+        $vendor = $validatedData['vendor_id'];
         $products = $validatedData['products'];
         $finishing_items = $validatedData['finishing_items'];
         $quantities = $validatedData['quantities'];
@@ -467,6 +476,17 @@ class FinishingController extends Controller
                 $finishing_item->update([
                     'quantity' => DB::raw("quantity + $quantity"),
                     'done' => $done
+                ]);
+
+                //finishing masuk
+                $finishing_masuk = FinishingMasuk::create([
+                    'no_spk'    => $no_spk,
+                    'date'      => $date,
+                    'vendor_id' => $vendor,
+                    'finishing_item_id' => $finishing_item->id,
+                    'product_id' => $product,
+                    'quantity'  => $quantity,
+                    'semester_id' => setting('current_semester')
                 ]);
 
                 EstimationService::createMovement('out', 'finishing', $finishing_item->finishing->id, $product, $quantity, 'realisasi');

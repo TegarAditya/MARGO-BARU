@@ -56,4 +56,9 @@ class FinishingItem extends Model
     {
         return $this->belongsTo(Finishing::class, 'finishing_id');
     }
+
+    public function masuks()
+    {
+        return $this->hasMany(FinishingMasuk::class, 'finishing_item_id');
+    }
 }

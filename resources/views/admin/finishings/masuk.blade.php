@@ -12,6 +12,26 @@
             <div class="row">
                 <div class="col-6">
                     <div class="form-group">
+                        <label class="required" for="no_spk">No SPK</label>
+                        <input class="form-control {{ $errors->has('no_spk') ? 'is-invalid' : '' }}" type="text" name="no_spk" id="no_spk" value="{{ old('no_spk') }}" required>
+                        @if($errors->has('no_spk'))
+                            <span class="text-danger">{{ $errors->first('no_spk') }}</span>
+                        @endif
+                        <span class="help-block">{{ trans('cruds.finishing.fields.no_spk_helper') }}</span>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="form-group">
+                        <label class="required" for="date">{{ trans('cruds.finishing.fields.date') }}</label>
+                        <input class="form-control date {{ $errors->has('date') ? 'is-invalid' : '' }}" type="text" name="date" id="date" value="{{ old('date', $today) }}" required>
+                        @if($errors->has('date'))
+                            <span class="text-danger">{{ $errors->first('date') }}</span>
+                        @endif
+                        <span class="help-block">{{ trans('cruds.finishing.fields.date_helper') }}</span>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="form-group">
                         <label class="required" for="vendor_id">{{ trans('cruds.finishing.fields.vendor') }}</label>
                         <select class="form-control select2 {{ $errors->has('vendor') ? 'is-invalid' : '' }}" name="vendor_id" id="vendor_id" required>
                             @foreach($vendors as $id => $entry)

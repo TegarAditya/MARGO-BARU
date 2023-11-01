@@ -358,6 +358,11 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     Route::resource('finishings', 'FinishingController');
 
     // Finishing Item
+    Route::delete('finishing-masuks/destroy', 'FinishingMasukController@massDestroy')->name('finishing-masuks.massDestroy');
+    // Route::get('finishing-masuks/show', 'FinishingMasukController@show')->name('finishing-masuks.show');
+    Route::resource('finishing-masuks', 'FinishingMasukController');
+
+    // Finishing Item
     Route::delete('finishing-items/destroy', 'FinishingItemController@massDestroy')->name('finishing-items.massDestroy');
     Route::resource('finishing-items', 'FinishingItemController');
 

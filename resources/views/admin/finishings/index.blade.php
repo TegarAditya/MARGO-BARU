@@ -11,8 +11,11 @@
             <a class="btn btn-primary mr-2" href="{{ route('admin.finishings.create') }}">
                 {{ trans('global.add') }} {{ trans('cruds.finishing.title_singular') }}
             </a>
-            <a class="btn btn-danger" href="{{ route('admin.finishings.masuk') }}">
+            <a class="btn btn-warning mr-2" href="{{ route('admin.finishings.masuk') }}">
                 Input Buku Masuk
+            </a>
+            <a class="btn btn-danger" href="{{ route('admin.finishing-masuks.index') }}">
+                List Buku Masuk
             </a>
         </div>
     </div>
