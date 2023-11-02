@@ -4,6 +4,7 @@ namespace App\Exports;
 
 use App\Models\BookVariant;
 use App\Models\Cover;
+use App\Models\Isi;
 use App\Models\ProductionEstimation;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\Exportable;
@@ -27,13 +28,22 @@ class EstimasiCoverExport implements FromCollection, ShouldAutoSize
 
         $covers = Cover::whereHas('production_estimations')->get();
 
+        $isis = Isi::whereHas('production_estimations')->get();
+
         $rows = collect([]);
 
         $label = ['No.', 'Mapel', 'Kelas', 'Halaman'];
 
+        foreach($isis as $isi) {
+            array_push($label, 'Naskah '. $isi->code.' Estimasi');
+            array_push($label, 'Naskah '. $isi->code.' Produksi');
+        }
+
+        array_push($label, ' ');
+
         foreach($covers as $cover) {
-            array_push($label, $cover->code .' Estimasi');
-            array_push($label, $cover->code .' Produksi');
+            array_push($label, 'Cover '. $cover->code .' Estimasi');
+            array_push($label, 'Cover '. $cover->code .' Produksi');
         }
         $rows->push($label);
 
@@ -48,6 +58,16 @@ class EstimasiCoverExport implements FromCollection, ShouldAutoSize
                     ->where('product.mapel_id', $product->mapel_id)
                     ->where('product.kelas_id', $product->kelas_id)
                     ->where('product.halaman_id', $product->halaman_id);
+
+            foreach($isis as $isi) {
+                $isi_filter = $product_filter->where('product.isi_id', $isi->id);
+                $estimasi = $isi_filter->sum('estimasi');
+                $produksi = $isi_filter->sum('produksi');
+                array_push($item, (string) $estimasi);
+                array_push($item, (string) $produksi);
+            }
+
+            array_push($item, ' ');
 
             foreach($covers as $cover) {
                 $cover_filter = $product_filter->where('product.cover_id', $cover->id);

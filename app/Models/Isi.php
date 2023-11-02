@@ -37,4 +37,16 @@ class Isi extends Model
     {
         return $this->hasMany(BookVariant::class, 'isi_id');
     }
+
+    public function production_estimations()
+    {
+        return $this->hasManyThrough(
+            ProductionEstimation::class,
+            BookVariant::class,
+            'isi_id',
+            'product_id',
+            'id',
+            'id'
+        );
+    }
 }
