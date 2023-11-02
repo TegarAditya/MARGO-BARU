@@ -41,7 +41,7 @@ class EstimasiCoverExport implements FromCollection, ShouldAutoSize
 
         foreach($products as $product) {
             $i++;
-            $item = [$i, $product->mapel->name, (string) $product->kelas->code, (string) $product->halaman->code];
+            $item = [$i, $product->mapel->name, (string) $product->kelas?->code, (string) $product->halaman?->code];
 
             $product_filter =  $production_estimations->where('product.jenjang_id', $product->jenjang_id)
                     ->where('product.kurikulum_id', $product->kurikulum_id)
