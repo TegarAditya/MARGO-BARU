@@ -98,7 +98,7 @@ class TransactionService
         ProductionTransaction::create([
             'date' => Carbon::now()->format('d-m-Y'),
             'description' => $description,
-            'vendor_id' => $reversal->vendor,
+            'vendor_id' => $reversal->vendor_id,
             'semester_id' => $semester,
             'type' => $type,
             'reference_id' => $reference,
