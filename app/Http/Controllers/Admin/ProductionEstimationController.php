@@ -89,7 +89,11 @@ class ProductionEstimationController extends Controller
             });
 
             $table->addColumn('product_code', function ($row) {
-                return $row->product ? $row->product->code : '';
+                return $row->product ?
+                '<a class="px-1" href="'.route('admin.book-variants.show', $row->product_id).'" title="Show">
+                    <i class="fas fa-eye text-success fa-lg"></i>
+                </a>'.$row->product->code
+                : '';
             });
 
             $table->addColumn('product_name', function ($row) {
@@ -115,7 +119,7 @@ class ProductionEstimationController extends Controller
                 return angka($row->realisasi);
             });
 
-            $table->rawColumns(['actions', 'placeholder', 'product']);
+            $table->rawColumns(['actions', 'placeholder', 'product', 'product_code']);
 
             return $table->make(true);
         }

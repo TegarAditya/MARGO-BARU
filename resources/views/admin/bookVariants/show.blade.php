@@ -112,6 +112,9 @@
                         </th>
                         <td>
                             @foreach($bookVariant->components as $key => $components)
+                                <a class="px-1" href="{{route('admin.book-variants.show', $components->id)}}" title="Show">
+                                    <i class="fas fa-eye text-success fa-lg"></i>
+                                </a>
                                 <span class="label label-info">{{ $components->name }} - <b>{{ $components->stock }} {{ $components->unit->name }}</b></span>
                                 <br>
                             @endforeach
