@@ -216,7 +216,6 @@
                         var product = $(item);
                         var quantity = product.find('.quantity');
                         var quantityText = product.find('.quantity_text');
-                        var max = quantity.data('max');
                         var status = product.find('.status');
                         var done = product.find('.done');
 
@@ -233,11 +232,6 @@
                             if (valueNum < 0) {
                                 el.val(0);
                                 quantityText.val(0).trigger('change');
-                            }
-
-                            if (valueNum > max) {
-                                el.val(max);
-                                quantityText.val(max).trigger('change');
                             }
                         }).trigger('change');
 

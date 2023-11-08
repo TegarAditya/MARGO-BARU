@@ -209,7 +209,7 @@
                             <div class="form-group text-field m-0">
                                 <div class="text-field-input px-2 py-0">
                                     <input class="quantity" type="hidden" name="quantities[]"
-                                        data-max="${Math.min(product.estimasi_produksi.estimasi, product.finishing_stock)}"
+                                        data-max="${product.finishing_stock}"
                                         value="1">
                                     <input class="form-control text-center quantity_text" type="text" name="quantity_text[]"
                                         value="1" required>

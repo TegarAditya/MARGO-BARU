@@ -121,7 +121,7 @@
                                     <p class="mb-0 text-sm">Quantity</p>
                                     <div class="form-group text-field m-0">
                                         <div class="text-field-input px-2 py-0">
-                                            <input class="quantity" type="hidden" name="quantities[]" value="{{ $item->estimasi }}" data-max="{{ min($product->components->min('stock') + $item->estimasi, $product->estimasi_produksi->estimasi + $item->estimasi) }}">
+                                            <input class="quantity" type="hidden" name="quantities[]" value="{{ $item->estimasi }}" data-max="{{ $product->components->min('stock') + $item->estimasi }}">
                                             <input class="form-control text-center quantity_text" type="text" name="quantity_text[]" value="{{ angka($item->estimasi) }}" required>
                                             <label class="text-field-border"></label>
                                         </div>
