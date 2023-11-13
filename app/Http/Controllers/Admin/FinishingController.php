@@ -234,7 +234,7 @@ class FinishingController extends Controller
             'products' => 'required|array',
             'products.*' => 'exists:book_variants,id',
             'quantities' => 'required|array',
-            'quantities.*' => 'numeric|min:1',
+            'quantities.*' => 'numeric|min:0',
             'finishing_items' => 'required|array',
         ]);
 
@@ -449,7 +449,7 @@ class FinishingController extends Controller
             'finishing_items' => 'required|array',
             'finishing_items.*' => 'exists:finishing_items,id',
             'quantities' => 'required|array',
-            'quantities.*' => 'numeric|min:1',
+            'quantities.*' => 'numeric|min:0',
             'done' => 'required|array'
         ]);
 
