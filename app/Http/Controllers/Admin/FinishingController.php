@@ -270,7 +270,7 @@ class FinishingController extends Controller
 
                     foreach($product->components as $item) {
                         StockService::editMovement('out', 'produksi', $finishing->id, $date, $item->id, -1 * $quantity);
-                        StockService::updateStock($item->id, ($quantity - $old_quantity));
+                        StockService::updateStock($item->id, -1 * ($quantity - $old_quantity));
                     }
                 } else {
                     $detail = FinishingItem::create([
