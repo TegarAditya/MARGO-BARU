@@ -133,17 +133,21 @@ class BookController extends Controller
                     $code = Book::generateCode($jenjang_id, $kurikulum_id, $mapel_id, $kelas_id, $semester_id, $isi_id, $cover_id);
                     $name = Book::generateName($jenjang_id, $kurikulum_id, $mapel_id, $kelas_id, $semester_id, $isi_id, $cover_id);
 
-                    $buku = Book::create([
-                        'code' => $code,
-                        'name' => $name,
-                        'jenjang_id' => $jenjang_id,
-                        'kurikulum_id' => $kurikulum_id,
-                        'mapel_id' => $mapel_id,
-                        'kelas_id' => $kelas_id,
-                        'semester_id' => $semester_id,
-                        'isi_id' => $isi_id,
-                        'cover_id' => $cover_id,
-                    ]);
+                    $buku = Book::where('code', $code)->first();
+
+                    if (!$buku) {
+                        $buku = Book::create([
+                            'code' => $code,
+                            'name' => $name,
+                            'jenjang_id' => $jenjang_id,
+                            'kurikulum_id' => $kurikulum_id,
+                            'mapel_id' => $mapel_id,
+                            'kelas_id' => $kelas_id,
+                            'semester_id' => $semester_id,
+                            'isi_id' => $isi_id,
+                            'cover_id' => $cover_id,
+                        ]);
+                    }
 
                     if ($request->has('lks_status')) {
                         $lks = BookVariant::updateOrCreate([

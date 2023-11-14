@@ -277,11 +277,14 @@ Dropzone.options.photoDropzone = {
     function toggleHalamanLks() {
         var checkbox = document.getElementById('lks_status');
         var halamanGroup = document.getElementById('halaman-lks-group');
+        var halamanSelect = document.getElementById('halaman_id');
 
         if (checkbox.checked) {
             halamanGroup.style.display = 'block';
+            halamanSelect.setAttribute('required', 'required');
         } else {
             halamanGroup.style.display = 'none';
+            halamanSelect.removeAttribute('required');
         }
     }
     function toggleHalamanPg() {

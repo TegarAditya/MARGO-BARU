@@ -336,8 +336,8 @@ class InvoiceController extends Controller
             'nominal' => 'numeric|min:0',
             'total_price' => 'numeric|min:0',
             'total_diskon' => 'numeric|min:0',
-            'delivery_items' => 'required|array',
-            'delivery_items.*' => 'exists:delivery_order_items,id',
+            'delivery_items' => 'nullable|array',
+            'delivery_items.*' => 'nullable',
             'invoice_items' => 'required|array',
             'invoice_items.*' => 'nullable',
             'products' => 'required|array',
@@ -360,7 +360,7 @@ class InvoiceController extends Controller
         $total_price = $validatedData['total_price'];
         $total_diskon = $validatedData['total_diskon'];
         $invoice_items = $validatedData['invoice_items'] ?? null;
-        $delivery_items = $validatedData['delivery_items'];
+        $delivery_items = $validatedData['delivery_items'] ?? null;
         $products = $validatedData['products'];
         $prices = $validatedData['prices'];
         $quantities = $validatedData['quantities'];
@@ -387,8 +387,8 @@ class InvoiceController extends Controller
             ]);
 
             for ($i = 0; $i < count($products); $i++) {
-                $invoice_item = $invoice_items[$i];
-                $delivery_item = $delivery_items[$i];
+                $invoice_item = $invoice_items[$i] ?? null;
+                $delivery_item = $delivery_items[$i] ?? null;
                 $product = $products[$i];
                 $price = $prices[$i];
                 $quantity = $quantities[$i];
