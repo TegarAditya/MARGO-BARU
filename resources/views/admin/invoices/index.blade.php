@@ -34,6 +34,26 @@
     </div>
 </div>
 @endif
+@if ($update_invoices->count() > 0)
+<div class="card">
+    <div class="card-header">Daftar Surat Jalan Yang Harus Di Update</div>
+    <div class="card-body">
+        <div class="row">
+            @foreach ($update_invoices as $item)
+                <div class="col-3">
+                    <div class="info-box">
+                        <span class="info-box-icon bg-warning"><a href="{{ route('admin.invoices.generate', $item->id) }}"><i class="fas fa-file-invoice"></i></a></span>
+                        <div class="info-box-content">
+                            <span class="info-box-text">{{ $item->no_faktur }}</span>
+                            <span class="info-box-number">Surat Jalan</span>
+                        </div>
+                    </div>
+                </div>
+            @endforeach
+        </div>
+    </div>
+</div>
+@endif
 <div class="card">
     <div class="card-header">
         {{ trans('cruds.invoice.title_singular') }} {{ trans('global.list') }}

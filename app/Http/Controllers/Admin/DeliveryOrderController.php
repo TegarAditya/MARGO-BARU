@@ -13,6 +13,7 @@ use App\Models\Salesperson;
 use App\Models\Semester;
 use App\Models\Jenjang;
 use App\Models\SalesOrder;
+use App\Models\Invoice;
 use Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -177,7 +178,7 @@ class DeliveryOrderController extends Controller
                         continue;
                     }
                     $product = $pgs[$i];
-                    $quantity = $quantities[$i];
+                    $quantity = $pg_quantities[$i];
                     $order = SalesOrder::where('product_id', $product)->where('salesperson_id', $salesperson)->where('semester_id', $semester)->first()->id ?? null;
                     $delivery_item = DeliveryOrderItem::create([
                         'delivery_order_id' => $delivery->id,
@@ -373,8 +374,9 @@ class DeliveryOrderController extends Controller
 
             if ($pgs) {
                 for ($i = 0; $i < count($pgs); $i++) {
-                    $product = $products[$i];
-                    $quantity = $quantities[$i];
+                    $product = $pgs[$i];
+                    $quantity = $pg_quantities[$i];
+
                     $order = SalesOrder::where('product_id', $product)->where('salesperson_id', $salesperson)->where('semester_id', $semester)->first()->id ?? null;
 
                     $delivery_item = DeliveryOrderItem::where('delivery_order_id', $delivery_id)->where('sales_order_id', $order)->where('product_id', $product)->first();
@@ -411,6 +413,12 @@ class DeliveryOrderController extends Controller
                 'no_suratjalan' => $no_suratjalan,
                 'date' => $date,
             ]);
+
+            Invoice::where('delivery_order_id', $deliveryOrder->id)
+                    ->where('type', 'jual')
+                    ->update([
+                        'must_update' => 1
+                    ]);
 
             DB::commit();
 

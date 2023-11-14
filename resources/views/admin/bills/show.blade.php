@@ -281,7 +281,7 @@
                                         </tr>
                                         <tr>
                                             <td class="text-center"><strong>Total</strong></td>
-                                            <td class="text-right px-5"><b>{{ money($invoice->nominal) }}</b></td>
+                                            <td class="text-right px-5" colspan="2"><b>{{ money($invoice->nominal) }}</b></td>
                                         </tr>
                                     </tfoot>
                                 </table>

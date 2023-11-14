@@ -14,14 +14,14 @@
             </p>
         @endif
 
-        <form method="POST" action="{{ route("admin.invoices.update", [$invoice->id]) }}" enctype="multipart/form-data">
+        <form method="POST" action="{{ route("admin.invoices.update", [$invoice->id]) }}" enctype="multipart/form-data" onkeypress="return event.keyCode != 13;">
             @method('PUT')
             @csrf
             <div class="row">
                 <div class="col-6">
                     <div class="form-group">
                         <label class="required" for="no_faktur">{{ trans('cruds.invoice.fields.no_faktur') }}</label>
-                        <input class="form-control {{ $errors->has('no_faktur') ? 'is-invalid' : '' }}" type="text" name="no_faktur" id="no_faktur" value="{{ $invoice->no_faktur }}" readonly>
+                        <input class="form-control {{ $errors->has('no_faktur') ? 'is-invalid' : '' }}" type="text" name="no_faktur" id="no_faktur" value="{{ old('no_suratjalan', noRevisi($invoice->no_faktur)) }}" readonly>
                         @if($errors->has('no_faktur'))
                             <span class="text-danger">{{ $errors->first('no_faktur') }}</span>
                         @endif
@@ -63,18 +63,11 @@
                     $total = 0;
                     $total_discount = 0;
                 @endphp
-                @foreach ($invoice_item as $item)
+                @foreach ($delivery_item as $item)
                     @php
                         $product = $item->product;
-                        $item_delivery = $delivery_item->where('product_id', $item->product_id)->first();
-
-                        if ($item_delivery->quantity !== $item->quantity) {
-                            $quantity = $item_delivery->quantity;
-                        } else {
-                            $quantity = $item->quantity;
-                        }
-
-                        $discount = $item->discount;
+                        $quantity = $item->quantity;
+                        $discount = $item->invoice_item ? $item->invoice_item->discount : 0;
 
                         $subtotal = $product->price * $quantity;
                         $total += $subtotal;
@@ -95,7 +88,8 @@
                                     Jenjang - Kurikulum : <strong>{{ $product->jenjang->name }} - {{ $product->book->cover->name }} - {{ $product->book->kurikulum->name }}</strong>
                                 </p>
                             </div>
-                            <input type="hidden" name="invoice_items[]" value="{{ $item->id }}">
+                            <input type="hidden" name="delivery_items[]" value="{{ $item->id }}">
+                            <input type="hidden" name="invoice_items[]" value="{{ $item->invoice_item ? $item->invoice_item->id : null }}">
                             <input type="hidden" name="products[]" value="{{ $product->id }}">
                             <div class="col offset-1 row align-items-end align-self-center">
                                 <div class="col" style="max-width: 210px">

@@ -60,4 +60,9 @@ class DeliveryOrderItem extends Model
     {
         return $this->belongsTo(BookVariant::class, 'product_id');
     }
+
+    public function invoice_item()
+    {
+        return $this->hasOne(InvoiceItem::class, 'delivery_order_item_id');
+    }
 }

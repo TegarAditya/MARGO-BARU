@@ -459,10 +459,12 @@ class BookVariantController extends Controller
         $order_id = $request->input('order');
 
         $product = BookVariant::find($product_id);
+        $order = SalesOrder::find($order_id);
 
-        $kelengkapan = BookVariant::whereHas('estimasi', function ($q) use ($order_id) {
-                            $q->where('id', $order_id);
+        $kelengkapan = BookVariant::whereHas('estimasi', function ($q) use ($order) {
+                            $q->where('no_order', $order->no_order);
                         })
+                        ->whereIn('type', ['P', 'K'])
                         ->where('jenjang_id', $product->jenjang_id)
                         ->where('kurikulum_id', $product->kurikulum_id)
                         ->where('mapel_id', $product->mapel_id)

@@ -10,6 +10,7 @@ use App\Models\Setting;
 use App\Models\Semester;
 use App\Models\Vendor;
 use App\Models\DeliveryOrder;
+use App\Models\Invoice;
 use App\Models\SalesOrder;
 use App\Models\Cetak;
 use App\Models\CetakItem;
@@ -134,8 +135,9 @@ if (! function_exists('checkInvoice')) {
     function checkInvoice()
     {
         $fakturs = DeliveryOrder::where('faktur', 0)->count();
+        $invoices = Invoice::where('must_update', 1)->count();
 
-        return $fakturs;
+        return $fakturs + $invoices;
     }
 }
 

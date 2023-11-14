@@ -63,6 +63,9 @@ class EstimasiCoverExport implements FromCollection, ShouldAutoSize
                 $isi_filter = $product_filter->where('product.isi_id', $isi->id);
                 $estimasi = $isi_filter->sum('estimasi');
                 $produksi = $isi_filter->sum('produksi');
+                if ($estimasi <= 0) {
+                    $estimasi = $isi_filter->eksternal - $produksi;
+                }
                 array_push($item, (string) $estimasi);
                 array_push($item, (string) $produksi);
             }
@@ -73,6 +76,10 @@ class EstimasiCoverExport implements FromCollection, ShouldAutoSize
                 $cover_filter = $product_filter->where('product.cover_id', $cover->id);
                 $estimasi = $cover_filter->sum('estimasi');
                 $produksi = $cover_filter->sum('produksi');
+
+                if ($estimasi <= 0) {
+                    $estimasi = $cover_filter->eksternal - $produksi;
+                }
                 array_push($item, (string) $estimasi);
                 array_push($item, (string) $produksi);
             }

@@ -108,7 +108,9 @@ class InvoiceController extends Controller
 
         $delivery_orders = DeliveryOrder::where('faktur', 0)->get();
 
-        return view('admin.invoices.index', compact('salespeople', 'semesters', 'delivery_orders'));
+        $update_invoices = Invoice::where('must_update', 1)->get();
+
+        return view('admin.invoices.index', compact('salespeople', 'semesters', 'delivery_orders', 'update_invoices'));
     }
 
     public function create()
@@ -132,16 +134,14 @@ class InvoiceController extends Controller
     {
         $delivery->load(['semester', 'salesperson']);
 
-        $delivery_item = DeliveryOrderItem::with('delivery_order', 'product', 'product.book', 'sales_order')->where('delivery_order_id', $delivery->id)->orderBy('product_id', 'ASC')->get();
+        $delivery_item = DeliveryOrderItem::with('delivery_order', 'product', 'product.book', 'sales_order', 'invoice_item')->where('delivery_order_id', $delivery->id)->orderBy('product_id', 'ASC')->get();
 
         $invoice = Invoice::where('type', 'jual')->where('delivery_order_id', $delivery->id)->first();
 
         if ($invoice) {
             $invoice->load('delivery_order', 'semester', 'salesperson');
 
-            $invoice_item = InvoiceItem::with('product', 'product.book', 'delivery_order')->where('invoice_id', $invoice->id)->orderBy('product_id', 'ASC')->get();
-
-            return view('admin.invoices.edit-generate', compact('invoice', 'invoice_item', 'delivery_item'));
+            return view('admin.invoices.edit-generate', compact('invoice', 'delivery_item'));
         }
 
         $no_faktur = Invoice::generateNoInvoice($delivery->semester_id);
@@ -330,13 +330,16 @@ class InvoiceController extends Controller
     {
         // Validate the form data
         $validatedData = $request->validate([
+            'no_suratjalan' => 'required',
             'date' => 'required',
             'note' => 'nullable',
             'nominal' => 'numeric|min:0',
             'total_price' => 'numeric|min:0',
             'total_diskon' => 'numeric|min:0',
+            'delivery_items' => 'required|array',
+            'delivery_items.*' => 'exists:delivery_order_items,id',
             'invoice_items' => 'required|array',
-            'invoice_items.*' => 'exists:invoice_items,id',
+            'invoice_items.*' => 'nullable',
             'products' => 'required|array',
             'products.*' => 'exists:book_variants,id',
             'prices' => 'required|array',
@@ -356,7 +359,8 @@ class InvoiceController extends Controller
         $nominal = $validatedData['nominal'];
         $total_price = $validatedData['total_price'];
         $total_diskon = $validatedData['total_diskon'];
-        $invoice_items = $validatedData['invoice_items'];
+        $invoice_items = $validatedData['invoice_items'] ?? null;
+        $delivery_items = $validatedData['delivery_items'];
         $products = $validatedData['products'];
         $prices = $validatedData['prices'];
         $quantities = $validatedData['quantities'];
@@ -369,6 +373,8 @@ class InvoiceController extends Controller
         $no_faktur = $invoice->no_faktur;
         $note = $invoice->note;
 
+        $delivery_order = DeliveryOrder::where('no_suratjalan', $validatedData['no_suratjalan'])->first()->id;
+
         DB::beginTransaction();
         try {
             $invoice->update([
@@ -376,11 +382,13 @@ class InvoiceController extends Controller
                 'discount' => $total_diskon,
                 'total' => $total_price,
                 'nominal' => $nominal,
-                'note' => $note
+                'note' => $note,
+                'must_update' => 0
             ]);
 
             for ($i = 0; $i < count($products); $i++) {
                 $invoice_item = $invoice_items[$i];
+                $delivery_item = $delivery_items[$i];
                 $product = $products[$i];
                 $price = $prices[$i];
                 $quantity = $quantities[$i];
@@ -388,14 +396,30 @@ class InvoiceController extends Controller
                 $diskon = $diskons[$i];
                 $subdiscount = $subdiscounts[$i];
 
-                InvoiceItem::where('id', $invoice_item)->update([
-                    'product_id' => $product,
-                    'quantity' => $quantity,
-                    'price' => $price,
-                    'total' => $subtotal,
-                    'discount' => $diskon,
-                    'total_discount' => $subdiscount,
-                ]);
+                if ($invoice_item == null) {
+                    InvoiceItem::create([
+                        'invoice_id' => $invoice->id,
+                        'delivery_order_id' => $delivery_order,
+                        'delivery_order_item_id' => $delivery_item,
+                        'semester_id' => $semester,
+                        'salesperson_id' => $salesperson,
+                        'product_id' => $product,
+                        'quantity' => $quantity,
+                        'price' => $price,
+                        'total' => $subtotal,
+                        'discount' => $diskon,
+                        'total_discount' => $subdiscount,
+                    ]);
+                } else {
+                    InvoiceItem::where('id', $invoice_item)->update([
+                        'product_id' => $product,
+                        'quantity' => $quantity,
+                        'price' => $price,
+                        'total' => $subtotal,
+                        'discount' => $diskon,
+                        'total_discount' => $subdiscount,
+                    ]);
+                }
             }
 
             TransactionService::editTransaction($date, $note, $salesperson, $semester, 'faktur', $invoice->id, $no_faktur, $total_price, 'debet');

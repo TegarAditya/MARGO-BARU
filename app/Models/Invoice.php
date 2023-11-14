@@ -44,6 +44,7 @@ class Invoice extends Model
         'nominal',
         'note',
         'retur',
+        'must_update',
         'created_by_id',
         'updated_by_id',
         'created_at',
