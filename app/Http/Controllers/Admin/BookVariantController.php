@@ -75,7 +75,7 @@ class BookVariantController extends Controller
 
             $table->editColumn('actions', function ($row) {
                 $viewGate      = 'book_variant_show';
-                $editGate      = 'book_variant_edit_hidden';
+                $editGate      = 'book_variant_edit';
                 $deleteGate    = 'book_variant_delete';
                 $crudRoutePart = 'book-variants';
 
@@ -225,25 +225,29 @@ class BookVariantController extends Controller
         return view('admin.bookVariants.edit', compact('bookVariant', 'books', 'covers', 'halamen', 'isis', 'jenjangs', 'kelas', 'kurikulums', 'mapels', 'semesters', 'units', 'components'));
     }
 
-    public function update(UpdateBookVariantRequest $request, BookVariant $bookVariant)
+    public function update(Request $request, BookVariant $bookVariant)
     {
-        $bookVariant->update($request->all());
+        $bookVariant->update([
+            'halaman_id' => $request->halaman_id,
+            'price' => $request->price,
+            'cost' => $request->cost
+        ]);
 
-        $bookVariant->components()->sync($request->input('components', []));
+        // $bookVariant->components()->sync($request->input('components', []));
 
-        if (count($bookVariant->photo) > 0) {
-            foreach ($bookVariant->photo as $media) {
-                if (! in_array($media->file_name, $request->input('photo', []))) {
-                    $media->delete();
-                }
-            }
-        }
-        $media = $bookVariant->photo->pluck('file_name')->toArray();
-        foreach ($request->input('photo', []) as $file) {
-            if (count($media) === 0 || ! in_array($file, $media)) {
-                $bookVariant->addMedia(storage_path('tmp/uploads/' . basename($file)))->toMediaCollection('photo');
-            }
-        }
+        // if (count($bookVariant->photo) > 0) {
+        //     foreach ($bookVariant->photo as $media) {
+        //         if (! in_array($media->file_name, $request->input('photo', []))) {
+        //             $media->delete();
+        //         }
+        //     }
+        // }
+        // $media = $bookVariant->photo->pluck('file_name')->toArray();
+        // foreach ($request->input('photo', []) as $file) {
+        //     if (count($media) === 0 || ! in_array($file, $media)) {
+        //         $bookVariant->addMedia(storage_path('tmp/uploads/' . basename($file)))->toMediaCollection('photo');
+        //     }
+        // }
 
         Alert::success('Success', 'Buku Berhasil Diperbarui');
 
