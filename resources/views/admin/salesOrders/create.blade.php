@@ -168,7 +168,7 @@
                                         Jenjang - Kurikulum : <strong>${product.jenjang.name} - ${product.kurikulum.name}</strong>
                                     </p>
                                     <p class="mb-0 text-sm">
-                                        Cover - Isi : <strong>${product.cover.name} - ${product.isi.name}</strong>
+                                        Cover - Isi : <strong>${product.cover?.name} - ${product.isi?.name}</strong>
                                     </p>
                                 </div>
                                 <div class="col offset-1 row align-items-end align-self-center">

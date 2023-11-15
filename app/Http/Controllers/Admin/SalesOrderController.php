@@ -139,7 +139,7 @@ class SalesOrderController extends Controller
                 ]);
 
                 if ($product->semester_id == $semester) {
-                    if ($product->isi->code !== 'MMJ' || $product->cover->code !== 'MMJ') {
+                    if ($product->isi?->code !== 'MMJ' || $product->cover?->code !== 'MMJ') {
                         $type_produksi = 'eksternal';
                     } else {
                         $type_produksi = 'sales';
@@ -221,7 +221,7 @@ class SalesOrderController extends Controller
                 $order->quantity = $quantity;
                 $order->save();
 
-                if ($product->isi->code !== 'MMJ' || $product->cover->code !== 'MMJ') {
+                if ($product->isi?->code !== 'MMJ' || $product->cover?->code !== 'MMJ') {
                     $type_produksi = 'eksternal';
                 } else {
                     $type_produksi = 'sales';

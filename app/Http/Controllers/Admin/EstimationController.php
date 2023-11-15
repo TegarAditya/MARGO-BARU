@@ -173,7 +173,7 @@ class EstimationController extends Controller
                 ]);
 
                 if ($product->semester_id == $semester) {
-                    if ($product->isi->code !== 'MMJ' || $product->cover->code !== 'MMJ') {
+                    if ($product->isi?->code !== 'MMJ' || $product->cover?->code !== 'MMJ') {
                         $type_produksi = 'eksternal';
                     } else {
                         $type_produksi = 'sales';
@@ -230,7 +230,7 @@ class EstimationController extends Controller
                     ]);
 
                     if ($product->semester_id == $semester) {
-                        if ($product->isi->code !== 'MMJ' || $product->cover->code !== 'MMJ') {
+                        if ($product->isi?->code !== 'MMJ' || $product->cover?->code !== 'MMJ') {
                             $type_produksi = 'eksternal';
                         } else {
                             $type_produksi = 'sales';
@@ -264,7 +264,7 @@ class EstimationController extends Controller
             return redirect()->route('admin.estimations.index');
         } catch (\Exception $e) {
             DB::rollback();
-
+            
             return redirect()->back()->with('error-message', $e->getMessage())->withInput();
         }
     }
@@ -340,7 +340,7 @@ class EstimationController extends Controller
                 ]);
 
                 if ($product->semester_id == $semester) {
-                    if ($product->isi->code !== 'MMJ' || $product->cover->code !== 'MMJ') {
+                    if ($product->isi?->code !== 'MMJ' || $product->cover?->code !== 'MMJ') {
                         $type_produksi = 'eksternal';
                     } else {
                         $type_produksi = 'sales';
@@ -445,7 +445,7 @@ class EstimationController extends Controller
                     $estimasi_item->save();
 
                     if ($product->semester_id == $semester) {
-                        if ($product->isi->code !== 'MMJ' || $product->cover->code !== 'MMJ') {
+                        if ($product->isi?->code !== 'MMJ' || $product->cover?->code !== 'MMJ') {
                             $type_produksi = 'eksternal';
                         } else {
                             $type_produksi = 'sales';
@@ -473,7 +473,7 @@ class EstimationController extends Controller
                     ]);
 
                     if ($product->semester_id == $semester) {
-                        if ($product->isi->code !== 'MMJ' || $product->cover->code !== 'MMJ') {
+                        if ($product->isi?->code !== 'MMJ' || $product->cover?->code !== 'MMJ') {
                             $type_produksi = 'eksternal';
                         } else {
                             $type_produksi = 'sales';
@@ -535,7 +535,7 @@ class EstimationController extends Controller
                     ]);
 
                     if ($product->semester_id == $semester) {
-                        if ($product->isi->code !== 'MMJ' || $product->cover->code !== 'MMJ') {
+                        if ($product->isi?->code !== 'MMJ' || $product->cover?->code !== 'MMJ') {
                             $type_produksi = 'eksternal';
                         } else {
                             $type_produksi = 'sales';

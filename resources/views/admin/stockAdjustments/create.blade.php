@@ -170,7 +170,7 @@
                                         Jenjang - Kurikulum : <strong>${product.jenjang.name} - ${product.kurikulum.name}</strong>
                                     </p>
                                     <p class="mb-0 text-sm">
-                                        Cover - Isi : <strong>${product.cover.name} - ${product.kurikulum.name}</strong>
+                                        Cover - Isi : <strong>${product.cover?.name} - ${product.kurikulum.name}</strong>
                                     </p>
                                     <p class="mb-0 text-sm">
                                         <strong>STOCK : ${product.stock}</strong>
