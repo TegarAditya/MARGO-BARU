@@ -386,7 +386,7 @@ class BookVariantController extends Controller
         $semester = $request->input('semester');
         $jenjang = $request->input('jenjang');
 
-        $query = BookVariant::whereIn('type', ['L', 'P'])->where(function($q) use ($query) {
+        $query = BookVariant::whereIn('type', ['L', 'P', 'K'])->where(function($q) use ($query) {
                     $q->where('code', 'LIKE', "%{$query}%")
                     ->orWhere('name', 'LIKE', "%{$query}%");
                 })->orderBy('code', 'ASC');
