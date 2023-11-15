@@ -21,6 +21,7 @@ use App\Models\Mapel;
 use App\Models\SalesOrder;
 use App\Models\StockMovement;
 use App\Models\FinishingItem;
+use App\Models\EstimationItem;
 use Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -533,8 +534,14 @@ class BookVariantController extends Controller
         $id = $request->input('id');
         $estimasi = $request->input('estimasi');
 
+        $estimasi_item = EstimationItem::where('estimation_id', $estimasi)->first();
+        $code = SalesOrder::generateNoOrder($estimasi_item->semester_id, $estimasi_item->salesperson_id);
+
         $product = BookVariant::join('estimation_items', 'estimation_items.product_id', '=', 'book_variants.id')
-                ->join('sales_orders', 'sales_orders.salesperson_id', '=', 'estimation_items.salesperson_id')
+                ->join('sales_orders', function ($join) use ($code) {
+                    $join->on('sales_orders.product_id', '=', 'book_variants.id')
+                        ->where('sales_orders.no_order', '=', $code);
+                })
                 ->where('book_variants.id', $id)
                 ->where('estimation_items.estimation_id', $estimasi)
                 ->first(['book_variants.*','estimation_items.id as estimasi_id', 'estimation_items.quantity as estimasi', 'sales_orders.moved as terkirim']);
