@@ -505,11 +505,11 @@ class CetakController extends Controller
                     'done' => $status
                 ]);
 
-                EstimationService::createMovement('out', 'cetak', $cetak->id, $product->id, $quantity, 'realisasi');
-                EstimationService::createUpdateRealisasi($product->id, $quantity);
+                EstimationService::createMovement('out', 'cetak', $cetak->id, $product, $quantity, 'realisasi');
+                EstimationService::createUpdateRealisasi($product, $quantity);
 
-                StockService::createMovement('in', 'cetak', $cetak->id, $date, $product->id, $quantity);
-                StockService::updateStock($product->id, $quantity);
+                StockService::createMovement('in', 'cetak', $cetak->id, $date, $product, $quantity);
+                StockService::updateStock($product, $quantity);
             }
 
             $cetak->update([
