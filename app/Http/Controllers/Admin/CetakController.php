@@ -274,8 +274,6 @@ class CetakController extends Controller
 
         $jenjangs = Jenjang::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
-        $materials = Material::where('category', 'plate')->orderBy('code', 'ASC')->pluck('name', 'id');
-
         $no_spc = noRevisi($cetak->no_spc);
 
         $cetak->load('semester', 'vendor', 'jenjang');
@@ -290,7 +288,7 @@ class CetakController extends Controller
             Alert::warning('Warning', 'Perintah Plate sudah dieksekusi, tidak disarankan untuk di edit');
         }
 
-        return view('admin.cetaks.edit', compact('no_spc', 'cetak', 'cetak_items', 'semesters', 'vendors', 'materials', 'jenjangs'));
+        return view('admin.cetaks.edit', compact('no_spc', 'cetak', 'cetak_items', 'semesters', 'vendors', 'jenjangs'));
     }
 
     public function update(Request $request, Cetak $cetak)

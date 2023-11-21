@@ -130,11 +130,8 @@
                                 <div class="col" style="min-width: 240px">
                                     <p class="mb-0 text-sm">Plate</p>
                                     <div class="form-group text-field m-0">
-                                        <select class="form-control text-center plates select2" name="plates[]" style="width: 100%;" tabIndex="-1">
-                                            <option value="">Belum Tahu</option>
-                                            @foreach($materials as $id => $entry)
-                                                <option value="{{ $id }}" {{ $item->plate_id == $id ? 'selected' : '' }}>{{ $entry }}</option>
-                                            @endforeach
+                                        <select class="form-control text-center plates select2" name="plates[]" style="width: 100%;" tabIndex="-1" data-product="{{ $product->id }}">
+                                            <option value="{{$item->plate_id}}">{{ $item->plate ? $item->plate->name : 'Belum Tahu' }}</option>
                                         </select>
                                     </div>
                                 </div>
@@ -470,6 +467,41 @@
         $('#product-form').on('click', '.product-delete', function() {
             var productId = $(this).data('product-id');
             $('#product-' + productId).remove();
+        });
+
+        $('.plates').select2({
+            ajax: {
+                url: "{{ route('admin.materials.getPlateRaws') }}",
+                data: function() {
+                    return {
+                        vendor: $('#vendor_id').val(),
+                        product: $(this).data('product')
+                    };
+                },
+                dataType: 'json',
+                processResults: function(data) {
+                    if (data.length > 0) {
+                        // If data is not empty, return the processed results
+                        return {
+                            results: data
+                        };
+                    } else {
+                        // If data is empty, show the SweetAlert alert and return empty results
+                        Swal.fire({
+                            title: 'Plate Not Found',
+                            text: 'Plate Belum Dicetak',
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonText: 'Okay',
+                            cancelButtonText: 'Cancel'
+                        });
+
+                        return {
+                            results: []
+                        };
+                    }
+                }
+            }
         });
     });
 </script>
