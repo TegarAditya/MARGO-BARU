@@ -475,7 +475,7 @@ class CetakController extends Controller
             'cetak_items' => 'required|array',
             'cetak_items.*' => 'exists:cetak_items,id',
             'quantities' => 'required|array',
-            'quantities.*' => 'numeric|min:1',
+            'quantities.*' => 'numeric|min:0',
             'done' => 'required|array',
         ]);
 
@@ -490,13 +490,15 @@ class CetakController extends Controller
             for ($i = 0; $i < count($products); $i++) {
                 $cetak_item = CetakItem::find($cetak_items[$i]);
 
+                $quantity_old = $cetak_item->quantity;
+                $product = $products[$i];
+                $quantity = $quantities[$i];
                 $status = $done[$i];
-                if ($cetak_item->done || !$status) {
+
+                if ($cetak_item->done && $quantity_old == $quantity) {
+                    // if ($finishing_item->done || !$status) {
                     continue;
                 }
-
-                $product = BookVariant::find($products[$i]);
-                $quantity = $quantities[$i];
 
                 $cetak_item->update([
                     'quantity' => $quantity,
