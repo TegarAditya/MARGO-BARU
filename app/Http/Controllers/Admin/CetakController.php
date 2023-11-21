@@ -554,6 +554,8 @@ class CetakController extends Controller
     {
         $kat = $halaman / 16;
 
+        if ($quantity <= 0) return 0;
+
         if ($quantity >= 5000) {
            $cost = $kat * 25 * $quantity;
         } else {
