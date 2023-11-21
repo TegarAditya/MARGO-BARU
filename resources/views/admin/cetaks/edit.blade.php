@@ -313,7 +313,7 @@
                                         Code : <strong>${product.code}</strong>
                                     </p>
                                     <p class="mb-0 text-sm">
-                                        Jenjang - Kurikulum : <strong>${product.jenjang.name} - ${product.kurikulum.name}</strong>
+                                        Jenjang - Kurikulum : <strong>${product.jenjang?.name} - ${product.kurikulum?.name}</strong>
                                     </p>
                                     <p class="mb-0 text-sm">
                                         <strong>STOCK : ${product.stock}</strong>
@@ -328,7 +328,7 @@
                                     <div class="col" style="min-width: 240px">
                                         <p class="mb-0 text-sm">Plate</p>
                                         <div class="form-group text-field m-0">
-                                            <select class="form-control text-center plates select2" name="plates[]" style="width: 100%;" tabIndex="-1" required>
+                                            <select class="form-control text-center plates select2" name="plates[]" style="width: 100%;" tabIndex="-1" data-product="${product.id}" required>
                                                 <option></option>
                                             </select>
                                         </div>
@@ -347,7 +347,7 @@
                                         <p class="mb-0 text-sm">Cetak</p>
                                         <div class="form-group text-field m-0">
                                             <div class="text-field-input px-2 py-0">
-                                                <input class="quantity" type="hidden" name="quantities[]" data-max="${product.estimasi_produksi.estimasi}" value="1">
+                                                <input class="quantity" type="hidden" name="quantities[]" data-max="${product.estimasi_produksi ? product.estimasi_produksi.estimasi : 0}" value="1">
                                                 <input class="form-control text-center quantity_text" type="text" name="quantity_text[]" value="1" required>
                                                 <label class="text-field-border"></label>
                                             </div>
@@ -371,17 +371,35 @@
 
                     $('.plates').select2({
                         ajax: {
-                            url: "{{ route('admin.materials.getPlates') }}",
+                            url: "{{ route('admin.materials.getPlateRaws') }}",
                             data: function() {
                                 return {
-                                    vendor: $('#vendor_id').val()
+                                    vendor: $('#vendor_id').val(),
+                                    product: $(this).data('product')
                                 };
                             },
                             dataType: 'json',
                             processResults: function(data) {
-                                return {
-                                    results: data
-                                };
+                                if (data.length > 0) {
+                                    // If data is not empty, return the processed results
+                                    return {
+                                        results: data
+                                    };
+                                } else {
+                                    // If data is empty, show the SweetAlert alert and return empty results
+                                    Swal.fire({
+                                        title: 'Plate Not Found',
+                                        text: 'Plate Belum Dicetak',
+                                        icon: 'warning',
+                                        showCancelButton: true,
+                                        confirmButtonText: 'Okay',
+                                        cancelButtonText: 'Cancel'
+                                    });
+
+                                    return {
+                                        results: []
+                                    };
+                                }
                             }
                         }
                     });

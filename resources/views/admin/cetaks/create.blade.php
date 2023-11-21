@@ -224,10 +224,10 @@
                                         Code : <strong>${product.code}</strong>
                                     </p>
                                     <p class="mb-0 text-sm">
-                                        Jenjang - Kurikulum : <strong>${product.jenjang.name} - ${product.kurikulum.name}</strong>
+                                        Jenjang - Kurikulum : <strong>${product.jenjang?.name} - ${product.kurikulum?.name}</strong>
                                     </p>
                                     <p class="mb-0 text-sm">
-                                        Halaman : <strong>${product.halaman.name}</strong>
+                                        Halaman : <strong>${product.halaman?.name}</strong>
                                     </p>
                                     <p class="mb-0 text-sm">
                                         <strong>STOCK : ${product.stock}</strong>
