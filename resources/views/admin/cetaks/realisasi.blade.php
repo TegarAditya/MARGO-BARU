@@ -117,7 +117,7 @@
                                     <div class="form-group text-field m-0">
                                         <div class="text-field-input px-2 py-0">
                                             <input class="quantity" type="hidden" name="quantities[]" value="{{ $item->quantity }}">
-                                            <input class="form-control text-center quantity_text" type="text" name="quantity_text[]" value="{{ angka($item->quantity ) }}" {{ $item->done ? 'readonly tabindex="-1" ' : 'required' }}>
+                                            <input class="form-control text-center quantity_text" type="text" name="quantity_text[]" value="{{ angka($item->quantity ) }}" {{ $item->done ? 'tabindex="-1" ' : 'required' }}>
                                             <label class="text-field-border"></label>
                                         </div>
                                     </div>
