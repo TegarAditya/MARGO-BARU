@@ -349,12 +349,12 @@ class CetakController extends Controller
                         'estimasi' => $quantity,
                         'quantity' => $quantity,
                         'cost' => $cost,
-                        'plate_id' => $plate,
+                        'plate_id' => $plate == 0 ? null : $plate,
                         'plate_cost' => $plate_quantity,
                     ]);
 
                     $print_plate_item = PlatePrintItem::where('product_id', $product->id)->update([
-                        'plate_id' => $plate,
+                        'plate_id' => $plate == 0 ? null : $plate,
                         'estimasi' => $plate_quantity,
                         'realisasi' => $plate_quantity
                     ]);
@@ -370,7 +370,7 @@ class CetakController extends Controller
                         'estimasi' => $quantity,
                         'quantity' => $quantity,
                         'cost' => $cost,
-                        'plate_id' => $plate,
+                        'plate_id' => $plate == 0 ? null : $plate,
                         'plate_cost' => $plate_quantity,
                         'done' => 0,
                     ]);
@@ -379,7 +379,7 @@ class CetakController extends Controller
                         'plate_print_id' => $print_plate->id,
                         'semester_id' => $semester,
                         'product_id' => $product->id,
-                        'plate_id' => $plate,
+                        'plate_id' => $plate == 0 ? null : $plate,
                         'estimasi' => $plate_quantity,
                         'realisasi' => 0,
                         'note' => null,

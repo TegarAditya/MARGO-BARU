@@ -282,7 +282,7 @@ class MaterialsController extends Controller
         $formattedMaterials = [];
 
         $formattedMaterials[] = [
-            'id' => '',
+            'id' => 0,
             'text' => 'Belum Tahu',
         ];
 
