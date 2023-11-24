@@ -375,6 +375,9 @@ class DeliveryOrderController extends Controller
             if ($pgs) {
                 for ($i = 0; $i < count($pgs); $i++) {
                     $product = $pgs[$i];
+                    if (!$product) {
+                        continue;
+                    }
                     $quantity = $pg_quantities[$i];
 
                     $order = SalesOrder::where('product_id', $product)->where('salesperson_id', $salesperson)->where('semester_id', $semester)->first()->id ?? null;
