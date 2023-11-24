@@ -5,14 +5,16 @@
         <h1 class="m-0 bold">Billing</h1>
     </div>
 </div>
-@can('bill_create')
+
 <div style="margin-bottom: 10px;" class="row">
-    <div class="col-2">
-        <form action="{{ route('admin.bills.generate') }}" method="POST">
-            @csrf
-            <button type="submit" class="btn btn-danger btn-block"><i class="fas fa-sync fa-spin fa-lg"></i> Generate Saldo</button>
-        </form>
-    </div>
+    @can('bill_create')
+        <div class="col-2">
+            <form action="{{ route('admin.bills.generate') }}" method="POST">
+                @csrf
+                <button type="submit" class="btn btn-danger btn-block"><i class="fas fa-sync fa-spin fa-lg"></i> Generate Saldo</button>
+            </form>
+        </div>
+    @endcan
     @can('direktur')
         <div class="col-4">
             <a href="{{ route('admin.bills.reportDirektur') }}" class="btn btn-success btn-block"><i class="fas fa-file-export"></i> Export Rekap Billing Direktur</a>
@@ -22,7 +24,6 @@
         <a href="{{ route('admin.bills.eksportRekapBilling') }}" class="btn btn-warning btn-block"><i class="fas fa-file-export"></i> Export Rekap Billing</a>
     </div>
 </div>
-@endcan
 
 <div class="card">
     <div class="card-header">
