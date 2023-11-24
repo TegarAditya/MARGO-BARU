@@ -13,6 +13,11 @@
             <button type="submit" class="btn btn-danger btn-block"><i class="fas fa-sync fa-spin fa-lg"></i> Generate Saldo</button>
         </form>
     </div>
+    @can('direktur')
+        <div class="col-4">
+            <a href="{{ route('admin.bills.reportDirektur') }}" class="btn btn-success btn-block"><i class="fas fa-file-export"></i> Export Rekap Billing Direktur</a>
+        </div>
+    @endcan
     <div class="col-2">
         <a href="{{ route('admin.bills.eksportRekapBilling') }}" class="btn btn-warning btn-block"><i class="fas fa-file-export"></i> Export Rekap Billing</a>
     </div>

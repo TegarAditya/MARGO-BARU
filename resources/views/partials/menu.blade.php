@@ -940,6 +940,19 @@
                                     </a>
                                 </li>
                             @endcan
+
+                            @can('stock_opname_access')
+                                <li class="nav-item">
+                                    <a href="{{ route("admin.stock-opnames.index") }}" class="nav-link {{ request()->is("admin/stock-opnames") || request()->is("admin/stock-opnames/*") ? "active" : "" }}">
+                                        <i class="fa-fw nav-icon fas fa-archive">
+
+                                        </i>
+                                        <p>
+                                            Stock
+                                        </p>
+                                    </a>
+                                </li>
+                            @endcan
                         </ul>
                     </li>
                 @endcan

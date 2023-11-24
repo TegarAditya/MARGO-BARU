@@ -258,6 +258,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     Route::get('bills/billing', 'BillController@billing')->name('bills.billing');
     Route::get('bills/print-billing', 'BillController@cetakBilling')->name('bills.cetakBilling');
     Route::get('bills/export-billing', 'BillController@eksportRekapBilling')->name('bills.eksportRekapBilling');
+    Route::get('bills/report-direktur', 'BillController@reportDirektur')->name('bills.reportDirektur');
     Route::resource('bills', 'BillController', ['except' => ['destroy']]);
 
     // Plate Print

@@ -59,6 +59,8 @@ class StockOpnameController extends Controller
                 $query->where('mapel_id', $request->mapel);
             }
 
+            $query->orderBy('jenjang_id', 'ASC')->orderBy('book_id', 'ASC')->orderBy('stock', 'DESC');
+
             $table = Datatables::of($query);
 
             $table->addColumn('placeholder', '&nbsp;');

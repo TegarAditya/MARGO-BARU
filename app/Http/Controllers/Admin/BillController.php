@@ -22,6 +22,7 @@ use Alert;
 use Illuminate\Support\Facades\Date;
 use Carbon\Carbon;
 use App\Exports\RekapBillingExport;
+use App\Exports\DirekturBillingExport;
 use App\Exports\BillingExport;
 
 class BillController extends Controller
@@ -378,5 +379,12 @@ class BillController extends Controller
         $today = Carbon::now()->format('d-m-Y');
         $semester = Semester::find(setting('current_semester'))->name;
         return (new RekapBillingExport())->download('REKAP BILLING '. preg_replace('/[^A-Za-z0-9_\-]/', '-', $semester) . ' TANGGAL ' . $today . '.xlsx');
+    }
+
+    public function reportDirektur(Request $request)
+    {
+        $today = Carbon::now()->format('d-m-Y');
+        $semester = Semester::find(setting('current_semester'))->name;
+        return (new DirekturBillingExport())->download('REKAP BILLING '. preg_replace('/[^A-Za-z0-9_\-]/', '-', $semester) . ' TANGGAL ' . $today . '.xlsx');
     }
 }
