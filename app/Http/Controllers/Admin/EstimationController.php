@@ -164,10 +164,10 @@ class EstimationController extends Controller
                 $order = SalesOrder::updateOrCreate([
                     'semester_id' => $semester,
                     'salesperson_id' => $salesperson,
-                    'product_id' => $product->id,
-                    'jenjang_id' => $product->jenjang_id,
-                    'kurikulum_id' => $product->kurikulum_id
+                    'product_id' => $product->id
                 ], [
+                    'jenjang_id' => $product->jenjang_id,
+                    'kurikulum_id' => $product->kurikulum_id,
                     'no_order' => SalesOrder::generateNoOrder($semester, $salesperson),
                     'quantity' => DB::raw("quantity + $quantity"),
                 ]);
@@ -221,10 +221,10 @@ class EstimationController extends Controller
                     $order = SalesOrder::updateOrCreate([
                         'semester_id' => $semester,
                         'salesperson_id' => $salesperson,
-                        'product_id' => $product->id,
-                        'jenjang_id' => $product->jenjang_id,
-                        'kurikulum_id' => $product->kurikulum_id
+                        'product_id' => $product->id
                     ], [
+                        'jenjang_id' => $product->jenjang_id,
+                        'kurikulum_id' => $product->kurikulum_id,
                         'no_order' => SalesOrder::generateNoOrder($semester, $salesperson),
                         'quantity' => DB::raw("quantity + $quantity"),
                     ]);
@@ -264,7 +264,7 @@ class EstimationController extends Controller
             return redirect()->route('admin.estimations.index');
         } catch (\Exception $e) {
             DB::rollback();
-            
+
             return redirect()->back()->with('error-message', $e->getMessage())->withInput();
         }
     }
@@ -495,10 +495,10 @@ class EstimationController extends Controller
                 $order = SalesOrder::updateOrCreate([
                     'semester_id' => $semester,
                     'salesperson_id' => $salesperson,
-                    'product_id' => $product->id,
-                    'jenjang_id' => $product->jenjang_id,
-                    'kurikulum_id' => $product->kurikulum_id
+                    'product_id' => $product->id
                 ], [
+                    'jenjang_id' => $product->jenjang_id,
+                    'kurikulum_id' => $product->kurikulum_id,
                     'no_order' => SalesOrder::generateNoOrder($semester, $salesperson),
                     'quantity' => DB::raw("quantity + $quantity"),
                 ]);
@@ -517,19 +517,19 @@ class EstimationController extends Controller
                         'semester_id' => $semester,
                         'salesperson_id' => $salesperson,
                         'product_id' => $product->id,
+                    ], [
                         'jenjang_id' => $product->jenjang_id,
                         'kurikulum_id' => $product->kurikulum_id,
-                    ], [
                         'quantity' => DB::raw("quantity + $quantity")
                     ]);
 
                     $order = SalesOrder::updateOrCreate([
                         'semester_id' => $semester,
                         'salesperson_id' => $salesperson,
-                        'product_id' => $product->id,
-                        'jenjang_id' => $product->jenjang_id,
-                        'kurikulum_id' => $product->kurikulum_id
+                        'product_id' => $product->id
                     ], [
+                        'jenjang_id' => $product->jenjang_id,
+                        'kurikulum_id' => $product->kurikulum_id,
                         'no_order' => SalesOrder::generateNoOrder($semester, $salesperson),
                         'quantity' => DB::raw("quantity + $quantity"),
                     ]);

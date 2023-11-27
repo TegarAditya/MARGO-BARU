@@ -33,11 +33,10 @@ class SalesOrderImport implements ToCollection, WithHeadingRow
                 $order = SalesOrder::updateOrCreate([
                     'semester_id' => $semester,
                     'salesperson_id' => $salesperson,
-
-                    'product_id' => $product->id,
-                    'jenjang_id' => $product->jenjang_id,
-                    'kurikulum_id' => $product->kurikulum_id
+                    'product_id' => $product->id
                 ], [
+                    'jenjang_id' => $product->jenjang_id,
+                    'kurikulum_id' => $product->kurikulum_id,
                     'no_order' => SalesOrder::generateNoOrder($semester, $salesperson),
                     'quantity' => DB::raw("quantity + $quantity"),
                     'moved' => 0,
