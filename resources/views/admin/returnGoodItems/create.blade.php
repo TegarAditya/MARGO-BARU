@@ -7,7 +7,7 @@
     </div>
 
     <div class="card-body">
-        <form method="POST" action="{{ route("admin.return-good-items.store") }}" enctype="multipart/form-data">
+        <form class="form-prevent-multiple-submits" method="POST" action="{{ route("admin.return-good-items.store") }}" enctype="multipart/form-data">
             @csrf
             <div class="form-group">
                 <label class="required" for="retur_id">{{ trans('cruds.returnGoodItem.fields.retur') }}</label>
@@ -94,7 +94,7 @@
                 <span class="help-block">{{ trans('cruds.returnGoodItem.fields.total_helper') }}</span>
             </div>
             <div class="form-group">
-                <button class="btn btn-danger" type="submit">
+                <button class="btn btn-danger form-prevent-multiple-submits" type="submit">
                     {{ trans('global.save') }}
                 </button>
             </div>

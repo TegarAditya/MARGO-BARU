@@ -7,7 +7,7 @@
     </div>
 
     <div class="card-body">
-        <form method="POST" action="{{ route("admin.semesters.store") }}" enctype="multipart/form-data">
+        <form class="form-prevent-multiple-submits" method="POST" action="{{ route("admin.semesters.store") }}" enctype="multipart/form-data">
             @csrf
             <div class="form-group">
                 <label class="required" for="code">{{ trans('cruds.semester.fields.code') }}</label>
@@ -65,7 +65,7 @@
                 <span class="help-block">{{ trans('cruds.semester.fields.status_helper') }}</span>
             </div>
             <div class="form-group">
-                <button class="btn btn-danger" type="submit">
+                <button class="btn btn-danger form-prevent-multiple-submits" type="submit">
                     {{ trans('global.save') }}
                 </button>
             </div>

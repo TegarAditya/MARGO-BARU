@@ -7,7 +7,7 @@
     </div>
 
     <div class="card-body">
-        <form method="POST" action="{{ route("admin.books.store") }}" enctype="multipart/form-data">
+        <form class="form-prevent-multiple-submits" method="POST" action="{{ route("admin.books.store") }}" enctype="multipart/form-data">
             @csrf
             <div class="row">
                 <div class="col-6">
@@ -200,7 +200,7 @@
 
             <div class="row mt-4">
                 <div class="col-2">
-                    <button type="submit" class="btn btn-success btn-block">{{ trans('global.save') }}</a>
+                    <button type="submit" class="btn btn-success btn-block form-prevent-multiple-submits">{{ trans('global.save') }}</a>
                 </div>
             </div>
         </form>

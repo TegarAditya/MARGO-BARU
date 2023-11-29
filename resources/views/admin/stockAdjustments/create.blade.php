@@ -13,7 +13,7 @@
             </p>
         @endif
 
-        <form method="POST" action="{{ route("admin.stock-adjustments.store") }}" enctype="multipart/form-data">
+        <form class="form-prevent-multiple-submits" method="POST" action="{{ route("admin.stock-adjustments.store") }}" enctype="multipart/form-data">
             @csrf
             <input type="hidden" name="type" value="book">
             <div class="row">
@@ -78,7 +78,7 @@
             <div class="row">
                 <div class="col-6">
                     <div class="form-group">
-                        <button class="btn btn-danger" type="submit">
+                        <button class="btn btn-danger form-prevent-multiple-submits" type="submit">
                             Submit
                         </button>
                     </div>

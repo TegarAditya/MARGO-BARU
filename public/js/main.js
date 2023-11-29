@@ -74,6 +74,11 @@ $(document).ready(function () {
       $($.fn.dataTable.tables(true)).DataTable().columns.adjust();
     }, 350);
   })
+
+    $('.form-prevent-multiple-submits').on('submit', function(){
+        $('.form-prevent-multiple-submits').attr('disabled', 'true');
+    })
+
 })
 
 if (window.numeral) {

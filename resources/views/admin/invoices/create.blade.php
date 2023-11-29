@@ -13,7 +13,7 @@
             </p>
         @endif
 
-        <form id="invoiceForm" method="POST" action="{{ route("admin.invoices.storeInvoice") }}" enctype="multipart/form-data">
+        <form class="form-prevent-multiple-submits" id="invoiceForm" method="POST" action="{{ route("admin.invoices.storeInvoice") }}" enctype="multipart/form-data">
             @csrf
             <div class="row">
                 <div class="col-6">
@@ -119,7 +119,7 @@
                 <div class="col"></div>
 
                 <div class="col-auto">
-                    <button type="submit" class="btn btn-primary">Simpan Faktur</a>
+                    <button type="submit" class="btn btn-primary form-prevent-multiple-submits">Simpan Faktur</a>
                 </div>
             </div>
         </form>

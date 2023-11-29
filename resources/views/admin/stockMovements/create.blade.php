@@ -7,7 +7,7 @@
     </div>
 
     <div class="card-body">
-        <form method="POST" action="{{ route("admin.stock-movements.store") }}" enctype="multipart/form-data">
+        <form class="form-prevent-multiple-submits" method="POST" action="{{ route("admin.stock-movements.store") }}" enctype="multipart/form-data">
             @csrf
             <div class="form-group">
                 <label class="required" for="movement_date">{{ trans('cruds.stockMovement.fields.movement_date') }}</label>
@@ -76,7 +76,7 @@
                 <span class="help-block">{{ trans('cruds.stockMovement.fields.transaction_type_helper') }}</span>
             </div>
             <div class="form-group">
-                <button class="btn btn-danger" type="submit">
+                <button class="btn btn-danger form-prevent-multiple-submits" type="submit">
                     {{ trans('global.save') }}
                 </button>
             </div>

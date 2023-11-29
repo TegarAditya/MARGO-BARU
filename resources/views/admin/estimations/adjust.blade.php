@@ -17,7 +17,7 @@
             </p>
         @endif
 
-        <form method="POST" action="{{ route("admin.estimations.adjustSave") }}" enctype="multipart/form-data" onkeypress="return event.keyCode != 13;">
+        <form class="form-prevent-multiple-submits" method="POST" action="{{ route("admin.estimations.adjustSave") }}" enctype="multipart/form-data" onkeypress="return event.keyCode != 13;">
             @csrf
             <input type="hidden" name="estimation_id" id="estimation_id" value="{{$estimation->id}}">
             <input type="hidden" id="semester_id" value="{{ setting('current_semester') }}">
@@ -95,7 +95,7 @@
             <div class="row">
                 <div class="col-6">
                     <div class="form-group">
-                        <button class="btn btn-danger" type="submit">
+                        <button class="btn btn-danger form-prevent-multiple-submits" type="submit">
                             Submit
                         </button>
                     </div>

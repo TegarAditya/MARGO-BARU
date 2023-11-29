@@ -13,7 +13,7 @@
             </p>
         @endif
 
-        <form method="POST" action="{{ route("admin.stock-adjustments.update", [$stockAdjustment->id]) }}" enctype="multipart/form-data">
+        <form class="form-prevent-multiple-submits" method="POST" action="{{ route("admin.stock-adjustments.update", [$stockAdjustment->id]) }}" enctype="multipart/form-data">
             @method('PUT')
             @csrf
             <input type="hidden" name="adjustment_id" id="adjustment_id" value="{{ $stockAdjustment->id }}">
@@ -80,7 +80,7 @@
             <div class="row">
                 <div class="col-6">
                     <div class="form-group">
-                        <button class="btn btn-danger" type="submit">
+                        <button class="btn btn-danger form-prevent-multiple-submits" type="submit">
                             Submit
                         </button>
                     </div>

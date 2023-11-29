@@ -7,7 +7,7 @@
     </div>
 
     <div class="card-body">
-        <form method="POST" action="{{ route("admin.cetaks.update", [$cetak->id]) }}" enctype="multipart/form-data">
+        <form class="form-prevent-multiple-submits" method="POST" action="{{ route("admin.cetaks.update", [$cetak->id]) }}" enctype="multipart/form-data">
             @method('PUT')
             @csrf
             <div class="row">
@@ -164,7 +164,7 @@
             <div class="row">
                 <div class="col-6">
                     <div class="form-group">
-                        <button class="btn btn-danger" type="submit">
+                        <button class="btn btn-danger form-prevent-multiple-submits" type="submit">
                             Submit
                         </button>
                     </div>

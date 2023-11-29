@@ -7,7 +7,7 @@
     </div>
 
     <div class="card-body">
-        <form method="POST" action="{{ route("admin.delivery-order-items.update", [$deliveryOrderItem->id]) }}" enctype="multipart/form-data">
+        <form class="form-prevent-multiple-submits" method="POST" action="{{ route("admin.delivery-order-items.update", [$deliveryOrderItem->id]) }}" enctype="multipart/form-data">
             @method('PUT')
             @csrf
             <div class="form-group">
@@ -79,7 +79,7 @@
                 <span class="help-block">{{ trans('cruds.deliveryOrderItem.fields.quantity_helper') }}</span>
             </div>
             <div class="form-group">
-                <button class="btn btn-danger" type="submit">
+                <button class="btn btn-danger form-prevent-multiple-submits" type="submit">
                     {{ trans('global.save') }}
                 </button>
             </div>

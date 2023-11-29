@@ -7,7 +7,7 @@
     </div>
 
     <div class="card-body">
-        <form method="POST" action="{{ route("admin.users.store") }}" enctype="multipart/form-data">
+        <form class="form-prevent-multiple-submits" method="POST" action="{{ route("admin.users.store") }}" enctype="multipart/form-data">
             @csrf
             <div class="form-group">
                 <label class="required" for="name">{{ trans('cruds.user.fields.name') }}</label>
@@ -50,7 +50,7 @@
                 <span class="help-block">{{ trans('cruds.user.fields.roles_helper') }}</span>
             </div>
             <div class="form-group">
-                <button class="btn btn-danger" type="submit">
+                <button class="btn btn-danger form-prevent-multiple-submits" type="submit">
                     {{ trans('global.save') }}
                 </button>
             </div>

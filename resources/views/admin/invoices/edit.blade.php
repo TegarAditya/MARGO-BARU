@@ -14,7 +14,7 @@
             </p>
         @endif
 
-        <form method="POST" action="{{ route("admin.invoices.update", [$invoice->id]) }}" enctype="multipart/form-data">
+        <form class="form-prevent-multiple-submits" method="POST" action="{{ route("admin.invoices.update", [$invoice->id]) }}" enctype="multipart/form-data">
             @method('PUT')
             @csrf
             <div class="row">
@@ -161,7 +161,7 @@
                 <div class="col"></div>
 
                 <div class="col-auto">
-                    <button type="submit" class="btn btn-primary">Simpan Faktur</a>
+                    <button type="submit" class="btn btn-primary form-prevent-multiple-submits">Simpan Faktur</a>
                 </div>
             </div>
         </form>

@@ -7,7 +7,7 @@
     </div>
 
     <div class="card-body">
-        <form method="POST" action="{{ route("admin.finishing-masuks.store") }}" enctype="multipart/form-data">
+        <form class="form-prevent-multiple-submits" method="POST" action="{{ route("admin.finishing-masuks.store") }}" enctype="multipart/form-data">
             @csrf
             <div class="form-group">
                 <label class="required" for="no_spk">{{ trans('cruds.finishingMasuk.fields.no_spk') }}</label>

@@ -7,7 +7,7 @@
     </div>
 
     <div class="card-body">
-        <form method="POST" action="{{ route("admin.books.update", [$book->id]) }}" enctype="multipart/form-data">
+        <form class="form-prevent-multiple-submits" method="POST" action="{{ route("admin.books.update", [$book->id]) }}" enctype="multipart/form-data">
             @method('PUT')
             @csrf
             <input type="hidden" name="lks_id" value="{{ $lks->id }}">
@@ -137,7 +137,7 @@
             </div>
             <div class="row mt-4">
                 <div class="col-auto">
-                    <button type="submit" class="btn btn-primary">{{ trans('global.save') }}</a>
+                    <button type="submit" class="btn btn-primary form-prevent-multiple-submits">{{ trans('global.save') }}</a>
                 </div>
             </div>
         </form>

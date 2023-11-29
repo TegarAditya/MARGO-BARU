@@ -14,7 +14,7 @@
             </p>
         @endif
 
-        <form method="POST" action="{{ route("admin.delivery-orders.update", [$deliveryOrder->id]) }}" enctype="multipart/form-data" onkeypress="return event.keyCode != 13;">
+        <form class="form-prevent-multiple-submits" method="POST" action="{{ route("admin.delivery-orders.update", [$deliveryOrder->id]) }}" enctype="multipart/form-data" onkeypress="return event.keyCode != 13;">
             @method('PUT')
             @csrf
             <input type="hidden" name="delivery_id" id="delivery_id" value="{{$deliveryOrder->id}}">
@@ -86,7 +86,7 @@
             <div class="row">
                 <div class="col-6">
                     <div class="form-group">
-                        <button class="btn btn-danger" type="submit">
+                        <button class="btn btn-danger form-prevent-multiple-submits" type="submit">
                             Submit
                         </button>
                     </div>
