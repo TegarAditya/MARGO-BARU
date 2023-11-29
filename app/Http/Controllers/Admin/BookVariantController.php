@@ -342,13 +342,13 @@ class BookVariantController extends Controller
 
     public function getProducts(Request $request)
     {
-        $query = $request->input('q');
+        $keyword = $request->input('q');
         $jenjang = $request->input('jenjang');
         $type = $request->input('type');
 
-        $query = BookVariant::where(function($q) use ($query) {
-                    $q->where('code', 'LIKE', "%{$query}%")
-                    ->orWhere('name', 'LIKE', "%{$query}%");
+        $query = BookVariant::where(function($q) use ($keyword) {
+                    $q->where('code', 'LIKE', "%{$keyword}%")
+                    ->orWhere('name', 'LIKE', "%{$keyword}%");
                 });
 
         if (!empty($jenjang)) {
@@ -383,13 +383,13 @@ class BookVariantController extends Controller
 
     public function getBooks(Request $request)
     {
-        $query = $request->input('q');
+        $keyword = $request->input('q');
         $semester = $request->input('semester');
         $jenjang = $request->input('jenjang');
 
-        $query = BookVariant::whereIn('type', ['L', 'P', 'K'])->where(function($q) use ($query) {
-                    $q->where('code', 'LIKE', "%{$query}%")
-                    ->orWhere('name', 'LIKE', "%{$query}%");
+        $query = BookVariant::whereIn('type', ['L', 'P', 'K'])->where(function($q) use ($keyword) {
+                    $q->where('code', 'LIKE', "%{$keyword}%")
+                    ->orWhere('name', 'LIKE', "%{$keyword}%");
                 })->orderBy('code', 'ASC');
 
         if (!empty($semester)) {
@@ -510,15 +510,15 @@ class BookVariantController extends Controller
 
     public function getEstimasi(Request $request)
     {
-        $query = $request->input('q');
+        $keyword = $request->input('q');
         $estimasi = $request->input('estimasi');
         $jenjang = $request->input('jenjang');
 
         $query = BookVariant::whereHas('estimasi_items', function ($q) use ($estimasi) {
                     $q->where('estimation_id', $estimasi);
-                })->where(function($q) use ($query) {
-                    $q->where('code', 'LIKE', "%{$query}%")
-                    ->orWhere('name', 'LIKE', "%{$query}%");
+                })->where(function($q) use ($keyword) {
+                    $q->where('code', 'LIKE', "%{$keyword}%")
+                    ->orWhere('name', 'LIKE', "%{$keyword}%");
                 })->orderBy('code', 'ASC');
 
         if (!empty($jenjang)) {
@@ -564,14 +564,14 @@ class BookVariantController extends Controller
 
     public function getDelivery(Request $request)
     {
-        $query = $request->input('q');
+        $keyword = $request->input('q');
         $delivery = $request->input('delivery');
 
         $products = BookVariant::whereHas('dikirim', function ($q) use ($delivery) {
                     $q->where('delivery_order_id', $delivery);
-                })->where(function($q) use ($query) {
-                    $q->where('code', 'LIKE', "%{$query}%")
-                    ->orWhere('name', 'LIKE', "%{$query}%");
+                })->where(function($q) use ($keyword) {
+                    $q->where('code', 'LIKE', "%{$keyword}%")
+                    ->orWhere('name', 'LIKE', "%{$keyword}%");
                 })->orderBy('code', 'ASC')->get();
 
         $formattedProducts = [];
@@ -605,16 +605,16 @@ class BookVariantController extends Controller
 
     public function getRetur(Request $request)
     {
-        $query = $request->input('q');
+        $keyword = $request->input('q');
         $semester = $request->input('semester');
         $salesperson = $request->input('salesperson');
 
         $products = BookVariant::whereHas('dikirim', function ($q) use ($semester, $salesperson) {
                     $q->where('semester_id', $semester)
                     ->where('salesperson_id', $salesperson);
-                })->where(function($q) use ($query) {
-                    $q->where('code', 'LIKE', "%{$query}%")
-                    ->orWhere('name', 'LIKE', "%{$query}%");
+                })->where(function($q) use ($keyword) {
+                    $q->where('code', 'LIKE', "%{$keyword}%")
+                    ->orWhere('name', 'LIKE', "%{$keyword}%");
                 })->orderBy('code', 'ASC')->get();
 
         $formattedProducts = [];
@@ -652,12 +652,12 @@ class BookVariantController extends Controller
 
     public function getEditRetur(Request $request)
     {
-        $query = $request->input('q');
+        $keyword = $request->input('q');
         $retur = $request->input('retur');
 
         $products = BookVariant::whereHas('diretur', function ($q) use ($retur) {
                     $q->where('retur_id', $retur);
-                })->where('code', 'like', "%{$query}%")
+                })->where('code', 'like', "%{$keyword}%")
                 ->orderBy('code', 'ASC')
                 ->get();
 
@@ -693,14 +693,14 @@ class BookVariantController extends Controller
 
     public function getAdjustment(Request $request)
     {
-        $query = $request->input('q');
+        $keyword = $request->input('q');
         $adjustment = $request->input('adjustment');
 
         $products = BookVariant::whereHas('adjustment', function ($q) use ($adjustment) {
                     $q->where('stock_adjustment_id', $adjustment);
-                })->where(function($q) use ($query) {
-                    $q->where('code', 'LIKE', "%{$query}%")
-                    ->orWhere('name', 'LIKE', "%{$query}%");
+                })->where(function($q) use ($keyword) {
+                    $q->where('code', 'LIKE', "%{$keyword}%")
+                    ->orWhere('name', 'LIKE', "%{$keyword}%");
                 })->orderBy('code', 'ASC')->get();
 
         $formattedProducts = [];
@@ -733,7 +733,7 @@ class BookVariantController extends Controller
 
     public function getCetakDefault(Request $request)
     {
-        $query = $request->input('q');
+        $keyword = $request->input('q');
         $type = $request->input('type');
         $jenjang = $request->input('jenjang');
         $cover_isi = $request->input('cover_isi');
@@ -742,9 +742,9 @@ class BookVariantController extends Controller
             return response()->json([]);
         }
 
-        $query = BookVariant::where(function($q) use ($query) {
-                    $q->where('code', 'LIKE', "%{$query}%")
-                    ->orWhere('name', 'LIKE', "%{$query}%");
+        $query = BookVariant::where(function($q) use ($keyword) {
+                    $q->where('code', 'LIKE', "%{$keyword}%")
+                    ->orWhere('name', 'LIKE', "%{$keyword}%");
                 });
 
         if ($type == 'isi') {
@@ -785,7 +785,7 @@ class BookVariantController extends Controller
 
     public function getCetak(Request $request)
     {
-        $query = $request->input('q');
+        $keyword = $request->input('q');
         $type = $request->input('type');
         $jenjang = $request->input('jenjang');
         $cover_isi = $request->input('cover_isi');
@@ -795,9 +795,9 @@ class BookVariantController extends Controller
             return response()->json([]);
         }
 
-        $query = BookVariant::where(function($q) use ($query) {
-            $q->where('code', 'LIKE', "%{$query}%")
-            ->orWhere('name', 'LIKE', "%{$query}%");
+        $query = BookVariant::where(function($q) use ($keyword) {
+            $q->where('code', 'LIKE', "%{$keyword}%")
+            ->orWhere('name', 'LIKE', "%{$keyword}%");
         });
 
         if ($estimasi) {
@@ -864,15 +864,15 @@ class BookVariantController extends Controller
 
     public function getListFinishing(Request $request)
     {
-        $query = $request->input('q');
+        $keyword = $request->input('q');
         $vendor = $request->input('vendor');
         $jenjang = $request->input('jenjang');
 
         $query = FinishingItem::join('book_variants', 'book_variants.id', '=', 'finishing_items.product_id')
                     ->join('finishings', 'finishing_items.finishing_id', '=', 'finishings.id')
-                    ->where(function($q) use ($query) {
-                        $q->where('book_variants.code', 'LIKE', "%{$query}%")
-                        ->orWhere('book_variants.name', 'LIKE', "%{$query}%");
+                    ->where(function($q) use ($keyword) {
+                        $q->where('book_variants.code', 'LIKE', "%{$keyword}%")
+                        ->orWhere('book_variants.name', 'LIKE', "%{$keyword}%");
                     })
                     ->where('finishing_items.done', 0)
                     ->orderBy('book_variants.code', 'ASC');

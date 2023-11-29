@@ -516,7 +516,7 @@ class DeliveryOrderController extends Controller
 
     public function getEstimasi(Request $request)
     {
-        $query = $request->input('q');
+        $keyword = $request->input('q');
         $semester = setting('current_semester');
         $salesperson = $request->input('salesperson');
         $jenjang = $request->input('jenjang');
@@ -524,9 +524,9 @@ class DeliveryOrderController extends Controller
         $query = BookVariant::whereHas('estimasi', function ($q) use ($semester, $salesperson) {
                     $q->where('salesperson_id', $salesperson)
                     ->where('semester_id', $semester);
-                })->where(function($q) use ($query) {
-                    $q->where('code', 'LIKE', "%{$query}%")
-                    ->orWhere('name', 'LIKE', "%{$query}%");
+                })->where(function($q) use ($keyword) {
+                    $q->where('code', 'LIKE', "%{$keyword}%")
+                    ->orWhere('name', 'LIKE', "%{$keyword}%");
                 })->orderBy('code', 'ASC');
 
         if (!empty($jenjang)) {

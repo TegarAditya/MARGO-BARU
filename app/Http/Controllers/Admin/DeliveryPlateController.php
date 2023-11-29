@@ -186,15 +186,15 @@ class DeliveryPlateController extends Controller
     }
 
     public function getPlateItems(Request $request) {
-        $query = $request->input('q');
+        $keyword = $request->input('q');
         $type = $request->input('type');
         $vendor = $request->input('vendor');
 
         $materials = PlatePrintItem::where('status', 'done')
         ->whereNull('surat_jalan_id')
-        ->whereHas('plate', function ($q) use ($query) {
-            $q->orWhere('code', 'LIKE', "%{$query}%")
-            ->orWhere('name', 'LIKE', "%{$query}%");
+        ->whereHas('plate', function ($q) use ($keyword) {
+            $q->orWhere('code', 'LIKE', "%{$keyword}%")
+            ->orWhere('name', 'LIKE', "%{$keyword}%");
         })->whereHas('plate_print', function ($q) use ($type, $vendor) {
             $q->where('type', $type);
             if ($vendor) {

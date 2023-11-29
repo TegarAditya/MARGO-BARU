@@ -228,11 +228,11 @@ class MaterialsController extends Controller
     }
 
     public function getPlates(Request $request) {
-        $query = $request->input('q');
+        $keyword = $request->input('q');
 
-        $materials = Material::where('category', 'plate')->where(function($q) use ($query) {
-            $q->where('code', 'LIKE', "%{$query}%")
-            ->orWhere('name', 'LIKE', "%{$query}%");
+        $materials = Material::where('category', 'plate')->where(function($q) use ($keyword) {
+            $q->where('code', 'LIKE', "%{$keyword}%")
+            ->orWhere('name', 'LIKE', "%{$keyword}%");
         })->orderBy('code', 'ASC')->get();
 
         $formattedMaterials = [];
@@ -312,11 +312,11 @@ class MaterialsController extends Controller
     }
 
     public function getMaterials(Request $request) {
-        $query = $request->input('q');
+        $keyword = $request->input('q');
 
-        $materials = Material::whereIn('category', ['plate', 'chemical'])->where(function($q) use ($query) {
-            $q->where('code', 'LIKE', "%{$query}%")
-            ->orWhere('name', 'LIKE', "%{$query}%");
+        $materials = Material::whereIn('category', ['plate', 'chemical'])->where(function($q) use ($keyword) {
+            $q->where('code', 'LIKE', "%{$keyword}%")
+            ->orWhere('name', 'LIKE', "%{$keyword}%");
         })->orderBy('code', 'ASC')->get();
 
         $formattedMaterials = [];
@@ -346,14 +346,14 @@ class MaterialsController extends Controller
 
     public function getAdjustment(Request $request)
     {
-        $query = $request->input('q');
+        $keyword = $request->input('q');
         $adjustment = $request->input('adjustment');
 
         $products = Material::whereHas('adjustment', function ($q) use ($adjustment) {
                     $q->where('stock_adjustment_id', $adjustment);
-                })->where(function($q) use ($query) {
-                    $q->where('code', 'LIKE', "%{$query}%")
-                    ->orWhere('name', 'LIKE', "%{$query}%");
+                })->where(function($q) use ($keyword) {
+                    $q->where('code', 'LIKE', "%{$keyword}%")
+                    ->orWhere('name', 'LIKE', "%{$keyword}%");
                 })->orderBy('code', 'ASC')->get();
 
         $formattedProducts = [];
