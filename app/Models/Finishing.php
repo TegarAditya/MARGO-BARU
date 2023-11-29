@@ -85,7 +85,7 @@ class Finishing extends Model
     }
 
     public static function generateNoSPK($semester, $vendor) {
-        $data = self::where('semester_id', $semester)->count();
+        $data = self::where('semester_id', $semester)->withTrashed()->count();
         $semester = Semester::find($semester);
         $vendor = Vendor::find($vendor);
 
@@ -98,7 +98,7 @@ class Finishing extends Model
     }
 
     public static function generateNoSPKTemp($semester) {
-        $data = self::where('semester_id', $semester)->count();
+        $data = self::where('semester_id', $semester)->withTrashed()->count();
         $semester = Semester::find($semester);
 
         $no = !$data ? 1 : ($data + 1);

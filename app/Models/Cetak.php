@@ -90,7 +90,7 @@ class Cetak extends Model
     }
 
     public static function generateNoSPC($semester, $vendor, $type) {
-        $data = self::where('semester_id', $semester)->count();
+        $data = self::where('semester_id', $semester)->withTrashed()->count();
         $semester = Semester::find($semester);
         $vendor = Vendor::find($vendor);
 
@@ -103,7 +103,7 @@ class Cetak extends Model
     }
 
     public static function generateNoSPCTemp($semester) {
-        $data = self::where('semester_id', $semester)->count();
+        $data = self::where('semester_id', $semester)->withTrashed()->count();
         $semester = Semester::find($semester);
 
         $no = !$data ? 1 : ($data + 1);

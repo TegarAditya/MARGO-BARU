@@ -76,7 +76,7 @@ class BillAdjustment extends Model
     }
 
     public static function generateNoAdjustment($semester) {
-        $data = self::where('semester_id', $semester)->count();
+        $data = self::where('semester_id', $semester)->withTrashed()->count();
         $semester = Semester::find($semester);
 
         $order_number = !$data ? 1 : ($data + 1);
