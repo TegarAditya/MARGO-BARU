@@ -140,7 +140,7 @@ $(function () {
         { data: 'actions', name: '{{ trans('global.actions') }}', class: 'text-center' }
     ],
     orderCellsTop: true,
-    order: [[ 1, 'desc' ]],
+    // order: [[ 1, 'desc' ]],
     pageLength: 50,
   };
   let table = $('.datatable-Bill').DataTable(dtOverrideGlobals);

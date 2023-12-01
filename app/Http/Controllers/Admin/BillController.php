@@ -33,7 +33,7 @@ class BillController extends Controller
 
         if ($request->ajax()) {
             $semester = setting('current_semester');
-            $query = Bill::with(['semester', 'salesperson'])->where('semester_id', $semester)->select(sprintf('%s.*', (new Bill)->table));
+            $query = Bill::with(['semester', 'salesperson'])->where('semester_id', $semester)->select(sprintf('%s.*', (new Bill)->table))->orderBy('salesperson_id', 'ASC');
             $table = Datatables::of($query);
 
             $table->addColumn('placeholder', '&nbsp;');
