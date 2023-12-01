@@ -94,9 +94,6 @@
                             <th>
                                 Date
                             </th>
-                            <th>
-                                Diedit Oleh
-                            </th>
                         </tr>
                     </thead>
                     <tbody>
@@ -109,7 +106,7 @@
                                 <td class="text-center">
                                     @if ($movement->reference_id)
                                         @if ($movement->reference_type == 'sales_order')
-                                            <span class="mr-2"><a href="{{ route('admin.estimations.show', $movement->reference_id) }}"><i class="fas fa-eye text-success fa-lg"></i></a></span> {{ $movement->reference->no_estimasi ?? '-' }}
+                                            <span class="mr-2"><a href="{{ route('admin.estimations.show', $movement->reference_id) }}"><i class="fas fa-eye text-success fa-lg"></i></a></span> {{ $movement->reference->no_estimasi ?? '-' }} <br> {{ $movement->reference ? $movement->reference->salesperson->short_name : '-' }}
                                         @elseif ($movement->reference_type == 'cetak')
                                             <span class="mr-2"><a href="{{ route('admin.cetaks.show', $movement->reference_id) }}"><i class="fas fa-eye text-success fa-lg"></i></a></span> {{ $movement->reference->no_spc ?? '-'}}
                                         @elseif ($movement->transaction_type == 'finishing')
@@ -122,9 +119,6 @@
                                 </td>
                                 <td class="text-center">
                                     {{ $movement->created_at ?? '' }}
-                                </td>
-                                <td class="text-center">
-                                    {{ $movement->pengedit ? $movement->pengedit->name : '' }}
                                 </td>
                             </tr>
                         @endforeach
