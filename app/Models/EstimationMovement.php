@@ -75,7 +75,13 @@ class EstimationMovement extends Model
 
     public function reference()
     {
-        return $this->belongsTo(SalesOrder::class, 'reference_id');
+        if ($this->reference_type === 'sales_order') {
+            return $this->belongsTo(Estimation::class, 'reference_id');
+        } else if ($this->reference_type === 'cetak') {
+            return $this->belongsTo(Cetak::class, 'reference_id');
+        } else if ($this->reference_type === 'finishing') {
+            return $this->belongsTo(Finishing::class, 'reference_id');
+        }
     }
 
     public function product()

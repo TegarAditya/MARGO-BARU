@@ -16,19 +16,12 @@
             <table class="table table-bordered table-striped">
                 <tbody>
                     <tr>
-                        <th>
+                        <th width="30%">
                             {{ trans('cruds.productionEstimation.fields.product') }}
                         </th>
                         <td>
-                            {{ $productionEstimation->product->code ?? '' }}
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>
-                            {{ trans('cruds.productionEstimation.fields.quantity') }}
-                        </th>
-                        <td>
-                            {{ $productionEstimation->quantity }}
+                            {{ $productionEstimation->product->code ?? '' }}<br>
+                            {{ $productionEstimation->product->name ?? '' }}
                         </td>
                     </tr>
                     <tr>
@@ -41,34 +34,100 @@
                     </tr>
                     <tr>
                         <th>
-                            {{ trans('cruds.productionEstimation.fields.isi') }}
+                            Estimasi Dari Sales
                         </th>
                         <td>
-                            {{ $productionEstimation->isi }}
+                            {{ $productionEstimation->sales }}
                         </td>
                     </tr>
                     <tr>
                         <th>
-                            {{ trans('cruds.productionEstimation.fields.cover') }}
+                            Estimasi Dari Eksternal
                         </th>
                         <td>
-                            {{ $productionEstimation->cover }}
+                            {{ $productionEstimation->eksternal }}
                         </td>
                     </tr>
                     <tr>
                         <th>
-                            {{ trans('cruds.productionEstimation.fields.finishing') }}
+                            Estimasi Dari Internal
                         </th>
                         <td>
-                            {{ $productionEstimation->finishing }}
+                            {{ $productionEstimation->internal }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>
+                            Yang telah Di Produksi (SPK)
+                        </th>
+                        <td>
+                            {{ $productionEstimation->produksi }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>
+                            Yang telah Di Produksi (Realisasi)
+                        </th>
+                        <td>
+                            {{ $productionEstimation->realisasi }}
                         </td>
                     </tr>
                 </tbody>
             </table>
-            <div class="form-group">
-                <a class="btn btn-default" href="{{ route('admin.production-estimations.index') }}">
-                    {{ trans('global.back_to_list') }}
-                </a>
+            <h3 class="mt-5 mb-3">History Product Movement</h3>
+            <div class="table-responsive">
+                <table class=" table table-bordered table-striped table-hover datatable datatable-movement">
+                    <thead>
+                        <tr>
+                            <th>
+
+                            </th>
+                            <th>
+                                Movement
+                            </th>
+                            <th>
+                                Reference
+                            </th>
+                            <th>
+                                Quantity
+                            </th>
+                            <th>
+                                Date
+                            </th>
+                            <th>
+                                Diedit Oleh
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($estimationMovement as $key => $movement)
+                            <tr data-entry-id="{{ $movement->id }}">
+                                <td></td>
+                                <td class="text-center">
+                                    {{ App\Models\EstimationMovement::TYPE_SELECT[$movement->type] ?? '' }}
+                                </td>
+                                <td class="text-center">
+                                    @if ($movement->reference_type == 'sales_order')
+                                        <span class="mr-2"><a href="{{ route('admin.estimations.show', $movement->reference->id) }}"><i class="fas fa-eye text-success fa-lg"></i></a></span> {{ $movement->reference->no_estimasi }}
+                                    @elseif ($movement->reference_type == 'cetak')
+                                        <span class="mr-2"><a href="{{ route('admin.cetaks.show', $movement->reference->id) }}"><i class="fas fa-eye text-success fa-lg"></i></a></span> {{ $movement->reference->no_spc}}
+                                    @elseif ($movement->transaction_type == 'finishing')
+                                        <span class="mr-2"><a href="{{ route('admin.finishings.show', $movement->reference->id) }}"><i class="fas fa-eye text-success fa-lg"></i></a></span> {{ $movement->reference->no_spk }}
+                                    @endif
+                                </td>
+                                <td class="text-center">
+                                    {{ angka($movement->quantity) }}
+                                </td>
+                                <td class="text-center">
+                                    {{ $movement->created_at ?? '' }}
+                                </td>
+                                <td class="text-center">
+                                    {{ $movement->pengedit ? $movement->pengedit->name : '' }}
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
@@ -76,4 +135,20 @@
 
 
 
+@endsection
+@section('scripts')
+@parent
+<script>
+    $(function () {
+       $('.datatable-movement').DataTable({
+         'paging'      : true,
+         'lengthChange': false,
+         'searching'   : false,
+         'ordering'    : false,
+         'info'        : true,
+         'autoWidth'   : false,
+         'pageLength'  : 50
+       })
+     })
+</script>
 @endsection

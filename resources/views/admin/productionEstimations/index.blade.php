@@ -293,6 +293,9 @@
                     <th class="text-center">
                         Realisasi Produksi
                     </th>
+                    <th>
+                        &nbsp;
+                    </th>
                 </tr>
             </thead>
         </table>
@@ -335,6 +338,7 @@ $(function () {
         // { data: 'internal', name: 'internal', class: 'text-center' },
         { data: 'produksi', name: 'produksi', class: 'text-center' },
         { data: 'realisasi', name: 'realisasi', class: 'text-center' },
+        { data: 'actions', name: '{{ trans('global.actions') }}', class: 'text-center' }
     ],
     orderCellsTop: true,
     order: [[ 1, 'desc' ]],

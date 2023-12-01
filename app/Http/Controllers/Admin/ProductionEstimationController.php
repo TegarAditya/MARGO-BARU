@@ -18,6 +18,7 @@ use App\Models\Cover;
 use App\Models\Kelas;
 use App\Models\Mapel;
 use App\Models\ProductionEstimation;
+use App\Models\EstimationMovement;
 use Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -74,18 +75,12 @@ class ProductionEstimationController extends Controller
             $table->addColumn('actions', '&nbsp;');
 
             $table->editColumn('actions', function ($row) {
-                $viewGate      = 'production_estimation_show';
-                $editGate      = 'production_estimation_edit';
-                $deleteGate    = 'production_estimation_delete';
-                $crudRoutePart = 'production-estimations';
-
-                return view('partials.datatablesActions', compact(
-                    'viewGate',
-                    'editGate',
-                    'deleteGate',
-                    'crudRoutePart',
-                    'row'
-                ));
+                $btn = '
+                    <a class="px-1" href="'.route('admin.production-estimations.show', $row->id).'" title="Show">
+                        <i class="fas fa-eye text-success fa-lg"></i>
+                    </a>
+                ';
+                return $btn;
             });
 
             $table->addColumn('product_code', function ($row) {
@@ -181,7 +176,9 @@ class ProductionEstimationController extends Controller
 
         $productionEstimation->load('product');
 
-        return view('admin.productionEstimations.show', compact('productionEstimation'));
+        $estimationMovement = EstimationMovement::with(['product'])->where('product_id', $productionEstimation->product_id)->orderBy('id', 'DESC')->get();
+
+        return view('admin.productionEstimations.show', compact('productionEstimation', 'estimationMovement'));
     }
 
     public function destroy(ProductionEstimation $productionEstimation)
