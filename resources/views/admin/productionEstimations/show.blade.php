@@ -74,7 +74,7 @@
                     </tr>
                 </tbody>
             </table>
-            <h3 class="mt-5 mb-3">History Product Movement</h3>
+            <h3 class="mt-5 mb-3">Breakdown Estimasi</h3>
             <div class="table-responsive">
                 <table class=" table table-bordered table-striped table-hover datatable datatable-movement">
                     <thead>

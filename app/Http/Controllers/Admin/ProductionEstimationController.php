@@ -176,7 +176,7 @@ class ProductionEstimationController extends Controller
 
         $productionEstimation->load('product');
 
-        $estimationMovement = EstimationMovement::with(['product'])->where('type', 'sales_order')->where('product_id', $productionEstimation->product_id)->orderBy('id', 'DESC')->get();
+        $estimationMovement = EstimationMovement::with(['product'])->where('reference_type', 'sales_order')->where('product_id', $productionEstimation->product_id)->orderBy('id', 'DESC')->get();
 
         return view('admin.productionEstimations.show', compact('productionEstimation', 'estimationMovement'));
     }
