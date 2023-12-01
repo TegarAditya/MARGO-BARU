@@ -43,14 +43,14 @@ class RekapBillingExport implements FromCollection, ShouldAutoSize
                 'no' => $i,
                 'salesperson_code' => $salesperson->code,
                 'salesperson_name' => $salesperson->short_name,
-                'saldo_awal' => $bill->saldo_awal,
-                'penjualan' => $bill->penjualan,
-                'diskon' => $bill->diskon,
-                'adjustment' => $bill->adjustment,
-                'retur' => $bill->retur,
-                'pembayaran' => $bill->bayar,
-                'potongan' => $bill->potongan,
-                'saldo_akhir' => $bill->saldo_akhir,
+                'saldo_awal' => (string) $bill->saldo_awal,
+                'penjualan' => (string) $bill->penjualan,
+                'diskon' => (string) $bill->diskon,
+                'adjustment' => (string)$bill->adjustment,
+                'retur' => (string) $bill->retur,
+                'pembayaran' => (string) $bill->bayar,
+                'potongan' => (string) $bill->potongan,
+                'saldo_akhir' => (string) $bill->saldo_akhir,
             ];
 
             $rows->push($row);
