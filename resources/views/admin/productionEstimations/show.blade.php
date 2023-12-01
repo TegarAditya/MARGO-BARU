@@ -107,12 +107,14 @@
                                     {{ App\Models\EstimationMovement::TYPE_SELECT[$movement->type] ?? '' }}
                                 </td>
                                 <td class="text-center">
-                                    @if ($movement->reference_type == 'sales_order')
-                                        <span class="mr-2"><a href="{{ route('admin.estimations.show', $movement->reference->id) }}"><i class="fas fa-eye text-success fa-lg"></i></a></span> {{ $movement->reference->no_estimasi }}
-                                    @elseif ($movement->reference_type == 'cetak')
-                                        <span class="mr-2"><a href="{{ route('admin.cetaks.show', $movement->reference->id) }}"><i class="fas fa-eye text-success fa-lg"></i></a></span> {{ $movement->reference->no_spc}}
-                                    @elseif ($movement->transaction_type == 'finishing')
-                                        <span class="mr-2"><a href="{{ route('admin.finishings.show', $movement->reference->id) }}"><i class="fas fa-eye text-success fa-lg"></i></a></span> {{ $movement->reference->no_spk }}
+                                    @if ($movement->reference_id)
+                                        @if ($movement->reference_type == 'sales_order')
+                                            <span class="mr-2"><a href="{{ route('admin.estimations.show', $movement->reference_id) }}"><i class="fas fa-eye text-success fa-lg"></i></a></span> {{ $movement->reference->no_estimasi }}
+                                        @elseif ($movement->reference_type == 'cetak')
+                                            <span class="mr-2"><a href="{{ route('admin.cetaks.show', $movement->reference_id) }}"><i class="fas fa-eye text-success fa-lg"></i></a></span> {{ $movement->reference->no_spc}}
+                                        @elseif ($movement->transaction_type == 'finishing')
+                                            <span class="mr-2"><a href="{{ route('admin.finishings.show', $movement->reference_id) }}"><i class="fas fa-eye text-success fa-lg"></i></a></span> {{ $movement->reference->no_spk }}
+                                        @endif
                                     @endif
                                 </td>
                                 <td class="text-center">
