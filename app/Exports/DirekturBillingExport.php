@@ -44,7 +44,7 @@ class DirekturBillingExport implements FromCollection, ShouldAutoSize
                 'salesperson_code' => $salesperson->code,
                 'salesperson_name' => $salesperson->short_name,
                 'saldo_awal' => (string) angka($bill->saldo_awal),
-                'penjualan' => (string) angka($bill->penjualan),
+                'penjualan' => (string) angka($bill->jual),
                 'diskon' => (string) angka($bill->diskon),
                 'adjustment' => (string) angka($bill->adjustment),
                 'retur' => (string) angka($bill->retur),

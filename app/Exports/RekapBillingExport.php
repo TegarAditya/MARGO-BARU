@@ -44,7 +44,7 @@ class RekapBillingExport implements FromCollection, ShouldAutoSize
                 'salesperson_code' => $salesperson->code,
                 'salesperson_name' => $salesperson->short_name,
                 'saldo_awal' => (string) $bill->saldo_awal,
-                'penjualan' => (string) $bill->penjualan,
+                'penjualan' => (string) $bill->jual,
                 'diskon' => (string) $bill->diskon,
                 'adjustment' => (string)$bill->adjustment,
                 'retur' => (string) $bill->retur,
