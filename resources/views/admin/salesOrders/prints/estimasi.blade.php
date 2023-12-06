@@ -92,9 +92,9 @@
                     @endphp
                     <tr>
                         <td class="text-center">{{ $loop->iteration }}</td>
-                        <td>{{ $product->cover->name }}</td>
-                        <td>{{ $product->mapel->name }}</td>
-                        <td class="text-center">{{ $product->kelas->code }}</td>
+                        <td>{{ $product->cover->name ?? '-' }}</td>
+                        <td>{{ $product->mapel->name ?? '-' }}</td>
+                        <td class="text-center">{{ $product->kelas->code ?? '-' }}</td>
                         <td class="text-center">{{ $product->halaman->code ?? 'KOSONG' }}</td>
                         <td class="text-center">{{ angka($sisa)}}</td>
                         <td class="text-center">
