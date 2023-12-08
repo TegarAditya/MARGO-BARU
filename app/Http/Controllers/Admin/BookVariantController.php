@@ -527,9 +527,21 @@ class BookVariantController extends Controller
 
         $products = $query->get();
 
+        $product_lks = $products->where('type', 'L');
+        $product_lain = $products->where('type', '!=', 'L');
+
         $formattedProducts = [];
 
-        foreach ($products as $product) {
+        foreach ($product_lks as $product) {
+            $formattedProducts[] = [
+                'id' => $product->id,
+                'text' => $product->code,
+                'stock' => $product->stock,
+                'name' => $product->name,
+            ];
+        }
+
+        foreach ($product_lain as $product) {
             $formattedProducts[] = [
                 'id' => $product->id,
                 'text' => $product->code,
