@@ -521,6 +521,10 @@ class DeliveryOrderController extends Controller
         $salesperson = $request->input('salesperson');
         $jenjang = $request->input('jenjang');
 
+        if (empty($salesperson)) {
+            return response()->json([]);
+        }
+
         $query = BookVariant::whereHas('estimasi', function ($q) use ($semester, $salesperson) {
                     $q->where('salesperson_id', $salesperson)
                     ->where('semester_id', $semester);
