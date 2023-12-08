@@ -163,7 +163,7 @@
                         })
                     };
                 },
-                cache: true
+                cache: false
             },
             minimumInputLength: 1
         });

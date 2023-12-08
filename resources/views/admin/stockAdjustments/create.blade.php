@@ -109,7 +109,7 @@
                             results: data
                         };
                     },
-                    cache: true
+                    cache: false
                 }
         });
 
@@ -157,7 +157,7 @@
                         });
                         productForm.empty().append(items);
                     }
-                    
+
                     var formHtml = `
                         <div class="item-product" id="product-${product.id}">
                             <div class="row">

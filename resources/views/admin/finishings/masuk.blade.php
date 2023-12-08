@@ -108,7 +108,7 @@
                             results: data
                         };
                     },
-                    cache: true
+                    cache: false
                 }
         });
 

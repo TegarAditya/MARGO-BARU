@@ -7,8 +7,13 @@ use App\Models\EstimationMovement;
 use App\Models\Estimation;
 use App\Models\EstimationItem;
 use App\Models\SalesOrder;
+use App\Models\Cetak;
+use App\Models\StockMovement;
 use App\Models\ProductionEstimation;
 use DB;
+use App\Services\EstimationService;
+use App\Services\StockService;
+use Carbon\Carbon;
 class HomeController
 {
     public function index()
@@ -232,13 +237,38 @@ class HomeController
 
     public function god()
     {
-        // abort(403, 'Unauthorized action.');
+        abort(403, 'Unauthorized action.');
 
         DB::beginTransaction();
         try {
-            $estimasi_items = EstimationItem::where('estimation_id', 87)->delete();
-            $estimasi = Estimation::where('id', 87)->delete();
-            $sales_order = SalesOrder::where('no_order', 'ORD/53/0223')->where('quantity', '<=', 0)->where('moved', '<=', 0)->delete();
+            $date = Carbon::now()->format('d-m-Y');
+            $cetak_items = CetakItem::where('cetak_id', 162)->get();
+
+            foreach($cetak_items as $item) {
+                EstimationService::editMovement('out', 'cetak', 162, $item->product_id, 0, 'produksi');
+                EstimationService::editCetak($item->product_id, (-1 * $item->quantity), $item->product->type);
+
+                StockService::editMovement('in', 'cetak', 162, $date, $item->product_id, 0);
+                StockService::updateStock($item->product_id, -1 * $item->quantity);
+            }
+
+            $cetak_items = CetakItem::where('cetak_id', 144)->get();
+
+            foreach($cetak_items as $item) {
+                EstimationService::editMovement('out', 'cetak', 162, $item->product_id, 0, 'produksi');
+                EstimationService::editCetak($item->product_id, (-1 * $item->quantity), $item->product->type);
+            }
+
+            CetakItem::where('cetak_id', 162)->update([
+                'estimasi' => 0,
+                'quantity' => 0,
+                'cost' => 0
+            ]);
+
+            Cetak::where('id', 162)->update([
+                'estimasi_oplah' => 0,
+                'total_cost' => 0,
+            ]);
 
             DB::commit();
 

@@ -130,13 +130,13 @@ class EstimationService
     }
 
     public static function updateMoved($order, $quantity) {
-        $order = SalesOrder::find($order);
+        $order = SalesOrder::findOrFail($order);
         $order->moved += $quantity;
         $order->save();
     }
 
     public static function updateRetur($order, $quantity) {
-        $order = SalesOrder::find($order);
+        $order = SalesOrder::findOrFail($order);
         $order->retur += $quantity;
         $order->save();
     }
