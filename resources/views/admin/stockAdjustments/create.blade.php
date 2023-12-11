@@ -96,7 +96,7 @@
             templateResult: formatProduct,
             templateSelection: formatProductSelection,
             ajax: {
-                    url: "{{ route('admin.book-variants.getBooks') }}",
+                    url: "{{ route('admin.book-variants.getProducts') }}",
                     dataType: 'json',
                     delay: 250,
                     data: function(params) {
