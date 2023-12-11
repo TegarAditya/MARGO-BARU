@@ -93,7 +93,7 @@
                                     <tr>
                                         <td class="text-right px-3">{{ $loop->iteration }}.</td>
                                         <td>{{ $product->name }}</td>
-                                        <td class="text-center px-2">{{ $product->halaman->code }}</td>
+                                        <td class="text-center px-2">{{ $product->halaman->code ?? null }}</td>
                                         <td class="text-center px-2">{{ angka($item->quantity) }}</td>
                                         <td class="text-center px-2">{{ angka($item->finishing_item->estimasi) }} / {{ angka($item->finishing_item->quantity) }}</td>
                                     </tr>

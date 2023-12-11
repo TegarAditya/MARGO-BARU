@@ -20,7 +20,7 @@
                             {{ trans('cruds.halaman.fields.code') }}
                         </th>
                         <td>
-                            {{ $halaman->code }}
+                            {{ $halaman->code ?? null }}
                         </td>
                     </tr>
                     <tr>

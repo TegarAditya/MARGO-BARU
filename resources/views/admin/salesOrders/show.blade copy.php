@@ -85,7 +85,7 @@
                                     <tr>
                                         <td class="text-right px-3">{{ $loop->iteration }}.</td>
                                         <td>{{ $product->name }}</td>
-                                        <td class="text-center px-2">{{ $product->halaman->code }}</td>
+                                        <td class="text-center px-2">{{ $product->halaman->code ?? null }}</td>
                                         <td class="text-center px-2">{{ angka($order->quantity) }}</td>
                                         <td class="text-center px-2">{{ angka($order->moved) }}</td>
                                         <td class="text-center px-2">{{ angka($order->retur) }}</td>
@@ -143,7 +143,7 @@
                                     <tr>
                                         <td class="text-right px-3">{{ $loop->iteration }}.</td>
                                         <td>{{ $product->name }}</td>
-                                        <td class="text-center px-2">{{ $product->halaman->code }}</td>
+                                        <td class="text-center px-2">{{ $product->halaman->code ?? null }}</td>
                                         <td class="text-center px-2">{{ angka($order->quantity) }}</td>
                                         <td class="text-center px-2">{{ angka($order->moved) }}</td>
                                         <td class="text-center px-2">{{ angka($order->retur) }}</td>

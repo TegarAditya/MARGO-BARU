@@ -70,10 +70,10 @@
             @endphp
             <tr>
                 <td class="text-center">{{ $loop->iteration }}</td>
-                <td>{{ $product->jenjang->name }} - {{ $product->kurikulum->code }}</td>
-                <td>{{ $product->mapel->name }}</td>
-                <td class="text-center">{{ $product->kelas->code }}</td>
-                <td class="text-center">{{ $product->halaman->code }}</td>
+                <td>{{ $product->jenjang->name }} - {{ $product->kurikulum->code ?? null }}</td>
+                <td>{{ $product->mapel->name ?? null }}</td>
+                <td class="text-center">{{ $product->kelas->code ?? null }}</td>
+                <td class="text-center">{{ $product->halaman->code ?? null}}</td>
                 <td class="text-right">{{ money($item->price) }}</td>
                 <td class="text-center">{{ angka($item->quantity)}}</td>
                 <td class="text-right">{{ money($item->total) }}</td>

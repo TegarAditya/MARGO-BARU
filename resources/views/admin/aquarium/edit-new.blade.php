@@ -95,7 +95,7 @@
                                     Kelas : <strong>{{ $plate_item->product->kelas->name }}</strong>
                                 </p>
                                 <p class="mb-0 text-sm">
-                                    Halaman : <strong>{{ $plate_item->product->halaman->code }}</strong>
+                                    Halaman : <strong>{{ $plate_item->product->halaman->code ?? null }}</strong>
                                 </p>
                                 <p class="mb-0 text-sm">
                                     Kurikulum : <strong>{{ $plate_item->product->kurikulum->name }}</strong>
