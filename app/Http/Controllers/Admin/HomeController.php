@@ -241,33 +241,8 @@ class HomeController
 
         DB::beginTransaction();
         try {
-            $date = Carbon::now()->format('d-m-Y');
-            $cetak_items = CetakItem::where('cetak_id', 162)->get();
-
-            foreach($cetak_items as $item) {
-                EstimationService::editMovement('out', 'cetak', 162, $item->product_id, 0, 'produksi');
-                EstimationService::editCetak($item->product_id, (-1 * $item->quantity), $item->product->type);
-
-                StockService::editMovement('in', 'cetak', 162, $date, $item->product_id, 0);
-                StockService::updateStock($item->product_id, -1 * $item->quantity);
-            }
-
-            $cetak_items = CetakItem::where('cetak_id', 144)->get();
-
-            foreach($cetak_items as $item) {
-                EstimationService::editMovement('out', 'cetak', 162, $item->product_id, 0, 'produksi');
-                EstimationService::editCetak($item->product_id, (-1 * $item->quantity), $item->product->type);
-            }
-
-            CetakItem::where('cetak_id', 162)->update([
-                'estimasi' => 0,
-                'quantity' => 0,
-                'cost' => 0
-            ]);
-
-            Cetak::where('id', 162)->update([
-                'estimasi_oplah' => 0,
-                'total_cost' => 0,
+            $estimations = ProductionEstimation::query()->update([
+                'estimasi_baru' => DB::raw("(internal + eksternal + MAX(sales - internal, 0)) - realisasi"),
             ]);
 
             DB::commit();
@@ -323,6 +298,50 @@ class HomeController
 
                 $item->save();
             }
+
+            DB::commit();
+
+            dd('God has spoken to thou');
+        } catch (\Exception $e) {
+            DB::rollback();
+            dd($e);
+        }
+    }
+
+    public function lali()
+    {
+        abort(403, 'Unauthorized action.');
+
+        DB::beginTransaction();
+        try {
+            $date = Carbon::now()->format('d-m-Y');
+            $cetak_items = CetakItem::where('cetak_id', 162)->get();
+
+            foreach($cetak_items as $item) {
+                EstimationService::editMovement('out', 'cetak', 162, $item->product_id, 0, 'produksi');
+                EstimationService::editCetak($item->product_id, (-1 * $item->quantity), $item->product->type);
+
+                StockService::editMovement('in', 'cetak', 162, $date, $item->product_id, 0);
+                StockService::updateStock($item->product_id, -1 * $item->quantity);
+            }
+
+            $cetak_items = CetakItem::where('cetak_id', 144)->get();
+
+            foreach($cetak_items as $item) {
+                EstimationService::editMovement('out', 'cetak', 162, $item->product_id, 0, 'produksi');
+                EstimationService::editCetak($item->product_id, (-1 * $item->quantity), $item->product->type);
+            }
+
+            CetakItem::where('cetak_id', 162)->update([
+                'estimasi' => 0,
+                'quantity' => 0,
+                'cost' => 0
+            ]);
+
+            Cetak::where('id', 162)->update([
+                'estimasi_oplah' => 0,
+                'total_cost' => 0,
+            ]);
 
             DB::commit();
 

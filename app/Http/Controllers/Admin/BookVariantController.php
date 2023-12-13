@@ -825,9 +825,10 @@ class BookVariantController extends Controller
         });
 
         if ($estimasi) {
-            $query->whereHas('estimasi_produksi', function ($q) {
-                $q->where('estimasi', '>', 0);
-            });
+            // $query->whereHas('estimasi_produksi', function ($q) {
+            //     $q->where('estimasi', '>', 0);
+            // });
+            $query->whereHas('estimasi_produksi');
         }
 
         if ($type == 'isi') {

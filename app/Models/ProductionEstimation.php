@@ -24,6 +24,7 @@ class ProductionEstimation extends Model
         'product_id',
         'type',
         'estimasi',
+        'estimasi_baru',
         'sales',
         'internal',
         'eksternal',
