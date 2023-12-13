@@ -98,6 +98,9 @@
                                 <p class="mb-0 text-sm">
                                     <strong>ESTIMASI : {{ $product->estimasi_produksi ? $product->estimasi_produksi->estimasi : 0 }}</strong>
                                 </p>
+                                <p class="mb-0 text-sm">
+                                    <strong>ESTIMASI BARU : {{ $product->estimasi_produksi ? $product->estimasi_produksi->estimasi_baru : 0 }}</strong>
+                                </p>
                             </div>
                             <div class="col offset-1 row align-items-end align-self-center">
                                 <input type="hidden" name="products[]" value="{{ $product->id }}">

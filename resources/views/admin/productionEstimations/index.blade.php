@@ -281,6 +281,9 @@
                     <th class="text-center">
                         {{ trans('cruds.productionEstimation.fields.estimasi') }}
                     </th>
+                    <th class="text-center">
+                        {{ trans('cruds.productionEstimation.fields.estimasi') }} Baru
+                    </th>
                     {{-- <th class="text-center">
                         Estimasi Sales
                     </th>
@@ -334,6 +337,7 @@ $(function () {
         { data: 'product_code', name: 'product.code', class: 'text-center' },
         { data: 'product_name', name: 'product.name' },
         { data: 'estimasi', name: 'estimasi', class: 'text-center' },
+        { data: 'estimasi_baru', name: 'estimasi_baru', class: 'text-center' },
         // { data: 'sales', name: 'sales', class: 'text-center' },
         // { data: 'internal', name: 'internal', class: 'text-center' },
         { data: 'produksi', name: 'produksi', class: 'text-center' },

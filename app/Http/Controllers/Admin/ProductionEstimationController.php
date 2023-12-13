@@ -101,6 +101,9 @@ class ProductionEstimationController extends Controller
             $table->editColumn('estimasi', function ($row) {
                 return angka($row->estimasi);
             });
+            $table->editColumn('estimasi_baru', function ($row) {
+                return angka($row->estimasi_baru);
+            });
             $table->editColumn('sales', function ($row) {
                 return angka($row->sales);
             });

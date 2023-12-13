@@ -185,6 +185,9 @@
                                     </p>
                                     <p class="mb-0 text-sm">
                                         <strong>ESTIMASI : ${product.estimasi_produksi.estimasi}</strong>
+                                    </p>
+                                    <p class="mb-0 text-sm">
+                                        <strong>ESTIMASI BARU : ${product.estimasi_produksi.estimasi_baru}</strong>
                                     </p>`
 
                                     product.components.forEach(element => {

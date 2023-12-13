@@ -149,7 +149,7 @@
                                     <p class="mb-0 text-sm">Cetak</p>
                                     <div class="form-group text-field m-0">
                                         <div class="text-field-input px-2 py-0">
-                                            <input class="quantity" type="hidden" name="quantities[]" value="{{ $item->estimasi }}" data-max="{{ max($product->estimasi_produksi->estimasi + $item->estimasi, $item->estimasi) }}">
+                                            <input class="quantity" type="hidden" name="quantities[]" value="{{ $item->estimasi }}" data-max="{{ max($product->estimasi_produksi->estimasi_baru + $item->estimasi, $item->estimasi) }}">
                                             <input class="form-control text-center quantity_text" type="text" name="quantity_text[]" value="{{ angka($item->estimasi) }}" required>
                                             <label class="text-field-border"></label>
                                         </div>
@@ -318,6 +318,9 @@
                                     <p class="mb-0 text-sm">
                                         <strong>ESTIMASI : ${product.estimasi_produksi.estimasi}</strong>
                                     </p>
+                                    <p class="mb-0 text-sm">
+                                        <strong>ESTIMASI BARU: ${product.estimasi_produksi ? product.estimasi_produksi.estimasi_baru : 0}</strong>
+                                    </p>
                                 </div>
                                 <div class="col offset-1 row align-items-end align-self-center">
                                     <input type="hidden" name="products[]" value="${product.id}">
@@ -344,7 +347,7 @@
                                         <p class="mb-0 text-sm">Cetak</p>
                                         <div class="form-group text-field m-0">
                                             <div class="text-field-input px-2 py-0">
-                                                <input class="quantity" type="hidden" name="quantities[]" data-max="${product.estimasi_produksi ? product.estimasi_produksi.estimasi : 0}" value="1">
+                                                <input class="quantity" type="hidden" name="quantities[]" data-max="${product.estimasi_produksi ? product.estimasi_produksi.estimasi_baru : 0}" value="1">
                                                 <input class="form-control text-center quantity_text" type="text" name="quantity_text[]" value="1" required>
                                                 <label class="text-field-border"></label>
                                             </div>

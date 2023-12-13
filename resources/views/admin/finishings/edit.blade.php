@@ -99,6 +99,9 @@
                                 <p class="mb-0 text-sm">
                                     <strong>ESTIMASI : {{ $product->estimasi_produksi ? ($product->estimasi_produksi->estimasi + $item->estimasi) : 0 }}</strong>
                                 </p>
+                                <p class="mb-0 text-sm">
+                                    <strong>ESTIMASI BARU : {{ $product->estimasi_produksi ? ($product->estimasi_produksi->estimasi + $item->estimasi_baru) : 0 }}</strong>
+                                </p>
                                 @foreach ($product->components as $component)
                                     @if ($component->type == 'C' || $component->type == 'V')
                                         <p class="mb-0 text-sm">
@@ -279,7 +282,7 @@ $(document).ready(function() {
                                     <p class="mb-0 text-sm">Quantity</p>
                                     <div class="form-group text-field m-0">
                                         <div class="text-field-input px-2 py-0">
-                                            <input class="quantity" type="hidden" name="quantities[]" data-max="${Math.min(product.estimasi_produksi.estimasi, product.finishing_stock)}" value="1">
+                                            <input class="quantity" type="hidden" name="quantities[]" data-max="${Math.min(product.estimasi_produksi.estimasi_baru, product.finishing_stock)}" value="1">
                                             <input class="form-control text-center quantity_text" type="text" name="quantity_text[]" value="1" required>
                                             <label class="text-field-border"></label>
                                         </div>
