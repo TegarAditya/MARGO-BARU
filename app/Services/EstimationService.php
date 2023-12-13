@@ -29,6 +29,7 @@ class EstimationService
         if ($production) {
             $production->{$type_produksi} += $quantity;
             $production->estimasi = ($production->internal + $production->eksternal + max(0, $production->sales - $production->internal)) - $production->produksi;
+            $production->estimasi_baru = ($production->internal + $production->eksternal + max(0, $production->sales - $production->internal)) - $production->realisasi;
             $production->save();
         } else {
             $new = ProductionEstimation::create([
@@ -36,6 +37,7 @@ class EstimationService
                 'type' => $type,
                 $type_produksi => $quantity,
                 'estimasi' => $quantity,
+                'estimasi_baru' => $quantity,
             ]);
         }
     }
@@ -47,6 +49,7 @@ class EstimationService
         if ($production) {
             $production->internal += $quantity;
             $production->estimasi = ($production->internal + $production->eksternal + max(0, $production->sales - $production->internal)) - $production->produksi;
+            $production->estimasi_baru = ($production->internal + $production->eksternal + max(0, $production->sales - $production->internal)) - $production->realisasi;
             $production->save();
         } else {
             $new = ProductionEstimation::create([
@@ -54,6 +57,7 @@ class EstimationService
                 'type' => $type,
                 'internal' => $quantity,
                 'estimasi' => $quantity,
+                'estimasi_baru' => $quantity,
             ]);
         }
     }
@@ -65,6 +69,7 @@ class EstimationService
         if ($production) {
             $production->produksi += $quantity;
             $production->estimasi = ($production->internal + $production->eksternal + max(0, $production->sales - $production->internal)) - $production->produksi;
+            $production->estimasi_baru = ($production->internal + $production->eksternal + max(0, $production->sales - $production->internal)) - $production->realisasi;
             $production->save();
         }
     }
@@ -103,6 +108,7 @@ class EstimationService
         if ($production) {
             $production->{$type_produksi} += $quantity;
             $production->estimasi = ($production->internal + $production->eksternal + max(0, $production->sales - $production->internal)) - $production->produksi;
+            $production->estimasi_baru = ($production->internal + $production->eksternal + max(0, $production->sales - $production->internal)) - $production->realisasi;
             $production->save();
         }
     }
@@ -114,6 +120,7 @@ class EstimationService
         if ($production) {
             $production->internal += $quantity;
             $production->estimasi = ($production->internal + $production->eksternal + max(0, $production->sales - $production->internal)) - $production->produksi;
+            $production->estimasi_baru = ($production->internal + $production->eksternal + max(0, $production->sales - $production->internal)) - $production->realisasi;
             $production->save();
         }
     }
@@ -125,6 +132,7 @@ class EstimationService
         if ($production) {
             $production->produksi += $quantity;
             $production->estimasi = ($production->internal + $production->eksternal + max(0, $production->sales - $production->internal)) - $production->produksi;
+            $production->estimasi_baru = ($production->internal + $production->eksternal + max(0, $production->sales - $production->internal)) - $production->realisasi;
             $production->save();
         }
     }
