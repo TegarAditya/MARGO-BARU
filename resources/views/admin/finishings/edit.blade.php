@@ -269,12 +269,27 @@ $(document).ready(function() {
                                     Jenjang - Kurikulum : <strong>${product.jenjang.name} - ${product.kurikulum.name}</strong>
                                 </p>
                                 <p class="mb-0 text-sm">
-                                    <strong>ESTIMASI : ${product.estimasi_produksi.estimasi}</strong>
+                                        <strong>ESTIMASI : ${product.estimasi_produksi.estimasi}</strong>
                                 </p>
                                 <p class="mb-0 text-sm">
-                                    <strong>STOCK COVER/ISI : ${product.finishing_stock}</strong>
+                                    <strong>ESTIMASI BARU : ${product.estimasi_produksi.estimasi_baru}</strong>
                                 </p>
-                            </div>
+                            `;
+                            product.components.forEach(element => {
+                                if (element.type == 'C' || element.type == 'V') {
+                                    var text = `<p class="mb-0 text-sm">
+                                        <strong>STOCK COVER : ${element.stock}</strong>
+                                    </p>`
+                                } else if (element.type == 'I' || element.type == 'S' || element.type == 'U') {
+                                    var text = `<p class="mb-0 text-sm">
+                                        <strong>STOCK ISI : ${element.stock}</strong>
+                                    </p>`
+                                }
+                                formHtml = formHtml.concat(text);
+                            });
+
+                formHtml = formHtml.concat(
+                        `</div>
                             <div class="col offset-1 row align-items-end align-self-center">
                                 <input type="hidden" name="products[]" value="${product.id}">
                                 <input type="hidden" name="finishing_items[]" value="0">
@@ -282,7 +297,7 @@ $(document).ready(function() {
                                     <p class="mb-0 text-sm">Quantity</p>
                                     <div class="form-group text-field m-0">
                                         <div class="text-field-input px-2 py-0">
-                                            <input class="quantity" type="hidden" name="quantities[]" data-max="${Math.min(product.estimasi_produksi.estimasi_baru, product.finishing_stock)}" value="1">
+                                            <input class="quantity" type="hidden" name="quantities[]" data-max="${Math.min(product.finishing_stock)}" value="1">
                                             <input class="form-control text-center quantity_text" type="text" name="quantity_text[]" value="1" required>
                                             <label class="text-field-border"></label>
                                         </div>
@@ -297,7 +312,7 @@ $(document).ready(function() {
                         </div>
                         <hr style="margin: 1em -15px;border-color:#ccc" />
                     </div>
-                `;
+                `);
                 $('#product-form').prepend(formHtml);
                 $('#product-search').val(null).trigger('change');
 
