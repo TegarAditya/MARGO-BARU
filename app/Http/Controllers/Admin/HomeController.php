@@ -241,10 +241,11 @@ class HomeController
 
         DB::beginTransaction();
         try {
-            $estimations = ProductionEstimation::query()->update([
-                'estimasi_baru' => DB::raw("(internal + eksternal + MAX(sales - internal, 0)) - realisasi"),
-            ]);
-
+            $estimations = ProductionEstimation::get();
+            foreach($estimations as $estimation) {
+                $estimation->estimasi_baru = ($estimation->internal + $estimation->eksternal + max(0, $estimation->sales - $estimation->internal)) - $estimation->realisasi;
+                $estimation->save();
+            }
             DB::commit();
 
             dd('God has spoken to thou');

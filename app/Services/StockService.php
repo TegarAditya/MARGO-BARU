@@ -69,7 +69,7 @@ class StockService
         }
     }
 
-    public static function createMovement($type_movement, $transaction_type, $reference, $date,  $product, $quantity)
+    public static function createMovement($type_movement, $transaction_type, $reference, $date,  $product, $quantity, $finishing_masuk = null)
     {
         $estimation = StockMovement::create([
             'warehouse' => 1,
@@ -80,6 +80,7 @@ class StockService
             'reference_date' => $date,
             'product_id' => $product,
             'quantity' => $quantity,
+            'finishing_masuk' => $finishing_masuk
         ]);
     }
 

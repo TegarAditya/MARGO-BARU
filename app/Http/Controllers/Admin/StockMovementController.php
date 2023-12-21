@@ -54,7 +54,11 @@ class StockMovementController extends Controller
                 } else if ($row->transaction_type == 'cetak') {
                     return 'Cetak <a class="px-1" title="Reference" href="'.route('admin.cetaks.show', $row->reference_id).'"><i class="fas fa-eye text-success fa-lg"></i></a>';
                 } else if ($row->transaction_type == 'produksi') {
-                    return 'Produksi <a class="px-1" title="Reference" href="'.route('admin.finishings.show', $row->reference_id).'"><i class="fas fa-eye text-success fa-lg"></i></a>';
+                    if ($row->finishing_masuk) {
+                        return 'Finishing <a class="px-1" title="Reference" href="'.route('admin.finishing-masuks.show', $row->finishing_masuk).'"><i class="fas fa-eye text-success fa-lg"></i></a>';
+                    } else {
+                        return 'Produksi <a class="px-1" title="Reference" href="'.route('admin.finishings.show', $row->reference_id).'"><i class="fas fa-eye text-success fa-lg"></i></a>';
+                    }
                 } else if ($row->transaction_type == 'plating') {
                     return 'Produksi <a class="px-1" title="Reference" href="'.route('admin.plate-prints.show', $row->reference_id).'"><i class="fas fa-eye text-success fa-lg"></i></a>';
                 } else if ($row->transaction_type == 'awal') {

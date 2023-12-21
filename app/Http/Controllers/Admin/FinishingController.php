@@ -493,7 +493,7 @@ class FinishingController extends Controller
                 EstimationService::createMovement('out', 'finishing', $finishing_item->finishing->id, $product, $quantity, 'realisasi');
                 EstimationService::createUpdateRealisasi($product, $quantity);
 
-                StockService::createMovement('in', 'produksi', $finishing_item->finishing->id, $date, $product, $quantity);
+                StockService::createMovement('in', 'produksi', $finishing_item->finishing->id, $date, $product, $quantity, $finishing_masuk->id);
                 StockService::updateStock($product, $quantity);
             }
 

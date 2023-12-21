@@ -186,6 +186,10 @@
                                         <span class="mr-2"><a href="{{ route('admin.cetaks.show', $stockMovement->reference->id) }}"><i class="fas fa-eye text-success fa-lg"></i></a></span> {{ $stockMovement->reference->no_spc }}
                                     @elseif ($stockMovement->transaction_type == 'produksi')
                                         <span class="mr-2"><a href="{{ route('admin.finishings.show', $stockMovement->reference->id) }}"><i class="fas fa-eye text-success fa-lg"></i></a></span> {{ $stockMovement->reference->no_spk }}
+                                        @if ($stockMovement->finishing_masuk)
+                                            <br>
+                                            <span class="mr-2"><a href="{{ route('admin.finishing-masuks.show', $stockMovement->finishing_masuk) }}"><i class="fas fa-eye text-success fa-lg"></i></a></span> {{ $stockMovement->finishing_masuk->no_spk }}
+                                        @endif
                                     @elseif ($stockMovement->transaction_type == 'awal')
                                         Stock Awal
                                     @endif

@@ -46,6 +46,7 @@ class StockMovement extends Model
         'movement_date',
         'movement_type',
         'transaction_type',
+        'finishing_masuk',
         'reference_id',
         'reference_date',
         'product_id',
@@ -124,5 +125,10 @@ class StockMovement extends Model
     public function pengedit()
     {
         return $this->belongsTo(User::class, 'updated_by_id');
+    }
+
+    public function finishing_masuk()
+    {
+        return $this->belongsTo(FinishingMasuk::class, 'finishing_masuk');
     }
 }
