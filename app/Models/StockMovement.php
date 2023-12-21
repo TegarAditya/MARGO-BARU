@@ -127,7 +127,7 @@ class StockMovement extends Model
         return $this->belongsTo(User::class, 'updated_by_id');
     }
 
-    public function finishing_masuk()
+    public function masuk()
     {
         return $this->belongsTo(FinishingMasuk::class, 'finishing_masuk');
     }
