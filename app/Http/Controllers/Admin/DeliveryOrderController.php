@@ -575,6 +575,7 @@ class DeliveryOrderController extends Controller
                 ->where('book_variants.id', $id)
                 ->where('sales_orders.semester_id', $semester)
                 ->where('sales_orders.salesperson_id', $salesperson)
+                ->whereNull('sales_orders.deleted_at')
                 ->first(['book_variants.*', 'sales_orders.quantity as estimasi', 'sales_orders.moved as terkirim', 'sales_orders.id as order_id']);
         $product->load('book', 'jenjang', 'cover', 'kurikulum', 'isi');
 
