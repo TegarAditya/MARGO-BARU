@@ -378,6 +378,7 @@ class MaterialsController extends Controller
         $product = Material::join('stock_adjustment_details', 'stock_adjustment_details.product_id', '=', 'materials.id')
                 ->where('materials.id', $id)
                 ->where('stock_adjustment_details.stock_adjustment_id', $adjustment)
+                ->whereNull('stock_adjustment_details.deleted_at')
                 ->first(['materials.*', 'stock_adjustment_details.quantity as quantity', 'stock_adjustment_details.id as adjustment_detail_id']);
         $product->load('unit');
 

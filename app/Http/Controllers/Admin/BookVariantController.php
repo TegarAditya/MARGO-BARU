@@ -623,6 +623,8 @@ class BookVariantController extends Controller
                 ->join('sales_orders', 'sales_orders.id', '=', 'delivery_order_items.sales_order_id')
                 ->where('book_variants.id', $id)
                 ->where('delivery_order_items.delivery_order_id', $delivery)
+                ->whereNull('delivery_order_items.deleted_at')
+                ->whereNull('sales_orders.deleted_at')
                 ->first(['book_variants.*', 'delivery_order_items.quantity as quantity', 'delivery_order_items.id as delivery_item_id', 'sales_orders.quantity as estimasi', 'sales_orders.moved as terkirim']);
         $product->load('book', 'jenjang', 'isi', 'cover', 'kurikulum');
 
@@ -667,6 +669,7 @@ class BookVariantController extends Controller
                 ->where('book_variants.id', $id)
                 ->where('sales_orders.semester_id', $semester)
                 ->where('sales_orders.salesperson_id', $salesperson)
+                ->whereNull('sales_orders.deleted_at')
                 ->first(['book_variants.*', 'sales_orders.moved as terkirim',
                     'sales_orders.retur as retur', 'sales_orders.id as order_id'
                 ]);
@@ -710,6 +713,8 @@ class BookVariantController extends Controller
                 ->join('sales_orders', 'sales_orders.id', '=', 'return_good_items.sales_order_id')
                 ->where('book_variants.id', $id)
                 ->where('return_good_items.retur_id', $retur)
+                ->whereNull('return_good_items.deleted_at')
+                ->whereNull('sales_orders.deleted_at')
                 ->first(['book_variants.*', 'return_good_items.quantity as quantity', 'return_good_items.id as retur_item_id',
                     'sales_orders.retur as retur', 'sales_orders.moved as terkirim']);
         $product->load('book', 'jenjang', 'isi', 'cover', 'kurikulum');
@@ -751,6 +756,7 @@ class BookVariantController extends Controller
         $product = BookVariant::join('stock_adjustment_details', 'stock_adjustment_details.product_id', '=', 'book_variants.id')
                 ->where('book_variants.id', $id)
                 ->where('stock_adjustment_details.stock_adjustment_id', $adjustment)
+                ->whereNull('stock_adjustment_details.deleted_at')
                 ->first(['book_variants.*', 'stock_adjustment_details.quantity as quantity', 'stock_adjustment_details.id as adjustment_detail_id']);
         $product->load('book', 'jenjang', 'isi', 'cover', 'kurikulum');
 
@@ -897,6 +903,8 @@ class BookVariantController extends Controller
 
         $query = FinishingItem::join('book_variants', 'book_variants.id', '=', 'finishing_items.product_id')
                     ->join('finishings', 'finishing_items.finishing_id', '=', 'finishings.id')
+                    ->whereNull('finishings.deleted_at')
+                    ->whereNull('finishing_items.deleted_at')
                     ->where(function($q) use ($keyword) {
                         $q->where('book_variants.code', 'LIKE', "%{$keyword}%")
                         ->orWhere('book_variants.name', 'LIKE', "%{$keyword}%");
