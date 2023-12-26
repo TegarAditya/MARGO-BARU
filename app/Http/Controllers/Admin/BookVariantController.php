@@ -576,10 +576,12 @@ class BookVariantController extends Controller
         $product = BookVariant::join('estimation_items', 'estimation_items.product_id', '=', 'book_variants.id')
                 ->join('sales_orders', function ($join) use ($code) {
                     $join->on('sales_orders.product_id', '=', 'book_variants.id')
-                        ->where('sales_orders.no_order', '=', $code);
+                        ->where('sales_orders.no_order', '=', $code)
+                        ->whereNull('sales_order.deleted_at');
                 })
                 ->where('book_variants.id', $id)
                 ->where('estimation_items.estimation_id', $estimasi)
+                ->whereNull('estimation_items.deleted_at')
                 ->first(['book_variants.*','estimation_items.id as estimasi_id', 'estimation_items.quantity as estimasi', 'sales_orders.moved as terkirim']);
         $product->load('book', 'jenjang', 'cover', 'kurikulum', 'isi');
 
