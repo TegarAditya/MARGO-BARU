@@ -577,7 +577,7 @@ class BookVariantController extends Controller
                 ->join('sales_orders', function ($join) use ($code) {
                     $join->on('sales_orders.product_id', '=', 'book_variants.id')
                         ->where('sales_orders.no_order', '=', $code)
-                        ->whereNull('sales_order.deleted_at');
+                        ->whereNull('sales_orders.deleted_at');
                 })
                 ->where('book_variants.id', $id)
                 ->where('estimation_items.estimation_id', $estimasi)
