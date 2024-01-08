@@ -98,7 +98,7 @@ class ReturnGoodController extends Controller
 
         $semesters = Semester::orderBy('code', 'DESC')->where('status', 1)->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
-        $salespeople = Salesperson::whereHas('estimasi')->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $salespeople = Salesperson::whereHas('estimasi')->get()->pluck('full_name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
         $no_retur = ReturnGood::generateNoRetur(setting('current_semester'));
 
