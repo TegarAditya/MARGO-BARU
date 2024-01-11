@@ -252,13 +252,13 @@ class HomeController
                 StockService::updateStock($item->product_id, -1 * $item->quantity);
             }
 
-            CetakItem::where('cetak_id', 162)->update([
+            CetakItem::where('cetak_id', 284)->update([
                 'estimasi' => 0,
                 'quantity' => 0,
                 'cost' => 0
             ]);
 
-            Cetak::where('id', 162)->update([
+            Cetak::where('id', 284)->update([
                 'estimasi_oplah' => 0,
                 'total_cost' => 0,
             ]);
