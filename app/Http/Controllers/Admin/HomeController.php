@@ -241,11 +241,28 @@ class HomeController
 
         DB::beginTransaction();
         try {
-            $estimations = ProductionEstimation::get();
-            foreach($estimations as $estimation) {
-                $estimation->estimasi_baru = ($estimation->internal + $estimation->eksternal + max(0, $estimation->sales - $estimation->internal)) - $estimation->realisasi;
-                $estimation->save();
+            $date = Carbon::now()->format('d-m-Y');
+            $cetak_items = CetakItem::where('cetak_id', 284)->get();
+
+            foreach($cetak_items as $item) {
+                EstimationService::editMovement('out', 'cetak', 284, $item->product_id, 0, 'produksi');
+                EstimationService::editCetak($item->product_id, (-1 * $item->quantity), $item->product->type);
+
+                StockService::editMovement('in', 'cetak', 284, $date, $item->product_id, 0);
+                StockService::updateStock($item->product_id, -1 * $item->quantity);
             }
+
+            CetakItem::where('cetak_id', 162)->update([
+                'estimasi' => 0,
+                'quantity' => 0,
+                'cost' => 0
+            ]);
+
+            Cetak::where('id', 162)->update([
+                'estimasi_oplah' => 0,
+                'total_cost' => 0,
+            ]);
+
             DB::commit();
 
             dd('God has spoken to thou');
@@ -344,6 +361,26 @@ class HomeController
                 'total_cost' => 0,
             ]);
 
+            DB::commit();
+
+            dd('God has spoken to thou');
+        } catch (\Exception $e) {
+            DB::rollback();
+            dd($e);
+        }
+    }
+
+    public function mbenake_estimasi_produksi()
+    {
+        abort(403, 'Unauthorized action.');
+
+        DB::beginTransaction();
+        try {
+            $estimations = ProductionEstimation::get();
+            foreach($estimations as $estimation) {
+                $estimation->estimasi_baru = ($estimation->internal + $estimation->eksternal + max(0, $estimation->sales - $estimation->internal)) - $estimation->realisasi;
+                $estimation->save();
+            }
             DB::commit();
 
             dd('God has spoken to thou');
