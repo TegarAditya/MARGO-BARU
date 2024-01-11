@@ -120,13 +120,13 @@
                 <strong>Total</strong>
             </td>
             <td class="text-right">
-                <strong>{{ money($invoice->sum('total')) }}</strong>
+                <strong>{{ money($invoices->sum('total')) }}</strong>
             </td>
             <td class="text-right">
-                <strong>{{ money($invoice->sum('discount')) }}</strong>
+                <strong>{{ money($invoices->sum('discount')) }}</strong>
             </td>
             <td class="text-right">
-                <strong>{{ money($invoice->sum('nominal')) }}</strong>
+                <strong>{{ money($invoices->sum('nominal')) }}</strong>
             </td>
         </tr>
     </tfoot>
