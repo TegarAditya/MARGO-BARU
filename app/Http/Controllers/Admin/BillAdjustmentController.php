@@ -142,7 +142,7 @@ class BillAdjustmentController extends Controller
             'no_adjustment' => 'required',
             'date' => 'required',
             'salesperson_id' => 'required',
-            'amount' => 'required|numeric|min:1',
+            'amount' => 'required|numeric|min:0',
             'note' => 'nullable'
         ]);
 
