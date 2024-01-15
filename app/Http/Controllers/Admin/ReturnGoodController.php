@@ -120,6 +120,8 @@ class ReturnGoodController extends Controller
             'products.*' => 'exists:book_variants,id',
             'quantities' => 'required|array',
             'quantities.*' => 'numeric|min:1',
+            'prices' => 'required|array',
+            'prices.*' => 'numeric|min:0',
         ]);
 
         $date = $validatedData['date'];
@@ -129,6 +131,7 @@ class ReturnGoodController extends Controller
         $products = $validatedData['products'];
         $orders = $validatedData['orders'];
         $quantities = $validatedData['quantities'];
+        $prices = $validatedData['prices'];
 
         DB::beginTransaction();
         try {
@@ -146,13 +149,14 @@ class ReturnGoodController extends Controller
             for ($i = 0; $i < count($products); $i++) {
                 $product = $products[$i];
                 $order = $orders[$i];
+                $price = $prices[$i];
 
-                $invoice_item = InvoiceItem::where('semester_id', $semester_retur)->where('salesperson_id', $salesperson)->where('product_id', $product )->first();
-                if (!$invoice_item) {
-                    throw new \Exception('Product tidak ditemukan');
-                }
+                // $invoice_item = InvoiceItem::where('semester_id', $semester_retur)->where('salesperson_id', $salesperson)->where('product_id', $product )->first();
+                // if (!$invoice_item) {
+                //     throw new \Exception('Product tidak ditemukan');
+                // }
+                // $price = $invoice_item->price - $invoice_item->discount;
 
-                $price = $invoice_item->price - $invoice_item->discount;
                 $quantity = $quantities[$i];
                 $total = (int) $price * $quantity;
                 $nominal += $total;
