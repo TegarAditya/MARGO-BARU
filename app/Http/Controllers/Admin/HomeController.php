@@ -239,10 +239,10 @@ class HomeController
 
     public function god()
     {
+        abort(403, 'Unauthorized action.');
+
         DB::beginTransaction();
         try {
-            abort(403, 'Unauthorized action.');
-
             $counter = 0;
             $books = BookVariant::whereHas('movement')->whereIn('type', ['I', 'C', 'S', 'V'])
                     ->withSum('movement as stock_movement', 'quantity')
