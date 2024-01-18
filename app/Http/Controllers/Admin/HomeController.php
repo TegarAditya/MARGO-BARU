@@ -11,6 +11,7 @@ use App\Models\Cetak;
 use App\Models\CetakItem;
 use App\Models\StockMovement;
 use App\Models\ProductionEstimation;
+use App\Models\BookVariant;
 use DB;
 use App\Services\EstimationService;
 use App\Services\StockService;
@@ -238,31 +239,22 @@ class HomeController
 
     public function god()
     {
-        abort(403, 'Unauthorized action.');
-
         DB::beginTransaction();
         try {
-            $date = Carbon::now()->format('d-m-Y');
-            $cetak_items = CetakItem::where('cetak_id', 284)->get();
+            abort(403, 'Unauthorized action.');
 
-            foreach($cetak_items as $item) {
-                EstimationService::editMovement('out', 'cetak', 284, $item->product_id, 0, 'produksi');
-                EstimationService::editCetak($item->product_id, (-1 * $item->quantity), $item->product->type);
+            $counter = 0;
+            $books = BookVariant::whereHas('movement')->whereIn('type', ['I', 'C', 'S', 'V'])
+                    ->withSum('movement as stock_movement', 'quantity')
+                    ->get();
 
-                StockService::editMovement('in', 'cetak', 284, $date, $item->product_id, 0);
-                StockService::updateStock($item->product_id, -1 * $item->quantity);
+            foreach($books as $item) {
+                if ($item->stock != $item->stock_movement) {
+
+                    $counter++;
+                    BookVariant::where('id', $item->id)->update(['stock' => $item->stock_movement]);
+                }
             }
-
-            CetakItem::where('cetak_id', 284)->update([
-                'estimasi' => 0,
-                'quantity' => 0,
-                'cost' => 0
-            ]);
-
-            Cetak::where('id', 284)->update([
-                'estimasi_oplah' => 0,
-                'total_cost' => 0,
-            ]);
 
             DB::commit();
 
@@ -390,4 +382,8 @@ class HomeController
             dd($e);
         }
     }
+
+    // ->withSum(['movement as stock_movement' => function ($q) {
+    //     $q->select(DB::raw('COALESCE(SUM(quantity), 0)'));
+    // }], 'quantity')
 }
