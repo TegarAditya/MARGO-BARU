@@ -715,7 +715,7 @@ class BookVariantController extends Controller
                 ->where('return_good_items.retur_id', $retur)
                 ->whereNull('return_good_items.deleted_at')
                 ->whereNull('sales_orders.deleted_at')
-                ->first(['book_variants.*', 'return_good_items.quantity as quantity', 'return_good_items.id as retur_item_id',
+                ->first(['book_variants.*', 'return_good_items.quantity as quantity', 'return_good_items.price as price', 'return_good_items.id as retur_item_id',
                     'sales_orders.retur as retur', 'sales_orders.moved as terkirim']);
         $product->load('book', 'jenjang', 'isi', 'cover', 'kurikulum');
 

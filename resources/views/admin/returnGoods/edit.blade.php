@@ -171,7 +171,7 @@
                     var formHtml = `
                         <div class="item-product" id="product-${product.id}">
                             <div class="row">
-                                <div class="col-8 align-self-center">
+                                <div class="col-6 align-self-center">
                                     <h6 class="text-sm product-name mb-1">(${product.book_type}) ${product.short_name}</h6>
                                     <p class="mb-0 text-sm">
                                         Code : <strong>${product.code}</strong>
@@ -199,6 +199,17 @@
                                             </div>
                                         </div>
                                     </div>
+                                    <div class="col" style="max-width: 210px">
+                                        <p class="mb-0 text-sm">Price</p>
+                                        <div class="form-group text-field m-0">
+                                            <div class="text-field-input px-2 py-0 pr-3">
+                                                <span class="text-sm mr-1">Rp</span>
+                                                <input class="price" type="hidden" name="prices[]" value="${product.price}">
+                                                <input class="form-control text-right price_text" type="text" name="price_text[]" value="${product.price}">
+                                                <label class="text-field-border"></label>
+                                            </div>
+                                        </div>
+                                    </div>
                                     <div class="col-auto pl-5">
                                         <button type="button" class="btn btn-danger btn-sm product-delete" data-product-id="${product.id}">
                                             <i class="fa fa-trash"></i>
@@ -221,6 +232,8 @@
                         var product = $(item);
                         var quantity = product.find('.quantity');
                         var quantityText = product.find('.quantity_text');
+                        var price = product.find('.price');
+                        var priceText = product.find('.price_text');
 
                         quantityText.on('input change', function(e) {
                             var value = numeral(e.target.value);
@@ -235,6 +248,25 @@
                             if (valueNum < 0) {
                                 el.val(0);
                                 quantityText.val(0).trigger('change');
+                            }
+                        }).trigger('change');
+
+                        priceText.on('input change', function(e) {
+                            var value = numeral(e.target.value);
+
+                            priceText.val(value.format('0,0'));
+                            price.val(value.value()).trigger('change');
+                            calculatePrice();
+                        }).trigger('change');
+
+                        price.on('change input', function(e) {
+                            var el = $(e.currentTarget);
+                            var max = parseInt(el.data('max'));
+                            var valueNum = parseInt(el.val());
+
+                            if (valueNum < 0) {
+                                el.val(0);
+                                priceText.val(0).trigger('change');
                             }
                         }).trigger('change');
                     });

@@ -245,6 +245,8 @@ class ReturnGoodController extends Controller
             'products.*' => 'exists:book_variants,id',
             'quantities' => 'required|array',
             'quantities.*' => 'numeric|min:1',
+            'prices' => 'required|array',
+            'prices.*' => 'numeric|min:0',
         ]);
 
         $no_retur = $validatedData['no_retur'];
@@ -253,25 +255,24 @@ class ReturnGoodController extends Controller
         $products = $validatedData['products'];
         $retur_items = $validatedData['retur_items'];
         $quantities = $validatedData['quantities'];
+        $prices = $validatedData['prices'];
         $semester_retur = $returnGood->semester_retur_id;
         $salesperson = $returnGood->salesperson_id;
 
         DB::beginTransaction();
         try {
-            $nominal = 0;
-
             for ($i = 0; $i < count($products); $i++) {
                 $product = $products[$i];
+                $price = $prices[$i];
 
-                $invoice_item = InvoiceItem::where('semester_id', $semester_retur)->where('salesperson_id', $salesperson)->where('product_id', $product )->first();
-                if (!$invoice_item) {
-                    throw new \Exception('Product tidak ditemukan');
-                }
+                // $invoice_item = InvoiceItem::where('semester_id', $semester_retur)->where('salesperson_id', $salesperson)->where('product_id', $product )->first();
+                // if (!$invoice_item) {
+                //     throw new \Exception('Product tidak ditemukan');
+                // }
+                // $price = $invoice_item->price - $invoice_item->discount;
 
-                $price = $invoice_item->price - $invoice_item->discount;
                 $quantity = $quantities[$i];
                 $total = (int) $price * $quantity;
-                $nominal += $total;
 
                 $retur_item = $retur_items[$i];
                 $retur_good_item = ReturnGoodItem::find($retur_item);
@@ -280,6 +281,8 @@ class ReturnGoodController extends Controller
                 $order = $retur_good_item->sales_order_id;
 
                 $retur_good_item->quantity = $quantity;
+                $retur_good_item->price = $price;
+                $retur_good_item->total = $total;
                 $retur_good_item->save();
 
                 StockService::editMovement('in', 'retur', $returnGood->id, $date, $product, $quantity);
@@ -292,7 +295,7 @@ class ReturnGoodController extends Controller
                 'semester_id' => setting('current_semester'),
                 'no_retur' => $no_retur,
                 'date' => $date,
-                'nominal' => $nominal
+                'nominal' => ReturnGoodItem::where('retur_id', $returnGood->id)->sum('total')
             ]);
 
             TransactionService::editTransaction($date, 'Retur from '.$no_retur, $salesperson, setting('current_semester'), 'retur', $returnGood->id, $no_retur, $nominal, 'credit');
