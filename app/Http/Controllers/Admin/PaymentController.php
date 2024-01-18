@@ -216,9 +216,9 @@ class PaymentController extends Controller
             'salesperson_id' => 'required',
             'semester_id' => 'required',
             'payment_method' => 'required',
-            'bayar' => 'required|numeric|min:1',
+            'bayar' => 'required|numeric|min:0',
             'diskon' => 'nullable|numeric',
-            'nominal' => 'required|numeric|min:1',
+            'nominal' => 'required|numeric|min:0',
             'note' => 'nullable'
         ]);
 
