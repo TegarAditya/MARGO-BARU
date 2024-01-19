@@ -256,7 +256,6 @@
 
                             priceText.val(value.format('0,0'));
                             price.val(value.value()).trigger('change');
-                            calculatePrice();
                         }).trigger('change');
 
                         price.on('change input', function(e) {
