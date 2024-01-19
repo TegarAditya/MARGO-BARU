@@ -78,6 +78,16 @@
                 </div>
             </div>
             <div id="product-form"></div>
+            <div class="row mt-3 pt-2 ml-2" style="margin-right:140px">
+                <div class="col-md-10 text-right">
+                    <span class="text-sm"><b>Total Oplah Retur</b></span>
+                </div>
+                <div class="col-2 text-right">
+                    <p class="mb-1">
+                        <strong id="product-total-quantity">{{ angka(0) }}</strong>
+                    </p>
+                </div>
+            </div>
             <div class="row">
                 <div class="col-6">
                     <div class="form-group">
@@ -230,6 +240,7 @@
 
                             quantityText.val(value.format('0,0'));
                             quantity.val(value.value()).trigger('change');
+                            calculateTotalQuantity();
                         }).trigger('change');
 
                         quantity.on('change', function(e) {
@@ -270,6 +281,7 @@
     $('#product-form').on('click', '.product-delete', function() {
         var productId = $(this).data('product-id');
         $('#product-' + productId).remove();
+        calculateTotalQuantity();
     });
 
     function sortItems() {
@@ -284,6 +296,21 @@
 
         productForm.empty().append(items);
     }
+
+    function calculateTotalQuantity() {
+        var productForm = $('#product-form');
+        var productTotalQuantity = $('#product-total-quantity');
+
+        var total_quantity = 0;
+
+        productForm.children().each(function(i, item) {
+            var product = $(item);
+            var quantity = parseInt(product.find('.quantity').val() || 0)
+            total_quantity += quantity;
+        });
+        console.log(total_quantity);
+        productTotalQuantity.html(numeral(total_quantity).format('0,0'));
+    };
 </script>
 @endsection
 

@@ -192,7 +192,7 @@
                 <div class="col"></div>
 
                 <div class="col-auto">
-                    <button type="submit" class="btn btn-primary form-prevent-multiple-submits">Simpan Faktur</a>
+                    <button type="submit" class="btn btn-primary form-prevent-multiple-submits">Simpan Faktur</button>
                 </div>
             </div>
         </form>
