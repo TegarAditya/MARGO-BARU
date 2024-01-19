@@ -157,17 +157,6 @@
                     retur: $('#retur_id').val()
                 },
                 success: function(product) {
-                    function sortItems() {
-                        const productForm = $('#product-form');
-                        const items = productForm.children('.item-product');
-                        items.sort(function(a, b) {
-                            const idA = parseInt(a.id.split('-')[1]);
-                            const idB = parseInt(b.id.split('-')[1]);
-                            return idA - idB;
-                        });
-                        productForm.empty().append(items);
-                    }
-
                     var formHtml = `
                         <div class="item-product" id="product-${product.id}">
                             <div class="row">
@@ -211,7 +200,7 @@
                                         </div>
                                     </div>
                                     <div class="col-auto pl-5">
-                                        <button type="button" class="btn btn-danger btn-sm product-delete" data-product-id="${product.id}">
+                                        <button type="button" class="btn btn-danger btn-sm product-delete" data-product-id="${product.id}" tabIndex="-1">
                                             <i class="fa fa-trash"></i>
                                         </button>
                                     </div>
@@ -281,5 +270,18 @@
         var productId = $(this).data('product-id');
         $('#product-' + productId).remove();
     });
+
+    function sortItems() {
+        var productForm = $('#product-form');
+        var items = productForm.find('.item-product').get();
+
+        items.sort(function(a, b) {
+            const idA = parseInt(a.id.split('-')[1]);
+            const idB = parseInt(b.id.split('-')[1]);
+            return idA - idB;
+        });
+
+        productForm.empty().append(items);
+    }
 </script>
 @endsection
