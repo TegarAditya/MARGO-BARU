@@ -291,11 +291,13 @@ class ReturnGoodController extends Controller
                 EstimationService::updateRetur($order, ($quantity - $old_quantity));
             }
 
+            $nominal = ReturnGoodItem::where('retur_id', $returnGood->id)->sum('total');
+
             $returnGood->update([
                 'semester_id' => setting('current_semester'),
                 'no_retur' => $no_retur,
                 'date' => $date,
-                'nominal' => ReturnGoodItem::where('retur_id', $returnGood->id)->sum('total')
+                'nominal' => $nominal
             ]);
 
             TransactionService::editTransaction($date, 'Retur from '.$no_retur, $salesperson, setting('current_semester'), 'retur', $returnGood->id, $no_retur, $nominal, 'credit');
