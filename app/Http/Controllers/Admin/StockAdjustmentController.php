@@ -168,7 +168,7 @@ class StockAdjustmentController extends Controller
             'products' => 'required|array',
             'products.*' => 'exists:book_variants,id',
             'quantities' => 'required|array',
-            'quantities.*' => 'numeric|min:1',
+            'quantities.*' => 'numeric|min:0',
         ]);
 
         $date = $validatedData['date'];
