@@ -819,6 +819,7 @@ class BookVariantController extends Controller
     {
         $keyword = $request->input('q');
         $type = $request->input('type');
+        $semester = $request->input('semester') ?? setting('current_semester');
         $jenjang = $request->input('jenjang');
         $cover_isi = $request->input('cover_isi');
         $estimasi = $request->input('estimasi') ?? 1;
@@ -830,7 +831,7 @@ class BookVariantController extends Controller
         $query = BookVariant::where(function($q) use ($keyword) {
             $q->where('code', 'LIKE', "%{$keyword}%")
             ->orWhere('name', 'LIKE', "%{$keyword}%");
-        });
+        })->where('semester_id', $semester);
 
         if ($estimasi) {
             // $query->whereHas('estimasi_produksi', function ($q) {
@@ -900,6 +901,7 @@ class BookVariantController extends Controller
         $keyword = $request->input('q');
         $vendor = $request->input('vendor');
         $jenjang = $request->input('jenjang');
+        $semester = $request->input('semester');
 
         $query = FinishingItem::join('book_variants', 'book_variants.id', '=', 'finishing_items.product_id')
                     ->join('finishings', 'finishing_items.finishing_id', '=', 'finishings.id')
@@ -918,6 +920,10 @@ class BookVariantController extends Controller
 
                     if (!empty($vendor)) {
                         $query->where('finishings.vendor_id', $vendor);
+                    }
+
+                    if (!empty($semester)) {
+                        $query->where('finishings.semester_id', $semester);
                     }
 
         $products = $query->get(['book_variants.*', 'finishings.no_spk as finishing_spk', 'finishing_items.id as finishing_item_id']);

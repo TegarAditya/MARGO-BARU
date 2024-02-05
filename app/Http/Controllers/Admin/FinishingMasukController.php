@@ -24,7 +24,7 @@ class FinishingMasukController extends Controller
         abort_if(Gate::denies('finishing_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         if ($request->ajax()) {
-            $query = FinishingMasuk::select('no_spk', 'date', 'vendor_id')->distinct()->with(['vendor']);
+            $query = FinishingMasuk::select('no_spk', 'date', 'vendor_id')->distinct()->with(['vendor'])->latest();
 
             if (!empty($request->vendor)) {
                 $query->where('vendor_id', $request->vendor);
@@ -63,7 +63,7 @@ class FinishingMasukController extends Controller
 
         $vendors = Vendor::where('type', 'finishing')->get()->pluck('full_name', 'id')->prepend('All', '');
 
-        $semesters = Semester::orderBy('code', 'DESC')->where('status', 1)->pluck('name', 'id')->prepend('All', '');
+        $semesters = Semester::latest()->where('status', 1)->pluck('name', 'id')->prepend('All', '');
 
         return view('admin.finishingMasuks.index', compact('vendors', 'semesters'));
     }

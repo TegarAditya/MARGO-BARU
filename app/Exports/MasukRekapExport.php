@@ -27,7 +27,7 @@ class MasukRekapExport implements FromCollection, ShouldAutoSize
             'no' => 'No.',
             'vendor' => 'Vendor',
             'no_spk' => 'No SPK Vendor',
-            'date' => 'Tanggal',
+            'date' => 'Tanggal SJ',
             'oplagh' => 'Oplagh Masuk',
         ]);
 
@@ -41,7 +41,7 @@ class MasukRekapExport implements FromCollection, ShouldAutoSize
             $row = [
                 'no' => $i,
                 'vendor' => $detail->vendor->name,
-                'no_spk' => $item->no_spk,  
+                'no_spk' => $item->no_spk,
                 'date' => $detail->date,
                 'oplagh' => (string) $item->quantity,
             ];

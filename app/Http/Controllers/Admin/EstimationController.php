@@ -32,7 +32,7 @@ class EstimationController extends Controller
         abort_if(Gate::denies('estimation_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         if ($request->ajax()) {
-            $query = Estimation::with(['semester', 'salesperson', 'created_by', 'updated_by'])->select(sprintf('%s.*', (new Estimation)->table));
+            $query = Estimation::with(['semester', 'salesperson', 'created_by', 'updated_by'])->select(sprintf('%s.*', (new Estimation)->table))->latest();
 
             if (!empty($request->salesperson)) {
                 $query->where('salesperson_id', $request->salesperson);
@@ -103,12 +103,12 @@ class EstimationController extends Controller
         $no_estimasi = Estimation::generateNoEstimasi(setting('current_semester'));
         $today = Carbon::now()->format('d-m-Y');
 
-        if ($request->salesperson == 'internal') {
-            return view('admin.estimations.createInternal', compact('jenjangs', 'no_estimasi', 'today'));
-        }
-
-        $semesters = Semester::orderBy('code', 'DESC')->where('status', 1)->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $semesters = Semester::latest()->where('status', 1)->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
         $salespeople = Salesperson::get()->pluck('full_name', 'id')->prepend(trans('global.pleaseSelect'), '');
+
+        if ($request->salesperson == 'internal') {
+            return view('admin.estimations.createInternal', compact('jenjangs', 'no_estimasi', 'today', 'semesters'));
+        }
 
         return view('admin.estimations.create', compact('salespeople', 'semesters', 'jenjangs', 'no_estimasi', 'today'));
     }
@@ -119,6 +119,7 @@ class EstimationController extends Controller
         $validatedData = $request->validate([
             'date' => 'required',
             'salesperson_id' => 'nullable',
+            'semester' => 'nullable',
             'jenjang_id' => 'nullable',
             'products' => 'required|array',
             'products.*' => 'exists:book_variants,id',
@@ -128,15 +129,17 @@ class EstimationController extends Controller
             'pgs.*' => 'nullable|exists:book_variants,id',
             'pg_quantities' => 'nullable|array',
             'pg_quantities.*' => 'numeric|min:0',
+            // 'status' => 'required',
         ]);
 
         $date = $validatedData['date'];
-        $semester = setting('current_semester');
+        $semester = $validatedData['semester'] ?? setting('current_semester');
         $salesperson = $validatedData['salesperson_id'] ?? null;
         $products = $validatedData['products'];
         $quantities = $validatedData['quantities'];
         $pgs = $validatedData['pgs'] ?? null;
         $pg_quantities = $validatedData['pg_quantities'] ?? null;
+        // $status = $validatedData['status'] ?? 0;
 
         DB::beginTransaction();
         try {

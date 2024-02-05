@@ -19,7 +19,8 @@
 
         <form class="form-prevent-multiple-submits" method="POST" action="{{ route("admin.estimations.store") }}" enctype="multipart/form-data" onkeypress="return event.keyCode != 13;">
             @csrf
-            <input type="hidden" id="semester_id" value="{{ setting('current_semester') }}">
+            <input type="hidden" id="status" name="status" value="1">
+            {{-- <input type="hidden" id="semester_id" value="{{ setting('current_semester') }}"> --}}
             <div class="row">
                 <div class="col-6">
                     <div class="form-group">
@@ -41,8 +42,38 @@
                         <span class="help-block">{{ trans('cruds.estimation.fields.date_helper') }}</span>
                     </div>
                 </div>
+                <div class="col-6">
+                    <div class="form-group">
+                        <label class="required">{{ trans('cruds.salesOrder.fields.semester') }}</label>
+                        <select class="form-control select2 {{ $errors->has('semester') ? 'is-invalid' : '' }}" name="semester" id="semester">
+                            @foreach($semesters as $id => $entry)
+                                <option value="{{ $id }}" {{ (old('semester') ? old('semester') : setting('current_semester') ?? '') == $id ? 'selected' : '' }}>{{ $entry }}</option>
+                            @endforeach
+                        </select>
+                        @if($errors->has('semester'))
+                            <span class="text-danger">{{ $errors->first('semester') }}</span>
+                        @endif
+                        <span class="help-block">{{ trans('cruds.salesOrder.fields.semester_helper') }}</span>
+                    </div>
+                </div>
             </div>
+            <hr style="margin: .5em -15px;border-color:#ccc" />
+            <h6 class="mt-2 mb-3">Filter</h6>
             <div class="row">
+                <div class="col-6">
+                    <div class="form-group">
+                        <label>{{ trans('cruds.salesOrder.fields.semester') }}</label>
+                        <select class="form-control select2 {{ $errors->has('semester') ? 'is-invalid' : '' }}" name="semester_id" id="semester_id">
+                            @foreach($semesters as $id => $entry)
+                                <option value="{{ $id }}" {{ (old('semester_id') ? old('semester_id') : setting('current_semester') ?? '') == $id ? 'selected' : '' }}>{{ $entry }}</option>
+                            @endforeach
+                        </select>
+                        @if($errors->has('semester'))
+                            <span class="text-danger">{{ $errors->first('semester') }}</span>
+                        @endif
+                        <span class="help-block">{{ trans('cruds.salesOrder.fields.semester_helper') }}</span>
+                    </div>
+                </div>
                 <div class="col-6">
                     <div class="form-group">
                         <label for="jenjang_id">{{ trans('cruds.salesOrder.fields.jenjang') }}</label>

@@ -33,6 +33,20 @@
                 </div>
                 <div class="col-6">
                     <div class="form-group">
+                        <label class="required">{{ trans('cruds.salesOrder.fields.semester') }}</label>
+                        <select class="form-control select2 {{ $errors->has('semester') ? 'is-invalid' : '' }}" name="semester_id" id="semester_id" disabled>
+                            @foreach($semesters as $id => $entry)
+                                <option value="{{ $id }}" {{ (old('semester_id') ? old('semester_id') : $cetak->semester_id ?? '') == $id ? 'selected' : '' }}>{{ $entry }}</option>
+                            @endforeach
+                        </select>
+                        @if($errors->has('semester'))
+                            <span class="text-danger">{{ $errors->first('semester') }}</span>
+                        @endif
+                        <span class="help-block">{{ trans('cruds.salesOrder.fields.semester_helper') }}</span>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="form-group">
                         <label class="required" for="vendor_id">{{ trans('cruds.cetak.fields.vendor') }}</label>
                         <select class="form-control select2 {{ $errors->has('vendor') ? 'is-invalid' : '' }}" name="vendor_id" id="vendor_id">
                             @foreach($vendors as $id => $entry)
@@ -252,6 +266,7 @@
                             q: params.term,
                             type: $('#type').val(),
                             jenjang: $('#jenjang_id').val(),
+                            semester: $('#semester_id').val(),
                             cover_isi: $('#isi_cover_id').val()
                         };
                     },

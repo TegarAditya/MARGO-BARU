@@ -122,7 +122,7 @@ class CetakController extends Controller
 
         $vendors = Vendor::where('type', 'cetak')->get()->pluck('full_name', 'id')->prepend('All', '');
 
-        $semesters = Semester::orderBy('code', 'DESC')->where('status', 1)->pluck('name', 'id')->prepend('All', '');
+        $semesters = Semester::latest()->where('status', 1)->pluck('name', 'id')->prepend('All', '');
 
         return view('admin.cetaks.index', compact('vendors', 'semesters'));
     }
@@ -131,7 +131,7 @@ class CetakController extends Controller
     {
         abort_if(Gate::denies('cetak_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $semesters = Semester::orderBy('code', 'DESC')->where('status', 1)->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $semesters = Semester::latest()->where('status', 1)->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
         $vendors = Vendor::where('type', 'cetak')->orderBy('code', 'ASC')->get()->pluck('full_name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
@@ -149,7 +149,7 @@ class CetakController extends Controller
         // Validate the form data
         $validatedData = $request->validate([
             'date' => 'required',
-            // 'semester_id' => 'required',
+            'semester_id' => 'required',
             'vendor_id' => 'required',
             'jenjang_id' => 'required',
             'type' => 'required',
@@ -165,7 +165,7 @@ class CetakController extends Controller
         ]);
 
         $date = $validatedData['date'];
-        $semester = setting('current_semester');
+        $semester = $validatedData['semester_id'] ?? setting('current_semester');
         $vendor = $validatedData['vendor_id'];
         $jenjang = $validatedData['jenjang_id'];
         $type = $validatedData['type'];
@@ -456,11 +456,13 @@ class CetakController extends Controller
 
         $vendors = Vendor::where('type', 'cetak')->get()->pluck('full_name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
+        $jenjangs = Jenjang::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+
         $cetak->load('semester', 'vendor');
 
         $cetak_items = CetakItem::with('product', 'semester', 'product.estimasi_produksi')->where('cetak_id', $cetak->id)->orderBy('product_id')->get();
 
-        return view('admin.cetaks.realisasi', compact('cetak', 'cetak_items', 'semesters', 'vendors'));
+        return view('admin.cetaks.realisasi', compact('cetak', 'cetak_items', 'semesters', 'vendors', 'jenjangs'));
     }
 
     public function realisasiStore(Request $request, Cetak $cetak)

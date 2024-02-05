@@ -24,7 +24,7 @@ class EstimasiSaldoController extends Controller
     {
         abort_if(Gate::denies('estimasi_saldo_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $semester = setting('current_semester');
+        $semester = !empty($request->semester_id) ? $request->semester_id : setting('current_semester');
         $group_area = null;
 
         $query = Salesperson::withSum(['estimasi as pesanan' => function ($q) use ($semester) {
@@ -43,9 +43,11 @@ class EstimasiSaldoController extends Controller
 
         $saldo = $query->get();
 
+        $selected_semester = Semester::find($semester);
         $group_areas = GroupArea::pluck('code', 'id')->prepend('All', '');
+        $semesters = Semester::latest()->where('status', 1)->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
-        return view('admin.estimasiSaldos.index', compact('saldo', 'group_area', 'group_areas'));
+        return view('admin.estimasiSaldos.index', compact('saldo', 'group_area', 'group_areas','selected_semester', 'semesters'));
     }
 
     public function create()

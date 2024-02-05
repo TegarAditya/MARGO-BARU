@@ -114,6 +114,8 @@ class FinishingController extends Controller
     {
         abort_if(Gate::denies('finishing_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
+        $semesters = Semester::latest()->where('status', 1)->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+
         $vendors = Vendor::where('type', 'finishing')->orderBy('code', 'ASC')->get()->pluck('full_name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
         $jenjangs = Jenjang::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
@@ -122,7 +124,7 @@ class FinishingController extends Controller
 
         $today = Carbon::now()->format('d-m-Y');
 
-        return view('admin.finishings.create', compact('vendors', 'jenjangs', 'no_spk', 'today'));
+        return view('admin.finishings.create', compact('semesters', 'vendors', 'jenjangs', 'no_spk', 'today'));
     }
 
     public function store(Request $request)
@@ -130,7 +132,7 @@ class FinishingController extends Controller
         // Validate the form data
         $validatedData = $request->validate([
             'date' => 'required',
-            // 'semester_id' => 'required',
+            'semester_id' => 'required',
             'jenjang_id' => 'required',
             'vendor_id' => 'required',
             'note' => 'nullable',
@@ -141,7 +143,7 @@ class FinishingController extends Controller
         ]);
 
         $date = $validatedData['date'];
-        $semester = setting('current_semester');
+        $semester = $validatedData['semester_id'] ?? setting('current_semester');
         $vendor = $validatedData['vendor_id'];
         $jenjang = $validatedData['jenjang_id'];
         $note = $validatedData['note'];
@@ -210,6 +212,8 @@ class FinishingController extends Controller
     {
         abort_if(Gate::denies('finishing_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
+        $semesters = Semester::latest()->where('status', 1)->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+
         $vendors = Vendor::where('type', 'finishing')->orderBy('code', 'ASC')->get()->pluck('full_name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
         $jenjangs = Jenjang::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
@@ -222,7 +226,7 @@ class FinishingController extends Controller
 
         $finishing->load('semester', 'vendor', 'jenjang');
 
-        return view('admin.finishings.edit', compact('finishing', 'vendors', 'finishing_items', 'jenjangs'));
+        return view('admin.finishings.edit', compact('finishing', 'vendors', 'finishing_items', 'jenjangs', 'semesters'));
     }
 
     public function update(Request $request, Finishing $finishing)
@@ -353,13 +357,15 @@ class FinishingController extends Controller
     {
         abort_if(Gate::denies('finishing_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
+        $semesters = Semester::latest()->where('status', 1)->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+
         $vendors = Vendor::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
         $finishing->load('semester', 'vendor');
 
         $finishing_items = FinishingItem::with('product', 'semester')->where('finishing_id', $finishing->id)->orderBy('product_id')->get();
 
-        return view('admin.finishings.realisasi', compact('finishing', 'vendors', 'finishing_items'));
+        return view('admin.finishings.realisasi', compact('finishing', 'vendors', 'finishing_items', 'semesters'));
     }
 
     public function realisasiStore(Request $request, Finishing $finishing)
@@ -430,12 +436,13 @@ class FinishingController extends Controller
 
     public function masuk()
     {
+        $semesters = Semester::latest()->where('status', 1)->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
         $vendors = Vendor::where('type', 'finishing')->get()->pluck('full_name', 'id')->prepend(trans('global.pleaseSelect'), '');
         $jenjangs = Jenjang::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
         $today = Carbon::now()->format('d-m-Y');
 
-        return view('admin.finishings.masuk', compact('vendors', 'jenjangs', 'today'));
+        return view('admin.finishings.masuk', compact('semesters', 'vendors', 'jenjangs', 'today'));
     }
 
     public function masukStore(Request $request)
@@ -443,6 +450,7 @@ class FinishingController extends Controller
         $validatedData = $request->validate([
             'no_spk' => 'required',
             'date' => 'required',
+            'semester_id' => 'required',
             'vendor_id' => 'required',
             'products' => 'required|array',
             'products.*' => 'exists:book_variants,id',
@@ -462,6 +470,7 @@ class FinishingController extends Controller
         $status = $validatedData['done'];
         $date = Carbon::now()->format('d-m-Y');
         $finishing = collect();
+        $semester = $validatedData['semester_id'] ?? setting('current_semester');
 
         DB::beginTransaction();
         try {
@@ -487,7 +496,7 @@ class FinishingController extends Controller
                     'finishing_item_id' => $finishing_item->id,
                     'product_id' => $product,
                     'quantity'  => $quantity,
-                    'semester_id' => setting('current_semester')
+                    'semester_id' => $semester
                 ]);
 
                 EstimationService::createMovement('out', 'finishing', $finishing_item->finishing->id, $product, $quantity, 'realisasi');

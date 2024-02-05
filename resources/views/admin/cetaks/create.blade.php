@@ -38,6 +38,20 @@
                 </div>
                 <div class="col-6">
                     <div class="form-group">
+                        <label class="required">{{ trans('cruds.salesOrder.fields.semester') }}</label>
+                        <select class="form-control select2 {{ $errors->has('semester') ? 'is-invalid' : '' }}" name="semester_id" id="semester_id" required>
+                            @foreach($semesters as $id => $entry)
+                                <option value="{{ $id }}" {{ (old('semester_id') ? old('semester_id') : setting('current_semester') ?? '') == $id ? 'selected' : '' }}>{{ $entry }}</option>
+                            @endforeach
+                        </select>
+                        @if($errors->has('semester'))
+                            <span class="text-danger">{{ $errors->first('semester') }}</span>
+                        @endif
+                        <span class="help-block">{{ trans('cruds.salesOrder.fields.semester_helper') }}</span>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="form-group">
                         <label class="required" for="vendor_id">{{ trans('cruds.cetak.fields.vendor') }}</label>
                         <select class="form-control select2 {{ $errors->has('vendor') ? 'is-invalid' : '' }}" name="vendor_id" id="vendor_id" required>
                             @foreach($vendors as $id => $entry)
@@ -67,6 +81,13 @@
                 </div>
                 <div class="col-6">
                     <div class="form-group">
+                        <label class="required" for="isi_cover_id">Isi / Cover</label>
+                        <select id="isi_cover_id" class="form-control select2" name="isi_cover_id" style="width: 100%;" required>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="form-group">
                         <label class="required" for="jenjang_id">{{ trans('cruds.bookVariant.fields.jenjang') }}</label>
                         <select class="form-control select2 {{ $errors->has('jenjang') ? 'is-invalid' : '' }}" name="jenjang_id" id="jenjang_id" required>
                             @foreach($jenjangs as $id => $entry)
@@ -77,13 +98,6 @@
                             <span class="text-danger">{{ $errors->first('jenjang') }}</span>
                         @endif
                         <span class="help-block">{{ trans('cruds.bookVariant.fields.jenjang_helper') }}</span>
-                    </div>
-                </div>
-                <div class="col-6">
-                    <div class="form-group">
-                        <label class="required" for="isi_cover_id">Isi / Cover</label>
-                        <select id="isi_cover_id" class="form-control select2" name="isi_cover_id" style="width: 100%;" required>
-                        </select>
                     </div>
                 </div>
                 <div class="col-12">
@@ -146,6 +160,7 @@
                             q: params.term,
                             type: $('#type').val(),
                             jenjang: $('#jenjang_id').val(),
+                            semester: $('#semester_id').val(),
                             cover_isi: $('#isi_cover_id').val(),
                             estimasi: $('#pakeestimasi').val()
                         };

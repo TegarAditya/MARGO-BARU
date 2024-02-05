@@ -23,6 +23,20 @@
                         </select>
                     </div>
                 </div>
+                <div class="col-6">
+                    <div class="form-group">
+                        <label>{{ trans('cruds.salesOrder.fields.semester') }}</label>
+                        <select class="form-control select2 {{ $errors->has('semester') ? 'is-invalid' : '' }}" name="semester_id" id="semester_id">
+                            @foreach($semesters as $id => $entry)
+                                <option value="{{ $id }}" {{ old('semester_id', $selected_semester ? $selected_semester->id : null) == $id ? 'selected' : '' }}>{{ $entry }}</option>
+                            @endforeach
+                        </select>
+                        @if($errors->has('semester_id'))
+                            <span class="text-danger">{{ $errors->first('semester_id') }}</span>
+                        @endif
+                        <span class="help-block">{{ trans('cruds.salesOrder.fields.semester_helper') }}</span>
+                    </div>
+                </div>
             </div>
             <div class="form-group">
                 <button class="btn btn-danger" type="submit">

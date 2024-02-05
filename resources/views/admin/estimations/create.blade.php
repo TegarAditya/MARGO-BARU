@@ -54,7 +54,36 @@
                         <span class="help-block">{{ trans('cruds.estimation.fields.salesperson_helper') }}</span>
                     </div>
                 </div>
+                <div class="col-6">
+                    <div class="form-group">
+                        <label class="required">{{ trans('cruds.salesOrder.fields.semester') }}</label>
+                        <select class="form-control select2 {{ $errors->has('semester') ? 'is-invalid' : '' }}" name="semester" id="semester">
+                            @foreach($semesters as $id => $entry)
+                                <option value="{{ $id }}" {{ (old('semester') ? old('semester') : setting('current_semester') ?? '') == $id ? 'selected' : '' }}>{{ $entry }}</option>
+                            @endforeach
+                        </select>
+                        @if($errors->has('semester'))
+                            <span class="text-danger">{{ $errors->first('semester') }}</span>
+                        @endif
+                        <span class="help-block">{{ trans('cruds.salesOrder.fields.semester_helper') }}</span>
+                    </div>
+                </div>
+                {{-- <div class="col-12">
+                    <div class="form-group">
+                        <div class="form-check {{ $errors->has('status') ? 'is-invalid' : '' }}">
+                            <label class="form-check-label" for="status">Apakah Akan Dimasukkan Ke Estimasi ?</label>
+                            <input type="hidden" id="status" name="status" value="1">
+                            <input id="switch-status" class="bootstrap-switch" type="checkbox" tabindex="-1" value="1" checked data-on-text="Iya" data-off-text="Tidak">
+                        </div>
+                        @if($errors->has('status'))
+                            <span class="text-danger">{{ $errors->first('status') }}</span>
+                        @endif
+                        <span class="help-block">{{ trans('cruds.semester.fields.status_helper') }}</span>
+                    </div>
+                </div> --}}
             </div>
+            <hr style="margin: .5em -15px;border-color:#ccc" />
+            <h6 class="mt-2 mb-3">Filter</h6>
             <div class="row">
                 <div class="col-6">
                     <div class="form-group">
@@ -345,6 +374,14 @@
 
             productForm.empty().append(items);
         }
+
+        $('#switch-status').on('switchChange.bootstrapSwitch', function (event, state) {
+            if (state) {
+                done.val(1);
+            } else {
+                done.val(0);
+            }
+        });
     });
 </script>
 @endsection

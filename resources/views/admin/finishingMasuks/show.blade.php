@@ -30,6 +30,14 @@
                         </tr>
                         <tr>
                             <th>
+                                {{ trans('cruds.finishingMasuk.fields.semester') }}
+                            </th>
+                            <td>
+                                {{ $finishingMasuk->semester->name }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>
                                 {{ trans('cruds.finishingMasuk.fields.vendor') }}
                             </th>
                             <td>
