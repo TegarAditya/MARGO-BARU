@@ -32,7 +32,7 @@ class ReturnGoodController extends Controller
         abort_if(Gate::denies('return_good_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         if ($request->ajax()) {
-            $query = ReturnGood::with(['salesperson', 'semester'])->select(sprintf('%s.*', (new ReturnGood)->table));
+            $query = ReturnGood::with(['salesperson', 'semester'])->select(sprintf('%s.*', (new ReturnGood)->table))->latest();
 
             if (!empty($request->salesperson)) {
                 $query->where('salesperson_id', $request->salesperson);
@@ -85,7 +85,7 @@ class ReturnGoodController extends Controller
             return $table->make(true);
         }
 
-        $semesters = Semester::orderBy('code', 'DESC')->where('status', 1)->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $semesters = Semester::latest()->where('status', 1)->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
         $salespeople = Salesperson::get()->pluck('short_name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
@@ -96,7 +96,7 @@ class ReturnGoodController extends Controller
     {
         abort_if(Gate::denies('return_good_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $semesters = Semester::orderBy('code', 'DESC')->where('status', 1)->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $semesters = Semester::latest()->where('status', 1)->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
         $salespeople = Salesperson::whereHas('estimasi')->get()->pluck('full_name', 'id')->prepend(trans('global.pleaseSelect'), '');
 

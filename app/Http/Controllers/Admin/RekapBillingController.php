@@ -40,7 +40,7 @@ class RekapBillingController extends Controller
 
         $semester = Semester::find($semester);
 
-        $semesters = Semester::orderBy('code', 'DESC')->where('status', 1)->pluck('name', 'id');
+        $semesters = Semester::latest()->where('status', 1)->pluck('name', 'id');
 
         return view('admin.rekapBillings.index', compact('sales','semesters', 'semester'));
     }

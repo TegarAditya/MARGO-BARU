@@ -95,7 +95,7 @@ class PlatePrintController extends Controller
 
         $vendors = Vendor::where('type', 'cetak')->get()->pluck('full_name', 'id')->prepend('All', '');
 
-        $semesters = Semester::orderBy('code', 'DESC')->where('status', 1)->pluck('name', 'id')->prepend('All', '');
+        $semesters = Semester::latest()->where('status', 1)->pluck('name', 'id')->prepend('All', '');
 
         return view('admin.platePrints.index', compact('vendors', 'semesters'));
     }

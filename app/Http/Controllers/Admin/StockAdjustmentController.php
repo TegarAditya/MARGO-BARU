@@ -24,7 +24,7 @@ class StockAdjustmentController extends Controller
         abort_if(Gate::denies('stock_adjustment_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         if ($request->ajax()) {
-            $query = StockAdjustment::query()->select(sprintf('%s.*', (new StockAdjustment)->table));
+            $query = StockAdjustment::query()->select(sprintf('%s.*', (new StockAdjustment)->table))->latest();
             $table = Datatables::of($query);
 
             $table->addColumn('placeholder', '&nbsp;');

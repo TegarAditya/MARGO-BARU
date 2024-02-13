@@ -84,7 +84,7 @@ class SettingController extends Controller
     {
         abort_if(Gate::denies('setting_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $semesters = Semester::orderBy('code', 'DESC')->where('status', 1)->pluck('name', 'id');
+        $semesters = Semester::latest()->where('status', 1)->pluck('name', 'id');
 
         return view('admin.settings.edit', compact('setting', 'semesters'));
     }

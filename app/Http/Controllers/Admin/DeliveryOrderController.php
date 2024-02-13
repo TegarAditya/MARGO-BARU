@@ -32,7 +32,7 @@ class DeliveryOrderController extends Controller
         abort_if(Gate::denies('delivery_order_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         if ($request->ajax()) {
-            $query = DeliveryOrder::with(['semester', 'salesperson'])->select(sprintf('%s.*', (new DeliveryOrder)->table));
+            $query = DeliveryOrder::with(['semester', 'salesperson'])->select(sprintf('%s.*', (new DeliveryOrder)->table))->latest();
 
             if (!empty($request->salesperson)) {
                 $query->where('salesperson_id', $request->salesperson);
@@ -91,7 +91,7 @@ class DeliveryOrderController extends Controller
             return $table->make(true);
         }
 
-        $semesters = Semester::orderBy('code', 'DESC')->where('status', 1)->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $semesters = Semester::latest()->where('status', 1)->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
         $salespeople = Salesperson::get()->pluck('short_name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
@@ -102,7 +102,7 @@ class DeliveryOrderController extends Controller
     {
         abort_if(Gate::denies('delivery_order_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $semesters = Semester::orderBy('code', 'DESC')->where('status', 1)->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $semesters = Semester::latest()->where('status', 1)->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
         $salespeople = Salesperson::whereHas('estimasi')->get()->pluck('full_name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
@@ -120,7 +120,7 @@ class DeliveryOrderController extends Controller
         // Validate the form data
         $validatedData = $request->validate([
             'date' => 'required',
-            // 'semester_id' =>'required',
+            'semester_id' =>'required',
             'salesperson_id' => 'required',
             'orders' => 'required|array',
             'orders.*' => 'exists:sales_orders,id',
@@ -135,7 +135,7 @@ class DeliveryOrderController extends Controller
         ]);
 
         $date = $validatedData['date'];
-        $semester = setting('current_semester');
+        $semester = $validatedData['semester_id'] ?? setting('current_semester');
         $salesperson = $validatedData['salesperson_id'];
         $products = $validatedData['products'];
         $orders = $validatedData['orders'];
@@ -212,13 +212,15 @@ class DeliveryOrderController extends Controller
     {
         abort_if(Gate::denies('delivery_order_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
+        $semesters = Semester::latest()->where('status', 1)->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+
         $salespeople = Salesperson::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
         $deliveryOrder->load('semester', 'salesperson');
 
         $delivery_items = DeliveryOrderItem::where('delivery_order_id', $deliveryOrder->id)->get();
 
-        return view('admin.deliveryOrders.edit', compact('deliveryOrder', 'salespeople', 'delivery_items'));
+        return view('admin.deliveryOrders.edit', compact('deliveryOrder', 'salespeople', 'delivery_items', 'semesters'));
     }
 
     public function update(Request $request, DeliveryOrder $deliveryOrder)
@@ -289,6 +291,8 @@ class DeliveryOrderController extends Controller
     {
         abort_if(Gate::denies('delivery_order_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
+        $semesters = Semester::latest()->where('status', 1)->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+
         $salespeople = Salesperson::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
         $jenjangs = Jenjang::pluck('name', 'id')->prepend('All', '');
@@ -297,7 +301,7 @@ class DeliveryOrderController extends Controller
 
         $delivery_items = DeliveryOrderItem::where('delivery_order_id', $deliveryOrder->id)->get();
 
-        return view('admin.deliveryOrders.adjust', compact('deliveryOrder', 'salespeople', 'jenjangs', 'delivery_items'));
+        return view('admin.deliveryOrders.adjust', compact('deliveryOrder', 'salespeople', 'jenjangs', 'delivery_items', 'semesters'));
     }
 
     public function adjustSave(Request $request)
@@ -517,7 +521,7 @@ class DeliveryOrderController extends Controller
     public function getEstimasi(Request $request)
     {
         $keyword = $request->input('q');
-        $semester = setting('current_semester');
+        $semester = $request->input('semester') ?? setting('current_semester');
         $salesperson = $request->input('salesperson');
         $jenjang = $request->input('jenjang');
 
@@ -568,7 +572,7 @@ class DeliveryOrderController extends Controller
     public function getInfoEstimasi(Request $request)
     {
         $id = $request->input('id');
-        $semester = setting('current_semester');
+        $semester = $request->input('semester') ?? setting('current_semester');
         $salesperson = $request->input('salesperson');
 
         $product = BookVariant::join('sales_orders', 'sales_orders.product_id', '=', 'book_variants.id')

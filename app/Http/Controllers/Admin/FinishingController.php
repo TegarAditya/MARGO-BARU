@@ -105,7 +105,7 @@ class FinishingController extends Controller
 
         $vendors = Vendor::where('type', 'finishing')->get()->pluck('full_name', 'id')->prepend('All', '');
 
-        $semesters = Semester::orderBy('code', 'DESC')->where('status', 1)->pluck('name', 'id')->prepend('All', '');
+        $semesters = Semester::latest()->where('status', 1)->pluck('name', 'id')->prepend('All', '');
 
         return view('admin.finishings.index', compact('vendors', 'semesters'));
     }

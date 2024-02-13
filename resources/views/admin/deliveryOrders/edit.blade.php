@@ -41,6 +41,20 @@
                 </div>
                 <div class="col-6">
                     <div class="form-group">
+                        <label class="required" for="semester_id">{{ trans('cruds.deliveryOrder.fields.semester') }}</label>
+                        <select class="form-control select2 {{ $errors->has('semester') ? 'is-invalid' : '' }}" name="semester_id" id="semester_id" disabled>
+                            @foreach($semesters as $id => $entry)
+                                <option value="{{ $id }}" {{ (old('semester_id') ? old('semester_id') : $deliveryOrder->semester_id ?? '') == $id ? 'selected' : '' }}>{{ $entry }}</option>
+                            @endforeach
+                        </select>
+                        @if($errors->has('semester'))
+                            <span class="text-danger">{{ $errors->first('semester') }}</span>
+                        @endif
+                        <span class="help-block">{{ trans('cruds.deliveryOrder.fields.semester_helper') }}</span>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="form-group">
                         <label class="required" for="salesperson_id">{{ trans('cruds.deliveryOrder.fields.salesperson') }}</label>
                         <select class="form-control select2 {{ $errors->has('salesperson') ? 'is-invalid' : '' }}" name="salesperson_id" id="salesperson_id" disabled>
                             @foreach($salespeople as $id => $entry)

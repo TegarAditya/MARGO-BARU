@@ -37,12 +37,12 @@
                         <span class="help-block">{{ trans('cruds.deliveryOrder.fields.date_helper') }}</span>
                     </div>
                 </div>
-                {{-- <div class="col-6">
+                <div class="col-6">
                     <div class="form-group">
                         <label class="required" for="semester_id">{{ trans('cruds.deliveryOrder.fields.semester') }}</label>
                         <select class="form-control select2 {{ $errors->has('semester') ? 'is-invalid' : '' }}" name="semester_id" id="semester_id" required>
                             @foreach($semesters as $id => $entry)
-                                <option value="{{ $id }}" {{ old('semester_id') == $id ? 'selected' : '' }}>{{ $entry }}</option>
+                                <option value="{{ $id }}" {{ (old('semester_id') ? old('semester_id') : setting('current_semester') ?? '') == $id ? 'selected' : '' }}>{{ $entry }}</option>
                             @endforeach
                         </select>
                         @if($errors->has('semester'))
@@ -50,7 +50,7 @@
                         @endif
                         <span class="help-block">{{ trans('cruds.deliveryOrder.fields.semester_helper') }}</span>
                     </div>
-                </div> --}}
+                </div>
                 <div class="col-6">
                     <div class="form-group">
                         <label class="required" for="salesperson_id">{{ trans('cruds.deliveryOrder.fields.salesperson') }}</label>
@@ -120,7 +120,7 @@
                     data: function(params) {
                         return {
                             q: params.term,
-                            // semester: $('#semester_id').val(),
+                            semester: $('#semester_id').val(),
                             salesperson: $('#salesperson_id').val(),
                             jenjang: $('#jenjang_id').val()
                         };
@@ -169,6 +169,7 @@
                 dataType: 'json',
                 data: {
                     id: productId,
+                    semester: $('#semester_id').val(),
                     salesperson: $('#salesperson_id').val()
                 },
                 success: function(product) {
