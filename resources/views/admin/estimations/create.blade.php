@@ -375,13 +375,13 @@
             productForm.empty().append(items);
         }
 
-        $('#switch-status').on('switchChange.bootstrapSwitch', function (event, state) {
-            if (state) {
-                done.val(1);
-            } else {
-                done.val(0);
-            }
-        });
+        // $('#switch-status').on('switchChange.bootstrapSwitch', function (event, state) {
+        //     if (state) {
+        //         done.val(1);
+        //     } else {
+        //         done.val(0);
+        //     }
+        // });
     });
 </script>
 @endsection

@@ -23,7 +23,7 @@ class SemesterController extends Controller
         abort_if(Gate::denies('semester_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         if ($request->ajax()) {
-            $query = Semester::query()->select(sprintf('%s.*', (new Semester)->table));
+            $query = Semester::query()->select(sprintf('%s.*', (new Semester)->table))->orderBy('id', 'DESC');
             $table = Datatables::of($query);
 
             $table->addColumn('placeholder', '&nbsp;');

@@ -53,7 +53,7 @@ $(function () {
   let dtButtons = $.extend(true, [], $.fn.dataTable.defaults.buttons)
 
   let dtOverrideGlobals = {
-    buttons: dtButtons,
+    // buttons: dtButtons,
     processing: true,
     serverSide: true,
     retrieve: true,
@@ -66,8 +66,8 @@ $(function () {
         { data: 'status', name: 'status', class: 'text-center' },
         { data: 'actions', name: '{{ trans('global.actions') }}', class: 'text-center' }
     ],
-    orderCellsTop: true,
-    order: [[ 2, 'desc' ]],
+    // orderCellsTop: true,
+    // order: [[ 2, 'desc' ]],
     pageLength: 25,
   };
   let table = $('.datatable-Semester').DataTable(dtOverrideGlobals);

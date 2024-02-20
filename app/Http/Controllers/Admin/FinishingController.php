@@ -35,7 +35,7 @@ class FinishingController extends Controller
         abort_if(Gate::denies('finishing_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         if ($request->ajax()) {
-            $query = Finishing::with(['semester', 'vendor', 'finishing_items'])->select(sprintf('%s.*', (new Finishing)->table))->latest();
+            $query = Finishing::where('semester_id', setting('current_semester'))->with(['semester', 'vendor', 'finishing_items'])->select(sprintf('%s.*', (new Finishing)->table))->latest();
             if (!empty($request->vendor)) {
                 $query->where('vendor_id', $request->vendor);
             }
