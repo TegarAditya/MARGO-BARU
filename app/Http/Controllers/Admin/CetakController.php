@@ -39,7 +39,7 @@ class CetakController extends Controller
         abort_if(Gate::denies('cetak_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         if ($request->ajax()) {
-            $query = Cetak::where('semester_id', setting('current_semester'))->with(['semester', 'vendor', 'cetak_items'])->select(sprintf('%s.*', (new Cetak)->table))->latest();
+            $query = Cetak::with(['semester', 'vendor', 'cetak_items'])->select(sprintf('%s.*', (new Cetak)->table))->latest();
 
             if (!empty($request->type)) {
                 $query->where('type', $request->type);
@@ -47,8 +47,10 @@ class CetakController extends Controller
             if (!empty($request->vendor)) {
                 $query->where('vendor_id', $request->vendor);
             }
-            if (!empty($request->semester)) {
+            if ($request->semester) {
                 $query->where('semester_id', $request->semester);
+            } else {
+                $query->where('semester_id', setting('current_semester'));
             }
 
             $table = Datatables::of($query);
