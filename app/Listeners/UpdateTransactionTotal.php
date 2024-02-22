@@ -38,7 +38,7 @@ class UpdateTransactionTotal
                     ->get()
                     ->pluck('total_amount', 'type');
 
-        $totalRecord = TransactionTotal::where('salesperson_id', $salesperson)->first();
+        $totalRecord = TransactionTotal::where('salesperson_id', $salesperson)->where('semester_id', $semester)->first();
 
         // If a total record exists, update it; otherwise, create a new record
         if ($totalRecord) {

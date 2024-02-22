@@ -31,8 +31,9 @@ class BillController extends Controller
     {
         abort_if(Gate::denies('bill_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
+        $semester = $request->semester ? $request->semester : setting('current_semester');
+
         if ($request->ajax()) {
-            $semester = setting('current_semester');
             $query = Bill::with(['semester', 'salesperson'])->where('semester_id', $semester)->select(sprintf('%s.*', (new Bill)->table))->orderBy('salesperson_id', 'ASC');
             $table = Datatables::of($query);
 
@@ -93,7 +94,9 @@ class BillController extends Controller
             return $table->make(true);
         }
 
-        return view('admin.bills.index');
+        $semesters = Semester::where('status', 1)->latest()->pluck('name', 'id');
+
+        return view('admin.bills.index', compact('semesters'));
     }
 
     public function create()

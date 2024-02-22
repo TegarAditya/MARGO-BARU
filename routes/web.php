@@ -114,6 +114,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     Route::post('books/ckmedia', 'BookController@storeCKEditorImages')->name('books.storeCKEditorImages');
     Route::post('books/import', 'BookController@import')->name('books.import');
     Route::get('books/template-import', 'BookController@template_import')->name('books.templateImport');
+    Route::post('books/export', 'BookController@export')->name('books.export');
     Route::resource('books', 'BookController');
 
     // Book Variant

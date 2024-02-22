@@ -124,7 +124,7 @@ class CetakController extends Controller
 
         $vendors = Vendor::where('type', 'cetak')->get()->pluck('full_name', 'id')->prepend('All', '');
 
-        $semesters = Semester::latest()->where('status', 1)->pluck('name', 'id')->prepend('All', '');
+        $semesters = Semester::where('status', 1)->orderBy('id', 'DESC')->pluck('name', 'id');
 
         return view('admin.cetaks.index', compact('vendors', 'semesters'));
     }

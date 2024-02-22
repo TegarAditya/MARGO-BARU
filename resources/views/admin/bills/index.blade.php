@@ -63,6 +63,27 @@
                     <button type="submit" value="export" name="export" class="btn btn-warning">Export</button>
                 </div>
             </div>
+            <div class="row">
+                <div class="col-4">
+                    <div class="form-group">
+                        <label for="semester_id">{{ trans('cruds.cetak.fields.semester') }}</label>
+                        <select class="form-control select2 {{ $errors->has('semester') ? 'is-invalid' : '' }}" name="semester_id" id="semester_id">
+                            @foreach($semesters as $id => $entry)
+                                <option value="{{ $id }}" {{ (old('semester_id') ? old('semester_id') : setting('current_semester') ?? '') == $id ? 'selected' : '' }}>{{ $entry }}</option>
+                            @endforeach
+                        </select>
+                        @if($errors->has('semester'))
+                            <span class="text-danger">{{ $errors->first('semester') }}</span>
+                        @endif
+                        <span class="help-block">{{ trans('cruds.cetak.fields.semester_helper') }}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-4">
+                    <button id="buttonChange" class="btn btn-primary mr-2">Pindah Semester</button>
+                </div>
+            </div>
         </form>
     </div>
 
@@ -125,7 +146,12 @@ $(function () {
     serverSide: true,
     retrieve: true,
     aaSorting: [],
-    ajax: "{{ route('admin.bills.index') }}",
+    ajax: {
+        url: "{{ route('admin.bills.index') }}",
+        data: function(data) {
+            data.semester = $('#semester_id').val()
+        }
+    },
     columns: [
         { data: 'placeholder', name: 'placeholder' },
         { data: 'salesperson_name', name: 'salesperson.name' },
@@ -149,7 +175,7 @@ $(function () {
           .columns.adjust();
   });
 
-  var picker = new easepick.create({
+    var picker = new easepick.create({
         element: $('#date').get(0),
         css: [
             'https://cdn.jsdelivr.net/npm/@easepick/bundle@1.2.0/dist/index.css',
@@ -173,6 +199,11 @@ $(function () {
 
         picker.clear();
         $(e.currentTarget).hide();
+    });
+
+    $("#buttonChange").click(function(event) {
+        event.preventDefault();
+        table.ajax.reload();
     });
 });
 

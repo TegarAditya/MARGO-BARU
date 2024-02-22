@@ -12,6 +12,12 @@
             <button class="btn btn-primary" data-toggle="modal" data-target="#importModal">
                 Import
             </button>
+            <form method="POST" action="{{ route('admin.books.export') }}" enctype="multipart/form-data">
+                {{ csrf_field() }}
+                <button type="submit" class="btn btn-primary">
+                    Export
+                </button>
+            </form>
             @include('csvImport.import_modal', ['model' => 'Book', 'route' => 'admin.books.import'])
         </div>
     </div>

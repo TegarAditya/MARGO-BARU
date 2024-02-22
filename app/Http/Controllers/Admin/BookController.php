@@ -27,6 +27,7 @@ use Yajra\DataTables\Facades\DataTables;
 use Alert;
 use Excel;
 use App\Imports\BookImport;
+use App\Exports\BookExport;
 use App\Services\StockService;
 
 class BookController extends Controller
@@ -613,5 +614,10 @@ class BookController extends Controller
     {
         $filepath = public_path('import-template\BOOK_TEMPLATE.xlsx');
         return response()->download($filepath);
+    }
+
+    public function export()
+    {
+        return (new BookExport())->download('BOOK_EXPORT.xlsx');
     }
 }
