@@ -40,15 +40,15 @@ class BillController extends Controller
             $table->addColumn('placeholder', '&nbsp;');
             $table->addColumn('actions', '&nbsp;');
 
-            $table->editColumn('actions', function ($row) {
+            $table->editColumn('actions', function ($row) use($semester) {
                 $btn = '
-                    <a class="px-1" href="'.route('admin.bills.billing', ['salesperson' => $row->salesperson_id]).'" title="Show">
+                    <a class="px-1" href="'.route('admin.bills.billing', ['salesperson' => $row->salesperson_id, 'semester' => $semester]).'" title="Show">
                         <i class="fas fa-eye text-success fa-lg"></i>
                     </a>
-                    <a class="px-1" href="'.route('admin.bills.cetakBilling', ['salesperson' => $row->salesperson_id]).'" title="Print Saldo" target="_blank">
+                    <a class="px-1" href="'.route('admin.bills.cetakBilling', ['salesperson' => $row->salesperson_id, 'semester' => $semester]).'" title="Print Saldo" target="_blank">
                         <i class="fas fa-print text-secondary fa-lg"></i>
                     </a>
-                    <a class="px-1" href="'.route('admin.bills.cetakBilling', ['salesperson' => $row->salesperson_id, 'rekap' => 1]).'" title="Print Rekap Saldo" target="_blank">
+                    <a class="px-1" href="'.route('admin.bills.cetakBilling', ['salesperson' => $row->salesperson_id, 'semester' => $semester, 'rekap' => 1]).'" title="Print Rekap Saldo" target="_blank">
                         <i class="fas fa-print text-danger fa-lg"></i>
                     </a>
                 ';
@@ -281,7 +281,7 @@ class BillController extends Controller
     public function billing(Request $request)
     {
         $salesperson = $request->salesperson;
-        $semester = setting('current_semester');
+        $semester = $request->semester ?? setting('current_semester');
 
         $invoices = Invoice::with('invoice_items')->where('salesperson_id', $salesperson)->where('semester_id', $semester)->get();
         $adjustments = BillAdjustment::where('salesperson_id', $salesperson)->where('semester_id', $semester)->get();
@@ -328,7 +328,7 @@ class BillController extends Controller
     public function cetakBilling(Request $request)
     {
         $salesperson = $request->salesperson;
-        $semester = setting('current_semester');
+        $semester = $request->semester ?? setting('current_semester');
 
         $invoices = Invoice::with('invoice_items')->where('salesperson_id', $salesperson)->where('semester_id', $semester)->get();
         $adjustments = BillAdjustment::where('salesperson_id', $salesperson)->where('semester_id', $semester)->get();
