@@ -153,7 +153,7 @@ class CetakController extends Controller
             'date' => 'required',
             'semester_id' => 'required',
             'vendor_id' => 'required',
-            'jenjang_id' => 'required',
+            'jenjang_id' => 'nullable',
             'type' => 'required',
             'note' => 'nullable',
             'products' => 'required|array',
@@ -169,7 +169,7 @@ class CetakController extends Controller
         $date = $validatedData['date'];
         $semester = $validatedData['semester_id'] ?? setting('current_semester');
         $vendor = $validatedData['vendor_id'];
-        $jenjang = $validatedData['jenjang_id'];
+        $jenjang = $validatedData['jenjang_id'] ?? null;
         $type = $validatedData['type'];
         $note = $validatedData['note'];
         $products = $validatedData['products'];
@@ -537,9 +537,9 @@ class CetakController extends Controller
     {
         $cetak->load('semester', 'vendor');
 
-        $cetak_items = CetakItem::with('product', 'product.jenjang', 'product.isi', 'product.cover', 'product.kurikulum')->where('cetak_id', $cetak->id)->get();
+        $cetak_items = CetakItem::with('product', 'product.jenjang', 'product.isi', 'product.cover', 'product.kurikulum')->where('cetak_id', $cetak->id)->orderBy('id', 'ASC')->get();
 
-        $cetak_items = $cetak_items->sortBy('product.nama_urut')->sortBy('product.kurikulum_id')->sortBy('product.jenjang_id');
+        // $cetak_items = $cetak_items->sortBy('product.nama_urut')->sortBy('product.kurikulum_id')->sortBy('product.jenjang_id');
 
         if($cetak->type == 'isi') {
             return view('admin.cetaks.spc_isi', compact('cetak', 'cetak_items'));

@@ -23,7 +23,7 @@
         <tr>
             <td><strong>Jenjang</strong></td>
             <td>:</td>
-            <td>{{ $cetak->jenjang->name }}</td>
+            <td>{{ $cetak->jenjang->name ?? 'Semua' }}</td>
         </tr>
 
         <tr>
