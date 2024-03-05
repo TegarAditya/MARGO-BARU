@@ -33,6 +33,7 @@ class UpdateTransactionTotal
         $semester = $transaction->semester_id;
 
         $sum_amount = Transaction::where('salesperson_id', $salesperson)
+                    ->where('semester_id', $semester)
                     ->select('type', DB::raw('SUM(amount) as total_amount'))
                     ->groupBy('type')
                     ->get()
@@ -59,6 +60,7 @@ class UpdateTransactionTotal
                 'total_retur' => $sum_amount['retur'] ?? 0,
                 'total_bayar' => $sum_amount['bayar'] ?? 0,
                 'total_potongan' => $sum_amount['potongan'] ?? 0,
+                'semester_id' => $semester
             ]);
         }
 
