@@ -73,7 +73,7 @@
                         <span class="help-block">{{ trans('cruds.payment.fields.salesperson_helper') }}</span>
                     </div>
                 </div>
-                {{-- <div class="col-6">
+                <div class="col-6">
                     <div class="form-group">
                         <label class="required" for="semester_id">{{ trans('cruds.payment.fields.semester') }}</label>
                         <select class="form-control select2 {{ $errors->has('semester') ? 'is-invalid' : '' }}" name="semester_id" id="semester_id" required>
@@ -86,7 +86,7 @@
                         @endif
                         <span class="help-block">{{ trans('cruds.payment.fields.semester_helper') }}</span>
                     </div>
-                </div> --}}
+                </div>
                 <div class="col-12">
                     <div id="tagihan">
                     </div>

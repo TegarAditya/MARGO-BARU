@@ -118,7 +118,7 @@ class PaymentController extends Controller
         $validatedData = $request->validate([
             'date' => 'required',
             'salesperson_id' => 'required',
-            // 'semester_id' => 'required',
+            'semester_id' => 'required',
             'payment_method' => 'required',
             'bayar' => 'required|numeric|min:1',
             'diskon' => 'nullable|numeric',
@@ -128,14 +128,14 @@ class PaymentController extends Controller
 
         $date = $validatedData['date'];
         $salesperson = $validatedData['salesperson_id'];
-        $semester = setting('current_semester');
+        $semester = $validatedData['semester_id'] ?? setting('current_semester');
         $payment_method = $validatedData['payment_method'];
         $bayar = $validatedData['bayar'];
         $diskon = $validatedData['diskon'];
         $nominal = $validatedData['nominal'];
         $note = $validatedData['note'];
 
-        $before = Bill::with('semester')->where('salesperson_id', $salesperson)->whereNot('semester_id', $semester)->where('piutang', '>' , 0)->oldest()->get();
+        $before = Bill::with('semester')->where('salesperson_id', $salesperson)->where('semester_id', '<', $semester)->where('piutang', '>' , 0)->oldest()->get();
 
         DB::beginTransaction();
         try {
@@ -148,7 +148,7 @@ class PaymentController extends Controller
                             'date' => $date,
                             'salesperson_id' => $salesperson,
                             'semester_id' => $bill->semester_id,
-                            'semester_bayar_id' => setting('current_semester'),
+                            'semester_bayar_id' => $semester,
                             'paid' => $paid,
                             'discount' => 0,
                             'amount' => $paid,
@@ -165,11 +165,11 @@ class PaymentController extends Controller
             }
             if ($bayar > 0 || $diskon > 0) {
                 $payment = Payment::create([
-                    'no_kwitansi' => Payment::generateNoKwitansi(setting('current_semester')),
+                    'no_kwitansi' => Payment::generateNoKwitansi($semester),
                     'date' => $date,
                     'salesperson_id' => $salesperson,
-                    'semester_id' => setting('current_semester'),
-                    'semester_bayar_id' => setting('current_semester'),
+                    'semester_id' => $semester,
+                    'semester_bayar_id' => $semester,
                     'paid' => $bayar,
                     'discount' => $diskon,
                     'amount' => $bayar + $diskon,
@@ -177,8 +177,8 @@ class PaymentController extends Controller
                     'note' => $note
                 ]);
 
-                TransactionService::createTransaction($date, 'Pembayaran dengan No Kwitansi ' .$payment->no_kwitansi.' dan Catatan :'. $note, $salesperson, setting('current_semester'), 'bayar', $payment->id, $payment->no_kwitansi, $bayar, 'credit');
-                TransactionService::createTransaction($date, 'Diskon Dari Pembayaran dengan No Kwitansi ' .$payment->no_kwitansi.' dan Catatan :'. $note, $salesperson, setting('current_semester'), 'potongan', $payment->id, $payment->no_kwitansi, $diskon, 'credit');
+                TransactionService::createTransaction($date, 'Pembayaran dengan No Kwitansi ' .$payment->no_kwitansi.' dan Catatan :'. $note, $salesperson, $semester, 'bayar', $payment->id, $payment->no_kwitansi, $bayar, 'credit');
+                TransactionService::createTransaction($date, 'Diskon Dari Pembayaran dengan No Kwitansi ' .$payment->no_kwitansi.' dan Catatan :'. $note, $salesperson, $semester, 'potongan', $payment->id, $payment->no_kwitansi, $diskon, 'credit');
             }
             DB::commit();
 
@@ -246,8 +246,8 @@ class PaymentController extends Controller
                 'note' => $note
             ]);
 
-            TransactionService::editTransaction($date, 'Pembayaran dengan No Kwitansi ' .$no_kwitansi.' dan Catatan :'. $note, $salesperson, setting('current_semester'), 'bayar', $payment->id, $no_kwitansi, $bayar, 'credit');
-            TransactionService::editTransaction($date, 'Diskon dari Pembayaran dengan No Kwitansi ' .$no_kwitansi.' dan Catatan :'. $note, $salesperson, setting('current_semester'), 'potongan', $payment->id, $no_kwitansi, $diskon, 'credit');
+            TransactionService::editTransaction($date, 'Pembayaran dengan No Kwitansi ' .$no_kwitansi.' dan Catatan :'. $note, $salesperson, $semester, 'bayar', $payment->id, $no_kwitansi, $bayar, 'credit');
+            TransactionService::editTransaction($date, 'Diskon dari Pembayaran dengan No Kwitansi ' .$no_kwitansi.' dan Catatan :'. $note, $salesperson, $semester, 'potongan', $payment->id, $no_kwitansi, $diskon, 'credit');
 
             DB::commit();
 
