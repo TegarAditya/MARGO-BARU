@@ -27,13 +27,17 @@ h1, h2, h3, h4, h5, h6 {
 
 
 @media print {
+    html, body {
+        width: 210mm;
+        height: 297mm;
+      }
+
     .pagebreak {
         page-break-before: always;
     }
 }
 
 @page {
-    size: auto;
     size: A4;
     margin: 10mm;
 }

@@ -578,10 +578,10 @@ class FinishingController extends Controller
         if ($request->has('masuk')) {
             $query = FinishingMasuk::select('no_spk', DB::raw('sum(quantity) as quantity'))->whereBetween('date', [$start, $end]);
             if (!empty($request->vendor_id)) {
-                $query->where('vendor_id', $request->vendor);
+                $query->where('vendor_id', $request->vendor_id);
             }
             if (!empty($request->semester_id)) {
-                $query->where('semester_id', $request->semester);
+                $query->where('semester_id', $request->semester_id);
             }
 
             $masuk = $query->groupBy('no_spk')->orderBy('date', 'ASC')->get();
@@ -592,10 +592,10 @@ class FinishingController extends Controller
         $query = Finishing::whereBetween('date', [$start, $end]);
 
         if (!empty($request->vendor_id)) {
-            $query->where('vendor_id', $request->vendor);
+            $query->where('vendor_id', $request->vendor_id);
         }
         if (!empty($request->semester_id)) {
-            $query->where('semester_id', $request->semester);
+            $query->where('semester_id', $request->semester_id);
         }
 
         $rekap = $query->orderBy('date', 'ASC')->get();
