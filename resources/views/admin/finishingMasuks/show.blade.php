@@ -14,7 +14,7 @@
                     <tbody>
                         <tr>
                             <th width="30%">
-                                {{ trans('cruds.finishingMasuk.fields.no_spk') }}
+                                No SPK (Dari SJ Vendor)
                             </th>
                             <td>
                                 {{ $finishingMasuk->no_spk }}
@@ -22,7 +22,7 @@
                         </tr>
                         <tr>
                             <th>
-                                {{ trans('cruds.finishingMasuk.fields.date') }}
+                                Tanggal SPK (Dari SJ Vendor)
                             </th>
                             <td>
                                 {{ $finishingMasuk->date }}

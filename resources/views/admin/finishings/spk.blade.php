@@ -23,7 +23,7 @@
         <tr>
             <td><strong>Jenjang</strong></td>
             <td>:</td>
-            <td>{{ $finishing->jenjang->name }}</td>
+            <td>{{ $finishing->jenjang->name ?? '-' }}</td>
         </tr>
 
     </tbody>

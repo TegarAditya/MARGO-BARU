@@ -15,6 +15,7 @@ use App\Models\VendorCost;
 use App\Models\BookVariant;
 use App\Models\Halaman;
 use App\Models\Jenjang;
+use App\Models\Kurikulum;
 use App\Models\Isi;
 use App\Models\Cover;
 use App\Models\PlatePrint;
@@ -135,6 +136,8 @@ class CetakController extends Controller
 
         $semesters = Semester::latest()->where('status', 1)->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
+        $kurikulums = Kurikulum::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+
         $vendors = Vendor::where('type', 'cetak')->orderBy('code', 'ASC')->get()->pluck('full_name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
         $jenjangs = Jenjang::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
@@ -143,7 +146,7 @@ class CetakController extends Controller
 
         $today = Carbon::now()->format('d-m-Y');
 
-        return view('admin.cetaks.create', compact('semesters', 'vendors', 'jenjangs', 'no_spc', 'today'));
+        return view('admin.cetaks.create', compact('semesters', 'kurikulums', 'vendors', 'jenjangs', 'no_spc', 'today'));
     }
 
     public function store(Request $request)
@@ -274,7 +277,7 @@ class CetakController extends Controller
 
         $vendors = Vendor::where('type', 'cetak')->orderBy('code', 'ASC')->get()->pluck('full_name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
-        $jenjangs = Jenjang::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $jenjangs = Jenjang::pluck('name', 'id')->prepend('Tidak Dipilih', '');
 
         $no_spc = noRevisi($cetak->no_spc);
 
@@ -427,7 +430,7 @@ class CetakController extends Controller
 
         $cetak->load('semester', 'vendor');
 
-        $cetak_items = CetakItem::with('product')->where('cetak_id', $cetak->id)->get();
+        $cetak_items = CetakItem::with('product')->where('cetak_id', $cetak->id)->orderBy('id', 'ASC')->get();
 
         return view('admin.cetaks.show', compact('cetak', 'cetak_items'));
     }

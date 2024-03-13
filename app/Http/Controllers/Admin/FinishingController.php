@@ -14,6 +14,7 @@ use App\Models\Vendor;
 use App\Models\BookVariant;
 use App\Models\Halaman;
 use App\Models\Jenjang;
+use App\Models\Kurikulum;
 use Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -118,6 +119,8 @@ class FinishingController extends Controller
 
         $semesters = Semester::latest()->where('status', 1)->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
+        $kurikulums = Kurikulum::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+
         $vendors = Vendor::where('type', 'finishing')->orderBy('code', 'ASC')->get()->pluck('full_name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
         $jenjangs = Jenjang::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
@@ -126,7 +129,7 @@ class FinishingController extends Controller
 
         $today = Carbon::now()->format('d-m-Y');
 
-        return view('admin.finishings.create', compact('semesters', 'vendors', 'jenjangs', 'no_spk', 'today'));
+        return view('admin.finishings.create', compact('semesters', 'kurikulums', 'vendors', 'jenjangs', 'no_spk', 'today'));
     }
 
     public function store(Request $request)
@@ -135,7 +138,7 @@ class FinishingController extends Controller
         $validatedData = $request->validate([
             'date' => 'required',
             'semester_id' => 'required',
-            'jenjang_id' => 'required',
+            'jenjang_id' => 'nullable',
             'vendor_id' => 'required',
             'note' => 'nullable',
             'products' => 'required|array',
@@ -147,7 +150,7 @@ class FinishingController extends Controller
         $date = $validatedData['date'];
         $semester = $validatedData['semester_id'] ?? setting('current_semester');
         $vendor = $validatedData['vendor_id'];
-        $jenjang = $validatedData['jenjang_id'];
+        $jenjang = $validatedData['jenjang_id'] ?? null;
         $note = $validatedData['note'];
         $products = $validatedData['products'];
         $quantities = $validatedData['quantities'];
@@ -218,7 +221,7 @@ class FinishingController extends Controller
 
         $vendors = Vendor::where('type', 'finishing')->orderBy('code', 'ASC')->get()->pluck('full_name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
-        $jenjangs = Jenjang::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $jenjangs = Jenjang::pluck('name', 'id')->prepend('Tidak Dipilih', '');
 
         $finishing_items = FinishingItem::with('product', 'product.components')->where('finishing_id', $finishing->id)->get();
 
@@ -330,7 +333,7 @@ class FinishingController extends Controller
 
         $finishing->load('semester', 'vendor');
 
-        $finishing_items = FinishingItem::with('product')->where('finishing_id', $finishing->id)->get();
+        $finishing_items = FinishingItem::with('product')->where('finishing_id', $finishing->id)->orderBy('id', 'ASC')->get();
 
         return view('admin.finishings.show', compact('finishing', 'finishing_items'));
     }
@@ -441,10 +444,11 @@ class FinishingController extends Controller
         $semesters = Semester::latest()->where('status', 1)->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
         $vendors = Vendor::where('type', 'finishing')->get()->pluck('full_name', 'id')->prepend(trans('global.pleaseSelect'), '');
         $jenjangs = Jenjang::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $kurikulums = Kurikulum::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
         $today = Carbon::now()->format('d-m-Y');
 
-        return view('admin.finishings.masuk', compact('semesters', 'vendors', 'jenjangs', 'today'));
+        return view('admin.finishings.masuk', compact('semesters', 'vendors', 'jenjangs', 'kurikulums', 'today'));
     }
 
     public function masukStore(Request $request)
@@ -534,7 +538,7 @@ class FinishingController extends Controller
     {
         $finishing->load('semester', 'vendor');
 
-        $finishing_items = FinishingItem::with('product')->where('finishing_id', $finishing->id)->get();
+        $finishing_items = FinishingItem::with('product')->where('finishing_id', $finishing->id)->orderBy('id', 'ASC')->get();
 
         return view('admin.finishings.spk', compact('finishing', 'finishing_items'));
     }

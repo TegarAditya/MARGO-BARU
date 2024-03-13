@@ -768,6 +768,7 @@ class BookVariantController extends Controller
         $keyword = $request->input('q');
         $type = $request->input('type');
         $jenjang = $request->input('jenjang');
+        $kurikulum = $request->input('kurikulum');
         $cover_isi = $request->input('cover_isi');
 
         if(empty($type)) {
@@ -789,6 +790,10 @@ class BookVariantController extends Controller
 
         if (!empty($jenjang)) {
             $query->where('jenjang_id', $jenjang);
+        }
+
+        if (!empty($kurikulum)) {
+            $query->where('kurikulum_id', $kurikulum);
         }
 
         if (!empty($cover_isi)) {
@@ -821,6 +826,7 @@ class BookVariantController extends Controller
         $type = $request->input('type');
         $semester = $request->input('semester') ?? setting('current_semester');
         $jenjang = $request->input('jenjang');
+        $kurikulum = $request->input('kurikulum');
         $cover_isi = $request->input('cover_isi');
         $estimasi = $request->input('estimasi') ?? 1;
 
@@ -850,6 +856,10 @@ class BookVariantController extends Controller
 
         if (!empty($jenjang)) {
             $query->where('jenjang_id', $jenjang);
+        }
+
+        if (!empty($kurikulum)) {
+            $query->where('kurikulum_id', $kurikulum);
         }
 
         if (!empty($cover_isi)) {
@@ -901,6 +911,7 @@ class BookVariantController extends Controller
         $keyword = $request->input('q');
         $vendor = $request->input('vendor');
         $jenjang = $request->input('jenjang');
+        $kurikulum = $request->input('kurikulum');
         $semester = $request->input('semester');
 
         $query = FinishingItem::join('book_variants', 'book_variants.id', '=', 'finishing_items.product_id')
@@ -916,6 +927,10 @@ class BookVariantController extends Controller
 
                     if (!empty($jenjang)) {
                         $query->where('book_variants.jenjang_id', $jenjang);
+                    }
+
+                    if (!empty($kurikulum)) {
+                        $query->where('book_variants.kurikulum_id', $kurikulum);
                     }
 
                     if (!empty($vendor)) {

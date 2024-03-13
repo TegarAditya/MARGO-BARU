@@ -60,8 +60,8 @@
                 </div>
                 <div class="col-6">
                     <div class="form-group">
-                        <label class="required" for="jenjang_id">{{ trans('cruds.bookVariant.fields.jenjang') }}</label>
-                        <select class="form-control select2 {{ $errors->has('jenjang') ? 'is-invalid' : '' }}" name="jenjang_id" id="jenjang_id" required>
+                        <label for="jenjang_id">{{ trans('cruds.bookVariant.fields.jenjang') }}</label>
+                        <select class="form-control select2 {{ $errors->has('jenjang') ? 'is-invalid' : '' }}" name="jenjang_id" id="jenjang_id">
                             @foreach($jenjangs as $id => $entry)
                                 <option value="{{ $id }}" {{ old('jenjang_id') == $id ? 'selected' : '' }}>{{ $entry }}</option>
                             @endforeach
@@ -70,6 +70,20 @@
                             <span class="text-danger">{{ $errors->first('jenjang') }}</span>
                         @endif
                         <span class="help-block">{{ trans('cruds.bookVariant.fields.jenjang_helper') }}</span>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="form-group">
+                        <label for="kurikulum_id">{{ trans('cruds.book.fields.kurikulum') }}</label>
+                        <select class="form-control select2 {{ $errors->has('kurikulum') ? 'is-invalid' : '' }}" name="kurikulum_id" id="kurikulum_id">
+                            @foreach($kurikulums as $id => $entry)
+                                <option value="{{ $id }}" {{ old('kurikulum_id') == $id ? 'selected' : '' }}>{{ $entry }}</option>
+                            @endforeach
+                        </select>
+                        @if($errors->has('kurikulum'))
+                            <span class="text-danger">{{ $errors->first('kurikulum') }}</span>
+                        @endif
+                        <span class="help-block">{{ trans('cruds.book.fields.kurikulum_helper') }}</span>
                     </div>
                 </div>
                 <div class="col-12">
@@ -125,6 +139,7 @@
                             q: params.term,
                             type: 'finishing',
                             jenjang: $('#jenjang_id').val(),
+                            kurikulum: $('#kurikulum_id').val(),
                             semester: $('#semester_id').val()
                         };
                     },
