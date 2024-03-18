@@ -128,9 +128,11 @@ class FinishingMasukController extends Controller
 
         $finishingMasuk->load('vendor', 'semester', 'created_by', 'updated_by');
 
-        $finishing_items = FinishingMasuk::with('product')->where('no_spk', $finishingMasuk->no_spk)->get();
+        $finishing_items = FinishingMasuk::with('product')->where('no_spk', $finishingMasuk->no_spk)->orderBy('id', 'ASC')->get();
 
-        return view('admin.finishingMasuks.show', compact('finishingMasuk', 'finishing_items'));
+        $finishing_date = FinishingMasuk::select('date')->where('no_spk', $finishingMasuk->no_spk)->distinct()->get();
+
+        return view('admin.finishingMasuks.show', compact('finishingMasuk', 'finishing_items', 'finishing_date'));
     }
 
     public function destroy(FinishingMasuk $finishingMasuk)

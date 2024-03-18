@@ -25,7 +25,10 @@
                                 Tanggal SPK (Dari SJ Vendor)
                             </th>
                             <td>
-                                {{ $finishingMasuk->date }}
+                                @foreach ($finishing_date as $date)
+                                    {{ $date->date }}
+                                    <br>
+                                @endforeach
                             </td>
                         </tr>
                         <tr>
@@ -80,6 +83,7 @@
                                     <th class="text-center" width="1%">No.</th>
                                     <th>Nama Produk</th>
                                     <th class="text-center px-2" width="1%">Halaman</th>
+                                    <th class="text-center px-2" width="1%">Tanggal</th>
                                     <th class="text-center px-2">Buku Masuk</th>
                                     <th class="text-center px-2">SPK / Realisasi</th>
                                 </tr>
@@ -102,6 +106,7 @@
                                         <td class="text-right px-3">{{ $loop->iteration }}.</td>
                                         <td>{{ $product->name }}</td>
                                         <td class="text-center px-2">{{ $product->halaman->code ?? null }}</td>
+                                        <td class="text-center px-2">{{ $item->date ?? null }}</td>
                                         <td class="text-center px-2">{{ angka($item->quantity) }}</td>
                                         <td class="text-center px-2">{{ angka($item->finishing_item->estimasi) }} / {{ angka($item->finishing_item->quantity) }}</td>
                                     </tr>
@@ -109,7 +114,7 @@
                             </tbody>
                             <tfoot>
                                 <tr>
-                                    <td class="text-center px-3" colspan="3"><strong>Total</strong></td>
+                                    <td class="text-center px-3" colspan="4"><strong>Total</strong></td>
                                     <td class="text-center px-2"><strong>{{ angka($totalinput) }}</strong></td>
                                     <td class="text-center px-2"><strong>{{ angka($totalestimasi) }} / {{ angka($totalrealisasi) }}</strong></td>
                                 </tr>
