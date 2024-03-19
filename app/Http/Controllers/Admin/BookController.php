@@ -40,6 +40,29 @@ class BookController extends Controller
 
         if ($request->ajax()) {
             $query = Book::with(['jenjang', 'kurikulum', 'mapel', 'kelas', 'cover', 'semester'])->select(sprintf('%s.*', (new Book)->table));
+
+            if (!empty($request->semester)) {
+                $query->where('semester_id', $request->semester);
+            }
+            if (!empty($request->jenjang)) {
+                $query->where('jenjang_id', $request->jenjang);
+            }
+            if (!empty($request->isi)) {
+                $query->where('isi_id', $request->isi);
+            }
+            if (!empty($request->cover)) {
+                $query->where('cover_id', $request->cover);
+            }
+            if (!empty($request->kurikulum)) {
+                $query->where('kurikulum_id', $request->kurikulum);
+            }
+            if (!empty($request->kelas)) {
+                $query->where('kelas_id', $request->kelas);
+            }
+            if (!empty($request->mapel)) {
+                $query->where('mapel_id', $request->mapel);
+            }
+
             $table = Datatables::of($query);
 
             $table->addColumn('placeholder', '&nbsp;');
@@ -84,7 +107,23 @@ class BookController extends Controller
             return $table->make(true);
         }
 
-        return view('admin.books.index');
+        $jenjangs = Jenjang::pluck('name', 'id')->prepend('All', '');
+
+        $halamen = Halaman::pluck('name', 'id')->prepend('All', '');
+
+        $kurikulums = Kurikulum::pluck('name', 'id')->prepend('All', '');
+
+        $mapels = Mapel::pluck('name', 'id')->prepend('All', '');
+
+        $kelas = Kelas::pluck('name', 'id')->prepend('All', '');
+
+        $covers = Cover::pluck('name', 'id')->prepend('All', '');
+
+        $isis = Isi::pluck('name', 'id')->prepend('All', '');
+
+        $semesters = Semester::where('status', 1)->pluck('name', 'id')->prepend('All', '');
+
+        return view('admin.books.index', compact('covers', 'jenjangs', 'kelas', 'kurikulums', 'mapels', 'semesters', 'isis'));
     }
 
     public function create()

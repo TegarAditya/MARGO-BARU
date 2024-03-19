@@ -286,7 +286,7 @@ $(function () {
                 data.kurikulum = $('#kurikulum_id').val(),
                 data.jenjang = $('#jenjang_id').val(),
                 data.kelas = $('#kelas_id').val(),
-                data.mapel = $('#mapel_id').val()
+                data.mapel = $('#mapel_id').val(),
                 data.halaman = $('#halaman_id').val()
             }
         },
