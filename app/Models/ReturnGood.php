@@ -70,6 +70,11 @@ class ReturnGood extends Model
         return $this->belongsTo(Semester::class, 'semester_id');
     }
 
+    public function semester_retur()
+    {
+        return $this->belongsTo(Semester::class, 'semester_retur_id');
+    }
+
     public function created_by()
     {
         return $this->belongsTo(User::class, 'created_by_id');

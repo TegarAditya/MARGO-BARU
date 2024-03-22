@@ -285,7 +285,7 @@ class BillController extends Controller
 
         $invoices = Invoice::with('invoice_items')->where('salesperson_id', $salesperson)->where('semester_id', $semester)->get();
         $adjustments = BillAdjustment::where('salesperson_id', $salesperson)->where('semester_id', $semester)->get();
-        $returs = ReturnGood::with('retur_items')->where('salesperson_id', $salesperson)->where('semester_id', $semester)->get();
+        $returs = ReturnGood::with('retur_items')->where('salesperson_id', $salesperson)->where('semester_retur_id', $semester)->get();
         $payments = Payment::where('salesperson_id', $salesperson)->where('semester_bayar_id', $semester)->get();
 
         $bills = collect([]);
@@ -307,7 +307,7 @@ class BillController extends Controller
             foreach($bills as $item) {
                 $faktur = Invoice::with('invoice_items')->where('salesperson_id', $salesperson)->where('semester_id', $item->semester_id)->get();
                 $adjustment = BillAdjustment::with('retur_items')->where('salesperson_id', $salesperson)->where('semester_id', $item->semester_id)->get();
-                $retur = ReturnGood::with('retur_items')->where('salesperson_id', $salesperson)->where('semester_id', $item->semester_id)->get();
+                $retur = ReturnGood::with('retur_items')->where('salesperson_id', $salesperson)->where('semester_retur_id', $item->semester_id)->get();
                 $bayar = Payment::where('salesperson_id', $salesperson)->where('semester_bayar_id', $item->semester_id)->get();
 
                 $invoices_old = $invoices_old->merge($faktur);
@@ -332,7 +332,7 @@ class BillController extends Controller
 
         $invoices = Invoice::with('invoice_items')->where('salesperson_id', $salesperson)->where('semester_id', $semester)->get();
         $adjustments = BillAdjustment::where('salesperson_id', $salesperson)->where('semester_id', $semester)->get();
-        $returs = ReturnGood::with('retur_items')->where('salesperson_id', $salesperson)->where('semester_id', $semester)->get();
+        $returs = ReturnGood::with('retur_items')->where('salesperson_id', $salesperson)->where('semester_retur_id', $semester)->get();
         $payments = Payment::where('salesperson_id', $salesperson)->where('semester_bayar_id', $semester)->get();
         $billing = Bill::where('salesperson_id', $salesperson)->where('semester_id', $semester)->first();
 
@@ -355,7 +355,7 @@ class BillController extends Controller
             foreach($bills as $item) {
                 $faktur = Invoice::with('invoice_items')->where('salesperson_id', $salesperson)->where('semester_id', $item->semester_id)->get();
                 $adjustment = BillAdjustment::with('retur_items')->where('salesperson_id', $salesperson)->where('semester_id', $item->semester_id)->get();
-                $retur = ReturnGood::with('retur_items')->where('salesperson_id', $salesperson)->where('semester_id', $item->semester_id)->get();
+                $retur = ReturnGood::with('retur_items')->where('salesperson_id', $salesperson)->where('semester_retur_id', $item->semester_id)->get();
                 $bayar = Payment::where('salesperson_id', $salesperson)->where('semester_bayar_id', $item->semester_id)->get();
 
                 $invoices_old = $invoices_old->merge($faktur);
