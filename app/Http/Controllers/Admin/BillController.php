@@ -65,28 +65,28 @@ class BillController extends Controller
             });
 
             $table->editColumn('saldo_awal', function ($row) {
-                return $row->saldo_awal ? $row->saldo_awal : 0;
+                return $row->saldo_awal ? angka($row->saldo_awal): 0;
             });
             $table->editColumn('jual', function ($row) {
-                return $row->jual ? $row->jual : 0;
+                return $row->jual ? angka($row->jual) : 0;
             });
             $table->editColumn('diskon', function ($row) {
-                return $row->diskon ? $row->diskon : 0;
+                return $row->diskon ? angka($row->diskon) : 0;
             });
             $table->editColumn('adjustment', function ($row) {
-                return $row->adjustment ? $row->adjustment : 0;
+                return $row->adjustment ? angka($row->adjustment) : 0;
             });
             $table->editColumn('retur', function ($row) {
-                return $row->retur ? $row->retur : 0;
+                return $row->retur ? angka($row->retur) : 0;
             });
             $table->editColumn('bayar', function ($row) {
-                return $row->bayar ? $row->bayar : 0;
+                return $row->bayar ? angka($row->bayar) : 0;
             });
             $table->editColumn('potongan', function ($row) {
-                return $row->potongan ? $row->potongan : 0;
+                return $row->potongan ? angka($row->potongan) : 0;
             });
             $table->editColumn('saldo_akhir', function ($row) {
-                return $row->saldo_akhir ? $row->saldo_akhir : 0;
+                return $row->saldo_akhir ? angka($row->saldo_akhir) : 0;
             });
 
             $table->rawColumns(['actions', 'placeholder', 'semester', 'salesperson']);
