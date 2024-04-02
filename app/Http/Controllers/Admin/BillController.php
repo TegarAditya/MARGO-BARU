@@ -34,7 +34,7 @@ class BillController extends Controller
         $semester = $request->semester ? $request->semester : setting('current_semester');
 
         if ($request->ajax()) {
-            $query = Bill::with(['semester', 'salesperson'])->where('semester_id', $semester)->select(sprintf('%s.*', (new Bill)->table))->orderBy('salesperson_id', 'ASC');
+            $query = Bill::with(['semester', 'salesperson'])->where('semester_id', $semester)->select(sprintf('%s.*', (new Bill)->table));
             $table = Datatables::of($query);
 
             $table->addColumn('placeholder', '&nbsp;');
@@ -65,28 +65,28 @@ class BillController extends Controller
             });
 
             $table->editColumn('saldo_awal', function ($row) {
-                return $row->saldo_awal ? money($row->saldo_awal) : 0;
+                return $row->saldo_awal ? $row->saldo_awal : 0;
             });
             $table->editColumn('jual', function ($row) {
-                return $row->jual ? money($row->jual) : 0;
+                return $row->jual ? $row->jual : 0;
             });
             $table->editColumn('diskon', function ($row) {
-                return $row->diskon ? money($row->diskon) : 0;
+                return $row->diskon ? $row->diskon : 0;
             });
             $table->editColumn('adjustment', function ($row) {
-                return $row->adjustment ? money($row->adjustment) : 0;
+                return $row->adjustment ? $row->adjustment : 0;
             });
             $table->editColumn('retur', function ($row) {
-                return $row->retur ? money($row->retur) : 0;
+                return $row->retur ? $row->retur : 0;
             });
             $table->editColumn('bayar', function ($row) {
-                return $row->bayar ? money($row->bayar) : 0;
+                return $row->bayar ? $row->bayar : 0;
             });
             $table->editColumn('potongan', function ($row) {
-                return $row->potongan ? money($row->potongan) : 0;
+                return $row->potongan ? $row->potongan : 0;
             });
             $table->editColumn('saldo_akhir', function ($row) {
-                return $row->saldo_akhir ? money($row->saldo_akhir) : 0;
+                return $row->saldo_akhir ? $row->saldo_akhir : 0;
             });
 
             $table->rawColumns(['actions', 'placeholder', 'semester', 'salesperson']);

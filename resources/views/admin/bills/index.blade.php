@@ -155,18 +155,18 @@ $(function () {
     columns: [
         { data: 'placeholder', name: 'placeholder' },
         { data: 'salesperson_name', name: 'salesperson.name' },
-        { data: 'saldo_awal', name: 'saldo_awal', class: 'text-right' },
-        { data: 'jual', name: 'jual', class: 'text-right' },
-        { data: 'diskon', name: 'diskon', class: 'text-right' },
-        { data: 'adjustment', name: 'adjustment', class: 'text-right' },
-        { data: 'retur', name: 'retur', class: 'text-right' },
-        { data: 'bayar', name: 'bayar', class: 'text-right' },
-        { data: 'potongan', name: 'potongan', class: 'text-right' },
-        { data: 'saldo_akhir', name: 'saldo_akhir', class: 'text-right' },
+        { data: 'saldo_awal', name: 'saldo_awal', class: 'text-right', render: function(value) { return numeral(value).format('$0,0'); } },
+        { data: 'jual', name: 'jual', class: 'text-right', render: function(value) { return numeral(value).format('$0,0'); } },
+        { data: 'diskon', name: 'diskon', class: 'text-right', render: function(value) { return numeral(value).format('$0,0'); } },
+        { data: 'adjustment', name: 'adjustment', class: 'text-right', render: function(value) { return numeral(value).format('$0,0'); } },
+        { data: 'retur', name: 'retur', class: 'text-right', render: function(value) { return numeral(value).format('$0,0'); } },
+        { data: 'bayar', name: 'bayar', class: 'text-right', render: function(value) { return numeral(value).format('$0,0'); } },
+        { data: 'potongan', name: 'potongan', class: 'text-right', render: function(value) { return numeral(value).format('$0,0'); } },
+        { data: 'saldo_akhir', name: 'saldo_akhir', class: 'text-right', render: function(value) { return numeral(value).format('$0,0'); } },
         { data: 'actions', name: '{{ trans('global.actions') }}', class: 'text-center' }
     ],
     orderCellsTop: true,
-    // order: [[ 1, 'desc' ]],
+    order: [[ 1, 'asc' ]],
     pageLength: 50,
   };
   let table = $('.datatable-Bill').DataTable(dtOverrideGlobals);
