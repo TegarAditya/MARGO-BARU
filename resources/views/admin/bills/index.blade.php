@@ -154,7 +154,7 @@ $(function () {
     },
     columns: [
         { data: 'placeholder', name: 'placeholder' },
-        { data: 'salesperson_name', name: 'salesperson.name' },
+        { data: 'sales', name: 'sales' },
         { data: 'saldo_awal', name: 'saldo_awal', class: 'text-right', render: function(value) { return numeral(value).format('$0,0'); } },
         { data: 'jual', name: 'jual', class: 'text-right', render: function(value) { return numeral(value).format('$0,0'); } },
         { data: 'diskon', name: 'diskon', class: 'text-right', render: function(value) { return numeral(value).format('$0,0'); } },
@@ -166,7 +166,7 @@ $(function () {
         { data: 'actions', name: '{{ trans('global.actions') }}', class: 'text-center' }
     ],
     orderCellsTop: true,
-    order: [[ 1, 'asc' ]],
+    order: [[ 1, 'ASC' ]],
     pageLength: 50,
   };
   let table = $('.datatable-Bill').DataTable(dtOverrideGlobals);
