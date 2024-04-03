@@ -166,7 +166,7 @@ $(function () {
         { data: 'actions', name: '{{ trans('global.actions') }}', class: 'text-center' }
     ],
     orderCellsTop: true,
-    order: [[ 1, 'ASC' ]],
+    order: [[ 1, 'asc' ]],
     pageLength: 50,
   };
   let table = $('.datatable-Bill').DataTable(dtOverrideGlobals);

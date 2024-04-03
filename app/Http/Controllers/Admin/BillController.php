@@ -35,6 +35,16 @@ class BillController extends Controller
 
         if ($request->ajax()) {
             $query = Bill::with(['semester', 'salesperson'])->where('semester_id', $semester)->select(sprintf('%s.*', (new Bill)->table));
+            $order = $request->order;
+            if (is_array($order) && count($order)) {
+                $sortBy = $order[0]['column'] ?? null;
+                $sort = $order[0]['dir'] ?? null;
+
+                if ($sortBy == 1) {
+                    $query->orderBy('salesperson_id', $sort == 'asc' ? 'asc' : 'desc');
+                }
+            }
+
             $table = Datatables::of($query);
 
             $table->addColumn('placeholder', '&nbsp;');
@@ -58,6 +68,10 @@ class BillController extends Controller
 
             $table->addColumn('semester_name', function ($row) {
                 return $row->semester ? $row->semester->name : '';
+            });
+
+            $table->addColumn('kode', function ($row) {
+                return $row->salesperson ? (int) $row->salesperson->code : '';
             });
 
             $table->addColumn('sales', function ($row) {
