@@ -98,6 +98,9 @@
                         {{ trans('cruds.bill.fields.salesperson') }}
                     </th>
                     <th>
+                        {{ trans('cruds.bill.fields.salesperson') }}
+                    </th>
+                    <th>
                         {{ trans('cruds.bill.fields.saldo_awal') }}
                     </th>
                     <th>
@@ -154,6 +157,7 @@ $(function () {
     },
     columns: [
         { data: 'placeholder', name: 'placeholder' },
+        { data: 'salesperson_name', name: 'salesperson.name', visible: false },
         { data: 'sales', name: 'sales' },
         { data: 'saldo_awal', name: 'saldo_awal', class: 'text-right', render: function(value) { return numeral(value).format('$0,0'); } },
         { data: 'jual', name: 'jual', class: 'text-right', render: function(value) { return numeral(value).format('$0,0'); } },

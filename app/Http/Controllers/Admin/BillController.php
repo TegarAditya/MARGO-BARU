@@ -70,8 +70,8 @@ class BillController extends Controller
                 return $row->semester ? $row->semester->name : '';
             });
 
-            $table->addColumn('kode', function ($row) {
-                return $row->salesperson ? (int) $row->salesperson->code : '';
+            $table->addColumn('salesperson_name', function ($row) {
+                return $row->salesperson ? $row->salesperson->full_name : '';
             });
 
             $table->addColumn('sales', function ($row) {
@@ -103,7 +103,7 @@ class BillController extends Controller
                 return $row->saldo_akhir ? angka($row->saldo_akhir) : 0;
             });
 
-            $table->rawColumns(['actions', 'placeholder', 'semester']);
+            $table->rawColumns(['actions', 'placeholder', 'semester', 'salesperson']);
 
             return $table->make(true);
         }
