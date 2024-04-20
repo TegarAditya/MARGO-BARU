@@ -98,7 +98,7 @@ class Payment extends Model
     }
 
     public static function generateNoKwitansi($semester) {
-        $data = self::where('semester_id', $semester)->withTrashed()->count();
+        $data = self::withTrashed()->count();
         $semester = Semester::find($semester);
 
         $payment_number = !$data ? 1 : ($data + 1);
