@@ -40,7 +40,7 @@ class EstimasiCoverExport implements FromCollection, ShouldAutoSize
 
         $rows = collect([]);
 
-        $label = ['No.', 'Mapel', 'Kelas', 'Halaman'];
+        $label = ['No.', 'Mapel', 'Kelas', 'Halaman', 'Jenjang', 'Kurikulum'];
 
         foreach($isis as $isi) {
             array_push($label, 'Naskah '. $isi->code.' Estimasi');
@@ -59,7 +59,7 @@ class EstimasiCoverExport implements FromCollection, ShouldAutoSize
 
         foreach($products as $product) {
             $i++;
-            $item = [$i, $product->mapel->name, (string) $product->kelas?->code, (string) $product->halaman?->code];
+            $item = [$i, $product->mapel->name, (string) $product->kelas?->code, (string) $product->halaman?->code, (string) $product->jenjang?->name, (string) $product->kurikulum?->name];
 
             $product_filter =  $production_estimations->where('product.jenjang_id', $product->jenjang_id)
                     ->where('product.kurikulum_id', $product->kurikulum_id)
