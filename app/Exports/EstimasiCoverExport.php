@@ -32,7 +32,7 @@ class EstimasiCoverExport implements FromCollection, ShouldAutoSize
                             $q->where('semester_id', $this->semester)->where('type', 'L');
                     })->get();
 
-        $products = BookVariant::whereHas('estimasi_produksi')->with('jenjang', 'kurikulum', 'mapel', 'kelas', 'halaman')->distinct()->get(['jenjang_id', 'kurikulum_id', 'mapel_id', 'kelas_id', 'halaman_id']);
+        $products = BookVariant::whereHas('estimasi_produksi')->where('type', 'L')->with('jenjang', 'kurikulum', 'mapel', 'kelas', 'halaman')->distinct()->get(['jenjang_id', 'kurikulum_id', 'mapel_id', 'kelas_id', 'halaman_id']);
 
         $covers = Cover::whereHas('production_estimations')->get();
 
