@@ -329,8 +329,9 @@ class ProductionEstimationController extends Controller
         }
     }
 
-    public function coverExport()
+    public function coverExport(Request $request)
     {
-        return (new EstimasiCoverExport())->download('ESTIMASI PRODUKSI BY COVER.xlsx');
+        $semester = $request->semester_export_cover;
+        return (new EstimasiCoverExport($semester))->download('ESTIMASI PRODUKSI BY COVER ' . str_replace(array("/", "\\", ":", "*", "?", "«", "<", ">", "|"), "-", getSemesterName($semester)) .'.xlsx');
     }
 }

@@ -14,6 +14,14 @@ use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 class EstimasiCoverExport implements FromCollection, ShouldAutoSize
 {
     use Exportable;
+    private int $semester;
+
+
+    public function __construct(int $semester)
+    {
+        $this->semester = $semester;
+    }
+
     /**
     * @return \Illuminate\Support\Collection
     */
@@ -21,7 +29,7 @@ class EstimasiCoverExport implements FromCollection, ShouldAutoSize
     {
         $production_estimations = ProductionEstimation::with(['product'])
                     ->whereHas('product', function ($q) {
-                            $q->where('semester_id', setting('current_semester'))->where('type', 'L');
+                            $q->where('semester_id', $this->semester)->where('type', 'L');
                     })->get();
 
         $products = BookVariant::whereHas('estimasi_produksi')->with('jenjang', 'kurikulum', 'mapel', 'kelas', 'halaman')->distinct()->get(['jenjang_id', 'kurikulum_id', 'mapel_id', 'kelas_id', 'halaman_id']);

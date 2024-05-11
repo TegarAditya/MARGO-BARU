@@ -5,11 +5,35 @@
         <h1 class="m-0">Estimasi Produksi</h1>
     </div>
 </div>
-<div style="margin-bottom: 10px;" class="row">
-    <div class="col-lg-12">
-        <a class="btn btn-success" href="{{ route('admin.production-estimations.coverExport') }}">
-            Export By Cover
-        </a>
+<div class="card">
+    <div class="card-header">
+        <strong>EXPORT BY COVER</strong>
+    </div>
+    <div class="card-body">
+        <form action="{{ route('admin.production-estimations.coverExport') }}" enctype="multipart/form-data" method="GET">
+            <div class="row">
+                <div class="col-4">
+                    <div class="form-group">
+                        <label for="semester_id">{{ trans('cruds.book.fields.semester') }}</label>
+                        <select class="form-control select2 {{ $errors->has('semester') ? 'is-invalid' : '' }}" name="semester_export_cover">
+                            @foreach($semesters as $id => $entry)
+                                @if (!$id == '')
+                                <option value="{{ $id }}" {{ (old('semester_id') ? old('semester_id') : setting('current_semester') ?? '') == $id ? 'selected' : '' }}>{{ $entry }}</option>
+                                @endif
+                            @endforeach
+                        </select>
+                        @if($errors->has('semester'))
+                            <span class="text-danger">{{ $errors->first('semester') }}</span>
+                        @endif
+                        <span class="help-block">{{ trans('cruds.book.fields.semester_helper') }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group mt-3">
+                <button type="submit" class="btn btn-success">Export By Cover</button>
+            </div>
+        </form>
     </div>
 </div>
 <div class="card">
