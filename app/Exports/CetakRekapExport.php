@@ -43,8 +43,8 @@ class CetakRekapExport implements FromCollection, ShouldAutoSize
             $row = [
                 'no' => $i,
                 'date' => $item->date,
-                'vendor' => $item->vendor->name,
-                'jenjang' => $item->jenjang->name,
+                'vendor' => $item->vendor?->name,
+                'jenjang' => $item->jenjang?->name,
                 'no_spc' => $item->no_spc,
                 'oplagh' => (string) $item->estimasi_oplah,
                 'ongkos' => (string) $item->total_cost,
