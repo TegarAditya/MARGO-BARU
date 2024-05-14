@@ -612,11 +612,11 @@ class CetakController extends Controller
         if (!empty($request->type)) {
             $query->where('type', $request->type);
         }
-        if (!empty($request->vendor)) {
-            $query->where('vendor_id', $request->vendor);
+        if (!empty($request->vendor_id)) {
+            $query->where('vendor_id', $request->vendor_id);
         }
-        if (!empty($request->semester)) {
-            $query->where('semester_id', $request->semester);
+        if (!empty($request->semester_id)) {
+            $query->where('semester_id', $request->semester_id);
         }
 
         $rekap = $query->orderBy('date', 'ASC')->get();
