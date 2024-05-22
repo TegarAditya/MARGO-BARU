@@ -98,7 +98,8 @@
     </div>
 
     <div class="card-body">
-        <form id="filterform">
+        <form id="filterform"  method="POST" action="{{ route("admin.book-variants.export") }}" enctype="multipart/form-data">
+            @csrf
             <div class="row">
                 <div class="col-4">
                     <div class="form-group">
@@ -230,9 +231,8 @@
             </div>
 
             <div class="form-group mt-3">
-                <button class="btn btn-success" type="submit">
-                    Filter
-                </button>
+                <button id="buttonFilter" class="btn btn-success">Filter</button>
+                <button type="submit" value="export" name="export" class="btn btn-warning">Export</button>
             </div>
         </form>
     </div>
@@ -332,7 +332,7 @@ $(function () {
         .columns.adjust();
     });
 
-    $("#filterform").submit(function(event) {
+    $("#buttonFilter").click(function(event) {
         event.preventDefault();
         table.ajax.reload();
     });

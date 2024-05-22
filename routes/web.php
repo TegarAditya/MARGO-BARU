@@ -142,6 +142,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     Route::get('book-variants/get-info-finishing', 'BookVariantController@getInfoFinishing')->name('book-variants.getInfoFinishing');
     Route::get('book-variants/get-list-finishing', 'BookVariantController@getListFinishing')->name('book-variants.getListFinishing');
     Route::get('book-variants/get-list-finishing-info', 'BookVariantController@getInfoFinishingDetail')->name('book-variants.getListFinishingInfo');
+    Route::post('book-variants/export', 'BookVariantController@export')->name('book-variants.export');
     Route::resource('book-variants', 'BookVariantController');
 
     // Book Component

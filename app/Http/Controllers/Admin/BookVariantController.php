@@ -29,6 +29,7 @@ use Yajra\DataTables\Facades\DataTables;
 use DB;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Alert;
+use App\Exports\BookVariantExport;
 
 class BookVariantController extends Controller
 {
@@ -307,6 +308,43 @@ class BookVariantController extends Controller
         $media         = $model->addMediaFromRequest('upload')->toMediaCollection('ck-media');
 
         return response()->json(['id' => $media->id, 'url' => $media->getUrl()], Response::HTTP_CREATED);
+    }
+
+    public function export(Request $request)
+    {
+        $query = BookVariant::with(['jenjang', 'semester', 'kurikulum', 'halaman']);
+
+        if (!empty($request->type)) {
+            $query->where('type', $request->type);
+        }
+        if (!empty($request->semester)) {
+            $query->where('semester_id', $request->semester);
+        }
+        if (!empty($request->jenjang)) {
+            $query->where('jenjang_id', $request->jenjang);
+        }
+        if (!empty($request->isi)) {
+            $query->where('isi_id', $request->isi);
+        }
+        if (!empty($request->cover)) {
+            $query->where('cover_id', $request->cover);
+        }
+        if (!empty($request->kurikulum)) {
+            $query->where('kurikulum_id', $request->kurikulum);
+        }
+        if (!empty($request->kelas)) {
+            $query->where('kelas_id', $request->kelas);
+        }
+        if (!empty($request->mapel)) {
+            $query->where('mapel_id', $request->mapel);
+        }
+        if (!empty($request->halaman)) {
+            $query->where('halaman_id', $request->halaman);
+        }
+
+        $books = $query->orderBy('jenjang_id', 'ASC')->orderBy('mapel_id', 'ASC')->orderBy('kelas_id', 'ASC')->orderBy('isi_id', 'ASC')->orderBy('cover_id', 'ASC')->get();
+
+        return (new BookVariantExport($books))->download('EXPORT BOOK VARIANT.xlsx');
     }
 
     public function updatePrice(Request $request)
