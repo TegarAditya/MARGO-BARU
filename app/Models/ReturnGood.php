@@ -86,7 +86,7 @@ class ReturnGood extends Model
     }
 
     public static function generateNoRetur($semester) {
-        $data = self::where('semester_id', $semester)->withTrashed()->count();
+        $data = self::withTrashed()->count();
         $semester = Semester::find($semester);
 
         $order_number = !$data ? 1 : ($data + 1);
