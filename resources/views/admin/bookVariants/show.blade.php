@@ -176,7 +176,7 @@
                                     @endif
                                 </td>
                                 <td class="text-center">
-                                    @if ($stockMovement->reference->id)
+                                    @if ($stockMovement->reference)
                                         @if ($stockMovement->transaction_type == 'adjustment')
                                             <span class="mr-2"><a href="{{ route('admin.stock-adjustments.show', $stockMovement->reference->id) }}"><i class="fas fa-eye text-success fa-lg"></i></a></span> {{ 'Adjustment Tanggal :'. $stockMovement->reference->date }}
                                         @elseif ($stockMovement->transaction_type == 'delivery')
