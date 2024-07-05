@@ -176,26 +176,22 @@
                                     @endif
                                 </td>
                                 <td class="text-center">
-                                    @if ($stockMovement->reference)
-                                        @if ($stockMovement->transaction_type == 'adjustment')
-                                            <span class="mr-2"><a href="{{ route('admin.stock-adjustments.show', $stockMovement->reference->id) }}"><i class="fas fa-eye text-success fa-lg"></i></a></span> {{ 'Adjustment Tanggal :'. $stockMovement->reference->date }}
-                                        @elseif ($stockMovement->transaction_type == 'delivery')
-                                            <span class="mr-2"><a href="{{ route('admin.delivery-orders.show', $stockMovement->reference->id) }}"><i class="fas fa-eye text-success fa-lg"></i></a></span> {{ $stockMovement->reference->no_suratjalan}}
-                                        @elseif ($stockMovement->transaction_type == 'retur')
-                                            <span class="mr-2"><a href="{{ route('admin.return-goods.show', $stockMovement->reference->id) }}"><i class="fas fa-eye text-success fa-lg"></i></a></span> {{ $stockMovement->reference->no_retur }}
-                                        @elseif ($stockMovement->transaction_type == 'cetak')
-                                            <span class="mr-2"><a href="{{ route('admin.cetaks.show', $stockMovement->reference->id) }}"><i class="fas fa-eye text-success fa-lg"></i></a></span> {{ $stockMovement->reference->no_spc }}
-                                        @elseif ($stockMovement->transaction_type == 'produksi')
-                                            <span class="mr-2"><a href="{{ route('admin.finishings.show', $stockMovement->reference->id) }}"><i class="fas fa-eye text-success fa-lg"></i></a></span> {{ $stockMovement->reference->no_spk }}
-                                            @if ($stockMovement->finishing_masuk)
-                                                <br>
-                                                <span class="mr-2"><a href="{{ route('admin.finishing-masuks.show', $stockMovement->finishing_masuk) }}"><i class="fas fa-eye text-success fa-lg"></i></a></span> {{ $stockMovement->masuk->no_spk }}
-                                            @endif
-                                        @elseif ($stockMovement->transaction_type == 'awal')
-                                            Stock Awal
+                                    @if ($stockMovement->transaction_type == 'adjustment')
+                                        <span class="mr-2"><a href="{{ route('admin.stock-adjustments.show', $stockMovement->reference->id ?? '') }}"><i class="fas fa-eye text-success fa-lg"></i></a></span> {{ 'Adjustment Tanggal :'. $stockMovement->reference->date ?? '' }}
+                                    @elseif ($stockMovement->transaction_type == 'delivery')
+                                        <span class="mr-2"><a href="{{ route('admin.delivery-orders.show', $stockMovement->reference->id ?? '') }}"><i class="fas fa-eye text-success fa-lg"></i></a></span> {{ $stockMovement->reference->no_suratjalan  ?? ''}}
+                                    @elseif ($stockMovement->transaction_type == 'retur')
+                                        <span class="mr-2"><a href="{{ route('admin.return-goods.show', $stockMovement->reference->id ?? '') }}"><i class="fas fa-eye text-success fa-lg"></i></a></span> {{ $stockMovement->reference->no_retur  ?? ''}}
+                                    @elseif ($stockMovement->transaction_type == 'cetak')
+                                        <span class="mr-2"><a href="{{ route('admin.cetaks.show', $stockMovement->reference->id ?? '') }}"><i class="fas fa-eye text-success fa-lg"></i></a></span> {{ $stockMovement->reference->no_spc ?? '' }}
+                                    @elseif ($stockMovement->transaction_type == 'produksi')
+                                        <span class="mr-2"><a href="{{ route('admin.finishings.show', $stockMovement->reference->id ?? '') }}"><i class="fas fa-eye text-success fa-lg"></i></a></span> {{ $stockMovement->reference->no_spk ?? '' }}
+                                        @if ($stockMovement->finishing_masuk)
+                                            <br>
+                                            <span class="mr-2"><a href="{{ route('admin.finishing-masuks.show', $stockMovement->finishing_masuk) }}"><i class="fas fa-eye text-success fa-lg"></i></a></span> {{ $stockMovement->masuk->no_spk }}
                                         @endif
-                                    @else
-                                        {{ $stockMovement->transaction_type }}
+                                    @elseif ($stockMovement->transaction_type == 'awal')
+                                        Stock Awal
                                     @endif
                                 </td>
                                 <td class="text-center">
