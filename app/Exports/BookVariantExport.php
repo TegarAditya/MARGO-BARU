@@ -48,6 +48,7 @@ class BookVariantExport implements FromCollection, ShouldAutoSize
             'isi_c' => 'KODE ISI',
             'cover' => 'COVER',
             'cover_c' => 'KODE COVER',
+            'created_at' => 'CREATED AT',
         ]);
 
         $i = 0;
@@ -76,6 +77,7 @@ class BookVariantExport implements FromCollection, ShouldAutoSize
                 'isi_c' => $book->isi->code ?? '',
                 'cover' => $book->cover->name ?? '',
                 'cover_c' => $book->cover->code ?? '',
+                'created_at' => $book->created_at ?? '',
             ];
 
             $rows->push($row);
