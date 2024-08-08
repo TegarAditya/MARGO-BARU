@@ -297,6 +297,7 @@
 
             productTotalPrice.html(numeral(total_price).format('$0,0'));
             productTotalDiskon.html(numeral(total_diskon).format('$0,0'));
+            productForm.find('[name="total_price"]').val(total_price);
             productForm.find('[name="total_diskon"]').val(total_diskon);
             productTotal.html(numeral(total).format('$0,0'));
             productForm.find('[name="nominal"]').val(total);
