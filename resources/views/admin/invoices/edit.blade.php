@@ -82,7 +82,7 @@
                                         <div class="text-field-input px-2 py-0 pr-3">
                                             <span class="text-sm mr-1">Rp</span>
                                             <input class="price" type="hidden" name="prices[]" value="{{ $product->price }}">
-                                            <input class="form-control text-right price_text" type="text" name="price_text[]" value="{{ angka($product->price)}}" readonly tabindex="-1">
+                                            <input class="form-control text-right price_text" type="text" name="price_text[]" value="{{ angka($product->price)}}" tabindex="-1">
                                             <label class="text-field-border"></label>
                                         </div>
                                     </div>
@@ -184,26 +184,54 @@
             var product = $(item);
             var diskon = product.find('.diskon');
             var diskonText = product.find('.diskon_text');
+            var price = product.find('.price');
+            var priceText = product.find('.price_text');
 
             diskonText.on('input change', function(e) {
                 var value = numeral(e.target.value);
 
                 diskonText.val(value.format('0,0'));
-                diskon.val(value.value());
+                diskon.val(value.value()).trigger('change');
                 calculatePrice();
             }).trigger('change');
 
-            diskon.on('change', function(e) {
+            diskon.on('change input', function(e) {
                 var el = $(e.currentTarget);
                 var max = parseInt(el.data('max'));
-                console.log(max);
                 var valueNum = parseInt(el.val());
-                if (valueNum < 0 ) {
+
+                if (valueNum < 0) {
                     el.val(0);
-                    diskonText.val(0);
-                }else if (valueNum > max) {
+                    diskonText.val(0).trigger('change');
+                }
+
+                if (valueNum > max) {
                     el.val(max);
-                    diskonText.val(max);
+                    diskonText.val(max).trigger('change');
+                }
+            }).trigger('change');
+
+            priceText.on('input change', function(e) {
+                var value = numeral(e.target.value);
+
+                priceText.val(value.format('0,0'));
+                price.val(value.value()).trigger('change');
+                calculatePrice();
+            }).trigger('change');
+
+            price.on('change input', function(e) {
+                var el = $(e.currentTarget);
+                var max = parseInt(el.data('max'));
+                var valueNum = parseInt(el.val());
+
+                if (valueNum < 0) {
+                    el.val(0);
+                    priceText.val(0).trigger('change');
+                }
+
+                if (valueNum > max) {
+                    el.val(max);
+                    priceText.val(max).trigger('change');
                 }
             }).trigger('change');
         });
@@ -216,21 +244,30 @@
 
         function calculatePrice () {
             var total_diskon = 0;
+            var total_price = 0;
 
             productForm.children().each(function(i, item) {
                 var product = $(item);
                 var quantity = parseInt(product.find('.quantity').val() || 0);
+                var price = parseInt(product.find('.price').val() || 0);
                 var diskon = parseInt(product.find('.diskon').val() || 0);
+
+                subprice = price * quantity;
+                product.find('.product-subtotal').html(numeral(subprice).format('$0,0'));
+                product.find('.subtotal').val(subprice);
+                total_price += subprice;
 
                 subdiskon = diskon * quantity;
                 product.find('.product-subdiskon').html(numeral(subdiskon).format('$0,0'));
                 product.find('.subdiskon').val(subdiskon);
                 total_diskon += subdiskon;
             });
-            var total_price = parseInt(productForm.find('[name="total_price"]').val() || 0);
+            // var total_price = parseInt(productForm.find('[name="total_price"]').val() || 0);
             var total = total_price - total_diskon;
 
+            productTotalPrice.html(numeral(total_price).format('$0,0'));
             productTotalDiskon.html(numeral(total_diskon).format('$0,0'));
+            productForm.find('[name="total_price"]').val(total_price);
             productForm.find('[name="total_diskon"]').val(total_diskon);
             productTotal.html(numeral(total).format('$0,0'));
             productForm.find('[name="nominal"]').val(total);
