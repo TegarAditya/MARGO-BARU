@@ -46,7 +46,7 @@
                 <tr>
                     <td class="text-center">{{ $loop->iteration }}.</td>
                     <td class="text-center">{{ $bill->semester->name }}</td>
-                    <td class="text-center"><strong>{{ money($bill->saldo_akhir) }}</strong></td>
+                    <td class="text-center"><strong>{{ money($bill->piutang_semester) }}</strong></td>
                 </tr>
             @endforeach
         </tbody>
@@ -54,14 +54,14 @@
         <tfoot>
             <tr>
                 <td colspan="2" class="text-center"><strong>Total</strong></td>
-                <td class="text-center"><strong>{{ money($bills->sum('saldo_akhir')) }}</strong></td>
+                <td class="text-center"><strong>{{ money($bills->sum('piutang_semester')) }}</strong></td>
             </tr>
         </tfoot>
     </table>
     <br>
     <div class="my-2 mb-2 ml-5 text-right">
         <p class="m-0">Total Saldo Hutang</p>
-        <h5 class="m-0">{{ money($bills->sum('saldo_akhir')) }}</h5>
+        <h5 class="m-0">{{ money($bills->sum('piutang_semester')) }}</h5>
     </div>
     <hr class="my-3 text-right mx-0" />
 @endif
@@ -346,7 +346,7 @@
 
 <hr class="my-3 text-right mx-0" />
 @php
-    $saldo_sebelumnya = $bills->sum('saldo_akhir');
+    $saldo_sebelumnya = $bills->sum('piutang_semester');
     $total_hutang = ($saldo_sebelumnya + $tagihan) - $bayaran;
 @endphp
 <h5 class="mb-3">Resume</h5>
