@@ -284,7 +284,7 @@
                                         <div class="form-group text-field m-0">
                                             <div class="text-field-input px-2 py-0">
                                                 <input class="plate_quantity" type="hidden" name="plate_quantities[]" value="1">
-                                                <input class="form-control text-center plate_quantity_text" type="text" name="plate_quantity_text[]" value="" required>
+                                                <input class="form-control text-center plate_quantity_text" type="text" name="plate_quantity_text[]" value="0" required>
                                                 <label class="text-field-border"></label>
                                             </div>
                                         </div>
