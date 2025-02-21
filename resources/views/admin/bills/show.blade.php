@@ -54,7 +54,7 @@
                                         <tr>
                                             <td class="text-right px-3">{{ $loop->iteration }}.</td>
                                             <td class="text-center">{{ $bill->semester->name }}</td>
-                                            <td class="text-center"><strong>{{ money($bill->saldo_akhir) }}</strong></td>
+                                            <td class="text-center"><strong>{{ money($bill->piutang_semester) }}</strong></td>
                                         </tr>
                                     @endforeach
                                 </tbody>
@@ -62,7 +62,7 @@
                                 <tfoot>
                                     <tr>
                                         <td colspan="2" class="text-center">Total</td>
-                                        <td class="text-center"><strong>{{ money($bills->sum('saldo_akhir')) }}</strong></td>
+                                        <td class="text-center"><strong>{{ money($bills->sum('piutang_semester')) }}</strong></td>
                                     </tr>
                                 </tfoot>
                             </table>
@@ -654,7 +654,7 @@
                     $total_retur = $returs->sum('nominal');
                     $total_bayar = $payments->sum('paid');
                     $total_potongan = $payments->sum('discount');
-                    $saldo_sebelumnya = $bills->sum('saldo_akhir');
+                    $saldo_sebelumnya = $bills->sum('piutang_semester');
                     $total_utang = $saldo_sebelumnya + $total_faktur - ($total_diskon + $total_retur + $total_bayar + $total_potongan);
                 @endphp
                 <div class="row mb-2">
