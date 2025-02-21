@@ -23,6 +23,10 @@
     <div class="col-2">
         <a href="{{ route('admin.bills.eksportRekapBilling') }}" class="btn btn-warning btn-block"><i class="fas fa-file-export"></i> Export Rekap Billing</a>
     </div>
+
+    <div class="col-2">
+        <a href="{{ route('admin.bills.salespersonIndex') }}" class="btn btn-secondary btn-block"><i class="fas fa-sync"></i> Check Rebalancing Sales</a>
+    </div>
 </div>
 
 <div class="card">

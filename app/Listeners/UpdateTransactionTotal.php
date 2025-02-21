@@ -96,7 +96,7 @@ class UpdateTransactionTotal
                 'saldo_akhir' => ($saldo_awal + $faktur) - ($adjustment + $diskon + $retur + $bayar + $potongan),
                 'tagihan' => $faktur - ($diskon + $retur),
                 'pembayaran' => $pembayaran,
-                'piutang' => ($saldo_awal + $faktur) - ($adjustment + $diskon + $retur + $pembayaran)
+                'piutang' => $faktur - ($adjustment + $diskon + $retur + $bayar + $potongan)
             ]);
         } else {
             $previous = Bill::where('salesperson_id', $salesperson)->where('semester_id', prevSemester($semester))->first();
@@ -116,7 +116,7 @@ class UpdateTransactionTotal
                 'saldo_akhir' => ($saldo_awal + $faktur) - ($adjustment + $diskon + $retur + $bayar + $potongan),
                 'tagihan' => $faktur - ($diskon + $retur),
                 'pembayaran' => $pembayaran,
-                'piutang' => ($saldo_awal + $faktur) - ($adjustment + $diskon + $retur + $pembayaran)
+                'piutang' => $faktur - ($adjustment + $diskon + $retur + $bayar + $potongan)
             ]);
         }
     }
