@@ -1,5 +1,7 @@
 FROM dunglas/frankenphp:php8.2-alpine
 
+COPY ./php.ini-production /usr/local/etc/php/php.ini
+
 RUN install-php-extensions \
     ctype \
     curl \

@@ -166,7 +166,7 @@ class CetakController extends Controller
             'plates' => 'required|array',
             'plates.*' => 'nullable',
             'plate_quantities' => 'required|array',
-            'plate_quantities.*' => 'numeric|min:1',
+            'plate_quantities.*' => 'numeric|min:0',
         ]);
 
         $date = $validatedData['date'];

@@ -457,6 +457,19 @@ class BillController extends Controller
             }
         } while($bill && $bill->saldo_awal > 0);
 
+        /**
+         * Filters the bills collection to include only those bills where there is no previous bill
+         * for the same salesperson in the previous semester, or the ending balance (saldo_akhir)
+         * is different from the previous bill's ending balance.
+         */
+
+        // $bills = $bills->filter(function ($bill) {
+        //     $previous = Bill::where('salesperson_id', $bill->salesperson_id)->where('semester_id', prevSemester($bill->semester_id))->first();
+        //     return !$previous;
+        // });
+
+        // dd($bills);
+
         if ($bills->count() > 0) {
             foreach($bills as $item) {
                 $faktur = Invoice::with('invoice_items')->where('salesperson_id', $salesperson)->where('semester_id', $item->semester_id)->get();
