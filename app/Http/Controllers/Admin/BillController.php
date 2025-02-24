@@ -412,8 +412,8 @@ class BillController extends Controller
             DB::raw('COALESCE(p.total_payments, 0) AS pembayaran'),
             DB::raw('COALESCE(SUM(i.total), 0) - COALESCE(SUM(i.discount), 0) - COALESCE(r.total_return_goods_nominal, 0) - COALESCE(p.total_payments, 0) AS saldo_akhir')
         )
-        ->where('i.salesperson_id', 6)
-        ->where('i.semester_id', '<', 12)
+        ->where('i.salesperson_id', $salesperson)
+        ->where('i.semester_id', '<', $semester)
         ->groupBy('i.salesperson_id', 'i.semester_id', 's.name', 'r.total_return_goods_nominal', 'p.total_payments')
         ->get();
 
