@@ -22,15 +22,17 @@ RUN install-php-extensions \
     session \
     tokenizer \
     xml \
-    zip
+    zip \
+    @composer 
 
-RUN apk add --no-cache nodejs npm
-
-RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" && \
-    php composer-setup.php && \
-    php -r "unlink('composer-setup.php');" && \
-    mv composer.phar /usr/local/bin/composer
+WORKDIR /app
 
 COPY . /app
 
-ENTRYPOINT ["php", "artisan", "octane:frankenphp"]
+RUN composer install --optimize-autoloader
+
+RUN php artisan optimize
+
+ENTRYPOINT ["php"]
+
+CMD ["artisan", "octane:frankenphp", "--workers=1", "--max-requests=1"]
