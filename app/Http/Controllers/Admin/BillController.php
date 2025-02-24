@@ -50,15 +50,15 @@ class BillController extends Controller
             $table->addColumn('placeholder', '&nbsp;');
             $table->addColumn('actions', '&nbsp;');
 
-            $table->editColumn('actions', function ($row) use($semester) {
+            $table->editColumn('actions', function ($row) use ($semester) {
                 $btn = '
-                    <a class="px-1" href="'.route('admin.bills.billing', ['salesperson' => $row->salesperson_id, 'semester' => $semester]).'" title="Show">
+                    <a class="px-1" href="' . route('admin.bills.billing', ['salesperson' => $row->salesperson_id, 'semester' => $semester]) . '" title="Show">
                         <i class="fas fa-eye text-success fa-lg"></i>
                     </a>
-                    <a class="px-1" href="'.route('admin.bills.cetakBilling', ['salesperson' => $row->salesperson_id, 'semester' => $semester]).'" title="Print Saldo" target="_blank">
+                    <a class="px-1" href="' . route('admin.bills.cetakBilling', ['salesperson' => $row->salesperson_id, 'semester' => $semester]) . '" title="Print Saldo" target="_blank">
                         <i class="fas fa-print text-secondary fa-lg"></i>
                     </a>
-                    <a class="px-1" href="'.route('admin.bills.cetakBilling', ['salesperson' => $row->salesperson_id, 'semester' => $semester, 'rekap' => 1]).'" title="Print Rekap Saldo" target="_blank">
+                    <a class="px-1" href="' . route('admin.bills.cetakBilling', ['salesperson' => $row->salesperson_id, 'semester' => $semester, 'rekap' => 1]) . '" title="Print Rekap Saldo" target="_blank">
                         <i class="fas fa-print text-danger fa-lg"></i>
                     </a>
                 ';
@@ -79,7 +79,7 @@ class BillController extends Controller
             });
 
             $table->editColumn('saldo_awal', function ($row) {
-                return $row->saldo_awal ? angka($row->saldo_awal): 0;
+                return $row->saldo_awal ? angka($row->saldo_awal) : 0;
             });
             $table->editColumn('jual', function ($row) {
                 return $row->jual ? angka($row->jual) : 0;
@@ -182,7 +182,7 @@ class BillController extends Controller
 
         DB::beginTransaction();
         try {
-            foreach($sales as $sale) {
+            foreach ($sales as $sale) {
                 $bill = Bill::where('salesperson_id', $sale->id)->where('semester_id', $semester)->first();
                 $payment = Payment::selectRaw('COALESCE(SUM(paid), 0) as bayar, COALESCE(SUM(discount), 0) as potongan')->where('salesperson_id', $sale->id)->where('semester_bayar_id', $semester)->first();
 
@@ -286,7 +286,7 @@ class BillController extends Controller
         }], 'amount')->get();
 
         if ($request->has('export')) {
-            return (new BillingExport($saldo_awal, $sales))->download('REKAP PIUTANG PERIODE' . $start->format('d-F-Y') .' sd '. $end->format('d-F-Y') .'.xlsx');
+            return (new BillingExport($saldo_awal, $sales))->download('REKAP PIUTANG PERIODE' . $start->format('d-F-Y') . ' sd ' . $end->format('d-F-Y') . '.xlsx');
         } else {
             return view('admin.bills.billing', compact('start', 'end', 'saldo_awal', 'sales'));
         }
@@ -315,10 +315,10 @@ class BillController extends Controller
             if ($bill) {
                 $bills->push($bill);
             }
-        } while($bill && $bill->saldo_awal > 0);
+        } while ($bill && $bill->saldo_awal > 0);
 
         if ($bills->count() > 0) {
-            foreach($bills as $item) {
+            foreach ($bills as $item) {
                 $faktur = Invoice::with('invoice_items')->where('salesperson_id', $salesperson)->where('semester_id', $item->semester_id)->get();
                 $adjustment = BillAdjustment::with('retur_items')->where('salesperson_id', $salesperson)->where('semester_id', $item->semester_id)->get();
                 $retur = ReturnGood::with('retur_items')->where('salesperson_id', $salesperson)->where('semester_retur_id', $item->semester_id)->get();
@@ -336,7 +336,7 @@ class BillController extends Controller
         $salesperson = Salesperson::find($salesperson);
         $semester = Semester::find($semester);
 
-        return view('admin.bills.show', compact('salesperson', 'semester', 'invoices', 'adjustments', 'returs', 'payments', 'bills', 'invoices_old','adjustments_old', 'returs_old', 'payments_old', 'list_semester'));
+        return view('admin.bills.show', compact('salesperson', 'semester', 'invoices', 'adjustments', 'returs', 'payments', 'bills', 'invoices_old', 'adjustments_old', 'returs_old', 'payments_old', 'list_semester'));
     }
 
     public function cetakBilling(Request $request)
@@ -355,6 +355,7 @@ class BillController extends Controller
         $adjustments_old = collect([]);
         $returs_old = collect([]);
         $payments_old = collect([]);
+        $new_bills = collect([]);
 
         $semester_id = $semester;
         do {
@@ -363,23 +364,63 @@ class BillController extends Controller
             if ($bill) {
                 $bills->push($bill);
             }
-        } while($bill && $bill->saldo_awal > 0);
+        } while ($bill && $bill->saldo_awal > 0);
 
-        /**
-         * Filters the bills collection to include only those bills where there is no previous bill
-         * for the same salesperson in the previous semester, or the ending balance (saldo_akhir)
-         * is different from the previous bill's ending balance.
-         */
+        $new_bills = DB::table('invoices as i')
+        ->leftJoin(
+            DB::raw('(
+                SELECT 
+                    salesperson_id, 
+                    semester_retur_id, 
+                    SUM(nominal) AS total_return_goods_nominal 
+                FROM 
+                    return_goods 
+                GROUP BY 
+                    salesperson_id, semester_retur_id
+            ) AS r'),
+            function ($join) {
+                $join->on('i.salesperson_id', '=', 'r.salesperson_id')
+                     ->on('i.semester_id', '=', 'r.semester_retur_id');
+            }
+        )
+        ->leftJoin(
+            DB::raw('(
+                SELECT 
+                    salesperson_id, 
+                    semester_bayar_id, 
+                    SUM(amount) AS total_payments 
+                FROM 
+                    payments 
+                GROUP BY 
+                    salesperson_id, semester_bayar_id
+            ) AS p'),
+            function ($join) {
+                $join->on('i.salesperson_id', '=', 'p.salesperson_id')
+                     ->on('i.semester_id', '=', 'p.semester_bayar_id');
+            }
+        )
+        ->leftJoin('semesters as s', 'i.semester_id', '=', 's.id')
+        ->select(
+            'i.salesperson_id',
+            'i.semester_id',
+            's.name AS semester_name',
+            DB::raw('COALESCE(SUM(i.total), 0) AS jual'),
+            DB::raw('COALESCE(SUM(i.discount), 0) AS diskon'),
+            DB::raw('COALESCE(SUM(i.total), 0) - COALESCE(SUM(i.discount), 0) AS jual_diskon'),
+            DB::raw('COALESCE(r.total_return_goods_nominal, 0) AS retur'),
+            DB::raw('COALESCE(SUM(i.total), 0) - COALESCE(SUM(i.discount), 0) - COALESCE(r.total_return_goods_nominal, 0) AS tagihan'),
+            DB::raw('COALESCE(p.total_payments, 0) AS pembayaran'),
+            DB::raw('COALESCE(SUM(i.total), 0) - COALESCE(SUM(i.discount), 0) - COALESCE(r.total_return_goods_nominal, 0) - COALESCE(p.total_payments, 0) AS saldo_akhir')
+        )
+        ->where('i.salesperson_id', 6)
+        ->where('i.semester_id', '<', 12)
+        ->groupBy('i.salesperson_id', 'i.semester_id', 's.name', 'r.total_return_goods_nominal', 'p.total_payments')
+        ->get();
 
-        // $bills = $bills->filter(function ($bill) {
-        //     $previous = Bill::where('salesperson_id', $bill->salesperson_id)->where('semester_id', prevSemester($bill->semester_id))->first();
-        //     return !$previous;
-        // });
-
-        // dd($bills);
+        // dd($new_bills);
 
         if ($bills->count() > 0) {
-            foreach($bills as $item) {
+            foreach ($bills as $item) {
                 $faktur = Invoice::with('invoice_items')->where('salesperson_id', $salesperson)->where('semester_id', $item->semester_id)->get();
                 $adjustment = BillAdjustment::with('retur_items')->where('salesperson_id', $salesperson)->where('semester_id', $item->semester_id)->get();
                 $retur = ReturnGood::with('retur_items')->where('salesperson_id', $salesperson)->where('semester_retur_id', $item->semester_id)->get();
@@ -392,13 +433,15 @@ class BillController extends Controller
             }
         }
 
+        // dd($bills);
+
         $list_semester = $bills->pluck('semester_id');
 
         $salesperson = Salesperson::find($salesperson);
         $semester = Semester::find($semester);
 
         if ($request->rekap == 1) {
-            return view('admin.bills.rekap_saldo', compact('salesperson', 'semester', 'invoices', 'adjustments', 'returs', 'payments', 'billing', 'bills', 'invoices_old', 'adjustments_old', 'returs_old', 'payments_old', 'list_semester'));
+            return view('admin.bills.rekap_saldo', compact('salesperson', 'semester', 'invoices', 'adjustments', 'returs', 'payments', 'billing', 'bills', 'new_bills', 'invoices_old', 'adjustments_old', 'returs_old', 'payments_old', 'list_semester'));
         }
 
         return view('admin.bills.saldo', compact('salesperson', 'semester', 'invoices', 'adjustments', 'returs', 'payments', 'billing', 'bills', 'invoices_old', 'adjustments_old', 'returs_old', 'payments_old', 'list_semester'));
@@ -408,13 +451,15 @@ class BillController extends Controller
     {
         $today = Carbon::now()->format('d-m-Y');
         $semester = Semester::find(setting('current_semester'))->name;
-        return (new RekapBillingExport())->download('REKAP BILLING '. preg_replace('/[^A-Za-z0-9_\-]/', '-', $semester) . ' TANGGAL ' . $today . '.xlsx');
+        return (new RekapBillingExport())->download('REKAP BILLING ' . preg_replace('/[^A-Za-z0-9_\-]/', '-', $semester) . ' TANGGAL ' . $today . '.xlsx');
     }
 
     public function reportDirektur(Request $request)
     {
         $today = Carbon::now()->format('d-m-Y');
         $semester = Semester::find(setting('current_semester'))->name;
-        return (new DirekturBillingExport())->download('REKAP BILLING '. preg_replace('/[^A-Za-z0-9_\-]/', '-', $semester) . ' TANGGAL ' . $today . '.xlsx');
+        return (new DirekturBillingExport())->download('REKAP BILLING ' . preg_replace('/[^A-Za-z0-9_\-]/', '-', $semester) . ' TANGGAL ' . $today . '.xlsx');
     }
+
+    protected function getBills(int $user_id, int $semester_id) {}
 }
