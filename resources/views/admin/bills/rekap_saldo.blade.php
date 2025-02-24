@@ -32,7 +32,7 @@
 @stop
 
 @section('content')
-@if($bills->count() > 0)
+<!-- @if($bills->count() > 0)
     <h5 class="mb-3">Saldo Hutang</h5>
     <table cellspacing="0" cellpadding="0" class="table table-sm table-bordered mt-2" style="width: 100%">
         <thead>
@@ -62,6 +62,40 @@
     <div class="my-2 mb-2 ml-5 text-right">
         <p class="m-0">Total Saldo Hutang</p>
         <h5 class="m-0">{{ money($bills->sum('saldo_akhir')) }}</h5>
+    </div>
+    <hr class="my-3 text-right mx-0" />
+@endif -->
+
+@if($new_bills->count() > 0)
+    <h5 class="mb-3">Saldo Hutang</h5>
+    <table cellspacing="0" cellpadding="0" class="table table-sm table-bordered mt-2" style="width: 100%">
+        <thead>
+            <th width="1%" class="text-center">No.</th>
+            <th class="text-center">Semester</th>
+            <th class="text-center" width="35%">Saldo Hutang</th>
+        </thead>
+
+        <tbody>
+            @foreach ($new_bills as $bill)
+                <tr>
+                    <td class="text-center">{{ $loop->iteration }}.</td>
+                    <td class="text-center">{{ $bill->semester_name }}</td>
+                    <td class="text-center"><strong>{{ money($bill->saldo_akhir) }}</strong></td>
+                </tr>
+            @endforeach
+        </tbody>
+
+        <tfoot>
+            <tr>
+                <td colspan="2" class="text-center"><strong>Total</strong></td>
+                <td class="text-center"><strong>{{ money($new_bills->sum('saldo_akhir')) }}</strong></td>
+            </tr>
+        </tfoot>
+    </table>
+    <br>
+    <div class="my-2 mb-2 ml-5 text-right">
+        <p class="m-0">Total Saldo Hutang</p>
+        <h5 class="m-0">{{ money($new_bills->sum('saldo_akhir')) }}</h5>
     </div>
     <hr class="my-3 text-right mx-0" />
 @endif
@@ -279,7 +313,7 @@
 
 <hr class="my-3 text-right mx-0" />
 @php
-    $saldo_sebelumnya = $bills->sum('saldo_akhir');
+    $saldo_sebelumnya = $new_bills->sum('saldo_akhir');
     $total_hutang = ($saldo_sebelumnya + $tagihan) - $bayaran;
 @endphp
 <h5 class="mb-3">Resume</h5>
