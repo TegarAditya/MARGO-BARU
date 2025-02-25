@@ -465,6 +465,7 @@ class BillController extends Controller
             )
             ->where('i.salesperson_id', $salesperson)
             ->where('i.semester_id', $includeCurrent ? '<=' : '<', $semester)
+            ->where('i.deleted_at', '!=', null)
             ->groupBy('i.salesperson_id', 'i.semester_id', 's.name', 'r.total_return_goods_nominal', 'p.total_payments')
             ->having('saldo_akhir', '>', 0)
             ->get();
