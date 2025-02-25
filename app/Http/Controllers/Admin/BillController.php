@@ -79,7 +79,8 @@ class BillController extends Controller
             });
 
             $table->editColumn('saldo_awal', function ($row) {
-                return $row->saldo_awal ? angka($row->saldo_awal) : 0;
+                $billSummary = $this->getBillSummary($row->salesperson->id, $row->semester->id, false);
+                return $billSummary ? angka($billSummary->sum('saldo_akhir')) : 0;
             });
             $table->editColumn('jual', function ($row) {
                 return $row->jual ? angka($row->jual) : 0;
@@ -100,7 +101,8 @@ class BillController extends Controller
                 return $row->potongan ? angka($row->potongan) : 0;
             });
             $table->editColumn('saldo_akhir', function ($row) {
-                return $row->saldo_akhir ? angka($row->saldo_akhir) : 0;
+                $billSummary = $this->getBillSummary($row->salesperson->id, $row->semester->id, true);
+                return $billSummary ? angka($billSummary->sum('saldo_akhir')) : 0;
             });
 
             $table->rawColumns(['actions', 'placeholder', 'semester', 'salesperson']);
@@ -303,6 +305,7 @@ class BillController extends Controller
         $payments = Payment::where('salesperson_id', $salesperson)->where('semester_bayar_id', $semester)->get();
 
         $bills = collect([]);
+        $new_bills = collect([]);
         $invoices_old = collect([]);
         $adjustments_old = collect([]);
         $returs_old = collect([]);
@@ -331,12 +334,14 @@ class BillController extends Controller
             }
         }
 
+        $new_bills = $this->getBillSummary($salesperson, $semester);
+
         $list_semester = $bills->pluck('semester_id');
 
         $salesperson = Salesperson::find($salesperson);
         $semester = Semester::find($semester);
 
-        return view('admin.bills.show', compact('salesperson', 'semester', 'invoices', 'adjustments', 'returs', 'payments', 'bills', 'invoices_old', 'adjustments_old', 'returs_old', 'payments_old', 'list_semester'));
+        return view('admin.bills.show', compact('salesperson', 'semester', 'invoices', 'adjustments', 'returs', 'payments', 'bills', 'new_bills', 'invoices_old', 'adjustments_old', 'returs_old', 'payments_old', 'list_semester'));
     }
 
     public function cetakBilling(Request $request)
@@ -366,57 +371,7 @@ class BillController extends Controller
             }
         } while ($bill && $bill->saldo_awal > 0);
 
-        $new_bills = DB::table('invoices as i')
-        ->leftJoin(
-            DB::raw('(
-                SELECT 
-                    salesperson_id, 
-                    semester_retur_id, 
-                    SUM(nominal) AS total_return_goods_nominal 
-                FROM 
-                    return_goods 
-                GROUP BY 
-                    salesperson_id, semester_retur_id
-            ) AS r'),
-            function ($join) {
-                $join->on('i.salesperson_id', '=', 'r.salesperson_id')
-                     ->on('i.semester_id', '=', 'r.semester_retur_id');
-            }
-        )
-        ->leftJoin(
-            DB::raw('(
-                SELECT 
-                    salesperson_id, 
-                    semester_bayar_id, 
-                    SUM(amount) AS total_payments 
-                FROM 
-                    payments 
-                GROUP BY 
-                    salesperson_id, semester_bayar_id
-            ) AS p'),
-            function ($join) {
-                $join->on('i.salesperson_id', '=', 'p.salesperson_id')
-                     ->on('i.semester_id', '=', 'p.semester_bayar_id');
-            }
-        )
-        ->leftJoin('semesters as s', 'i.semester_id', '=', 's.id')
-        ->select(
-            'i.salesperson_id',
-            'i.semester_id',
-            's.name AS semester_name',
-            DB::raw('COALESCE(SUM(i.total), 0) AS jual'),
-            DB::raw('COALESCE(SUM(i.discount), 0) AS diskon'),
-            DB::raw('COALESCE(SUM(i.total), 0) - COALESCE(SUM(i.discount), 0) AS jual_diskon'),
-            DB::raw('COALESCE(r.total_return_goods_nominal, 0) AS retur'),
-            DB::raw('COALESCE(SUM(i.total), 0) - COALESCE(SUM(i.discount), 0) - COALESCE(r.total_return_goods_nominal, 0) AS tagihan'),
-            DB::raw('COALESCE(p.total_payments, 0) AS pembayaran'),
-            DB::raw('COALESCE(SUM(i.total), 0) - COALESCE(SUM(i.discount), 0) - COALESCE(r.total_return_goods_nominal, 0) - COALESCE(p.total_payments, 0) AS saldo_akhir')
-        )
-        ->where('i.salesperson_id', $salesperson)
-        ->where('i.semester_id', '<', $semester)
-        ->groupBy('i.salesperson_id', 'i.semester_id', 's.name', 'r.total_return_goods_nominal', 'p.total_payments')
-        ->having('saldo_akhir', '>', 0)
-        ->get();
+        $new_bills = $this->getBillSummary($salesperson, $semester);
 
         // dd($new_bills);
 
@@ -433,8 +388,6 @@ class BillController extends Controller
                 $payments_old = $payments_old->merge($bayar);
             }
         }
-
-        // dd($bills);
 
         $list_semester = $bills->pluck('semester_id');
 
@@ -462,5 +415,58 @@ class BillController extends Controller
         return (new DirekturBillingExport())->download('REKAP BILLING ' . preg_replace('/[^A-Za-z0-9_\-]/', '-', $semester) . ' TANGGAL ' . $today . '.xlsx');
     }
 
-    protected function getBills(int $user_id, int $semester_id) {}
+    protected function getBillSummary(int $salesperson, int $semester, bool $includeCurrent = false)
+    {
+        return DB::table('invoices as i')
+            ->leftJoin(
+                DB::raw('(
+                SELECT 
+                    salesperson_id, 
+                    semester_retur_id, 
+                    SUM(nominal) AS total_return_goods_nominal 
+                FROM 
+                    return_goods 
+                GROUP BY 
+                    salesperson_id, semester_retur_id
+            ) AS r'),
+                function ($join) {
+                    $join->on('i.salesperson_id', '=', 'r.salesperson_id')
+                        ->on('i.semester_id', '=', 'r.semester_retur_id');
+                }
+            )
+            ->leftJoin(
+                DB::raw('(
+                SELECT 
+                    salesperson_id, 
+                    semester_bayar_id, 
+                    SUM(amount) AS total_payments 
+                FROM 
+                    payments 
+                GROUP BY 
+                    salesperson_id, semester_bayar_id
+            ) AS p'),
+                function ($join) {
+                    $join->on('i.salesperson_id', '=', 'p.salesperson_id')
+                        ->on('i.semester_id', '=', 'p.semester_bayar_id');
+                }
+            )
+            ->leftJoin('semesters as s', 'i.semester_id', '=', 's.id')
+            ->select(
+                'i.salesperson_id',
+                'i.semester_id',
+                's.name AS semester_name',
+                DB::raw('COALESCE(SUM(i.total), 0) AS jual'),
+                DB::raw('COALESCE(SUM(i.discount), 0) AS diskon'),
+                DB::raw('COALESCE(SUM(i.total), 0) - COALESCE(SUM(i.discount), 0) AS jual_diskon'),
+                DB::raw('COALESCE(r.total_return_goods_nominal, 0) AS retur'),
+                DB::raw('COALESCE(SUM(i.total), 0) - COALESCE(SUM(i.discount), 0) - COALESCE(r.total_return_goods_nominal, 0) AS tagihan'),
+                DB::raw('COALESCE(p.total_payments, 0) AS pembayaran'),
+                DB::raw('COALESCE(SUM(i.total), 0) - COALESCE(SUM(i.discount), 0) - COALESCE(r.total_return_goods_nominal, 0) - COALESCE(p.total_payments, 0) AS saldo_akhir')
+            )
+            ->where('i.salesperson_id', $salesperson)
+            ->where('i.semester_id', $includeCurrent ? '<=' : '<', $semester)
+            ->groupBy('i.salesperson_id', 'i.semester_id', 's.name', 'r.total_return_goods_nominal', 'p.total_payments')
+            ->having('saldo_akhir', '>', 0)
+            ->get();
+    }
 }
