@@ -349,7 +349,7 @@ class BillController extends Controller
         $salesperson = $request->salesperson;
         $semester = $request->semester ?? setting('current_semester');
 
-        $invoices = Invoice::with('invoice_items')->where('salesperson_id', $salesperson)->where('semester_id', $semester)->get();
+        $invoices = Invoice::with('invoice_items')->where('salesperson_id', $salesperson)->where('semester_id', $semester)->where('deleted_at', '=', null)->get();
         $adjustments = BillAdjustment::where('salesperson_id', $salesperson)->where('semester_id', $semester)->get();
         $returs = ReturnGood::with('retur_items')->where('salesperson_id', $salesperson)->where('semester_retur_id', $semester)->get();
         $payments = Payment::where('salesperson_id', $salesperson)->where('semester_bayar_id', $semester)->where('paid', '!=', '0,00')->get();
