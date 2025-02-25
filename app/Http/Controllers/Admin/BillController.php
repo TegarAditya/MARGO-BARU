@@ -623,4 +623,66 @@ class BillController extends Controller
 
         return redirect()->back();
     }
+
+    public function recalculating(Request $request)
+    {
+        $salesperson = $request->salesperson;
+        $semester = $request->semester ?? setting('current_semester');
+
+        $list_semester = array(9, 10, 11);
+
+        foreach($list_semester as $item) {
+
+            $bill = Bill::where('salesperson_id', $salesperson)->where('semester_id', $item)->first();
+
+            $faktur = Invoice::where('salesperson_id', $salesperson)->where('semester_id', $item)->sum('total');
+            $diskon = Invoice::where('salesperson_id', $salesperson)->where('semester_id', $item)->sum('discount');
+            $adjustment = BillAdjustment::where('salesperson_id', $salesperson)->where('semester_id', $item)->sum('amount');
+            $retur = ReturnGood::where('salesperson_id', $salesperson)->where('semester_retur_id', $item)->sum('nominal');
+
+            $bayar = Payment::where('salesperson_id', $salesperson)->where('semester_bayar_id', $item)->sum('paid');
+            $potongan = Payment::where('salesperson_id', $salesperson)->where('semester_bayar_id', $item)->sum('discount');
+            $pembayaran = $bayar + $potongan;
+
+            if ($bill) {
+                $saldo_awal = $bill->previous ? $bill->previous->saldo_akhir : 0;
+                $bill->update([
+                    'saldo_awal' => $saldo_awal,
+                    'jual' => $faktur,
+                    'diskon' => $diskon,
+                    'adjustment' => $adjustment,
+                    'retur' => $retur,
+                    'bayar' => $bayar,
+                    'potongan' => $potongan,
+                    'saldo_akhir' => ($saldo_awal + $faktur) - ($adjustment + $diskon + $retur + $pembayaran),
+                    'tagihan' => $faktur - ($diskon + $retur),
+                    'pembayaran' => $pembayaran,
+                    'piutang' => $faktur - ($adjustment + $diskon + $retur + $pembayaran)
+                ]);
+            } else {
+                $previous = Bill::where('salesperson_id', $salesperson)->where('semester_id', prevSemester($item))->first();
+    
+                $saldo_awal = $previous ? $previous->saldo_akhir : 0;
+                Bill::create([
+                    'semester_id' => $item,
+                    'salesperson_id' => $salesperson,
+                    'previous_id' => $previous ? $previous->id : null,
+                    'saldo_awal' => $saldo_awal,
+                    'jual' => $faktur,
+                    'diskon' => $diskon,
+                    'adjustment' => $adjustment,
+                    'retur' => $retur,
+                    'bayar' => $bayar,
+                    'potongan' => $potongan,
+                    'saldo_akhir' => ($saldo_awal + $faktur) - ($adjustment + $diskon + $retur + $pembayaran),
+                    'tagihan' => $faktur - ($diskon + $retur),
+                    'pembayaran' => $pembayaran,
+                    'piutang' => $faktur - ($adjustment + $diskon + $retur + $pembayaran)
+                ]);
+            }
+
+        }
+
+        return redirect()->back();
+    }
 }
