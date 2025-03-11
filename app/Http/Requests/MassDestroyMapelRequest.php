@@ -3,7 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Models\Mapel;
-use Gate;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Foundation\Http\FormRequest;
 use Symfony\Component\HttpFoundation\Response;
 

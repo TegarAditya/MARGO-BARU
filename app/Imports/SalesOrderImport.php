@@ -10,8 +10,8 @@ use App\Models\BookVariant;
 use App\Models\Jenjang;
 use App\Models\Semester;
 use App\Models\SalesOrder;
-use DB;
-use Alert;
+use Illuminate\Support\Facades\DB;
+use RealRashid\SweetAlert\Facades\Alert;
 use App\Services\EstimationService;
 use Carbon\Carbon;
 

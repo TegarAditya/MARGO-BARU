@@ -5,7 +5,7 @@ namespace App\Listeners;
 use App\Events\ProductionTransactionUpdated;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
-use DB;
+use Illuminate\Support\Facades\DB;
 use App\Models\ProductionTransaction;
 use App\Models\ProductionTransactionTotal;
 

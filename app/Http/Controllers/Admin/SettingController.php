@@ -9,11 +9,11 @@ use App\Http\Requests\UpdateSettingRequest;
 use App\Models\Setting;
 use App\Models\User;
 use App\Models\Semester;
-use Gate;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Yajra\DataTables\Facades\DataTables;
-use Alert;
+use RealRashid\SweetAlert\Facades\Alert;
 
 class SettingController extends Controller
 {

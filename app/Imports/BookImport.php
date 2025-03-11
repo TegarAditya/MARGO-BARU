@@ -17,8 +17,8 @@ use App\Models\Isi;
 use App\Models\Cover;
 use App\Models\Semester;
 use App\Models\Halaman;
-use DB;
-use Alert;
+use Illuminate\Support\Facades\DB;
+use RealRashid\SweetAlert\Facades\Alert;
 use App\Services\StockService;
 
 class BookImport implements ToCollection, WithHeadingRow

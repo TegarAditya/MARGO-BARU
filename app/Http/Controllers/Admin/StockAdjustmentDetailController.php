@@ -10,7 +10,7 @@ use App\Models\BookVariant;
 use App\Models\Material;
 use App\Models\StockAdjustment;
 use App\Models\StockAdjustmentDetail;
-use Gate;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Yajra\DataTables\Facades\DataTables;

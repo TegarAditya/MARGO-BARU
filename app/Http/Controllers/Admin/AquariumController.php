@@ -11,13 +11,13 @@ use App\Models\PlatePrintItem;
 use App\Models\Semester;
 use App\Models\Vendor;
 use App\Models\Material;
-use Gate;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Yajra\DataTables\Facades\DataTables;
 use App\Services\StockService;
-use DB;
-use Alert;
+use Illuminate\Support\Facades\DB;
+use RealRashid\SweetAlert\Facades\Alert;
 use Carbon\Carbon;
 
 class AquariumController extends Controller

@@ -11,17 +11,17 @@ use App\Models\Material;
 use App\Models\Unit;
 use App\Models\Vendor;
 use App\Models\BookVariant;
-use Gate;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Yajra\DataTables\Facades\DataTables;
-use Alert;
+use RealRashid\SweetAlert\Facades\Alert;
 use Excel;
 use App\Imports\MaterialImport;
 use App\Exports\MaterialTemplate;
 use Illuminate\Support\Facades\Date;
 use Carbon\Carbon;
-use DB;
+use Illuminate\Support\Facades\DB;
 
 class MaterialsController extends Controller
 {

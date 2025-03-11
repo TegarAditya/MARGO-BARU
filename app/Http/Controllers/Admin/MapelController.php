@@ -8,11 +8,11 @@ use App\Http\Requests\MassDestroyMapelRequest;
 use App\Http\Requests\StoreMapelRequest;
 use App\Http\Requests\UpdateMapelRequest;
 use App\Models\Mapel;
-use Gate;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Yajra\DataTables\Facades\DataTables;
-use Alert;
+use RealRashid\SweetAlert\Facades\Alert;
 
 class MapelController extends Controller
 {

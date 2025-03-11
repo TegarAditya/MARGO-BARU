@@ -22,13 +22,13 @@ use App\Models\SalesOrder;
 use App\Models\StockMovement;
 use App\Models\FinishingItem;
 use App\Models\EstimationItem;
-use Gate;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Yajra\DataTables\Facades\DataTables;
-use DB;
+use Illuminate\Support\Facades\DB;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
-use Alert;
+use RealRashid\SweetAlert\Facades\Alert;
 use App\Exports\BookVariantExport;
 
 class BookVariantController extends Controller

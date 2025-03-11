@@ -9,12 +9,12 @@ use App\Http\Requests\StoreGroupAreaRequest;
 use App\Http\Requests\UpdateGroupAreaRequest;
 use App\Models\GroupArea;
 use App\Models\MarketingArea;
-use Gate;
-use DB;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Yajra\DataTables\Facades\DataTables;
-use Alert;
+use RealRashid\SweetAlert\Facades\Alert;
 
 class GroupAreaController extends Controller
 {

@@ -9,7 +9,7 @@ use App\Http\Requests\StoreMarketingAreaRequest;
 use App\Http\Requests\UpdateMarketingAreaRequest;
 use App\Models\GroupArea;
 use App\Models\MarketingArea;
-use Gate;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Yajra\DataTables\Facades\DataTables;

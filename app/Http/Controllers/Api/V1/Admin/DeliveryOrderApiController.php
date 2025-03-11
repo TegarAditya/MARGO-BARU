@@ -7,7 +7,7 @@ use App\Http\Requests\StoreDeliveryOrderRequest;
 use App\Http\Requests\UpdateDeliveryOrderRequest;
 use App\Http\Resources\Admin\DeliveryOrderResource;
 use App\Models\DeliveryOrder;
-use Gate;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 

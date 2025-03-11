@@ -8,11 +8,11 @@ use App\Http\Requests\MassDestroyIsiRequest;
 use App\Http\Requests\StoreIsiRequest;
 use App\Http\Requests\UpdateIsiRequest;
 use App\Models\Isi;
-use Gate;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Yajra\DataTables\Facades\DataTables;
-use Alert;
+use RealRashid\SweetAlert\Facades\Alert;
 
 class IsiController extends Controller
 {

@@ -10,11 +10,11 @@ use App\Models\Semester;
 use App\Models\SalesOrder;
 use App\Models\Salesperson;
 use App\Models\GroupArea;
-use Gate;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
-use DB;
-use Alert;
+use Illuminate\Support\Facades\DB;
+use RealRashid\SweetAlert\Facades\Alert;
 use Carbon\Carbon;
 use Yajra\DataTables\Facades\DataTables;
 

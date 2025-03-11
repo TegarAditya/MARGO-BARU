@@ -12,7 +12,7 @@ use App\Models\CetakItem;
 use App\Models\StockMovement;
 use App\Models\ProductionEstimation;
 use App\Models\BookVariant;
-use DB;
+use Illuminate\Support\Facades\DB;
 use App\Services\EstimationService;
 use App\Services\StockService;
 use Carbon\Carbon;

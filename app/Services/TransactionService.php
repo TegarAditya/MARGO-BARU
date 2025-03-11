@@ -2,7 +2,7 @@
 namespace App\Services;
 
 use Carbon\Carbon;
-use DB;
+use Illuminate\Support\Facades\DB;
 use App\Models\Transaction;
 use App\Models\ProductionTransaction;
 use App\Models\Salesperson;

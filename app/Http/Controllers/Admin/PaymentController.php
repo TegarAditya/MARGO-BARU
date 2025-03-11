@@ -13,12 +13,12 @@ use App\Models\Invoice;
 use App\Models\ReturnGood;
 use App\Models\Transaction;
 use App\Models\Bill;
-use Gate;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Yajra\DataTables\Facades\DataTables;
-use DB;
-use Alert;
+use Illuminate\Support\Facades\DB;
+use RealRashid\SweetAlert\Facades\Alert;
 use App\Services\TransactionService;
 use Carbon\Carbon;
 

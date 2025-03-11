@@ -11,7 +11,7 @@ use App\Models\Bill;
 use App\Models\Payment;
 use App\Models\Invoice;
 use App\Models\ReturnGood;
-use DB;
+use Illuminate\Support\Facades\DB;
 
 class UpdateTransactionTotal
 {
