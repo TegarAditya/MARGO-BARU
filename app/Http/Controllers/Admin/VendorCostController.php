@@ -9,11 +9,11 @@ use App\Http\Requests\StoreVendorCostRequest;
 use App\Http\Requests\UpdateVendorCostRequest;
 use App\Models\Vendor;
 use App\Models\VendorCost;
-use Gate;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Yajra\DataTables\Facades\DataTables;
-use Alert;
+use RealRashid\SweetAlert\Facades\Alert;
 
 class VendorCostController extends Controller
 {

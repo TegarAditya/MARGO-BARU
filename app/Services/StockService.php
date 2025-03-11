@@ -2,7 +2,7 @@
 namespace App\Services;
 
 use Carbon\Carbon;
-use DB;
+use Illuminate\Support\Facades\DB;
 use App\Models\SalesOrder;
 use App\Models\BookVariant;
 use App\Models\StockMovement;

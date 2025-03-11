@@ -10,13 +10,13 @@ use App\Models\DeliveryPlate;
 use App\Models\User;
 use App\Models\Vendor;
 use App\Models\PlatePrintItem;
-use Gate;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Yajra\DataTables\Facades\DataTables;
 use Carbon\Carbon;
-use DB;
-use Alert;
+use Illuminate\Support\Facades\DB;
+use RealRashid\SweetAlert\Facades\Alert;
 
 class DeliveryPlateController extends Controller
 {

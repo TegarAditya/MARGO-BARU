@@ -8,11 +8,11 @@ use App\Http\Requests\MassDestroyKelaRequest;
 use App\Http\Requests\StoreKelaRequest;
 use App\Http\Requests\UpdateKelaRequest;
 use App\Models\Kelas;
-use Gate;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Yajra\DataTables\Facades\DataTables;
-use Alert;
+use RealRashid\SweetAlert\Facades\Alert;
 
 class KelasController extends Controller
 {

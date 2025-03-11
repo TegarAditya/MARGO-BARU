@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\MassDestroyRekapBillingRequest;
 use App\Http\Requests\StoreRekapBillingRequest;
 use App\Http\Requests\UpdateRekapBillingRequest;
-use Gate;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use App\Models\Transaction;
@@ -15,7 +15,7 @@ use App\Models\Semester;
 use App\Models\Invoice;
 use App\Models\ReturnGood;
 use App\Models\Payment;
-use DB;
+use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
 class RekapBillingController extends Controller

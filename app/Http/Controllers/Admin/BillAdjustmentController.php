@@ -10,13 +10,13 @@ use App\Models\BillAdjustment;
 use App\Models\Salesperson;
 use App\Models\Semester;
 use App\Models\User;
-use Gate;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Yajra\DataTables\Facades\DataTables;
 use Carbon\Carbon;
-use DB;
-use Alert;
+use Illuminate\Support\Facades\DB;
+use RealRashid\SweetAlert\Facades\Alert;
 use App\Services\TransactionService;
 
 class BillAdjustmentController extends Controller

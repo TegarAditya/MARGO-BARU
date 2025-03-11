@@ -13,13 +13,13 @@ use App\Models\Vendor;
 use App\Models\Jenjang;
 use App\Models\BookVariant;
 use App\Models\Material;
-use Gate;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Yajra\DataTables\Facades\DataTables;
 use App\Services\StockService;
-use DB;
-use Alert;
+use Illuminate\Support\Facades\DB;
+use RealRashid\SweetAlert\Facades\Alert;
 use Carbon\Carbon;
 
 class PlatePrintController extends Controller

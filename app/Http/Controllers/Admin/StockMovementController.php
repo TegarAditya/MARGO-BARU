@@ -9,7 +9,7 @@ use App\Http\Requests\UpdateStockMovementRequest;
 use App\Models\BookVariant;
 use App\Models\Material;
 use App\Models\StockMovement;
-use Gate;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Yajra\DataTables\Facades\DataTables;

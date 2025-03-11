@@ -5,7 +5,7 @@ use App\Models\EstimationMovement;
 use App\Models\ProductionEstimation;
 use App\Models\SalesOrder;
 use Carbon\Carbon;
-use DB;
+use Illuminate\Support\Facades\DB;
 
 class EstimationService
 {

@@ -11,7 +11,7 @@ use App\Models\CetakItem;
 use App\Models\Halaman;
 use App\Models\Material;
 use App\Models\Semester;
-use Gate;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Yajra\DataTables\Facades\DataTables;

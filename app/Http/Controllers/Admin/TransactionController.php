@@ -10,7 +10,7 @@ use App\Models\Invoice;
 use App\Models\Salesperson;
 use App\Models\Semester;
 use App\Models\Transaction;
-use Gate;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Yajra\DataTables\Facades\DataTables;

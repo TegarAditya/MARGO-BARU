@@ -18,13 +18,13 @@ use App\Models\Isi;
 use App\Models\Cover;
 use App\Models\Kelas;
 use App\Models\Mapel;
-use Gate;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Yajra\DataTables\Facades\DataTables;
 use Carbon\Carbon;
-use Alert;
-use DB;
+use RealRashid\SweetAlert\Facades\Alert;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Date;
 use App\Exports\StockExport;
 

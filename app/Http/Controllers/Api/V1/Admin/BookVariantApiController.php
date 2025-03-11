@@ -7,7 +7,7 @@ use App\Http\Requests\StoreBookVariantRequest;
 use App\Http\Requests\UpdateBookVariantRequest;
 use App\Http\Resources\Admin\BookVariantResource;
 use App\Models\BookVariant;
-use Gate;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 

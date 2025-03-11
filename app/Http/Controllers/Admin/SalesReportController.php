@@ -7,12 +7,12 @@ use App\Http\Requests\MassDestroySalesReportRequest;
 use App\Http\Requests\StoreSalesReportRequest;
 use App\Http\Requests\UpdateSalesReportRequest;
 use App\Models\Salesperson;
-use Gate;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Yajra\DataTables\Facades\DataTables;
-use DB;
-use Alert;
+use Illuminate\Support\Facades\DB;
+use RealRashid\SweetAlert\Facades\Alert;
 use Carbon\Carbon;
 
 class SalesReportController extends Controller
