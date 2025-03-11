@@ -13,17 +13,17 @@ use App\Models\Transaction;
 use App\Models\Invoice;
 use App\Models\ReturnGood;
 use App\Models\Payment;
-use Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Yajra\DataTables\Facades\DataTables;
-use DB;
-use Alert;
 use Illuminate\Support\Facades\Date;
 use Carbon\Carbon;
 use App\Exports\RekapBillingExport;
 use App\Exports\DirekturBillingExport;
 use App\Exports\BillingExport;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
+use RealRashid\SweetAlert\Facades\Alert;
 
 class BillController extends Controller
 {
