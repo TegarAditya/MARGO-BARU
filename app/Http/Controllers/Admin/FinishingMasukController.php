@@ -24,7 +24,7 @@ class FinishingMasukController extends Controller
         abort_if(Gate::denies('finishing_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         if ($request->ajax()) {
-            $query = FinishingMasuk::select('no_spk', 'date', 'vendor_id')->distinct()->with(['vendor'])->latest();
+            $query = FinishingMasuk::select('no_spk', 'date', 'vendor_id','created_at')->distinct()->with(['vendor'])->latest();
 
             if (!empty($request->vendor)) {
                 $query->where('vendor_id', $request->vendor);
