@@ -387,7 +387,7 @@ class BookVariantController extends Controller
         $query = BookVariant::where(function($q) use ($keyword) {
                     $q->where('code', 'LIKE', "%{$keyword}%")
                     ->orWhere('name', 'LIKE', "%{$keyword}%");
-                });
+                })->limit(50);
 
         if (!empty($jenjang)) {
             $query->where('jenjang_id', $jenjang);
