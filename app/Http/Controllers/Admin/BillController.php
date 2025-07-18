@@ -64,6 +64,9 @@ class BillController extends Controller
                     <a class="px-1" href="' . route('admin.bills.eksportBillingDetail', ['salesperson' => $row->salesperson_id, 'semester' => $semester]) . '" title="Print Rekap Saldo" target="_blank">
                         <i class="fas fa-file-excel text-danger fa-lg"></i>
                     </a>
+                    <a class="px-1" href="'.route('admin.bills.recalculating', ['salesperson' => $row->salesperson_id]).'" title="Rebalancing" target="_blank">
+                        <i class="fas fa-spinner fa-spin text-danger fa-lg"></i>
+                    </a>
                 ';
 
                 return $btn;
@@ -116,6 +119,93 @@ class BillController extends Controller
         $semesters = Semester::where('status', 1)->latest()->pluck('name', 'id');
 
         return view('admin.bills.index', compact('semesters'));
+    }
+
+    public function salespersonIndex(Request $request)
+    {
+        abort_if(Gate::denies('bill_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+
+        if ($request->ajax()) {
+            $query = Bill::with(['semester', 'salesperson'])->select(sprintf('%s.*', (new Bill)->table));
+
+            if (!empty($request->salesperson)) {
+                $query->where('salesperson_id', $request->salesperson);
+            }
+
+            $query = $query->orderBy('salesperson_id')->oldest();
+
+            $table = Datatables::of($query);
+
+            $table->addColumn('placeholder', '&nbsp;');
+            $table->addColumn('actions', '&nbsp;');
+
+            $table->editColumn('actions', function ($row) {
+                $btn = '
+                    <a class="px-1" href="'.route('admin.bills.billing', ['salesperson' => $row->salesperson_id, 'semester' => $row->semester_id]).'" title="Show">
+                        <i class="fas fa-eye text-success fa-lg"></i>
+                    </a>
+                    <a class="px-1" href="'.route('admin.bills.cetakBilling', ['salesperson' => $row->salesperson_id, 'semester' => $row->semester_id]).'" title="Print Saldo" target="_blank">
+                        <i class="fas fa-print text-secondary fa-lg"></i>
+                    </a>
+                    <a class="px-1" href="'.route('admin.bills.cetakBilling', ['salesperson' => $row->salesperson_id, 'semester' => $row->semester_id, 'rekap' => 1]).'" title="Print Rekap Saldo" target="_blank">
+                        <i class="fas fa-print text-danger fa-lg"></i>
+                    </a>
+                    <a class="px-1" href="'.route('admin.bills.recalculating', ['salesperson' => $row->salesperson_id]).'" title="Rebalancing" target="_blank">
+                        <i class="fas fa-spinner fa-spin text-danger fa-lg"></i>
+                    </a>
+                ';
+
+                return $btn;
+            });
+
+            $table->addColumn('semester_name', function ($row) {
+                return $row->semester ? $row->semester->name : '';
+            });
+
+            $table->addColumn('salesperson_name', function ($row) {
+                return $row->salesperson ? $row->salesperson->full_name : '';
+            });
+
+            $table->addColumn('sales', function ($row) {
+                return $row->salesperson ? $row->salesperson->full_name : '';
+            });
+
+            $table->editColumn('saldo_awal', function ($row) {
+                return $row->saldo_awal ? angka($row->saldo_awal): 0;
+            });
+            $table->editColumn('jual', function ($row) {
+                return $row->jual ? angka($row->jual) : 0;
+            });
+            $table->editColumn('diskon', function ($row) {
+                return $row->diskon ? angka($row->diskon) : 0;
+            });
+            $table->editColumn('adjustment', function ($row) {
+                return $row->adjustment ? angka($row->adjustment) : 0;
+            });
+            $table->editColumn('retur', function ($row) {
+                return $row->retur ? angka($row->retur) : 0;
+            });
+            $table->editColumn('bayar', function ($row) {
+                return $row->bayar ? angka($row->bayar) : 0;
+            });
+            $table->editColumn('potongan', function ($row) {
+                return $row->potongan ? angka($row->potongan) : 0;
+            });
+            $table->editColumn('saldo_akhir', function ($row) {
+                return $row->saldo_akhir ? angka($row->saldo_akhir) : 0;
+            });
+            $table->editColumn('piutang', function ($row) {
+                return $row->piutang ? angka($row->piutang) : 0;
+            });
+
+            $table->rawColumns(['actions', 'placeholder', 'semester', 'salesperson']);
+
+            return $table->make(true);
+        }
+
+        $salespeople = Salesperson::latest()->get()->pluck('full_name', 'id')->prepend(trans('global.pleaseSelect'), '');
+
+        return view('admin.bills.salesperson_index', compact('salespeople'));
     }
 
     public function create()
@@ -213,7 +303,8 @@ class BillController extends Controller
                         'saldo_akhir' => ($saldo_awal + $faktur) - ($adjustment + $diskon + $retur + $bayar + $potongan),
                         'tagihan' => $faktur - ($adjustment + $diskon + $retur),
                         'pembayaran' => $pembayaran,
-                        'piutang' => ($saldo_awal + $faktur) - ($adjustment + $diskon + $retur + $pembayaran)
+                        'piutang' => ($saldo_awal + $faktur) - ($adjustment + $diskon + $retur + $pembayaran),
+                        'piutang_semester' => $faktur - ($adjustment + $diskon + $retur + $pembayaran)
                     ]);
                 } else {
                     $previous = Bill::where('salesperson_id', $sale->id)->where('semester_id', prevSemester($semester))->first();
@@ -233,7 +324,8 @@ class BillController extends Controller
                         'saldo_akhir' => ($saldo_awal + $faktur) - ($adjustment + $diskon + $retur + $bayar + $potongan),
                         'tagihan' => $faktur - ($adjustment + $diskon + $retur),
                         'pembayaran' => $pembayaran,
-                        'piutang' => ($saldo_awal + $faktur) - ($adjustment + $diskon + $retur + $pembayaran)
+                        'piutang' => ($saldo_awal + $faktur) - ($adjustment + $diskon + $retur + $pembayaran),
+                        'piutang_semester' => $faktur - ($adjustment + $diskon + $retur + $pembayaran)
                     ]);
                 }
             }
@@ -565,5 +657,67 @@ class BillController extends Controller
             ->groupBy('i.salesperson_id', 'i.semester_id', 's.name', 'r.total_return_goods_nominal', 'p.total_payments')
             ->havingRaw('saldo_akhir != 0')
             ->get();
+    }
+
+    public function recalculating(Request $request)
+    {
+        $salesperson = $request->salesperson;
+        $semester = $request->semester ?? setting('current_semester');
+
+        $list_semester = array(9, 10, 11);
+
+        foreach($list_semester as $item) {
+
+            $bill = Bill::where('salesperson_id', $salesperson)->where('semester_id', $item)->first();
+
+            $faktur = Invoice::where('salesperson_id', $salesperson)->where('semester_id', $item)->sum('total');
+            $diskon = Invoice::where('salesperson_id', $salesperson)->where('semester_id', $item)->sum('discount');
+            $adjustment = BillAdjustment::where('salesperson_id', $salesperson)->where('semester_id', $item)->sum('amount');
+            $retur = ReturnGood::where('salesperson_id', $salesperson)->where('semester_retur_id', $item)->sum('nominal');
+
+            $bayar = Payment::where('salesperson_id', $salesperson)->where('semester_bayar_id', $item)->sum('paid');
+            $potongan = Payment::where('salesperson_id', $salesperson)->where('semester_bayar_id', $item)->sum('discount');
+            $pembayaran = $bayar + $potongan;
+
+            if ($bill) {
+                $saldo_awal = $bill->previous ? $bill->previous->saldo_akhir : 0;
+                $bill->update([
+                    'saldo_awal' => $saldo_awal,
+                    'jual' => $faktur,
+                    'diskon' => $diskon,
+                    'adjustment' => $adjustment,
+                    'retur' => $retur,
+                    'bayar' => $bayar,
+                    'potongan' => $potongan,
+                    'saldo_akhir' => ($saldo_awal + $faktur) - ($adjustment + $diskon + $retur + $pembayaran),
+                    'tagihan' => $faktur - ($diskon + $retur),
+                    'pembayaran' => $pembayaran,
+                    'piutang' => $faktur - ($adjustment + $diskon + $retur + $pembayaran)
+                ]);
+            } else {
+                $previous = Bill::where('salesperson_id', $salesperson)->where('semester_id', prevSemester($item))->first();
+    
+                $saldo_awal = $previous ? $previous->saldo_akhir : 0;
+                Bill::create([
+                    'semester_id' => $item,
+                    'salesperson_id' => $salesperson,
+                    'previous_id' => $previous ? $previous->id : null,
+                    'saldo_awal' => $saldo_awal,
+                    'jual' => $faktur,
+                    'diskon' => $diskon,
+                    'adjustment' => $adjustment,
+                    'retur' => $retur,
+                    'bayar' => $bayar,
+                    'potongan' => $potongan,
+                    'saldo_akhir' => ($saldo_awal + $faktur) - ($adjustment + $diskon + $retur + $pembayaran),
+                    'tagihan' => $faktur - ($diskon + $retur),
+                    'pembayaran' => $pembayaran,
+                    'piutang' => $faktur - ($adjustment + $diskon + $retur + $pembayaran)
+                ]);
+            }
+
+        }
+
+        return redirect()->back();
     }
 }
