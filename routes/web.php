@@ -263,6 +263,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     Route::get('bills/billing', 'BillController@billing')->name('bills.billing');
     Route::get('bills/print-billing', 'BillController@cetakBilling')->name('bills.cetakBilling');
     Route::get('bills/export-billing', 'BillController@eksportRekapBilling')->name('bills.eksportRekapBilling');
+    Route::get('bills/export-billing-detail', 'BillController@eksportBillingDetail')->name('bills.eksportBillingDetail');
     Route::get('bills/report-direktur', 'BillController@reportDirektur')->name('bills.reportDirektur');
     Route::get('bills/recalculating', 'BillController@recalculating')->name('bills.recalculating');
     Route::get('bills/salesperson', 'BillController@salespersonIndex')->name('bills.salespersonIndex');
