@@ -61,6 +61,9 @@ class BillController extends Controller
                     <a class="px-1" href="' . route('admin.bills.cetakBilling', ['salesperson' => $row->salesperson_id, 'semester' => $semester, 'rekap' => 1]) . '" title="Print Rekap Saldo" target="_blank">
                         <i class="fas fa-print text-danger fa-lg"></i>
                     </a>
+                    <a class="px-1" href="' . route('admin.bills.eksportBillingDetail', ['salesperson' => $row->salesperson_id, 'semester' => $semester]) . '" title="Print Rekap Saldo" target="_blank">
+                        <i class="fas fa-file-excel text-danger fa-lg"></i>
+                    </a>
                 ';
 
                 return $btn;
