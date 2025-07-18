@@ -417,7 +417,10 @@ class BillController extends Controller
         $semester = $request->semester ?? setting('current_semester');
 
         $billing = $this->getBillSummary($salesperson_id, $semester)->map(function ($item) {
-            return (array) $item;
+            return [
+                'semester_name' => $item->semester_name,
+                'saldo_akhir' => (float) $item->saldo_akhir,
+            ];
         })->toArray();
         $currentBilling = $this->getBillSummary($salesperson_id, $semester, true)->sum('saldo_akhir');
 
@@ -437,14 +440,14 @@ class BillController extends Controller
             ->where('salesperson_id', $salesperson_id)
             ->where('semester_id', $semester)
             ->get();
-        // dd($invoices->toArray());
+
         $flatInvoices = $invoices->map(function ($invoice) {
             return [
                 'number' => $invoice->no_faktur,
                 'date' => $invoice->date,
-                'total' => $invoice->total,
-                'discount' => $invoice->discount,
-                'nominal' => $invoice->nominal,
+                'total' => (float) $invoice->total,
+                'discount' => (float) $invoice->discount,
+                'nominal' => (float) $invoice->nominal,
                 'note' => $invoice->note,
                 'items' => $invoice->invoice_items->map(function ($item) {
                     $product = $item->product;
@@ -452,10 +455,10 @@ class BillController extends Controller
                     return [
                         'quantity' => $item->quantity,
                         'price' => $item->price,
-                        'total' => $item->total,
-                        'discount' => $item->discount,
-                        'total_discount' => $item->total_discount,
-                        'subtotal' => $item->total - $item->total_discount,
+                        'total' => (float) $item->total,
+                        'discount' => (float) $item->discount,
+                        'total_discount' => (float) $item->total_discount,
+                        'subtotal' => (float) $item->total - (float) $item->total_discount,
                         'jenjang' => $product->jenjang->name . ' - ' . $product->kurikulum->code ?? null,
                         'mapel' => $product->mapel->name ?? null,
                         'kelas' => $product->kelas->name ?? null,
@@ -479,7 +482,7 @@ class BillController extends Controller
             'salesperson' => $salesperson->toArray(),
             'semester' => $semesterName,
             'bills' => $billing,
-            'current_bills' => $currentBilling,
+            'current_bills' => (float) $currentBilling,
             ...$flatInvoices->mapWithKeys(function ($invoice, $index) use (&$additionalIndex) {
                 if (!empty($invoice['items'])) {
                     return ['invoices' . ($index + 1) => $invoice];
