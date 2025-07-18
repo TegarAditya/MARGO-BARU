@@ -408,6 +408,96 @@ class BillController extends Controller
         return (new RekapBillingExport())->download('REKAP BILLING ' . preg_replace('/[^A-Za-z0-9_\-]/', '-', $semester) . ' TANGGAL ' . $today . '.xlsx');
     }
 
+    public function eksportBillingDetail(Request $request)
+    {
+        $salesperson_id = $request->salesperson;
+        $semester = $request->semester ?? setting('current_semester');
+
+        $billing = $this->getBillSummary($salesperson_id, $semester)->map(function ($item) {
+            return (array) $item;
+        })->toArray();
+        $currentBilling = $this->getBillSummary($salesperson_id, $semester, true)->sum('saldo_akhir');
+
+        $invoices = Invoice::with([
+            'invoice_items' => function ($q) {
+                $q->select('id', 'invoice_id', 'product_id', 'quantity', 'price', 'total', 'discount', 'total_discount');
+            },
+            'invoice_items.product' => function ($q) {
+                $q->select('id', 'kelas_id', 'jenjang_id', 'mapel_id', 'kurikulum_id', 'halaman_id', 'name');
+            },
+            'invoice_items.product.kurikulum:id,code',
+            'invoice_items.product.jenjang:id,name',
+            'invoice_items.product.kelas:id,name',
+            'invoice_items.product.mapel:id,name',
+            'invoice_items.product.halaman:id,code'
+        ])
+            ->where('salesperson_id', $salesperson_id)
+            ->where('semester_id', $semester)
+            ->get();
+        // dd($invoices->toArray());
+        $flatInvoices = $invoices->map(function ($invoice) {
+            return [
+                'number' => $invoice->no_faktur,
+                'date' => $invoice->date,
+                'total' => $invoice->total,
+                'discount' => $invoice->discount,
+                'nominal' => $invoice->nominal,
+                'note' => $invoice->note,
+                'items' => $invoice->invoice_items->map(function ($item) {
+                    $product = $item->product;
+
+                    return [
+                        'quantity' => $item->quantity,
+                        'price' => $item->price,
+                        'total' => $item->total,
+                        'discount' => $item->discount,
+                        'total_discount' => $item->total_discount,
+                        'subtotal' => $item->total - $item->total_discount,
+                        'jenjang' => $product->jenjang->name . ' - ' . $product->kurikulum->code ?? null,
+                        'mapel' => $product->mapel->name ?? null,
+                        'kelas' => $product->kelas->name ?? null,
+                        'halaman' => $product->halaman->code ?? null,
+                    ];
+                })->toArray(),
+            ];
+        });
+
+        $adjustments = BillAdjustment::where('salesperson_id', $salesperson_id)->where('semester_id', $semester)->get();
+        $returs = ReturnGood::with('retur_items')->where('salesperson_id', $salesperson_id)->where('semester_retur_id', $semester)->get();
+        $payments = Payment::where('salesperson_id', $salesperson_id)->where('semester_bayar_id', $semester)->get();
+
+        $semesterName = Semester::find($semester)->name;
+        $salesperson = Salesperson::find($salesperson_id);
+
+        $additionalIndex = 1;
+
+        $data = [
+            'date' => Carbon::now()->format('d-m-Y'),
+            'salesperson' => $salesperson->toArray(),
+            'semester' => $semesterName,
+            'bills' => $billing,
+            'current_bills' => $currentBilling,
+            ...$flatInvoices->mapWithKeys(function ($invoice, $index) use (&$additionalIndex) {
+                if (!empty($invoice['items'])) {
+                    return ['invoices' . ($index + 1) => $invoice];
+                } else {
+                    return ['additional_invoices' . ($additionalIndex++) => $invoice];
+                }
+            })->toArray(),
+            'adjustments' => $adjustments->toArray(),
+            'returs' => $returs->toArray(),
+            'payments' => $payments->toArray(),
+        ];
+
+        // dd($data);
+
+        return response()->streamDownload(function () use ($data) {
+            echo (new \AnourValar\Office\SheetsService)
+                ->generate(resource_path() . '/xlsx/export_billing_detail.xlsx', $data)
+                ->save(\AnourValar\Office\Format::Xlsx);
+        }, str_replace('/', '_', $salesperson->full_name . ' - ' . $semesterName) . '.xlsx');
+    }
+
     public function reportDirektur(Request $request)
     {
         $today = Carbon::now()->format('d-m-Y');
