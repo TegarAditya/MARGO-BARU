@@ -545,8 +545,8 @@ class BillController extends Controller
                     $product = $item->product;
 
                     return [
-                        'quantity' => $item->quantity,
-                        'price' => $item->price,
+                        'quantity' => (int) $item->quantity,
+                        'price' => (float) $item->price,
                         'total' => (float) $item->total,
                         'discount' => (float) $item->discount,
                         'total_discount' => (float) $item->total_discount,
