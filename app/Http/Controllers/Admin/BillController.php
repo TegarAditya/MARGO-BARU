@@ -468,8 +468,46 @@ class BillController extends Controller
             ];
         });
 
+        $returs = ReturnGood::with([
+            'retur_items' => function ($q) {
+                $q->select('id', 'retur_id', 'product_id', 'quantity', 'price', 'total');
+            },
+            'retur_items.product' => function ($q) {
+                $q->select('id', 'kelas_id', 'jenjang_id', 'mapel_id', 'kurikulum_id', 'halaman_id', 'name');
+            },
+            'retur_items.product.kurikulum:id,code',
+            'retur_items.product.jenjang:id,name',
+            'retur_items.product.kelas:id,name',
+            'retur_items.product.mapel:id,name',
+            'retur_items.product.halaman:id,code'
+        ])
+            ->where('salesperson_id', $salesperson_id)
+            ->where('semester_retur_id', $semester)
+            ->get();
+
+        $flatReturs = $returs->map(function ($retur) {
+            return [
+                'number' => $retur->no_retur,
+                'date' => $retur->date,
+                'nominal' => (float) $retur->nominal,
+                'items' => $retur->retur_items->map(function ($item) {
+                    $product = $item->product;
+
+                    return [
+                        'quantity' => (int) $item->quantity,
+                        'price' => (float) $item->price,
+                        'total' => (float) $item->total,
+                        'subtotal' => (float) $item->total - (float) $item->total_discount,
+                        'jenjang' => $product->jenjang->name . ' - ' . $product->kurikulum->code ?? null,
+                        'mapel' => $product->mapel->name ?? null,
+                        'kelas' => $product->kelas->name ?? null,
+                        'halaman' => $product->halaman->code ?? null,
+                    ];
+                })->toArray(),
+            ];
+        });
+
         $adjustments = BillAdjustment::where('salesperson_id', $salesperson_id)->where('semester_id', $semester)->get();
-        $returs = ReturnGood::with('retur_items')->where('salesperson_id', $salesperson_id)->where('semester_retur_id', $semester)->get();
         $payments = Payment::where('salesperson_id', $salesperson_id)->where('semester_bayar_id', $semester)->get();
 
         $semesterName = Semester::find($semester)->name;
@@ -491,7 +529,9 @@ class BillController extends Controller
                 }
             })->toArray(),
             'adjustments' => $adjustments->toArray(),
-            'returs' => $returs->toArray(),
+            ...$flatReturs->mapWithKeys(function ($retur, $index) {
+                return ['returs' . ($index + 1) => $retur];
+            })->toArray(),
             'payments' => $payments->toArray(),
         ];
 
