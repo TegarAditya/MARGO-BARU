@@ -508,69 +508,59 @@ class BillController extends Controller
         $salesperson_id = $request->salesperson;
         $semester = $request->semester ?? setting('current_semester');
 
-        $billing = $this->getBillSummary($salesperson_id, $semester)->map(function ($item) {
-            return [
-                'semester_name' => $item->semester_name,
-                'saldo_akhir' => (float) $item->saldo_akhir,
-            ];
-        })->toArray();
+        $billing = $this->getBillSummary($salesperson_id, $semester)->map(fn($item) => [
+            'semester_name' => $item->semester_name,
+            'saldo_akhir' => (float) $item->saldo_akhir,
+        ])->toArray();
+
         $currentBilling = $this->getBillSummary($salesperson_id, $semester, true)->sum('saldo_akhir');
 
-        $invoices = Invoice::with([
-            'invoice_items' => function ($q) {
-                $q->select('id', 'invoice_id', 'product_id', 'quantity', 'price', 'total', 'discount', 'total_discount');
-            },
-            'invoice_items.product' => function ($q) {
-                $q->select('id', 'kelas_id', 'jenjang_id', 'mapel_id', 'kurikulum_id', 'halaman_id', 'name');
-            },
+        $invoiceRelations = [
+            'invoice_items:id,invoice_id,product_id,quantity,price,total,discount,total_discount',
+            'invoice_items.product:id,kelas_id,jenjang_id,mapel_id,kurikulum_id,halaman_id,name',
             'invoice_items.product.kurikulum:id,code',
             'invoice_items.product.jenjang:id,name',
             'invoice_items.product.kelas:id,name',
             'invoice_items.product.mapel:id,name',
-            'invoice_items.product.halaman:id,code'
-        ])
+            'invoice_items.product.halaman:id,code',
+        ];
+
+        $returRelations = [
+            'retur_items:id,retur_id,product_id,quantity,price,total',
+            'retur_items.product:id,kelas_id,jenjang_id,mapel_id,kurikulum_id,halaman_id,name',
+            'retur_items.product.kurikulum:id,code',
+            'retur_items.product.jenjang:id,name',
+            'retur_items.product.kelas:id,name',
+            'retur_items.product.mapel:id,name',
+            'retur_items.product.halaman:id,code',
+        ];
+
+        $invoices = Invoice::with($invoiceRelations)
             ->where('salesperson_id', $salesperson_id)
             ->where('semester_id', $semester)
             ->get();
 
-        $flatInvoices = $invoices->map(function ($invoice) {
-            return [
-                'number' => $invoice->no_faktur,
-                'date' => $invoice->date,
-                'total' => (float) $invoice->total,
-                'discount' => (float) $invoice->discount,
-                'nominal' => (float) $invoice->nominal,
-                'note' => $invoice->note,
-                'items' => $invoice->invoice_items->map(function ($item) {
-                    $product = $item->product;
+        $returs = ReturnGood::with($returRelations)
+            ->where('salesperson_id', $salesperson_id)
+            ->where('semester_retur_id', $semester)
+            ->get();
 
-                    return [
-                        'quantity' => (int) $item->quantity,
-                        'price' => (float) $item->price,
-                        'total' => (float) $item->total,
-                        'discount' => (float) $item->discount,
-                        'total_discount' => (float) $item->total_discount,
-                        'subtotal' => (float) $item->total - (float) $item->total_discount,
-                        'jenjang' => $product->jenjang->name . ' - ' . $product->kurikulum->code ?? null,
-                        'mapel' => $product->mapel->name ?? null,
-                        'kelas' => $product->kelas->name ?? null,
-                        'halaman' => $product->halaman->code ?? null,
-                    ];
-                })->toArray(),
-            ];
-        });
+        $flatInvoices = $invoices->map(fn($invoice) => $this->mapInvoice($invoice));
+        $flatReturs = $returs->map(fn($retur) => $this->mapRetur($retur));
 
-        $adjustments = BillAdjustment::where('salesperson_id', $salesperson_id)->where('semester_id', $semester)->get();
-        $returs = ReturnGood::with('retur_items')->where('salesperson_id', $salesperson_id)->where('semester_retur_id', $semester)->get();
-        $payments = Payment::where('salesperson_id', $salesperson_id)->where('semester_bayar_id', $semester)->get();
+        $adjustments = BillAdjustment::where('salesperson_id', $salesperson_id)
+            ->where('semester_id', $semester)->get();
 
-        $semesterName = Semester::find($semester)->name;
-        $salesperson = Salesperson::find($salesperson_id);
+        $payments = Payment::where('salesperson_id', $salesperson_id)
+            ->where('semester_bayar_id', $semester)->get();
+
+        $semesterName = Semester::findOrNew($semester)->name;
+        $salesperson = Salesperson::findOrNew($salesperson_id);
 
         $additionalIndex = 1;
 
         $data = [
-            'date' => Carbon::now()->format('d-m-Y'),
+            'date' => now()->format('d-m-Y'),
             'salesperson' => $salesperson->toArray(),
             'semester' => $semesterName,
             'bills' => $billing,
@@ -583,7 +573,7 @@ class BillController extends Controller
                 }
             })->toArray(),
             'adjustments' => $adjustments->toArray(),
-            'returs' => $returs->toArray(),
+            ...$flatReturs->mapWithKeys(fn($retur, $index) => ['returs' . ($index + 1) => $retur])->toArray(),
             'payments' => $payments->toArray(),
         ];
 
@@ -591,7 +581,7 @@ class BillController extends Controller
 
         return response()->streamDownload(function () use ($data) {
             echo (new \AnourValar\Office\SheetsService)
-                ->generate(resource_path() . '/xlsx/export_billing_detail.xlsx', $data)
+                ->generate(resource_path('xlsx/export_billing_detail.xlsx'), $data)
                 ->save(\AnourValar\Office\Format::Xlsx);
         }, str_replace('/', '_', $salesperson->full_name . ' - ' . $semesterName) . '.xlsx');
     }
@@ -657,6 +647,47 @@ class BillController extends Controller
             ->groupBy('i.salesperson_id', 'i.semester_id', 's.name', 'r.total_return_goods_nominal', 'p.total_payments')
             ->havingRaw('saldo_akhir != 0')
             ->get();
+    }
+
+    private function mapInvoice($invoice): array
+    {
+        return [
+            'number' => $invoice->no_faktur,
+            'date' => $invoice->date,
+            'total' => (float) $invoice->total,
+            'discount' => (float) $invoice->discount,
+            'nominal' => (float) $invoice->nominal,
+            'note' => $invoice->note,
+            'items' => $invoice->invoice_items->map(fn($item) => $this->mapProductItem($item))->toArray(),
+        ];
+    }
+
+    private function mapRetur($retur): array
+    {
+        return [
+            'number' => $retur->no_retur,
+            'date' => $retur->date,
+            'nominal' => (float) $retur->nominal,
+            'items' => $retur->retur_items->map(fn($item) => $this->mapProductItem($item))->toArray(),
+        ];
+    }
+
+    private function mapProductItem($item): array
+    {
+        $product = $item->product;
+
+        return [
+            'quantity' => (int) $item->quantity,
+            'price' => (float) $item->price,
+            'total' => (float) $item->total,
+            'discount' => (float) ($item->discount ?? 0),
+            'total_discount' => (float) ($item->total_discount ?? 0),
+            'subtotal' => (float) $item->total - (float) ($item->total_discount ?? 0),
+            'jenjang' => optional($product->jenjang)->name . ' - ' . optional($product->kurikulum)->code,
+            'mapel' => optional($product->mapel)->name,
+            'kelas' => optional($product->kelas)->name,
+            'halaman' => optional($product->halaman)->code,
+        ];
     }
 
     public function recalculating(Request $request)
