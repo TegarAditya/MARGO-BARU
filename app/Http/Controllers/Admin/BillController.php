@@ -64,7 +64,7 @@ class BillController extends Controller
                     <a class="px-1" href="' . route('admin.bills.eksportBillingDetail', ['salesperson' => $row->salesperson_id, 'semester' => $semester]) . '" title="Print Rekap Saldo" target="_blank">
                         <i class="fas fa-file-excel text-danger fa-lg"></i>
                     </a>
-                    <a class="px-1" href="'.route('admin.bills.recalculating', ['salesperson' => $row->salesperson_id]).'" title="Rebalancing" target="_blank">
+                    <a class="px-1" href="' . route('admin.bills.recalculating', ['salesperson' => $row->salesperson_id]) . '" title="Rebalancing" target="_blank">
                         <i class="fas fa-spinner fa-spin text-danger fa-lg"></i>
                     </a>
                 ';
@@ -141,16 +141,16 @@ class BillController extends Controller
 
             $table->editColumn('actions', function ($row) {
                 $btn = '
-                    <a class="px-1" href="'.route('admin.bills.billing', ['salesperson' => $row->salesperson_id, 'semester' => $row->semester_id]).'" title="Show">
+                    <a class="px-1" href="' . route('admin.bills.billing', ['salesperson' => $row->salesperson_id, 'semester' => $row->semester_id]) . '" title="Show">
                         <i class="fas fa-eye text-success fa-lg"></i>
                     </a>
-                    <a class="px-1" href="'.route('admin.bills.cetakBilling', ['salesperson' => $row->salesperson_id, 'semester' => $row->semester_id]).'" title="Print Saldo" target="_blank">
+                    <a class="px-1" href="' . route('admin.bills.cetakBilling', ['salesperson' => $row->salesperson_id, 'semester' => $row->semester_id]) . '" title="Print Saldo" target="_blank">
                         <i class="fas fa-print text-secondary fa-lg"></i>
                     </a>
-                    <a class="px-1" href="'.route('admin.bills.cetakBilling', ['salesperson' => $row->salesperson_id, 'semester' => $row->semester_id, 'rekap' => 1]).'" title="Print Rekap Saldo" target="_blank">
+                    <a class="px-1" href="' . route('admin.bills.cetakBilling', ['salesperson' => $row->salesperson_id, 'semester' => $row->semester_id, 'rekap' => 1]) . '" title="Print Rekap Saldo" target="_blank">
                         <i class="fas fa-print text-danger fa-lg"></i>
                     </a>
-                    <a class="px-1" href="'.route('admin.bills.recalculating', ['salesperson' => $row->salesperson_id]).'" title="Rebalancing" target="_blank">
+                    <a class="px-1" href="' . route('admin.bills.recalculating', ['salesperson' => $row->salesperson_id]) . '" title="Rebalancing" target="_blank">
                         <i class="fas fa-spinner fa-spin text-danger fa-lg"></i>
                     </a>
                 ';
@@ -171,7 +171,7 @@ class BillController extends Controller
             });
 
             $table->editColumn('saldo_awal', function ($row) {
-                return $row->saldo_awal ? angka($row->saldo_awal): 0;
+                return $row->saldo_awal ? angka($row->saldo_awal) : 0;
             });
             $table->editColumn('jual', function ($row) {
                 return $row->jual ? angka($row->jual) : 0;
@@ -517,22 +517,24 @@ class BillController extends Controller
 
         $invoiceRelations = [
             'invoice_items:id,invoice_id,product_id,quantity,price,total,discount,total_discount',
-            'invoice_items.product:id,kelas_id,jenjang_id,mapel_id,kurikulum_id,halaman_id,name',
+            'invoice_items.product:id,kelas_id,jenjang_id,mapel_id,kurikulum_id,halaman_id,cover_id,name',
             'invoice_items.product.kurikulum:id,code',
             'invoice_items.product.jenjang:id,name',
             'invoice_items.product.kelas:id,name',
             'invoice_items.product.mapel:id,name',
             'invoice_items.product.halaman:id,code',
+            'invoice_items.product.cover:id,name',
         ];
 
         $returRelations = [
             'retur_items:id,retur_id,product_id,quantity,price,total',
-            'retur_items.product:id,kelas_id,jenjang_id,mapel_id,kurikulum_id,halaman_id,name',
+            'retur_items.product:id,kelas_id,jenjang_id,mapel_id,kurikulum_id,halaman_id,cover_id,name',
             'retur_items.product.kurikulum:id,code',
             'retur_items.product.jenjang:id,name',
             'retur_items.product.kelas:id,name',
             'retur_items.product.mapel:id,name',
             'retur_items.product.halaman:id,code',
+            'retur_items.product.cover:id,name',
         ];
 
         $invoices = Invoice::with($invoiceRelations)
@@ -565,6 +567,11 @@ class BillController extends Controller
             'semester' => $semesterName,
             'bills' => $billing,
             'current_bills' => (float) $currentBilling,
+            'invoices' => $flatInvoices->map(function ($invoice) {
+                $invoiceCopy = $invoice;
+                unset($invoiceCopy['items']);
+                return $invoiceCopy;
+            })->toArray(),
             ...$flatInvoices->mapWithKeys(function ($invoice, $index) use (&$additionalIndex) {
                 if (!empty($invoice['items'])) {
                     return ['invoices' . ($index + 1) => $invoice];
@@ -573,6 +580,11 @@ class BillController extends Controller
                 }
             })->toArray(),
             'adjustments' => $adjustments->toArray(),
+            'returs' => $flatReturs->map(function ($invoice) {
+                $invoiceCopy = $invoice;
+                unset($invoiceCopy['items']);
+                return $invoiceCopy;
+            })->toArray(),
             ...$flatReturs->mapWithKeys(fn($retur, $index) => ['returs' . ($index + 1) => $retur])->toArray(),
             'payments' => $payments->toArray(),
         ];
@@ -687,6 +699,7 @@ class BillController extends Controller
             'mapel' => optional($product->mapel)->name,
             'kelas' => optional($product->kelas)->name,
             'halaman' => optional($product->halaman)->code,
+            'cover' => optional($product->cover)->name,
         ];
     }
 
@@ -697,7 +710,7 @@ class BillController extends Controller
 
         $list_semester = array(9, 10, 11);
 
-        foreach($list_semester as $item) {
+        foreach ($list_semester as $item) {
 
             $bill = Bill::where('salesperson_id', $salesperson)->where('semester_id', $item)->first();
 
@@ -727,7 +740,7 @@ class BillController extends Controller
                 ]);
             } else {
                 $previous = Bill::where('salesperson_id', $salesperson)->where('semester_id', prevSemester($item))->first();
-    
+
                 $saldo_awal = $previous ? $previous->saldo_akhir : 0;
                 Bill::create([
                     'semester_id' => $item,
@@ -746,7 +759,6 @@ class BillController extends Controller
                     'piutang' => $faktur - ($adjustment + $diskon + $retur + $pembayaran)
                 ]);
             }
-
         }
 
         return redirect()->back();
