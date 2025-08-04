@@ -517,7 +517,7 @@ class BillController extends Controller
 
         $invoiceRelations = [
             'invoice_items:id,invoice_id,product_id,quantity,price,total,discount,total_discount',
-            'invoice_items.product:id,kelas_id,jenjang_id,mapel_id,kurikulum_id,halaman_id,cover_id,name',
+            'invoice_items.product:id,kelas_id,jenjang_id,mapel_id,kurikulum_id,halaman_id,cover_id,name,code',
             'invoice_items.product.kurikulum:id,code',
             'invoice_items.product.jenjang:id,name',
             'invoice_items.product.kelas:id,name',
@@ -528,7 +528,7 @@ class BillController extends Controller
 
         $returRelations = [
             'retur_items:id,retur_id,product_id,quantity,price,total',
-            'retur_items.product:id,kelas_id,jenjang_id,mapel_id,kurikulum_id,halaman_id,cover_id,name',
+            'retur_items.product:id,kelas_id,jenjang_id,mapel_id,kurikulum_id,halaman_id,cover_id,name,code',
             'retur_items.product.kurikulum:id,code',
             'retur_items.product.jenjang:id,name',
             'retur_items.product.kelas:id,name',
@@ -700,6 +700,7 @@ class BillController extends Controller
             'kelas' => optional($product->kelas)->name,
             'halaman' => optional($product->halaman)->code,
             'cover' => optional($product->cover)->name,
+            'code' => $product->code,
         ];
     }
 
