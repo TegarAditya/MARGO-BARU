@@ -45,23 +45,23 @@ class InvoiceController extends Controller
 
             $table->editColumn('actions', function ($row) {
                 $btn = '
-                    <a class="px-1" href="'.route('admin.invoices.show', $row->id).'" title="Show">
+                    <a class="px-1" href="' . route('admin.invoices.show', $row->id) . '" title="Show">
                         <i class="fas fa-eye text-success fa-lg"></i>
                     </a>
-                    <a class="px-1" href="'.route('admin.invoices.print-faktur', $row->id).'" target="_blank" title="Print Faktur" >
+                    <a class="px-1" href="' . route('admin.invoices.print-faktur', $row->id) . '" target="_blank" title="Print Faktur" >
                         <i class="fas fa-print text-secondary fa-lg"></i>
                     </a>
                 ';
 
                 if ($row->type == 'jual') {
-                    $btn = $btn. '
-                        <a class="px-1" href="'.route('admin.invoices.edit', $row->id).'" title="Edit">
+                    $btn = $btn . '
+                        <a class="px-1" href="' . route('admin.invoices.edit', $row->id) . '" title="Edit">
                             <i class="fas fa-edit fa-lg"></i>
                         </a>
                     ';
                 } else {
-                    $btn = $btn. '
-                        <a class="px-1" href="'.route('admin.invoices.editInvoice', $row->id).'" title="Edit">
+                    $btn = $btn . '
+                        <a class="px-1" href="' . route('admin.invoices.editInvoice', $row->id) . '" title="Edit">
                             <i class="fas fa-edit fa-lg"></i>
                         </a>
                     ';
@@ -156,7 +156,7 @@ class InvoiceController extends Controller
         // Validate the form data
         $validatedData = $request->validate([
             'date' => 'required',
-            'delivery' =>'required|exists:delivery_orders,id',
+            'delivery' => 'required|exists:delivery_orders,id',
             // 'note' => 'nullable',
             'nominal' => 'numeric|min:0',
             'total_price' => 'numeric|min:0',
@@ -195,6 +195,13 @@ class InvoiceController extends Controller
         $semester = $delivery_order->semester_id;
         $salesperson = $delivery_order->salesperson_id;
 
+        $existingInvoice = Invoice::where('delivery_order_id', $validatedData['delivery'])->exists();
+        if ($existingInvoice) {
+            return redirect()->back()
+                ->with('error-message', 'An invoice for this delivery order already exists.')
+                ->withInput();
+        }
+
         DB::beginTransaction();
         try {
             $invoice = Invoice::create([
@@ -207,7 +214,7 @@ class InvoiceController extends Controller
                 'discount' => $total_diskon,
                 'total' => $total_price,
                 'nominal' => $nominal,
-                'note' => 'Generated Invoice From '. $delivery_order->no_faktur,
+                'note' => 'Generated Invoice From ' . $delivery_order->no_faktur,
                 'created_by_id' => auth()->user()->id
             ]);
 
@@ -235,8 +242,8 @@ class InvoiceController extends Controller
                 ]);
             }
 
-            TransactionService::createTransaction($date, 'Faktur from '. $invoice->no_faktur, $salesperson, $semester, 'faktur', $invoice->id, $invoice->no_faktur, $total_price, 'debet');
-            TransactionService::createTransaction($date, 'Diskon from '. $invoice->no_faktur, $salesperson, $semester, 'diskon', $invoice->id, $invoice->no_faktur, $total_diskon, 'credit');
+            TransactionService::createTransaction($date, 'Faktur from ' . $invoice->no_faktur, $salesperson, $semester, 'faktur', $invoice->id, $invoice->no_faktur, $total_price, 'debet');
+            TransactionService::createTransaction($date, 'Diskon from ' . $invoice->no_faktur, $salesperson, $semester, 'diskon', $invoice->id, $invoice->no_faktur, $total_diskon, 'credit');
             DeliveryService::generateFaktur($delivery);
 
             DB::commit();
@@ -257,9 +264,9 @@ class InvoiceController extends Controller
         $validatedData = $request->validate([
             'date' => 'required',
             'type' => 'required',
-            'salesperson_id' =>'required',
+            'salesperson_id' => 'required',
             // 'semester_id' =>'required',
-            'delivery_order_id' =>'required|exists:delivery_orders,id',
+            'delivery_order_id' => 'required|exists:delivery_orders,id',
             'note' => 'required',
             'nominal' => 'numeric|min:1',
         ]);
@@ -288,7 +295,7 @@ class InvoiceController extends Controller
                 'created_by_id' => auth()->user()->id
             ]);
 
-            $note = 'Faktur From '. $invoice->no_faktur. '. Catatan :'. $note;
+            $note = 'Faktur From ' . $invoice->no_faktur . '. Catatan :' . $note;
 
             TransactionService::createTransaction($date, $note, $salesperson, $semester, 'faktur', $invoice->id, $invoice->no_faktur, $nominal, 'debet');
 
@@ -468,7 +475,7 @@ class InvoiceController extends Controller
                 'note' => $note
             ]);
 
-            $note = 'Faktur From '. $no_faktur. '. Catatan :'. $note;
+            $note = 'Faktur From ' . $no_faktur . '. Catatan :' . $note;
 
             TransactionService::editTransaction($date, $note, $salesperson, $semester, 'faktur', $invoice->id, $no_faktur, $nominal, 'debet');
 
