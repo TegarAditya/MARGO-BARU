@@ -101,7 +101,14 @@
                                     Code : <strong>{{ $product->code }}</strong>
                                 </p>
                                 <p class="mb-0 text-sm">
-                                    Jenjang - Kurikulum : <strong>{{ $product->jenjang->name }} - {{ $product->book->cover->name }} - {{ $product->book->kurikulum->name }}</strong>
+                                    Jenjang - Kurikulum :
+                                    <strong @if(!$product->book) class="text-danger" @endif>
+                                        {{ $product->jenjang->name }}
+                                        -
+                                        {{ optional($product->book)->cover->name ?? $product->cover->name }}
+                                        -
+                                        {{ optional($product->book)->kurikulum->name ?? $product->kurikulum->name}}
+                                    </strong>
                                 </p>
                             </div>
                             <input type="hidden" name="delivery_items[]" value="{{ $item->id }}">
