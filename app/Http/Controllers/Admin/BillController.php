@@ -62,10 +62,7 @@ class BillController extends Controller
                         <i class="fas fa-print text-danger fa-lg"></i>
                     </a>
                     <a class="px-1" href="' . route('admin.bills.eksportBillingDetail', ['salesperson' => $row->salesperson_id, 'semester' => $semester]) . '" title="Print Rekap Saldo" target="_blank">
-                        <i class="fas fa-file-excel text-danger fa-lg"></i>
-                    </a>
-                    <a class="px-1" href="' . route('admin.bills.recalculating', ['salesperson' => $row->salesperson_id]) . '" title="Rebalancing" target="_blank">
-                        <i class="fas fa-spinner fa-spin text-danger fa-lg"></i>
+                        <i class="fas fa-file-excel text-success fa-lg"></i>
                     </a>
                 ';
 
