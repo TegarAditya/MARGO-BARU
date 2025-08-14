@@ -195,7 +195,7 @@ class InvoiceController extends Controller
         $semester = $delivery_order->semester_id;
         $salesperson = $delivery_order->salesperson_id;
 
-        $existingInvoice = Invoice::where('delivery_order_id', $validatedData['delivery'])->exists();
+        $existingInvoice = Invoice::where('delivery_order_id', $validatedData['delivery'])->where('type', 'jual')->exists();
         if ($existingInvoice) {
             return redirect()->back()
                 ->with('error-message', 'An invoice for this delivery order already exists.')
