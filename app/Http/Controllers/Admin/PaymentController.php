@@ -119,6 +119,7 @@ class PaymentController extends Controller
             'date' => 'required',
             'salesperson_id' => 'required',
             'semester_id' => 'required',
+            'pay_previous' => 'required|in:0,1',
             'payment_method' => 'required',
             'bayar' => 'required|numeric|min:1',
             'diskon' => 'nullable|numeric',
@@ -129,6 +130,7 @@ class PaymentController extends Controller
         $date = $validatedData['date'];
         $salesperson = $validatedData['salesperson_id'];
         $semester = $validatedData['semester_id'] ?? setting('current_semester');
+        $pay_previous = $validatedData['pay_previous'];
         $payment_method = $validatedData['payment_method'];
         $bayar = $validatedData['bayar'];
         $diskon = $validatedData['diskon'];
@@ -139,7 +141,7 @@ class PaymentController extends Controller
 
         DB::beginTransaction();
         try {
-            if ($before->count() > 0) {
+            if ($pay_previous && $before->count() > 0) {
                 foreach($before as $bill) {
                     if ($bayar > 0) {
                         $paid = ($bayar < $bill->piutang) ? $bayar : $bill->piutang;

@@ -87,6 +87,16 @@
                         <span class="help-block">{{ trans('cruds.payment.fields.semester_helper') }}</span>
                     </div>
                 </div>
+                <div class="col-6">
+                    <div class="form-group">
+                        <label class="required" for="pay_previous">{{ trans('cruds.payment.fields.pay_previous') }}</label>
+                        <select class="form-control select2" name="pay_previous" id="pay_previous" required>
+                                <option value="1">Ya</option>
+                                <option value="0">Tidak</option>
+                        </select>
+                        <span class="help-block">{{ trans('cruds.payment.fields.pay_previous_helper') }}</span>
+                    </div>
+                </div>
                 <div class="col-12">
                     <div id="tagihan">
                     </div>
