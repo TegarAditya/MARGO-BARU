@@ -831,6 +831,8 @@ return [
             'salesperson_helper'    => ' ',
             'semester'              => 'Semester',
             'semester_helper'       => ' ',
+            'pay_previous'          => 'Bayar Tagihan Sebelumnya',
+            'pay_previous_helper'   => ' ',
             'paid'                  => 'Paid',
             'paid_helper'           => ' ',
             'discount'              => 'Discount',
