@@ -119,7 +119,7 @@ class PaymentController extends Controller
             'date' => 'required',
             'salesperson_id' => 'required',
             'semester_id' => 'required',
-            'pay_previous' => 'required|boolean',
+            'pay_previous' => 'required|in:0,1',
             'payment_method' => 'required',
             'bayar' => 'required|numeric|min:1',
             'diskon' => 'nullable|numeric',
