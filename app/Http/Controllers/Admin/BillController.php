@@ -441,7 +441,23 @@ class BillController extends Controller
         $salesperson = $request->salesperson;
         $semester = $request->semester ?? setting('current_semester');
 
-        $invoices = Invoice::with('invoice_items')->where('salesperson_id', $salesperson)->where('semester_id', $semester)->where('deleted_at', '=', null)->get();
+        $invoices = Invoice::with('invoice_items.product')
+            ->where('salesperson_id', $salesperson)
+            ->where('semester_id', $semester)
+            ->whereNull('deleted_at')
+            ->get()
+            ->map(function ($invoice) use ($semester) {
+                $firstItem = $invoice->invoice_items->first();
+
+                if ($firstItem && $firstItem->product && $firstItem->product->semester_id < $semester) {
+                    $invoice->type = 'jual_lama'; // override type
+                }
+
+                return $invoice;
+            });
+
+        // dd($invoices->toArray());
+
         $adjustments = BillAdjustment::where('salesperson_id', $salesperson)->where('semester_id', $semester)->get();
         $returs = ReturnGood::with('retur_items')->where('salesperson_id', $salesperson)->where('semester_retur_id', $semester)->get();
         $payments = Payment::where('salesperson_id', $salesperson)->where('semester_bayar_id', $semester)->where('paid', '!=', '0,00')->get();
@@ -505,7 +521,8 @@ class BillController extends Controller
         $salesperson_id = $request->salesperson;
         $semester = $request->semester ?? setting('current_semester');
 
-        $billing = $this->getBillSummary($salesperson_id, $semester)->map(fn($item) => [
+        $billing = $this->getBillSummary($salesperson_id, $semester)->map(fn($item, $index) => [
+            'index' => $index + 1,
             'semester_name' => $item->semester_name,
             'saldo_akhir' => (float) $item->saldo_akhir,
         ])->toArray();
@@ -514,24 +531,26 @@ class BillController extends Controller
 
         $invoiceRelations = [
             'invoice_items:id,invoice_id,product_id,quantity,price,total,discount,total_discount',
-            'invoice_items.product:id,kelas_id,jenjang_id,mapel_id,kurikulum_id,halaman_id,cover_id,name,code',
+            'invoice_items.product:id,kelas_id,jenjang_id,mapel_id,kurikulum_id,halaman_id,cover_id,semester_id,name,code',
             'invoice_items.product.kurikulum:id,code',
             'invoice_items.product.jenjang:id,name',
             'invoice_items.product.kelas:id,name',
             'invoice_items.product.mapel:id,name',
             'invoice_items.product.halaman:id,code',
             'invoice_items.product.cover:id,name',
+            'invoice_items.product.semester:id,code,name',
         ];
 
         $returRelations = [
             'retur_items:id,retur_id,product_id,quantity,price,total',
-            'retur_items.product:id,kelas_id,jenjang_id,mapel_id,kurikulum_id,halaman_id,cover_id,name,code',
+            'retur_items.product:id,kelas_id,jenjang_id,mapel_id,kurikulum_id,halaman_id,cover_id,semester_id,name,code',
             'retur_items.product.kurikulum:id,code',
             'retur_items.product.jenjang:id,name',
             'retur_items.product.kelas:id,name',
             'retur_items.product.mapel:id,name',
             'retur_items.product.halaman:id,code',
             'retur_items.product.cover:id,name',
+            'retur_items.product.semester:id,code,name',
         ];
 
         $invoices = Invoice::with($invoiceRelations)
@@ -551,11 +570,18 @@ class BillController extends Controller
             ->where('semester_id', $semester)->get();
 
         $payments = Payment::where('salesperson_id', $salesperson_id)
-            ->where('semester_bayar_id', $semester)->get();
+            ->where('semester_bayar_id', $semester)
+            ->get()
+            ->map(function ($item, $index) {
+                $array = $item->toArray();
+                $array = ['index' => $index + 1] + $array;
+                return $array;
+            });
 
         $semesterName = Semester::findOrNew($semester)->name;
         $salesperson = Salesperson::findOrNew($salesperson_id);
 
+        $oldIndex = 1;
         $additionalIndex = 1;
 
         $data = [
@@ -569,8 +595,10 @@ class BillController extends Controller
                 unset($invoiceCopy['items']);
                 return $invoiceCopy;
             })->toArray(),
-            ...$flatInvoices->mapWithKeys(function ($invoice, $index) use (&$additionalIndex) {
-                if (!empty($invoice['items'])) {
+            ...$flatInvoices->mapWithKeys(function ($invoice, $index) use ($semester, &$oldIndex, &$additionalIndex) {
+                if (!empty($invoice['items']) && $invoice['items'][0]['semester_id'] < $semester) {
+                    return ['old_invoices' . ($oldIndex++) => $invoice];
+                } else if (!empty($invoice['items'])) {
                     return ['invoices' . ($index + 1) => $invoice];
                 } else {
                     return ['additional_invoices' . ($additionalIndex++) => $invoice];
@@ -667,7 +695,7 @@ class BillController extends Controller
             'discount' => (float) $invoice->discount,
             'nominal' => (float) $invoice->nominal,
             'note' => $invoice->note,
-            'items' => $invoice->invoice_items->map(fn($item) => $this->mapProductItem($item))->toArray(),
+            'items' => $invoice->invoice_items->map(fn($item, $index) => $this->mapProductItem($item, $index))->toArray(),
         ];
     }
 
@@ -677,15 +705,16 @@ class BillController extends Controller
             'number' => $retur->no_retur,
             'date' => $retur->date,
             'nominal' => (float) $retur->nominal,
-            'items' => $retur->retur_items->map(fn($item) => $this->mapProductItem($item))->toArray(),
+            'items' => $retur->retur_items->map(fn($item, $index) => $this->mapProductItem($item, $index))->toArray(),
         ];
     }
 
-    private function mapProductItem($item): array
+    private function mapProductItem($item, int $index): array
     {
         $product = $item->product;
 
         return [
+            'index' => $index + 1,
             'quantity' => (int) $item->quantity,
             'price' => (float) $item->price,
             'total' => (float) $item->total,
@@ -698,6 +727,8 @@ class BillController extends Controller
             'halaman' => optional($product->halaman)->code,
             'cover' => optional($product->cover)->name,
             'code' => $product->code,
+            'semester_id' => $product->semester_id,
+            'semester_name' => optional($product->semester)->name,
         ];
     }
 
@@ -706,7 +737,7 @@ class BillController extends Controller
         $salesperson = $request->salesperson;
         $semester = $request->semester ?? setting('current_semester');
 
-        $list_semester = array(9, 10, 11);
+        $list_semester = Semester::where('id', '>=', $semester)->where('status', true)->pluck('id');
 
         foreach ($list_semester as $item) {
 
