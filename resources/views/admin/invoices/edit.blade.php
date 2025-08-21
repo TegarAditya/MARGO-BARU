@@ -67,7 +67,10 @@
                             <div class="col-4 align-self-center">
                                 <h6 class="text-sm product-name mb-1">({{ $product->book_type }}) {{ $product->short_name }}</h6>
                                 <p class="mb-0 text-sm">
-                                    Code : <strong>{{ $product->code }}</strong>
+                                    Code : <strong>{{ $product->code }}</strong> 
+                                    @if($product->semester_id < $invoice->semester_id)
+                                        <span class="badge badge-info">Buku Lama</span>
+                                    @endif
                                 </p>
                                 <p class="mb-0 text-sm">
                                     Jenjang - Kurikulum :
