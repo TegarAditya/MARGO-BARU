@@ -103,7 +103,7 @@
 
 {{-- @if($invoices->count() > 0) --}}
 <hr class="my-3 text-right mx-0" />
-<h5 class="mb-3">Faktur Penjualan</h5>
+<h5 class="mb-3">Faktur Penjualan Buku Baru</h5>
 <table cellspacing="0" cellpadding="0" class="table table-sm table-bordered mt-2" style="width: 100%">
     <thead>
         <th width="1%" class="text-center">No.</th>
@@ -116,7 +116,7 @@
     </thead>
 
     <tbody>
-        @forelse ($invoices->sortBy('type') as $invoice)
+        @forelse ($invoices->where('type', '!=', 'jual_lama')->sortBy('type') as $invoice)
             <tr>
                 <td class="text-center">{{ $loop->iteration }}.</td>
                 <td>
@@ -166,6 +166,56 @@
     </tfoot>
 </table>
 {{-- @endif --}}
+
+@if($invoices->where('type', 'jual_lama')->count() > 0)
+<hr class="my-3 text-right mx-0" />
+<h5 class="mb-3">Faktur Penjualan Buku Lama</h5>
+<table cellspacing="0" cellpadding="0" class="table table-sm table-bordered mt-2" style="width: 100%">
+    <thead>
+        <th width="1%" class="text-center">No.</th>
+        <th class="text-center">No. Faktur</th>
+        <th class="text-center">No. Surat Jalan</th>
+        <th class="text-center">Tanggal</th>
+        <th width="20%" class="text-center">Subtotal</th>
+        <th width="15%" class="text-center">Discount</th>
+        <th width="20%" class="text-center">Grand Total</th>
+    </thead>
+
+    <tbody>
+        @foreach ($invoices->where('type', 'jual_lama') as $invoice)
+            <tr>
+                <td class="text-center">{{ $loop->iteration }}.</td>
+                <td>
+                    <div class="row text-center">
+                        <div class="col">
+                            <span>{{ $invoice->no_faktur }}</span>
+                        </div>
+                        <div class="col-auto">
+                            <a href="{{ route('admin.invoices.print-faktur', $invoice->id) }}" 
+                               class="fa fa-print ml-1 text-info" 
+                               title="Print Invoice" 
+                               target="_blank"></a>
+                        </div>
+                    </div>
+                </td>
+                <td class="text-center">{{ $invoice->delivery_order->no_suratjalan }}</td>
+                <td class="text-center">{{ $invoice->date }}</td>
+                <td class="text-right">{{ money($invoice->total) }}</td>
+                <td class="text-right">{{ money($invoice->discount) }}</td>
+                <td class="text-right">{{ money($invoice->nominal) }}</td>
+            </tr>
+        @endforeach
+    </tbody>
+    <tfoot>
+        <tr>
+            <td class="text-center" colspan="4"><strong>Total</strong></td>
+            <td class="text-right"><strong>{{ money($invoices->where('type', 'jual_lama')->sum('total')) }}</strong></td>
+            <td class="text-right"><strong>{{ money($invoices->where('type', 'jual_lama')->sum('discount')) }}</strong></td>
+            <td class="text-right"><strong>{{ money($invoices->where('type', 'jual_lama')->sum('nominal')) }}</strong></td>
+        </tr>
+    </tfoot>
+</table>
+@endif
 
 @if($adjustments->count() > 0)
     <hr class="my-3 text-right mx-0" />

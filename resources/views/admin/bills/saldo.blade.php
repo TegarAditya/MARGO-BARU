@@ -100,8 +100,9 @@
     <hr class="my-3 text-right mx-0" />
 @endif
 
-<h5 class="mb-3">Faktur Penjualan</h5>
-@foreach ($invoices->sortBy('type') as $invoice)
+@if($invoices->where('type','!=','jual_lama')->count() > 0)
+<h5 class="mb-3">Faktur Penjualan Buku Baru</h5>
+@foreach ($invoices->where('type', '!=', 'jual_lama')->sortBy('type') as $invoice)
     @if($invoice->type == 'jual')
         <div class="row">
             <div class="col-6">
@@ -213,6 +214,80 @@
     @endif
     <br>
 @endforeach
+@endif
+
+@if($invoices->where('type', 'jual_lama')->count() > 0)
+<h5 class="mb-3">Faktur Penjualan Buku Lama</h5>
+@foreach ($invoices->where('type', 'jual_lama')->sortBy('type') as $invoice)
+        <div class="row">
+            <div class="col-6">
+                <p class="mb-0 text-sm">
+                    No. Faktur Penjualan
+                    <br />
+                    <strong>{{ $invoice->no_faktur }}</strong>
+                </p>
+            </div>
+            <div class="col-6">
+                <p class="mb-0 text-sm">
+                    Tanggal
+                    <br />
+                    <strong>{{ Carbon\Carbon::parse($invoice->date)->format('d-m-Y') }}</strong>
+                </p>
+            </div>
+        </div>
+        <table cellspacing="0" cellpadding="0" class="table table-sm table-bordered" style="width: 100%">
+            <thead>
+                <th width="1%" class="text-center">No.</th>
+                <th class="text-center">Jenjang</th>
+                <th class="text-center">Tema/Mapel</th>
+                {{-- <th width="1%" class="text-center">Hal</th> --}}
+                <th width="10%" class="text-center">Harga</th>
+                <th width="1%" class="text-center">Quantity</th>
+                <th width="17%" class="text-center">Total</th>
+                <th width="13%" class="text-center">Diskon</th>
+            </thead>
+
+            <tbody>
+                @foreach ($invoice->invoice_items->sortBy('product.type')->sortBy('product.kelas_id')->sortBy('product.mapel_id') as $item)
+                    @php
+                    $product = $item->product;
+                    @endphp
+                    <tr>
+                        <td class="text-center">{{ $loop->iteration }}.</td>
+                        <td class="text-center">{{ $product->jenjang->name }} - {{ $product->kurikulum->code }}</td>
+                        <td class="text-center">{{ $product->short_name }}</td>
+                        {{-- <td class="text-center">{{ $product->halaman->code ?? null }}</td> --}}
+                        <td class="text-right">{{ money($item->price )}}</td>
+                        <td class="text-center">{{ angka($item->quantity) }}</td>
+                        <td class="text-right">{{ money($item->total) }}</td>
+                        <td class="text-right">{{ money($item->total_discount) }}</td>
+                    </tr>
+                @endforeach
+            </tbody>
+
+            <tfoot>
+                <tr>
+                    <td colspan="3" class="text-right px-3"><strong>Total Eksemplar</strong></td>
+                    <td colspan="4" class="text-right px-3"><b>{{ angka($invoice->invoice_items->sum('quantity')) }}</b></td>
+                </tr>
+                <tr>
+                    <td colspan="3" class="text-right px-3"><strong>Subtotal</strong></td>
+                    <td colspan="4" class="text-right px-3"><b>{{ money($invoice->total) }}</b></td>
+                </tr>
+                <tr>
+                    <td colspan="3" class="text-right px-3"><strong>Discount</strong></td>
+                    <td colspan="4" class="text-right px-3"><b>{{ money($invoice->discount) }}</b></td>
+                </tr>
+                <tr>
+                    <td colspan="3" class="text-right px-3"><strong>Grand Total</strong></td>
+                    <td colspan="4" class="text-right px-3"><b>{{ money($invoice->nominal) }}</b></td>
+                </tr>
+            </tfoot>
+        </table>
+    <br>
+@endforeach
+@endif
+
 @if($adjustments->count() > 0)
 <hr class="my-3 text-right mx-0" />
 <h5 class="mb-3">Adjustment</h5>
