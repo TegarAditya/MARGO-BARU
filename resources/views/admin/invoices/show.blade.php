@@ -84,7 +84,12 @@
                                     <tr>
                                         <td class="text-right px-3">{{ $loop->iteration }}.</td>
                                         {{-- <td class="text-center">{{ $product->jenjang->name ?? '' }} - {{ $product->kurikulum->code ?? '' }}</td> --}}
-                                        <td>{{ $product->name }}</td>
+                                        <td>
+                                            {{ $product->name }}
+                                            @if($product->semester_id < $invoice->semester_id)
+                                                <span class="badge badge-info">Buku Lama</span>
+                                            @endif
+                                        </td>
                                         <td class="text-right px-2">{{ money($item->price )}}</td>
                                         <td class="text-center px-2">{{ $item->quantity }}</td>
                                         <td class="text-right px-2">{{ money($item->total) }}</td>
