@@ -284,7 +284,7 @@ $(document).ready(function() {
                     response.bills.forEach(bill => {
                         var formHtml = `
                             <div class="detail-tagihan mt-3 mb-4">
-                                <p class="mb-0 font-weight-bold">Detail Tagihan ${bill.semester.name}</p>
+                                <p class="mb-0 font-weight-bold">Detail Tagihan ${bill.semester_name}</p>
                                 <div class="row">
                                     <div class="col-auto" style="min-width: 160px">
                                         <p class="mb-0">
@@ -305,7 +305,7 @@ $(document).ready(function() {
                                         <p class="mb-0">
                                             <small class="font-weight-bold">Total Pembayaran</small>
                                             <br />
-                                            <span class="tagihan-saldo">${convertToRupiah(parseInt(bill.bayar) + parseInt(bill.potongan))}</span>
+                                            <span class="tagihan-saldo">${convertToRupiah(parseInt(bill.pembayaran))}</span>
                                         </p>
                                     </div>
 
@@ -313,7 +313,7 @@ $(document).ready(function() {
                                         <p class="mb-0">
                                             <small class="font-weight-bold">Sisa Tagihan</small>
                                             <br />
-                                            <span class="tagihan-sisa">${convertToRupiah(parseInt(bill.saldo_akhir))}</span>
+                                            <span class="tagihan-sisa">${convertToRupiah(parseInt(bill.saldo_awal) + parseInt(bill.tagihan) - parseInt(bill.pembayaran))}</span>
                                         </p>
                                     </div>
                                 </div>

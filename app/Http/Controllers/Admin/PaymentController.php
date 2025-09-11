@@ -394,19 +394,16 @@ class PaymentController extends Controller
     public function getTagihan(Request $request)
     {
         $semester = setting('current_semester');
-        $bills = collect([]);
+        $bills = BillingService::getBillSummary($request->salesperson, $semester, true);
 
-        $bill = Bill::with('semester')->where('salesperson_id', $request->salesperson)->where('semester_id', $semester)->first();
-        if ($bill) {
-            $bills->push($bill);
+        $saldo_awal = 0;
+        foreach ($bills as $bill) {
+            $bill->saldo_awal = $saldo_awal;
+            $bill->saldo_akhir = $saldo_awal + $bill->tagihan - $bill->pembayaran;
+            $saldo_awal = $bill->saldo_akhir;
         }
-        do {
-            $semester = prevSemester($semester);
-            $bill = Bill::with('semester')->where('salesperson_id', $request->salesperson)->where('semester_id', $semester)->first();
-            if ($bill && $bill->piutang > 0) {
-                $bills->push($bill);
-            }
-        } while ($bill && $bill->piutang > 0);
+
+        // dd($bills);
 
         if ($bills->count() > 0) {
             return response()->json(['status' => 'success', 'bills' => $bills]);
