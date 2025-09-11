@@ -21,6 +21,7 @@ use Carbon\Carbon;
 use App\Exports\RekapBillingExport;
 use App\Exports\DirekturBillingExport;
 use App\Exports\BillingExport;
+use App\Services\BillingService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use RealRashid\SweetAlert\Facades\Alert;
@@ -82,7 +83,7 @@ class BillController extends Controller
             });
 
             $table->editColumn('saldo_awal', function ($row) {
-                $billSummary = $this->getBillSummary($row->salesperson->id, $row->semester->id, false);
+                $billSummary = BillingService::getBillSummary($row->salesperson->id, $row->semester->id, false);
                 return $billSummary ? angka($billSummary->sum('saldo_akhir')) : 0;
             });
             $table->editColumn('jual', function ($row) {
@@ -104,7 +105,7 @@ class BillController extends Controller
                 return $row->potongan ? angka($row->potongan) : 0;
             });
             $table->editColumn('saldo_akhir', function ($row) {
-                $billSummary = $this->getBillSummary($row->salesperson->id, $row->semester->id, true);
+                $billSummary = BillingService::getBillSummary($row->salesperson->id, $row->semester->id, true);
                 return $billSummary ? angka($billSummary->sum('saldo_akhir')) : 0;
             });
 
@@ -394,7 +395,7 @@ class BillController extends Controller
         $invoices = Invoice::with('invoice_items')->where('salesperson_id', $salesperson)->where('semester_id', $semester)->get();
         $adjustments = BillAdjustment::where('salesperson_id', $salesperson)->where('semester_id', $semester)->get();
         $returs = ReturnGood::with('retur_items')->where('salesperson_id', $salesperson)->where('semester_retur_id', $semester)->get();
-        $payments = Payment::where('salesperson_id', $salesperson)->where('semester_bayar_id', $semester)->get();
+        $payments = Payment::where('salesperson_id', $salesperson)->where('semester_id', $semester)->get();
 
         $bills = collect([]);
         $new_bills = collect([]);
@@ -426,7 +427,7 @@ class BillController extends Controller
             }
         }
 
-        $new_bills = $this->getBillSummary($salesperson, $semester);
+        $new_bills = BillingService::getBillSummary($salesperson, $semester);
 
         $list_semester = $bills->pluck('semester_id');
 
@@ -460,7 +461,7 @@ class BillController extends Controller
 
         $adjustments = BillAdjustment::where('salesperson_id', $salesperson)->where('semester_id', $semester)->get();
         $returs = ReturnGood::with('retur_items')->where('salesperson_id', $salesperson)->where('semester_retur_id', $semester)->get();
-        $payments = Payment::where('salesperson_id', $salesperson)->where('semester_bayar_id', $semester)->where('paid', '!=', '0,00')->get();
+        $payments = Payment::where('salesperson_id', $salesperson)->where('semester_id', $semester)->where('paid', '!=', '0,00')->get();
         $billing = Bill::where('salesperson_id', $salesperson)->where('semester_id', $semester)->first();
 
         $bills = collect([]);
@@ -479,9 +480,7 @@ class BillController extends Controller
             }
         } while ($bill && $bill->saldo_awal > 0);
 
-        $new_bills = $this->getBillSummary($salesperson, $semester);
-
-        // dd($new_bills);
+        $new_bills = BillingService::getBillSummary($salesperson, $semester);
 
         if ($bills->count() > 0) {
             foreach ($bills as $item) {
@@ -521,13 +520,13 @@ class BillController extends Controller
         $salesperson_id = $request->salesperson;
         $semester = $request->semester ?? setting('current_semester');
 
-        $billing = $this->getBillSummary($salesperson_id, $semester)->map(fn($item, $index) => [
+        $billing = BillingService::getBillSummary($salesperson_id, $semester)->map(fn($item, $index) => [
             'index' => $index + 1,
             'semester_name' => $item->semester_name,
             'saldo_akhir' => (float) $item->saldo_akhir,
         ])->toArray();
 
-        $currentBilling = $this->getBillSummary($salesperson_id, $semester, true)->sum('saldo_akhir');
+        $currentBilling = BillingService::getBillSummary($salesperson_id, $semester, true)->sum('saldo_akhir');
 
         $invoiceRelations = [
             'invoice_items:id,invoice_id,product_id,quantity,price,total,discount,total_discount',
@@ -570,7 +569,7 @@ class BillController extends Controller
             ->where('semester_id', $semester)->get();
 
         $payments = Payment::where('salesperson_id', $salesperson_id)
-            ->where('semester_bayar_id', $semester)
+            ->where('semester_id', $semester)
             ->get()
             ->map(function ($item, $index) {
                 $array = $item->toArray();
@@ -628,62 +627,6 @@ class BillController extends Controller
         $today = Carbon::now()->format('d-m-Y');
         $semester = Semester::find(setting('current_semester'))->name;
         return (new DirekturBillingExport())->download('REKAP BILLING ' . preg_replace('/[^A-Za-z0-9_\-]/', '-', $semester) . ' TANGGAL ' . $today . '.xlsx');
-    }
-
-    protected function getBillSummary(int $salesperson, int $semester, bool $includeCurrent = false)
-    {
-        return DB::table('invoices as i')
-            ->leftJoin(
-                DB::raw('(
-                SELECT 
-                    salesperson_id, 
-                    semester_retur_id, 
-                    SUM(nominal) AS total_return_goods_nominal 
-                FROM 
-                    return_goods 
-                GROUP BY 
-                    salesperson_id, semester_retur_id
-            ) AS r'),
-                function ($join) {
-                    $join->on('i.salesperson_id', '=', 'r.salesperson_id')
-                        ->on('i.semester_id', '=', 'r.semester_retur_id');
-                }
-            )
-            ->leftJoin(
-                DB::raw('(
-                SELECT 
-                    salesperson_id, 
-                    semester_bayar_id, 
-                    SUM(amount) AS total_payments 
-                FROM 
-                    payments 
-                GROUP BY 
-                    salesperson_id, semester_bayar_id
-            ) AS p'),
-                function ($join) {
-                    $join->on('i.salesperson_id', '=', 'p.salesperson_id')
-                        ->on('i.semester_id', '=', 'p.semester_bayar_id');
-                }
-            )
-            ->leftJoin('semesters as s', 'i.semester_id', '=', 's.id')
-            ->select(
-                'i.salesperson_id',
-                'i.semester_id',
-                's.name AS semester_name',
-                DB::raw('COALESCE(SUM(i.total), 0) AS jual'),
-                DB::raw('COALESCE(SUM(i.discount), 0) AS diskon'),
-                DB::raw('COALESCE(SUM(i.total), 0) - COALESCE(SUM(i.discount), 0) AS jual_diskon'),
-                DB::raw('COALESCE(r.total_return_goods_nominal, 0) AS retur'),
-                DB::raw('COALESCE(SUM(i.total), 0) - COALESCE(SUM(i.discount), 0) - COALESCE(r.total_return_goods_nominal, 0) AS tagihan'),
-                DB::raw('COALESCE(p.total_payments, 0) AS pembayaran'),
-                DB::raw('COALESCE(SUM(i.total), 0) - COALESCE(SUM(i.discount), 0) - COALESCE(r.total_return_goods_nominal, 0) - COALESCE(p.total_payments, 0) AS saldo_akhir')
-            )
-            ->where('i.salesperson_id', $salesperson)
-            ->where('i.semester_id', $includeCurrent ? '<=' : '<', $semester)
-            ->whereNull('i.deleted_at')
-            ->groupBy('i.salesperson_id', 'i.semester_id', 's.name', 'r.total_return_goods_nominal', 'p.total_payments')
-            ->havingRaw('saldo_akhir != 0')
-            ->get();
     }
 
     private function mapInvoice($invoice): array

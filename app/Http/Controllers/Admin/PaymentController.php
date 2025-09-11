@@ -13,6 +13,7 @@ use App\Models\Invoice;
 use App\Models\ReturnGood;
 use App\Models\Transaction;
 use App\Models\Bill;
+use App\Services\BillingService;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -49,13 +50,13 @@ class PaymentController extends Controller
 
             $table->editColumn('actions', function ($row) {
                 return '
-                    <a class="px-1" href="'.route('admin.payments.show', $row->id).'" title="Show">
+                    <a class="px-1" href="' . route('admin.payments.show', $row->id) . '" title="Show">
                         <i class="fas fa-eye text-success fa-lg"></i>
                     </a>
-                    <a class="px-1" href="'.route('admin.payments.kwitansi', $row->id).'" target="_blank" title="Print Kwitansi" >
+                    <a class="px-1" href="' . route('admin.payments.kwitansi', $row->id) . '" target="_blank" title="Print Kwitansi" >
                         <i class="fas fa-print text-secondary fa-lg"></i>
                     </a>
-                    <a class="px-1" href="'.route('admin.payments.edit', $row->id).'" title="Edit">
+                    <a class="px-1" href="' . route('admin.payments.edit', $row->id) . '" title="Edit">
                         <i class="fas fa-edit fa-lg"></i>
                     </a>
                 ';
@@ -74,7 +75,7 @@ class PaymentController extends Controller
             });
 
             $table->editColumn('paid', function ($row) {
-                return 'Metode Pembayaran : <b>'. Payment::PAYMENT_METHOD_SELECT[$row->payment_method]. '</b><br>Bayar : <b>'. money($row->paid) .'</b><br>Potongan: <b>'.money($row->discount).'</b>';
+                return 'Metode Pembayaran : <b>' . Payment::PAYMENT_METHOD_SELECT[$row->payment_method] . '</b><br>Bayar : <b>' . money($row->paid) . '</b><br>Potongan: <b>' . money($row->discount) . '</b>';
             });
 
             $table->editColumn('discount', function ($row) {
@@ -109,7 +110,7 @@ class PaymentController extends Controller
 
         $today = Carbon::now()->format('d-m-Y');
 
-        return view('admin.payments.create', compact('salespeople', 'semesters','no_kwitansi', 'today'));
+        return view('admin.payments.create', compact('salespeople', 'semesters', 'no_kwitansi', 'today'));
     }
 
     public function store(Request $request)
@@ -133,18 +134,85 @@ class PaymentController extends Controller
         $pay_previous = $validatedData['pay_previous'];
         $payment_method = $validatedData['payment_method'];
         $bayar = $validatedData['bayar'];
-        $diskon = $validatedData['diskon'];
+        $diskon = $validatedData['diskon'] ?? 0;
         $nominal = $validatedData['nominal'];
         $note = $validatedData['note'];
 
-        $before = Bill::with('semester')->where('salesperson_id', $salesperson)->where('semester_id', '<', $semester)->where('piutang', '>' , 0)->oldest()->get();
+        $previous = BillingService::getBillSummary($salesperson, $semester);
 
         DB::beginTransaction();
         try {
-            if ($pay_previous && $before->count() > 0) {
-                foreach($before as $bill) {
-                    if ($bayar > 0) {
-                        $paid = ($bayar < $bill->piutang) ? $bayar : $bill->piutang;
+            if ($pay_previous && $previous->count() > 0) {
+                foreach ($previous as $bill) {
+                    if ($bill->saldo_akhir < 0) {
+                        /**
+                         * 1: Create negative payment record first
+                         */
+                        $negativePayment = Payment::create([
+                            'no_kwitansi' => Payment::generateNoKwitansi($bill->semester_id),
+                            'date' => $date,
+                            'salesperson_id' => $salesperson,
+                            'semester_id' => $bill->semester_id,
+                            'semester_bayar_id' => $bill->semester_id, // Pay to the same semester
+                            'paid' => $bill->saldo_akhir, // NEGATIVE value
+                            'discount' => 0,
+                            'amount' => $bill->saldo_akhir, // NEGATIVE amount
+                            'payment_method' => $payment_method,
+                            'note' => '[AUTO] Pemindahan saldo ke ' . Semester::find($semester)->name . '.'
+                        ]);
+
+                        TransactionService::createTransaction(
+                            $date,
+                            'Mencatat saldo negatif dengan No Kwitansi ' . $negativePayment->no_kwitansi,
+                            $salesperson,
+                            $bill->semester_id,
+                            'bayar',
+                            $negativePayment->id,
+                            $negativePayment->no_kwitansi,
+                            $bill->saldo_akhir,
+                            'credit'
+                        );
+
+                        /**
+                         * 2: Create positive payment to offset negative saldo
+                         */
+                        $positivePaid = abs($bill->saldo_akhir);
+
+                        $positivePayment = Payment::create([
+                            'no_kwitansi' => Payment::generateNoKwitansi($bill->semester_id),
+                            'date' => $date,
+                            'salesperson_id' => $salesperson,
+                            'semester_id' => $semester,
+                            'semester_bayar_id' => $semester,
+                            'paid' => $positivePaid,
+                            'discount' => 0,
+                            'amount' => $positivePaid,
+                            'payment_method' => $payment_method,
+                            'note' => '[AUTO] Pemindahan saldo dari ' . $bill->semester_name . '.'
+                        ]);
+
+                        TransactionService::createTransaction(
+                            $date,
+                            'Mengoreksi saldo negatif dengan No Kwitansi ' . $positivePayment->no_kwitansi,
+                            $salesperson,
+                            $bill->semester_id,
+                            'bayar',
+                            $positivePayment->id,
+                            $positivePayment->no_kwitansi,
+                            $positivePaid,
+                            'credit'
+                        );
+
+                        // Tidak kurangi $bayar — ini hanya koreksi saldo
+                        continue;
+                    }
+
+                    /**
+                     * 3: Normal payment flow for positive saldo
+                     */
+                    if ($bayar > 0 && $bill->saldo_akhir > 0) {
+                        $paid = min($bayar, $bill->saldo_akhir);
+
                         $payment = Payment::create([
                             'no_kwitansi' => Payment::generateNoKwitansi($bill->semester_id),
                             'date' => $date,
@@ -158,13 +226,24 @@ class PaymentController extends Controller
                             'note' => $note
                         ]);
 
-                        TransactionService::createTransaction($date, 'Pembayaran dengan No Kwitansi ' .$payment->no_kwitansi.' dan Catatan :'. $note, $salesperson, $bill->semester_id, 'bayar', $payment->id, $payment->no_kwitansi, $paid, 'credit');
-                        TransactionService::createTransaction($date, 'Diskon Dari Pembayaran dengan No Kwitansi ' .$payment->no_kwitansi.' dan Catatan :'. $note, $salesperson, $bill->semester_id, 'potongan', $payment->id, $payment->no_kwitansi, 0, 'credit');
+                        TransactionService::createTransaction(
+                            $date,
+                            'Pembayaran dengan No Kwitansi ' . $payment->no_kwitansi,
+                            $salesperson,
+                            $bill->semester_id,
+                            'bayar',
+                            $payment->id,
+                            $payment->no_kwitansi,
+                            $paid,
+                            'credit'
+                        );
 
                         $bayar -= $paid;
                     }
                 }
             }
+
+            // STEP 4: Apply remaining bayar/diskon to current semester
             if ($bayar > 0 || $diskon > 0) {
                 $payment = Payment::create([
                     'no_kwitansi' => Payment::generateNoKwitansi($semester),
@@ -179,13 +258,36 @@ class PaymentController extends Controller
                     'note' => $note
                 ]);
 
-                TransactionService::createTransaction($date, 'Pembayaran dengan No Kwitansi ' .$payment->no_kwitansi.' dan Catatan :'. $note, $salesperson, $semester, 'bayar', $payment->id, $payment->no_kwitansi, $bayar, 'credit');
-                TransactionService::createTransaction($date, 'Diskon Dari Pembayaran dengan No Kwitansi ' .$payment->no_kwitansi.' dan Catatan :'. $note, $salesperson, $semester, 'potongan', $payment->id, $payment->no_kwitansi, $diskon, 'credit');
+                TransactionService::createTransaction(
+                    $date,
+                    'Pembayaran dengan No Kwitansi ' . $payment->no_kwitansi,
+                    $salesperson,
+                    $semester,
+                    'bayar',
+                    $payment->id,
+                    $payment->no_kwitansi,
+                    $bayar,
+                    'credit'
+                );
+
+                if ($diskon > 0) {
+                    TransactionService::createTransaction(
+                        $date,
+                        'Diskon dari pembayaran dengan No Kwitansi ' . $payment->no_kwitansi,
+                        $salesperson,
+                        $semester,
+                        'potongan',
+                        $payment->id,
+                        $payment->no_kwitansi,
+                        $diskon,
+                        'credit'
+                    );
+                }
             }
+
             DB::commit();
 
-            Alert::success('Success', 'Pembayaran berhasil di simpan');
-
+            Alert::success('Success', 'Pembayaran berhasil disimpan');
             return redirect()->route('admin.payments.index');
         } catch (\Exception $e) {
             DB::rollback();
@@ -248,8 +350,8 @@ class PaymentController extends Controller
                 'note' => $note
             ]);
 
-            TransactionService::editTransaction($date, 'Pembayaran dengan No Kwitansi ' .$no_kwitansi.' dan Catatan :'. $note, $salesperson, $semester, 'bayar', $payment->id, $no_kwitansi, $bayar, 'credit');
-            TransactionService::editTransaction($date, 'Diskon dari Pembayaran dengan No Kwitansi ' .$no_kwitansi.' dan Catatan :'. $note, $salesperson, $semester, 'potongan', $payment->id, $no_kwitansi, $diskon, 'credit');
+            TransactionService::editTransaction($date, 'Pembayaran dengan No Kwitansi ' . $no_kwitansi . ' dan Catatan :' . $note, $salesperson, $semester, 'bayar', $payment->id, $no_kwitansi, $bayar, 'credit');
+            TransactionService::editTransaction($date, 'Diskon dari Pembayaran dengan No Kwitansi ' . $no_kwitansi . ' dan Catatan :' . $note, $salesperson, $semester, 'potongan', $payment->id, $no_kwitansi, $diskon, 'credit');
 
             DB::commit();
 
@@ -298,19 +400,16 @@ class PaymentController extends Controller
     public function getTagihan(Request $request)
     {
         $semester = setting('current_semester');
-        $bills = collect([]);
+        $bills = BillingService::getBillSummary($request->salesperson, $semester, true);
 
-        $bill = Bill::with('semester')->where('salesperson_id', $request->salesperson)->where('semester_id', $semester)->first();
-        if ($bill) {
-            $bills->push($bill);
+        $saldo_awal = 0;
+        foreach ($bills as $bill) {
+            $bill->saldo_awal = $saldo_awal;
+            $bill->saldo_akhir = $saldo_awal + $bill->tagihan - $bill->pembayaran;
+            $saldo_awal = $bill->saldo_akhir;
         }
-        do {
-            $semester = prevSemester($semester);
-            $bill = Bill::with('semester')->where('salesperson_id', $request->salesperson)->where('semester_id', $semester)->first();
-            if ($bill && $bill->piutang > 0) {
-                $bills->push($bill);
-            }
-        } while($bill && $bill->piutang > 0);
+
+        // dd($bills);
 
         if ($bills->count() > 0) {
             return response()->json(['status' => 'success', 'bills' => $bills]);
