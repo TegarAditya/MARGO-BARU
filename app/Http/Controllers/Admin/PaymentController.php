@@ -145,7 +145,9 @@ class PaymentController extends Controller
             if ($pay_previous && $previous->count() > 0) {
                 foreach ($previous as $bill) {
                     if ($bill->saldo_akhir < 0) {
-                        // 1: Create negative payment record first
+                        /**
+                         * 1: Create negative payment record first
+                         */
                         $negativePayment = Payment::create([
                             'no_kwitansi' => Payment::generateNoKwitansi($bill->semester_id),
                             'date' => $date,
@@ -171,7 +173,9 @@ class PaymentController extends Controller
                             'credit'
                         );
 
-                        // 2: Create positive payment to offset negative saldo
+                        /**
+                         * 2: Create positive payment to offset negative saldo
+                         */
                         $positivePaid = abs($bill->saldo_akhir);
 
                         $positivePayment = Payment::create([
@@ -203,7 +207,9 @@ class PaymentController extends Controller
                         continue;
                     }
 
-                    // 3: Normal payment flow for positive saldo
+                    /**
+                     * 3: Normal payment flow for positive saldo
+                     */
                     if ($bayar > 0 && $bill->saldo_akhir > 0) {
                         $paid = min($bayar, $bill->saldo_akhir);
 
