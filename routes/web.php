@@ -170,6 +170,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
 
     // Stock Adjustment
     Route::delete('stock-adjustments/destroy', 'StockAdjustmentController@massDestroy')->name('stock-adjustments.massDestroy');
+    Route::post('stock-adjustments/import', 'StockAdjustmentController@import')->name('stock-adjustments.import');
     Route::resource('stock-adjustments', 'StockAdjustmentController');
 
     // Materials
