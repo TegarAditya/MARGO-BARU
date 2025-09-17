@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\MassDestroyStockAdjustmentRequest;
 use App\Http\Requests\StoreStockAdjustmentRequest;
 use App\Http\Requests\UpdateStockAdjustmentRequest;
+use App\Imports\StockAdjustmentImport;
 use App\Models\StockAdjustment;
 use App\Models\StockAdjustmentDetail;
 use Illuminate\Support\Facades\Gate;
@@ -16,12 +17,15 @@ use Illuminate\Support\Facades\DB;
 use RealRashid\SweetAlert\Facades\Alert;
 use App\Services\StockService;
 use Carbon\Carbon;
+use Maatwebsite\Excel\Facades\Excel;
 
 class StockAdjustmentController extends Controller
 {
     public function index(Request $request)
     {
         abort_if(Gate::denies('stock_adjustment_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+
+        $today = Carbon::now()->format('d-m-Y');
 
         if ($request->ajax()) {
             $query = StockAdjustment::query()->select(sprintf('%s.*', (new StockAdjustment)->table))->latest();
@@ -32,10 +36,10 @@ class StockAdjustmentController extends Controller
 
             $table->editColumn('actions', function ($row) {
                 return '
-                    <a class="px-1" href="'.route('admin.stock-adjustments.show', $row->id).'" title="Show">
+                    <a class="px-1" href="' . route('admin.stock-adjustments.show', $row->id) . '" title="Show">
                         <i class="fas fa-eye text-success fa-lg"></i>
                     </a>
-                    <a class="px-1" href="'.route('admin.stock-adjustments.edit', $row->id).'" title="Edit">
+                    <a class="px-1" href="' . route('admin.stock-adjustments.edit', $row->id) . '" title="Edit">
                         <i class="fas fa-edit fa-lg"></i>
                     </a>
                 ';
@@ -56,7 +60,7 @@ class StockAdjustmentController extends Controller
             return $table->make(true);
         }
 
-        return view('admin.stockAdjustments.index');
+        return view('admin.stockAdjustments.index', compact('today'));
     }
 
     public function create(Request $request)
@@ -76,7 +80,7 @@ class StockAdjustmentController extends Controller
     {
         // Validate the form data
         $validatedData = $request->validate([
-            'date' =>'required',
+            'date' => 'required',
             'operation' => 'required',
             'type' => 'required',
             'reason' => 'required',
@@ -120,7 +124,7 @@ class StockAdjustmentController extends Controller
 
                     StockService::createMovement('adjustment', 'adjustment', $adjustment->id, $date, $product, $multiplier * $quantity);
                     StockService::updateStock($product, $multiplier * $quantity);
-                } else if($type == 'material') {
+                } else if ($type == 'material') {
                     $adjustment_item = StockAdjustmentDetail::create([
                         'material_id' => $product,
                         'stock_adjustment_id' => $adjustment->id,
@@ -159,7 +163,7 @@ class StockAdjustmentController extends Controller
     {
         // Validate the form data
         $validatedData = $request->validate([
-            'date' =>'required',
+            'date' => 'required',
             'type' => 'required',
             'reason' => 'required',
             'note' => 'nullable',
@@ -206,7 +210,7 @@ class StockAdjustmentController extends Controller
                 if ($type == 'book') {
                     StockService::editMovement('adjustment', 'adjustment', $stockAdjustment->id, $date, $product, $multiplier * $quantity);
                     StockService::updateStock($product, ($multiplier * $quantity) - ($multiplier * $old_quantity));
-                } else if($type == 'material') {
+                } else if ($type == 'material') {
                     StockService::editMovementMaterial('adjustment', 'adjustment', $stockAdjustment->id, $date, $product, $multiplier * $quantity);
                     StockService::updateStockMaterial($product, ($multiplier * $quantity) - ($multiplier * $old_quantity));
                 }
@@ -251,5 +255,54 @@ class StockAdjustmentController extends Controller
         }
 
         return response(null, Response::HTTP_NO_CONTENT);
+    }
+
+    public function import(Request $request)
+    {
+        abort_if(Gate::denies('stock_adjustment_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+
+        $validatedData = $request->validate([
+            'date' => 'required',
+            'operation' => 'required',
+            'type' => 'required',
+            'reason' => 'required',
+            'note' => 'nullable',
+            'import_file' => 'required|file|mimes:xlsx,xls,csv',
+        ]);
+
+
+        $date = $validatedData['date'];
+        $operation = $validatedData['operation'];
+        $type = $validatedData['type'];
+        $reason = $validatedData['reason'];
+        $note = $validatedData['note'];
+
+        DB::beginTransaction();
+
+        try {
+            $adjustment = StockAdjustment::create([
+                'date' => $date,
+                'type' => $type,
+                'operation' => $operation,
+                'reason' => $reason,
+                'note' => $note,
+            ]);
+
+            if ($request->hasFile('import_file')) {
+                $file = $request->file('import_file');
+
+                Excel::import(new StockAdjustmentImport($adjustment->id), $file);
+            }
+
+            DB::commit();
+
+            Alert::success('Success', 'Stock Adjustment berhasil di import');
+
+            return redirect()->route('admin.stock-adjustments.index');
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            Alert::error('Error', $e->getMessage());
+        }
     }
 }
