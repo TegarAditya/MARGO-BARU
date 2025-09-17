@@ -161,17 +161,8 @@ class PaymentController extends Controller
                             'note' => '[AUTO] Pemindahan saldo ke ' . Semester::find($semester)->name . '.'
                         ]);
 
-                        TransactionService::createTransaction(
-                            $date,
-                            'Mencatat saldo negatif dengan No Kwitansi ' . $negativePayment->no_kwitansi,
-                            $salesperson,
-                            $bill->semester_id,
-                            'bayar',
-                            $negativePayment->id,
-                            $negativePayment->no_kwitansi,
-                            $bill->saldo_akhir,
-                            'credit'
-                        );
+                        TransactionService::createTransaction($date, 'Pembayaran dengan No Kwitansi ' . $negativePayment->no_kwitansi . ' dan Catatan :' . $note, $salesperson, $bill->semester_id, 'bayar', $negativePayment->id, $negativePayment->no_kwitansi, $bill->saldo_akhir, 'credit');
+                        TransactionService::createTransaction($date, 'Diskon Dari Pembayaran dengan No Kwitansi ' . $negativePayment->no_kwitansi . ' dan Catatan :' . $note, $salesperson, $bill->semester_id, 'potongan', $negativePayment->id, $negativePayment->no_kwitansi, 0, 'credit');
 
                         /**
                          * 2: Create positive payment to offset negative saldo
@@ -191,17 +182,8 @@ class PaymentController extends Controller
                             'note' => '[AUTO] Pemindahan saldo dari ' . $bill->semester_name . '.'
                         ]);
 
-                        TransactionService::createTransaction(
-                            $date,
-                            'Mengoreksi saldo negatif dengan No Kwitansi ' . $positivePayment->no_kwitansi,
-                            $salesperson,
-                            $bill->semester_id,
-                            'bayar',
-                            $positivePayment->id,
-                            $positivePayment->no_kwitansi,
-                            $positivePaid,
-                            'credit'
-                        );
+                        TransactionService::createTransaction($date, 'Pembayaran dengan No Kwitansi ' . $positivePayment->no_kwitansi . ' dan Catatan :' . $note, $salesperson, $bill->semester_id, 'bayar', $positivePayment->id, $positivePayment->no_kwitansi, $positivePaid, 'credit');
+                        TransactionService::createTransaction($date, 'Diskon Dari Pembayaran dengan No Kwitansi ' . $positivePayment->no_kwitansi . ' dan Catatan :' . $note, $salesperson, $bill->semester_id, 'potongan', $positivePayment->id, $positivePayment->no_kwitansi, 0, 'credit');
 
                         // Tidak kurangi $bayar — ini hanya koreksi saldo
                         continue;
@@ -226,17 +208,8 @@ class PaymentController extends Controller
                             'note' => $note
                         ]);
 
-                        TransactionService::createTransaction(
-                            $date,
-                            'Pembayaran dengan No Kwitansi ' . $payment->no_kwitansi,
-                            $salesperson,
-                            $bill->semester_id,
-                            'bayar',
-                            $payment->id,
-                            $payment->no_kwitansi,
-                            $paid,
-                            'credit'
-                        );
+                        TransactionService::createTransaction($date, 'Pembayaran dengan No Kwitansi ' . $payment->no_kwitansi . ' dan Catatan :' . $note, $salesperson, $semester, 'bayar', $payment->id, $payment->no_kwitansi, $bayar, 'credit');
+                        TransactionService::createTransaction($date, 'Diskon Dari Pembayaran dengan No Kwitansi ' . $payment->no_kwitansi . ' dan Catatan :' . $note, $salesperson, $semester, 'potongan', $payment->id, $payment->no_kwitansi, $diskon, 'credit');
 
                         $bayar -= $paid;
                     }
