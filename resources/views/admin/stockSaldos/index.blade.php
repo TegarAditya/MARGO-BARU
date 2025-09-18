@@ -13,7 +13,7 @@
         <form action="{{ route("admin.stock-saldos.jangka") }}" enctype="multipart/form-data" method="POST">
             @csrf
             <div class="row">
-                <div class="col-12">
+                <div class="col-8">
                     <div class="form-group">
                         <label class="required" for="date">Tanggal</label>
                         <x-admin.form-group
@@ -32,6 +32,20 @@
                                 </button>
                             </x-slot>
                         </x-admin.form-group>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="form-group">
+                        <label for="semester_id">{{ trans('cruds.book.fields.semester') }}</label>
+                        <select class="form-control select2 {{ $errors->has('semester') ? 'is-invalid' : '' }}" name="semester_id" id="semester_id">
+                            @foreach($semesters as $id => $entry)
+                                <option value="{{ $id }}" {{ old('semester_id') == $id ? 'selected' : '' }}>{{ $entry }}</option>
+                            @endforeach
+                        </select>
+                        @if($errors->has('semester'))
+                            <span class="text-danger">{{ $errors->first('semester') }}</span>
+                        @endif
+                        <span class="help-block">{{ trans('cruds.book.fields.semester_helper') }}</span>
                     </div>
                 </div>
                 <div class="col-4">

@@ -104,7 +104,9 @@ class StockSaldoController extends Controller
 
         $periode = StockSaldo::groupBy('code', 'periode')->pluck('periode', 'code');
 
-        return view('admin.stockSaldos.index', compact('covers', 'jenjangs', 'kelas', 'mapels', 'isis', 'periode'));
+        $semesters = Semester::where('status', 1)->pluck('name', 'id')->prepend('All', '');
+
+        return view('admin.stockSaldos.index', compact('covers', 'jenjangs', 'kelas', 'mapels', 'isis', 'periode', 'semesters'));
     }
 
     public function create()
@@ -257,6 +259,9 @@ class StockSaldoController extends Controller
         if (!empty($request->mapel_id)) {
             $awal->where('mapel_id', $request->mapel_id);
         }
+        if (!empty($request->semester_id)) {
+            $awal->where('semester_id', $request->semester_id);
+        }
 
         $saldo_awal = $awal->get();
 
@@ -289,6 +294,10 @@ class StockSaldoController extends Controller
         if (!empty($request->mapel_id)) {
             $akhir->where('mapel_id', $request->mapel_id);
         }
+        if (!empty($request->semester_id)) {
+            $akhir->where('semester_id', $request->semester_id);
+        }
+        
         $saldo_akhir = $akhir->orderBy('semester_id', 'DESC')->orderBy('jenjang_id', 'ASC')->orderBy('mapel_id', 'ASC')->orderBy('kelas_id', 'ASC')->orderBy('cover_id', 'ASC')->get();
         
         if ($request->has('export')) {
