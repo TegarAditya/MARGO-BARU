@@ -104,6 +104,8 @@ class DeliveryOrderController extends Controller
 
         $semesters = Semester::latest()->where('status', 1)->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
+        $semester_books = Semester::latest()->where('status', 1)->pluck('name', 'id')->prepend('All', '');
+
         $salespeople = Salesperson::whereHas('estimasi')->get()->pluck('full_name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
         $jenjangs = Jenjang::pluck('name', 'id')->prepend('All', '');
@@ -112,7 +114,7 @@ class DeliveryOrderController extends Controller
 
         $today = Carbon::now()->format('d-m-Y');
 
-        return view('admin.deliveryOrders.create', compact('salespeople', 'semesters', 'jenjangs', 'no_suratjalan', 'today'));
+        return view('admin.deliveryOrders.create', compact('salespeople', 'semesters', 'jenjangs', 'no_suratjalan', 'today', 'semester_books'));
     }
 
     public function store(Request $request)
@@ -524,6 +526,7 @@ class DeliveryOrderController extends Controller
         $semester = $request->input('semester') ?? setting('current_semester');
         $salesperson = $request->input('salesperson');
         $jenjang = $request->input('jenjang');
+        $semester_book = $request->input('semester_book');
 
         if (empty($salesperson)) {
             return response()->json([]);
@@ -539,6 +542,10 @@ class DeliveryOrderController extends Controller
 
         if (!empty($jenjang)) {
             $query->where('jenjang_id', $jenjang);
+        }
+
+        if (!empty($semester_book)) {
+            $query->where('semester_id', $semester_book);
         }
 
         $products = $query->get();
