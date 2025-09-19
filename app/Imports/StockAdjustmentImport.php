@@ -6,10 +6,8 @@ use App\Models\StockAdjustment;
 use App\Models\StockAdjustmentDetail;
 use App\Services\StockService;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
-use RealRashid\SweetAlert\Facades\Alert;
 
 class StockAdjustmentImport implements ToCollection, WithHeadingRow
 {
