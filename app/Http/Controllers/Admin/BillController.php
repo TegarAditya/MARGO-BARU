@@ -470,8 +470,6 @@ class BillController extends Controller
                 return $invoice;
             });
 
-        // dd($invoices->toArray());
-
         $adjustments = BillAdjustment::where('salesperson_id', $salesperson)->where('semester_id', $semester)->get();
         $returs = ReturnGood::with('retur_items')->where('salesperson_id', $salesperson)->where('semester_retur_id', $semester)->get();
         $payments = Payment::where('salesperson_id', $salesperson)->where('semester_id', $semester)->where('paid', '!=', '0,00')->get();
@@ -494,8 +492,6 @@ class BillController extends Controller
         } while ($bill && $bill->saldo_awal > 0);
 
         $new_bills = BillingService::getBillSummary($salesperson, $semester);
-
-        dd($new_bills->toArray());
 
         if ($bills->count() > 0) {
             foreach ($bills as $item) {
