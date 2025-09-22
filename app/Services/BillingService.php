@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\DB;
 
 class BillingService
 {
-    public static function getBillSummary(?int $salesperson = null, int $semester, bool $includeCurrent = false, $orderDesc = false)
+    public static function getBillSummary(int $semester, bool $includeCurrent = false, $orderDesc = false, ?int $salesperson = null)
     {
         $query = DB::table('invoices as i')
             ->leftJoin(

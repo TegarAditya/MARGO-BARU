@@ -440,7 +440,7 @@ class BillController extends Controller
             }
         }
 
-        $new_bills = BillingService::getBillSummary($salesperson, $semester);
+        $new_bills = BillingService::getBillSummary(salesperson: $salesperson, semester:$semester);
 
         $list_semester = $bills->pluck('semester_id');
 
@@ -491,7 +491,7 @@ class BillController extends Controller
             }
         } while ($bill && $bill->saldo_awal > 0);
 
-        $new_bills = BillingService::getBillSummary($salesperson, $semester);
+        $new_bills = BillingService::getBillSummary(salesperson: $salesperson, semester:$semester);
 
         if ($bills->count() > 0) {
             foreach ($bills as $item) {
@@ -531,13 +531,13 @@ class BillController extends Controller
         $salesperson_id = $request->salesperson;
         $semester = $request->semester ?? setting('current_semester');
 
-        $billing = BillingService::getBillSummary($salesperson_id, $semester)->map(fn($item, $index) => [
+        $billing = BillingService::getBillSummary(salesperson: $salesperson_id, semester: $semester)->map(fn($item, $index) => [
             'index' => $index + 1,
             'semester_name' => $item->semester_name,
             'saldo_akhir' => (float) $item->saldo_akhir,
         ])->toArray();
 
-        $currentBilling = BillingService::getBillSummary($salesperson_id, $semester, true)->sum('saldo_akhir');
+        $currentBilling = BillingService::getBillSummary(salesperson: $salesperson_id, semester: $semester, includeCurrent: true)->sum('saldo_akhir');
 
         $invoiceRelations = [
             'invoice_items:id,invoice_id,product_id,quantity,price,total,discount,total_discount',
