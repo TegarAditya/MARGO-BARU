@@ -138,7 +138,7 @@ class PaymentController extends Controller
         $nominal = $validatedData['nominal'];
         $note = $validatedData['note'];
 
-        $previous = BillingService::getBillSummary($salesperson, $semester);
+        $previous = BillingService::getBillSummary(salesperson: $salesperson, semester: $semester);
 
         DB::beginTransaction();
         try {
@@ -373,7 +373,7 @@ class PaymentController extends Controller
     public function getTagihan(Request $request)
     {
         $semester = setting('current_semester');
-        $bills = BillingService::getBillSummary($request->salesperson, $semester, true);
+        $bills = BillingService::getBillSummary(salesperson: $request->salesperson, semester: $semester, includeCurrent: true);
 
         $saldo_awal = 0;
         foreach ($bills as $bill) {

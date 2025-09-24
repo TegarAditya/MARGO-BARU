@@ -65,6 +65,24 @@
                         <span class="help-block">{{ trans('cruds.deliveryOrder.fields.salesperson_helper') }}</span>
                     </div>
                 </div>
+            </div>
+            <hr style="margin: .5em -15px;border-color:#ccc" />
+            <h6 class="mt-2 mb-3">Filter</h6>
+            <div class="row">
+                <div class="col-6">
+                    <div class="form-group">
+                        <label>{{ trans('cruds.salesOrder.fields.semester') }}</label>
+                        <select class="form-control select2 {{ $errors->has('semester_books') ? 'is-invalid' : '' }}" name="semester_book_id" id="semester_book_id">
+                            @foreach($semester_books as $id => $entry)
+                                <option value="{{ $id }}">{{ $entry }}</option>
+                            @endforeach
+                        </select>
+                        @if($errors->has('semester_books'))
+                            <span class="text-danger">{{ $errors->first('semester_books') }}</span>
+                        @endif
+                        <span class="help-block">{{ trans('cruds.salesOrder.fields.semester_helper') }}</span>
+                    </div>
+                </div>
                 <div class="col-6">
                     <div class="form-group">
                         <label for="jenjang_id">{{ trans('cruds.salesOrder.fields.jenjang') }}</label>
@@ -122,7 +140,8 @@
                             q: params.term,
                             semester: $('#semester_id').val(),
                             salesperson: $('#salesperson_id').val(),
-                            jenjang: $('#jenjang_id').val()
+                            jenjang: $('#jenjang_id').val(),
+                            semester_book: $('#semester_book_id').val()
                         };
                     },
                     processResults: function(data) {

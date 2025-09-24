@@ -34,6 +34,9 @@ class BillController extends Controller
 
         $semester = $request->semester ? $request->semester : setting('current_semester');
 
+        $old_bills = BillingService::getBillSummary(salesperson: null, semester: $semester, includeCurrent: false, orderDesc: true);
+        $new_bills = BillingService::getBillSummary(salesperson: null, semester: $semester, includeCurrent: true, orderDesc: true);
+
         if ($request->ajax()) {
             $query = Bill::with(['semester', 'salesperson'])->where('semester_id', $semester)->select(sprintf('%s.*', (new Bill)->table));
             $order = $request->order;
@@ -82,31 +85,41 @@ class BillController extends Controller
                 return $row->salesperson ? $row->salesperson->full_name : '';
             });
 
-            $table->editColumn('saldo_awal', function ($row) {
-                $billSummary = BillingService::getBillSummary($row->salesperson->id, $row->semester->id, false);
-                return $billSummary ? angka($billSummary->sum('saldo_akhir')) : 0;
+            $table->editColumn('saldo_awal', function ($row) use ($old_bills) {
+                $billSummary = $old_bills->where('salesperson_id', $row->salesperson->id);
+                return $billSummary->count() ? angka($billSummary->sum('saldo_akhir')) : 0;
             });
-            $table->editColumn('jual', function ($row) {
-                return $row->jual ? angka($row->jual) : 0;
+
+            $table->editColumn('jual', function ($row) use ($new_bills) {
+                $billSummary = $new_bills->where('salesperson_id', $row->salesperson->id)->first();
+                return $billSummary ? angka($billSummary->jual) : 0;
             });
-            $table->editColumn('diskon', function ($row) {
-                return $row->diskon ? angka($row->diskon) : 0;
+
+            $table->editColumn('diskon', function ($row) use ($new_bills) {
+                $billSummary = $new_bills->where('salesperson_id', $row->salesperson->id)->first();
+                return $billSummary ? angka($billSummary->diskon) : 0;
             });
-            $table->editColumn('adjustment', function ($row) {
-                return $row->adjustment ? angka($row->adjustment) : 0;
+
+            $table->editColumn('adjustment', fn($row) => $row->adjustment ? angka($row->adjustment) : 0);
+
+            $table->editColumn('retur', function ($row) use ($new_bills) {
+                $billSummary = $new_bills->where('salesperson_id', $row->salesperson->id)->first();
+                return $billSummary ? angka($billSummary->retur) : 0;
             });
-            $table->editColumn('retur', function ($row) {
-                return $row->retur ? angka($row->retur) : 0;
+
+            $table->editColumn('bayar', function ($row) use ($new_bills) {
+                $billSummary = $new_bills->where('salesperson_id', $row->salesperson->id)->first();
+                return $billSummary ? angka($billSummary->bayar) : 0;
             });
-            $table->editColumn('bayar', function ($row) {
-                return $row->bayar ? angka($row->bayar) : 0;
+
+            $table->editColumn('potongan', function ($row) use ($new_bills) {
+                $billSummary = $new_bills->where('salesperson_id', $row->salesperson->id)->first();
+                return $billSummary ? angka($billSummary->potongan) : 0;
             });
-            $table->editColumn('potongan', function ($row) {
-                return $row->potongan ? angka($row->potongan) : 0;
-            });
-            $table->editColumn('saldo_akhir', function ($row) {
-                $billSummary = BillingService::getBillSummary($row->salesperson->id, $row->semester->id, true);
-                return $billSummary ? angka($billSummary->sum('saldo_akhir')) : 0;
+
+            $table->editColumn('saldo_akhir', function ($row) use ($new_bills) {
+                $billSummary = $new_bills->where('salesperson_id', $row->salesperson->id);
+                return $billSummary->count() ? angka($billSummary->sum('saldo_akhir')) : 0;
             });
 
             $table->rawColumns(['actions', 'placeholder', 'semester', 'salesperson']);
@@ -427,7 +440,7 @@ class BillController extends Controller
             }
         }
 
-        $new_bills = BillingService::getBillSummary($salesperson, $semester);
+        $new_bills = BillingService::getBillSummary(salesperson: $salesperson, semester:$semester);
 
         $list_semester = $bills->pluck('semester_id');
 
@@ -457,8 +470,6 @@ class BillController extends Controller
                 return $invoice;
             });
 
-        // dd($invoices->toArray());
-
         $adjustments = BillAdjustment::where('salesperson_id', $salesperson)->where('semester_id', $semester)->get();
         $returs = ReturnGood::with('retur_items')->where('salesperson_id', $salesperson)->where('semester_retur_id', $semester)->get();
         $payments = Payment::where('salesperson_id', $salesperson)->where('semester_id', $semester)->where('paid', '!=', '0,00')->get();
@@ -480,7 +491,7 @@ class BillController extends Controller
             }
         } while ($bill && $bill->saldo_awal > 0);
 
-        $new_bills = BillingService::getBillSummary($salesperson, $semester);
+        $new_bills = BillingService::getBillSummary(salesperson: $salesperson, semester:$semester);
 
         if ($bills->count() > 0) {
             foreach ($bills as $item) {
@@ -520,13 +531,13 @@ class BillController extends Controller
         $salesperson_id = $request->salesperson;
         $semester = $request->semester ?? setting('current_semester');
 
-        $billing = BillingService::getBillSummary($salesperson_id, $semester)->map(fn($item, $index) => [
+        $billing = BillingService::getBillSummary(salesperson: $salesperson_id, semester: $semester)->map(fn($item, $index) => [
             'index' => $index + 1,
             'semester_name' => $item->semester_name,
             'saldo_akhir' => (float) $item->saldo_akhir,
         ])->toArray();
 
-        $currentBilling = BillingService::getBillSummary($salesperson_id, $semester, true)->sum('saldo_akhir');
+        $currentBilling = BillingService::getBillSummary(salesperson: $salesperson_id, semester: $semester, includeCurrent: true)->sum('saldo_akhir');
 
         $invoiceRelations = [
             'invoice_items:id,invoice_id,product_id,quantity,price,total,discount,total_discount',

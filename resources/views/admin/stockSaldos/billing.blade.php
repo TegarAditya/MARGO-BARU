@@ -87,7 +87,7 @@
         $('.datatable-saldo').DataTable({
             'paging': true,
             'lengthChange': false,
-            'searching': false,
+            'searching': true,
             'ordering': false,
             'info': true,
             'autoWidth': false,
