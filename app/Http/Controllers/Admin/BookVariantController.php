@@ -866,7 +866,7 @@ class BookVariantController extends Controller
         $jenjang = $request->input('jenjang');
         $kurikulum = $request->input('kurikulum');
         $cover_isi = $request->input('cover_isi');
-        $estimasi = $request->input('estimasi') ?? 1;
+        $estimasi = $request->input('estimasi') ?? 0; // WARNING: Unsafe bypass, make sure handle this properly on next patch
 
         if(empty($type)) {
             return response()->json([]);
