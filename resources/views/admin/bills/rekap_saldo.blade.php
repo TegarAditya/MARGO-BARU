@@ -154,13 +154,13 @@
                 <strong>Total</strong>
             </td>
             <td class="text-right">
-                <strong>{{ money($invoices->sum('total')) }}</strong>
+                <strong>{{ money($invoices->where('type', '!=', 'jual_lama')->sum('total')) }}</strong>
             </td>
             <td class="text-right">
-                <strong>{{ money($invoices->sum('discount')) }}</strong>
+                <strong>{{ money($invoices->where('type', '!=', 'jual_lama')->sum('discount')) }}</strong>
             </td>
             <td class="text-right">
-                <strong>{{ money($invoices->sum('nominal')) }}</strong>
+                <strong>{{ money($invoices->where('type', '!=', 'jual_lama')->sum('nominal')) }}</strong>
             </td>
         </tr>
     </tfoot>
