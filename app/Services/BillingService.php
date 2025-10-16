@@ -24,7 +24,7 @@ class BillingService
             $returns->where('salesperson_id', $salesperson);
         }
 
-        $allActivities = $invoices->union($payments)->union($returns);
+        $allTransactions = $invoices->union($payments)->union($returns);
 
         $invoiceSummary = DB::table('invoices')
             ->select(
@@ -55,7 +55,7 @@ class BillingService
             ->groupBy('salesperson_id', 'semester_id');
 
         $query = DB::query()
-            ->fromSub($allActivities, 'base')
+            ->fromSub($allTransactions, 'base')
             ->leftJoinSub($invoiceSummary, 'i', function ($join) {
                 $join->on('base.salesperson_id', '=', 'i.salesperson_id')
                     ->on('base.semester_id', '=', 'i.semester_id');
