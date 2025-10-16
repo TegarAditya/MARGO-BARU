@@ -25,10 +25,10 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Symfony\Component\HttpFoundation\Response;
 use Yajra\DataTables\Facades\DataTables;
 use RealRashid\SweetAlert\Facades\Alert;
-use Excel;
 use App\Imports\BookImport;
 use App\Exports\BookExport;
 use App\Services\StockService;
+use Maatwebsite\Excel\Facades\Excel;
 
 class BookController extends Controller
 {
@@ -651,7 +651,7 @@ class BookController extends Controller
 
     public function template_import()
     {
-        $filepath = public_path('import-template\BOOK_TEMPLATE.xlsx');
+        $filepath = public_path('import-template/BOOK_TEMPLATE.xlsx');
         return response()->download($filepath);
     }
 
