@@ -104,6 +104,8 @@
                                             <strong>{{ $errors->first('import_file') }}</strong>
                                         </span>
                                     @endif
+
+                                    <small id="importHelp" class="form-text text-muted">Supported formats: .xls, .xlsx, .csv. <a href="{{ asset('import-template/STOCK_ADJUSTMENT_TEMPLATE.xlsx') }}"><b>Download template here</b></a>.</small>
                                 </div>
                             </div>
 
