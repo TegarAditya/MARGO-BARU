@@ -2,6 +2,8 @@
 
 namespace App\Imports;
 
+use App\Models\BookVariant;
+use App\Models\Material;
 use App\Models\StockAdjustment;
 use App\Models\StockAdjustmentDetail;
 use App\Services\StockService;
@@ -25,29 +27,41 @@ class StockAdjustmentImport implements ToCollection, WithHeadingRow
         $date = $adjustment->date;
 
         foreach ($rows as $row) {
-            $product    = $row['product_id'];
+            $code    = $row['code'];
             $quantity   = $row['quantity'];
 
             $multiplier = ($adjustment->operation == 'increase') ? 1 : -1;
 
             if ($type === 'book') {
+                $product = BookVariant::where('code', $code)->first();
+            } elseif ($type === 'material') {
+                $product = Material::where('code', $code)->first();
+            }
+
+            if (! $product) {
+                throw new \Exception("Product code not found: " . $code);
+            }
+
+            $productId = $product->id;
+
+            if ($type === 'book') {
                 StockAdjustmentDetail::create([
-                    'product_id'            => $product,
+                    'product_id'            => $productId,
                     'stock_adjustment_id'   => $adjustment->id,
                     'quantity'              => $quantity,
                 ]);
 
-                StockService::createMovement('adjustment', 'adjustment', $adjustment->id, $date, $product, $multiplier * $quantity);
-                StockService::updateStock($product, $multiplier * $quantity);
+                StockService::createMovement('adjustment', 'adjustment', $adjustment->id, $date, $productId, $multiplier * $quantity);
+                StockService::updateStock($productId, $multiplier * $quantity);
             } elseif ($type === 'material') {
                 StockAdjustmentDetail::create([
-                    'material_id'           => $product,
+                    'material_id'           => $productId,
                     'stock_adjustment_id'   => $adjustment->id,
                     'quantity'              => $quantity,
                 ]);
 
-                StockService::createMovementMaterial('adjustment', 'adjustment', $adjustment->id, $date, $product, $multiplier * $quantity);
-                StockService::updateStockMaterial($product, $multiplier * $quantity);
+                StockService::createMovementMaterial('adjustment', 'adjustment', $adjustment->id, $date, $productId, $multiplier * $quantity);
+                StockService::updateStockMaterial($productId, $multiplier * $quantity);
             }
         }
     }
